@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfurnace"
+version = "0.0.1" 
+description = "A Python package for designing RNA nanostructures."
+readme = "README.md"  
+requires-python = ">=3.8"
+license = {text = "GNU General Public License v3 (GPLv3)"}
+authors = [
+    {name = "Luca Monari", email = "l.monari@zmbh.uni-heidelberg.de"} 
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+keywords = ["RNA", "DNA", "nucleic acids", "bioinformatics", "design"]
+
+dependencies = [
+    "numpy==1.26",
+    "streamlit>=1.38.0",
+    "st-click-detector",
+    "hydralit_components",
+    "streamlit_code_editor",
+    "colour",
+    "st_forna_component",
+    "biopython",
+    "ViennaRNA",
+    "deap",
+    "pytest",
+    "st-oxview",
+    "streamlit-shortcuts",
+    "st-copy-to-clipboard",
+    "oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "mypy",
+    "pytest",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310"]
+
+[tool.flake8]
+max-line-length = 88
+ignore = ["E203", "W503"]  # Compatible with `black`
+
+[tool.mypy]
+strict = true
+disallow-untyped-defs = true
+disallow-incomplete-defs = true
+check-untyped-defs = true
+ignore-missing-imports = true

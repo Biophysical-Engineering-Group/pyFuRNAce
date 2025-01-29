@@ -1,0 +1,13 @@
+# Ignore unwanted files
+.DS_Store
+.DS_Store?
+__pycache__
+**/.DS_Store
+**.DS_Store
+**/.DS_Store?
+**/__pycache__
+.vscode
+.vscode?
+*.ipynb_checkpoints
+*.pyc
+*.pyidx

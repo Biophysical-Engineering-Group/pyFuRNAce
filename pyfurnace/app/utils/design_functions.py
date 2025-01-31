@@ -1,7 +1,9 @@
 from time import sleep
-import random
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import numpy as np
 import streamlit as st
-import hydralit_components as hc
+from streamlit_option_menu import option_menu
 from st_click_detector import click_detector
 from st_oxview import oxview_from_text
 from code_editor import code_editor
@@ -10,7 +12,7 @@ from st_copy_to_clipboard import st_copy_to_clipboard
 # from streamlit_shortcuts import button
 import matplotlib.pyplot as plt
 ### Custom libraries
-from . import main_hc_theme, second_hc_theme
+from . import main_menu_style, second_menu_style
 import pyfurnace as pf
 from utils.commands import *
 
@@ -36,8 +38,8 @@ code_editor_buttons = [
 
 funny_bootstrap_icons = ['robot', 'trash', 'umbrella', 'camera', 'cart', 'cpu', 'cup-straw', 'trophy', 'palette', 'cup-straw', 'camera-reels', 'puzzle', 'hourglass-split', 'mortarboard']
 
-def origami_general_options(origami):
-    with st.expander('General settings'):
+def origami_general_options(origami, expanded=True):
+    with st.expander('General settings', expanded=expanded):
         col1, col2, col3, col4 = st.columns(4)
 
         ### select alignment
@@ -72,32 +74,23 @@ def origami_general_options(origami):
 
             st.toggle("Single stranded 3D assembly", key='single_stranded', on_change=submit_ss_rna, help='The Origami 3d assembly is created concatenating the single strands, rather than concatenating the double strands.')
 
-        ### set global font size with CSS
-        font_size = st.slider('Font size:', min_value=4, max_value=40, value=14, key='general_font_size', help='Change the font size of the motif preview.')
-        st.markdown(
-            f"""
-            <style>
-            /* Apply global font size */
-            html, body, [class*="css"]  {{
-                font-size: {font_size}px;
-            }}
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
+        # font_size = st.slider('Font size:', min_value=4, max_value=40, value=14, key='general_font_size', help='Change the font size of the motif preview.')
+        # st.markdown(
+        #     f"""
+        #     <style>
+        #     /* Apply global font size */
+        #     html, body, [class*="css"]  {{
+        #         font-size: {font_size}px;
+        #     }}
+        #     </style>
+        #     """,
+        #     unsafe_allow_html=True,
+        # )
 
         st.slider('Origami font size', min_value=2, max_value=50, value=14, key='origami_font_size')
 
-        col1, col2 = st.columns([6, 1])
-        with col1:
-            st.slider('OxView 3D Frame height:(close and reopen the "Origami 3D view" tab to apply the changes)', min_value=100, max_value=1000, value=500, key='oxview_frame_height', 
-                      help='Change the height of the OxView visualization.')
-        with col2:
-            st.selectbox('OxView 3D ColorMap:', ['Reds', None] + plt.colormaps() , key='oxview_colormap', help='Change the color of the OxView visualization.')
-
 def simple_origami():
-    with st.form('Simple Origami Parameters'):
-        st.write('Simple Origami Parameters')
+    with st.form(key='simple_origami_form'):
         dt_text = st.text_input("Enter a list of the angles between helices, separated by commas", 
                                 "120, ", 
                                 key='dt_text_list',
@@ -114,15 +107,15 @@ The connection between helice (Dovetails) are obtained roughly with this lookup 
         main_stem_default = 11 * ((max([abs(dt) for dt in dt_list], default=0) + 17) // 11 + 1)
         col1, col2, col3 = st.columns(3)
         with col1:
-            helix_kl = st.number_input('Kissing Loop repeats', min_value=1, value=1, help='number of KL repeats in the helix')
+            helix_kl = st.number_input('Kissing Loop repeats:', min_value=1, value=1, help='number of KL repeats in the helix')
         with col2:
-            main_stem = st.number_input('Bp in the consecutive stem ', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
+            main_stem = st.number_input('Consecutive stem length (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
             main_stem = [main_stem] * helix_kl
         with col3:
             st.write('\n'); st.write('\n')
-            terminal_helix = st.toggle('Automatic start/end helix',
+            terminal_helix = st.toggle('Add terminal helices',
                                        value=True,
-                                        help='Add the first and last helix without dovetails')
+                                        help='Add the first and last helix with 0bp dovetails')
 
         submitted = st.form_submit_button("Submit")
         if submitted:
@@ -133,9 +126,8 @@ The connection between helice (Dovetails) are obtained roughly with this lookup 
                                                          align=st.session_state.origami.align, 
                                                          use_angles=True)
             st.session_state.code.append(f'origami = pf.simple_origami(dt_list={angle_list}, helix_kl={helix_kl}, main_stem={main_stem}, add_terminal_helix={terminal_helix}, align="{st.session_state.origami.align}", use_angles=True) # Create a simple origami')
-            st.session_state.toggle_simple_origami = False
 
-def motif_text_format(motif, ends='35'):
+def motif_text_format(motif):
     if isinstance(motif, pf.Motif): ### Add the 5' and 3' to the motif text
         # take a motif string and expand it on right, left, top and bottom with spaces
         motif_list = [[' '] * (motif.num_char + 2)] + [[' '] + [char for char in line] + [' '] for line in str(motif).split('\n')] + [[' '] * (motif.num_char + 2)]
@@ -167,8 +159,6 @@ def initiate_session_state():
         st.session_state.copied_motif = None
     if "copied_motif_text" not in st.session_state:
         st.session_state.copied_motif_text = ""
-    if 'toggle_simple_origami' not in st.session_state:
-        st.session_state.toggle_simple_origami = False
     if 'modified_motif_text' not in st.session_state:
         st.session_state.modified_motif_text = ""
     if 'upload_key' not in st.session_state:
@@ -196,6 +186,8 @@ def initiate_session_state():
         st.session_state.max_pk_index = 1
     if 'oxview_selected' not in st.session_state:
         st.session_state.oxview_selected = ()
+    if 'flip' not in st.session_state:
+        st.session_state.flip = False
 
 def update_file_uploader():
     st.session_state.upload_key += 1
@@ -206,18 +198,20 @@ def make_motif_menu(origami):
     st.session_state.max_pk_index = max([abs(int(x.pk_index.replace("'", ""))) for line in origami[lambda m: hasattr(m, 'pk_index')] for x in line], default=0) + 1
 
     st.write("\n") # add space between initial menu and motif menu
-    option_data = [
-                    {'icon': "bi bi-sliders", 'label':"Connections"},
-                    {'icon': "bi bi-bricks",'label':"Structural"},
-                    {'icon': "bi bi-heart-half", 'label':"Kissing Loops"},
-                    {'icon': "bi bi-palette", 'label':"Aptamers"},
-                    {'icon': "bi bi-joystick", 'label':"Custom"},
-                    {'icon': "bi bi-bandaid", 'label':"Edit"},
-                    {'icon': "bi bi-code", 'label':"Code"},
-                    # {'icon': "bi bi-clock-history", 'label':"Undo/Redo"},
-                ]
+    option_data = {'Connections': 'bi-sliders',
+                   'Structural': 'bi-bricks',
+                   'Kissing Loops': 'bi-heart-half',
+                   'Aptamers': 'bi-palette',
+                   'Custom': 'bi-joystick',
+                   'Edit': 'bi-bandaid',
+                   'Code': 'bi-code'}
     
-    selected_motif = hc.option_bar(option_definition=option_data, override_theme=main_hc_theme, horizontal_orientation=True)
+    selected_motif = option_menu(None, 
+                                list(option_data.keys()),
+                                icons=list(option_data.values()),
+                                menu_icon="cast", 
+                                orientation="horizontal",
+                                styles=main_menu_style)
 
     motif_add = True
 
@@ -233,10 +227,14 @@ def make_motif_menu(origami):
         ### Adding the menu here, otherwise there are issues choosing the custom motif with st.fragment when the edit mode is off
         col1, col2 = st.columns([5, 1])
         with col1:
-            motif_selected = hc.option_bar(option_definition=[{'icon': f"bi bi-{l[1]}", 'label':l[0]} for l in st.session_state.custom_motifs],
-                                                    key='Kissing Loop angle', override_theme=second_hc_theme, horizontal_orientation=True)
+            motif_selected = option_menu(None,
+                                        [l[0] for l in st.session_state.custom_motifs],
+                                        icons=[f"bi bi-{l[1]}" for l in st.session_state.custom_motifs],
+                                        menu_icon="cast", 
+                                        orientation="horizontal",
+                                        styles=second_menu_style)
         with col2:
-            new_name = st.text_input(":green[Add Custom Name:]", key=f'new_custom_motif{st.session_state.custom_key}')
+            new_name = st.text_input(":green[Add Custom Motif with Name:]", key=f'new_custom_motif{st.session_state.custom_key}')
             if new_name:
                 icon = funny_bootstrap_icons[0]
                 funny_bootstrap_icons[:] = funny_bootstrap_icons[1:] + [funny_bootstrap_icons[0]]
@@ -455,12 +453,12 @@ def generate_custom_motif_text(strand, x_size=50, y_size=10):
     for y in range(y_size):
         for x in range(x_size):
             if (x, y) in strand.map:
-                content += f'<a href="#" id="{x},{y}" style="color: #D00000;">{strand.map[(x, y)]}</a>'
+                content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: #D00000;">{strand.map[(x, y)]}</a>'
             elif (x, y) in current_motif.map: # strand not currently selected
                 symbol = current_motif[current_motif.map[(x, y)]].map[(x, y)]
-                content += f'<a href="#" id="{x},{y}" style="color: #00856A; opacity: 0.5;">{symbol}</a>'
+                content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: #00856A; opacity: 0.5;">{symbol}</a>'
             else:
-                content += f'<a href="#" id="{x},{y}" style="color: grey; opacity: 0.5;">•</a>'
+                content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: grey; opacity: 0.5;">•</a>'
         content += '<br />'
     return content
 
@@ -694,7 +692,7 @@ def custom(current_custom_motif):
         seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(strand.directionality), key=f'seq_dir_custom')
     with col5:
         new_strand = st.text_input(f'New strand (strand directionality: {strand.directionality}) ', value=str(strand), key=f'strand_custom')
-    coords = st.file_uploader(f"3D Coordinates", type=['dat'], key=f'custom_{st.session_state.upload_key}', 
+    coords = st.file_uploader(f"Strand 3D Coordinates (oxDNA format)", type=['dat'], key=f'custom_{st.session_state.upload_key}', 
                                 help='Upload a Oxview configuration ".dat" file with the 3D coordinates of one strand.')
     dummy_cols = st.columns(7)
     with dummy_cols[2]:
@@ -784,12 +782,17 @@ def undo(key=''):
 
 @st.fragment
 def origami_display_menu():
-    option_data = [
-                    {'icon': "bi bi-align-start", 'label':"Origami 2D View"},
-                    {'icon': "bi bi-layers",'label':"Origami 3D View"},
-                    {'icon': "bi bi-fullscreen-exit", 'label':"Origami Split View"},
-                ]
-    selected_display = hc.option_bar(option_definition=option_data, override_theme=main_hc_theme, key='DisplayMenu', horizontal_orientation=True)
+    option_data = {"Origami 2D View": "bi bi-align-start", 
+                   "Origami 3D View": "bi bi-layers", 
+                   "Origami Split View": "bi bi-fullscreen-exit"}
+
+    selected_display = option_menu(None,
+                                   list(option_data.keys()),
+                                   icons=list(option_data.values()),
+                                   orientation='horizontal',
+                                   key='DisplayMenu',
+                                   styles=main_menu_style
+                                   )
     ### Display the RNA origami structure with clickable elements and modify them in case
     warnings.filterwarnings("ignore") # ignore numpy warnings
     if selected_display == 'Origami 2D View':
@@ -806,22 +809,31 @@ def origami_display_menu():
         clicked_options(clicked)
 
 def display3d():
-    m_slice = (st.session_state.line_index, st.session_state.motif_index)
     origami = st.session_state.origami
-    index_colors = ()
-    if m_slice[0] < len(origami) and m_slice[1] < len(origami[m_slice[0]]):
-        motif = origami[m_slice[0]][m_slice[1]]
-        motif_shift = origami.shift_map[m_slice]
-        index_colors = [0] * len(origami.sequence.replace('&', ''))
-        for pos in motif.base_map:
-            shifted = tuple([pos[0] + motif_shift[0], pos[1] + motif_shift[1]])
-            index_colors[origami.sequence_index_map[shifted]] = 1
+    
+    if st.session_state.gradient:
+        seq = origami.sequence.replace('&', '')
+        index_colors = list(range(len(seq)))
+
+    else:
+        m_slice = (st.session_state.line_index, st.session_state.motif_index)
+        index_colors = ()
+        if m_slice[0] < len(origami) and m_slice[1] < len(origami[m_slice[0]]):
+            motif = origami[m_slice[0]][m_slice[1]]
+            motif_shift = origami.shift_map[m_slice]
+            index_colors = [0] * len(origami.sequence.replace('&', ''))
+            for pos in motif.base_map:
+                shifted = tuple([pos[0] + motif_shift[0], pos[1] + motif_shift[1]])
+                index_colors[origami.sequence_index_map[shifted]] = 1
+
+    for s in origami.strands:
+        for protein in s.coords.proteins:
+            index_colors += [0] * len(protein)
 
     conf, topo = origami.save_3d_model("origami", return_text=True)
     oxview_from_text(configuration=conf, # path to the configuration file
                     topology=topo,      # path to the topology file
                     width='99%',                # width of the viewer frame
-                    height=str(st.session_state.oxview_frame_height), # height of the viewer frame
                     colormap=st.session_state.oxview_colormap, # colormap for the viewer
                     index_colors=index_colors, # color the bases in the viewer
                     key='display_nano')  
@@ -833,7 +845,18 @@ def build_origami_content(origami):
         origami_str = origami.to_road()
     else:
         origami_str = str(origami)
+
     motif = origami.motif
+
+    # create color gradient
+    if st.session_state.gradient:
+        tot_len = 0
+        for s in origami.strands:
+            tot_len += len(s.sequence)
+            for protein in s.coords.proteins:
+                tot_len += len(protein)
+        cmap = plt.get_cmap(st.session_state.oxview_colormap)
+        c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len)]
     
     # Prepare the string to add 5' and 3' symbols for the strands
     motif_list = [[' '] * (motif.num_char + 2)] + [[' '] + [char for char in line] + [' '] for line in origami_str.split('\n')] + [[' '] * (motif.num_char + 2)]
@@ -851,6 +874,7 @@ def build_origami_content(origami):
     line_nr = -2
     origami_list = origami_str.split('\n')
     origami_list_len = len(origami_list)
+
     for y, line in enumerate(origami_list):
         line_color = normal_color
         motif_slice = None
@@ -870,9 +894,12 @@ def build_origami_content(origami):
             content += f'<span style="color: #D52919; line-height:1;">_____</span>'  # the origami line is empty
         else:
             content += '<span style="line-height:1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'  # is not a new origami line
+        
         hit = False # to highlight the first symbol
         for x, char in enumerate(line):
+            ori_pos = (x - 1, y - 1)
             color = normal_color
+
             if char == ' ':
                 content += '<span style="line-height:1;">&nbsp;</span>'
             elif char == '1':
@@ -880,17 +907,25 @@ def build_origami_content(origami):
             elif char == '2':
                 content += f'<span style="color: {highlight_color}; line-height:1;">3</span>'
             elif char in pf.bp_symbols:
-                content += f'<span style="color: {color}; line-height:1;">{char}</span>'  # highlight the base pair in red too
-            elif (x - 1, y - 1) in origami.map:  # a motif symbol
-                motif_slice = origami.map[(x - 1, y - 1)]
-                # highlight the selected motif
+                content += f'<span style="color: {color}; line-height:1;">{char}</span>'  # do not highlight the base pair in red
+            elif ori_pos in origami.map:  # a motif symbol
+                motif_slice = origami.map[ori_pos]
+                if st.session_state.gradient: 
+                    index = st.session_state.origami.sequence_index_map.get(ori_pos)
+                    if index:
+                        color = c_map[index]
+
+                # This is the selected motif
                 if motif_slice and motif_slice[0] == st.session_state.line_index and motif_slice[1] == st.session_state.motif_index:
-                    if not hit: # the first symbol is yellow
+                    if st.session_state.gradient: # Don't add color if the gradient is not active
+                        color = normal_color
+                    elif not hit: # the first symbol is yellow
                         color = '#FF8800'
                         hit = True
                     else:
                         color = highlight_color
-                content += f'<a href="#" id="{motif_slice[0]},{motif_slice[1]},{x - 1},{y - 1}" style="color: {color}; line-height:1;">{char}</a>'
+
+                content += f'<a href="javascript:void(0);" id="{motif_slice[0]},{motif_slice[1]},{x - 1},{y - 1}" style="color: {color}; line-height:1;">{char}</a>'
             else:  # is a junction symbol 
                 content += f'<span style="color: {color}; line-height:1;">{char}</span>'
         # Check if you wanna add the cursor
@@ -1119,6 +1154,7 @@ def scrollable_text(text: str):
             background-color: #fafafa;
             padding: 10px;
             border-radius: 20px; /* Rounded corners */
+            font-size: {st.session_state.origami_font_size + 2}px;
         }}
         </style>
         <div class="scroll-box">{text}</div>

@@ -1,9 +1,9 @@
 import warnings
 import streamlit as st
-import hydralit_components as hc
+from streamlit_option_menu import option_menu
 from pyfurnace.design.motifs import kissing_loops
 from .motif_command import MotifCommand
-from .. import second_hc_theme
+from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
 
 kl_name_map = { 'Kissing Dimer': "KissingDimer",
@@ -12,8 +12,6 @@ kl_name_map = { 'Kissing Dimer': "KissingDimer",
                 'Branched KL': 'BranchedKissingLoop',
                 'Branched Dimer': "BranchedDimer",
             }
-option_data = [{'icon': MOTIF_ICONS[kl_name_map[name]], 
-                'label': name} for name in kl_name_map]
 
 class KissingLoopsCommand(MotifCommand):
     
@@ -39,7 +37,14 @@ class KissingLoopsCommand(MotifCommand):
                 motif.pk_index = pk_index
         ### Create new motif
         else:
-            kl_selction = hc.option_bar(option_definition=option_data, key='KLOption', override_theme=second_hc_theme, horizontal_orientation=True)
+            kl_selction = option_menu(None,
+                                      list(kl_name_map.keys()),
+                                      icons=[MOTIF_ICONS[kl_name_map[name]] for name in kl_name_map],
+                                      menu_icon="cast",
+                                      orientation="horizontal",
+                                      styles=second_menu_style,
+                                      key='KLOption',
+                                      )
             name = kl_name_map[kl_selction]
             kl_class = getattr(kissing_loops, name)
             flip, top_seq, kl_energy, tolerance, pk_index = self.interface(change_side=st.session_state.current_line_occupied and 'Dimer' not in name)

@@ -1,12 +1,29 @@
 from pathlib import Path
+from copy import deepcopy
 import tempfile
 import sys
 import streamlit as st
 import importlib.util
 
 app_path = Path(__file__).resolve().parent.parent
-main_hc_theme = {'txc_inactive': '#262730','menu_background':'#F0F2F6','txc_active':'white','option_active':'#116656'}
-second_hc_theme = {'txc_inactive': '#262730','menu_background':'#F0F2F6','txc_active':'white','option_active':'#D00000'}
+main_menu_style = { "container": {
+                        "padding": "0!important", 
+                        "border-radius": "10px",  # Rounded borders
+                        "position": "relative"  # Ensures it doesn't overflow
+                    },
+                    "nav-link": {
+                        "font-size": "inherit", 
+                        "text-align": "center", 
+                        "margin": "0px", 
+                        "border-radius": "10px", # Rounded option links
+                        "--hover-color": "#cccfcc"  # Hover color
+                    },
+                    "nav-link-selected": {
+                        "border-radius": "10px"  # Rounded selected option
+                    }
+                }
+second_menu_style = deepcopy(main_menu_style)
+second_menu_style['nav-link-selected']['background-color'] = '#D00000'
 
 
 def check_import_pyfurnace():

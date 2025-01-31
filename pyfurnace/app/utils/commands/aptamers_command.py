@@ -1,10 +1,10 @@
 import inspect
 import streamlit as st
-import hydralit_components as hc
+from streamlit_option_menu import option_menu
 from pyfurnace.design.motifs import aptamers
 from pyfurnace.design.motifs import Loop
 from .motif_command import MotifCommand
-from .. import second_hc_theme
+from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
 
 # Get names of all aptamer functions defined in the `aptamers` module
@@ -12,6 +12,8 @@ aptamers_names = [
     func_name for func_name, member in inspect.getmembers(aptamers, inspect.isfunction)
     if member.__module__ == aptamers.__name__
 ]
+
+aptamers_names.remove('create_aptamer')
 
 common_aptamers = ['Broccoli',
                    'Pepper',
@@ -25,16 +27,30 @@ class AptamersCommand(MotifCommand):
 
     def execute(self):
         # override the theme
-        col1, col2 = st.columns([5, 1])
+        col1, col2 = st.columns([1, 5])
         with col1:
-            option_data = [{'icon': MOTIF_ICONS[name],
-                            'label': name} for name in common_aptamers]
-            aptamer_selction = hc.option_bar(option_definition=option_data, key='AptamerOption', override_theme=second_hc_theme, horizontal_orientation=True)
-        with col2:
-            aptamers_box = st.selectbox(":green[Or search an Aptamer]", 
+            aptamers_box = st.selectbox(":green[Search an Aptamer or]", 
                                         ['No selection'] + aptamers_names, 
                                         key='aptamers_ddd',
                                         )
+        with col2:
+            st.markdown(
+                """
+                <div style="text-align: center;">
+                    Select a common aptamer:
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            aptamer_selction = option_menu(None,
+                                           common_aptamers,
+                                           icons=[MOTIF_ICONS[name] for name in common_aptamers],
+                                           menu_icon="cast",
+                                           orientation="horizontal",
+                                           styles=second_menu_style,
+                                           key='AptamerOption',
+                                           )
+
         if aptamers_box != 'No selection':
             aptamer_selction = aptamers_box
         if aptamer_selction:

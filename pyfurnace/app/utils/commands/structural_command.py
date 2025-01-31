@@ -1,11 +1,11 @@
 import inspect
 import streamlit as st
-import hydralit_components as hc
+from streamlit_option_menu import option_menu
 from pyfurnace.design import motifs, Loop, structural
 from .motif_command import MotifCommand
 from .dovetail_command import DovetailCommand
 from .stem_command import StemCommand
-from .. import second_hc_theme
+from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
 
 
@@ -13,14 +13,17 @@ struct_names = [ut_name for ut_name, obj in inspect.getmembers(structural) if in
           
 struct_names = ['Stem', 'Dovetail'] + struct_names
 
-option_data = [{'icon': MOTIF_ICONS[name], 
-                'label': name.replace('_', ' ')} for name in struct_names]
-
 class StructuralCommand(MotifCommand):
 
     def execute(self):
-        # override the theme
-        selected = hc.option_bar(option_definition=option_data, key='StructuralOption', override_theme=second_hc_theme, horizontal_orientation=True)
+        selected = option_menu(None,
+                               struct_names,
+                               icons=[MOTIF_ICONS[name] for name in struct_names],
+                               menu_icon="cast",
+                               orientation="horizontal",
+                               styles=second_menu_style,
+                               key='StructuralOption',
+                               )
         match selected:
             case 'Stem':
                 StemCommand().execute()

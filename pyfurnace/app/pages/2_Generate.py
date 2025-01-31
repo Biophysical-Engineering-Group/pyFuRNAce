@@ -12,56 +12,55 @@ def format_text(text):
     return "```\n" + text + "\n```"
 
 def forna_options(lenght):
-    with st.expander("Forna dispaly options"):
-        ### checkboxes for the options
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.session_state.zoomable = st.checkbox("Zoomable", value=True, help = """Enable zooming in and out the structure""")
-        with col2:
-            st.session_state.animation = st.checkbox("Interact", value=False, help = """Enable interaction with the structure""")
-        with col3:
-            st.session_state.node_label = st.checkbox("Node label", value=True, help = """Show the nucleotide label""")
-        ### second row of options
-        with col1:
-            ### color scheme options
-            scheme_options = ["sequence", "structure", "positions", "color range", "custom"]
-            st.session_state.color_scheme = st.selectbox("Select a color scheme", scheme_options, index=1)
-        with col2:
-            st.session_state.height = st.slider("Frame height", 10, 800, 300, help = """Set the height of the frame""")
-        with col3:
-            st.session_state.label_interval = st.slider("Label interval", 0,  max(lenght, 10), min(lenght, 10), help = """Show the nucleotide number every n nucleotides""")
+    ### checkboxes for the options
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.session_state.zoomable = st.checkbox("Zoomable", value=True, help = """Enable zooming in and out the structure""")
+    with col2:
+        st.session_state.animation = st.checkbox("Interact", value=False, help = """Enable interaction with the structure""")
+    with col3:
+        st.session_state.node_label = st.checkbox("Label", value=True, help = """Show the nucleotide label""")
+    ### second row of options
+    with col1:
+        ### color scheme options
+        scheme_options = ["sequence", "structure", "positions", "color range", "custom"]
+        st.session_state.color_scheme = st.selectbox("Select a color scheme", scheme_options, index=1)
+    with col2:
+        st.session_state.height = st.slider("Frame height", 10, 800, 300, help = """Set the height of the frame""")
+    with col3:
+        st.session_state.label_interval = st.slider("Label interval", 0,  max(lenght, 10), min(lenght, 10), help = """Show the nucleotide number every n nucleotides""")
 
-        st.session_state.color_text = ''
-        st.session_state.colors = {}
-        ### color scheme based on the sequence
-        if st.session_state.color_scheme == "color range":
-            st.session_state.color_scheme = "custom"
-            with col2: # start color
-                first = st.color_picker("Select a color", "#ff0000")
-            with col3: # end color
-                last = st.color_picker("Select a color", "#00ff00")
-            # create the colors range
-            first = Color(first)
-            last = Color(last)
-            color_range = [first] + list(first.range_to(last, lenght))
-            # save the colors in the session state and create the colors string
-            for i, c in enumerate(color_range):
-                st.session_state.colors[i] = c.hex
-                st.session_state.color_text += str(i) + ":" + c.hex + " "
-        ### custom colors for each nucleotide
-        elif st.session_state.color_scheme == "custom":
-            with col2: # select nucleotide index
-                index = st.number_input("Select nucleotide index", 1, lenght, 1)
-            with col3: # select color
-                color = st.color_picker("Select a color", "#ffffff")
-            # save the color in the session state
-            st.session_state.colors[index] = color
-            # create the colors string
-            for i, c in st.session_state.colors.items():
-                st.session_state.color_text += str(i) + ":" + c + " "
-        ### display the custom colors
-        else:
-            st.session_state.color_text = None
+    st.session_state.color_text = ''
+    st.session_state.colors = {}
+    ### color scheme based on the sequence
+    if st.session_state.color_scheme == "color range":
+        st.session_state.color_scheme = "custom"
+        with col2: # start color
+            first = st.color_picker("Select a color", "#ff0000")
+        with col3: # end color
+            last = st.color_picker("Select a color", "#00ff00")
+        # create the colors range
+        first = Color(first)
+        last = Color(last)
+        color_range = [first] + list(first.range_to(last, lenght))
+        # save the colors in the session state and create the colors string
+        for i, c in enumerate(color_range):
+            st.session_state.colors[i] = c.hex
+            st.session_state.color_text += str(i) + ":" + c.hex + " "
+    ### custom colors for each nucleotide
+    elif st.session_state.color_scheme == "custom":
+        with col2: # select nucleotide index
+            index = st.number_input("Select nucleotide index", 1, lenght, 1)
+        with col3: # select color
+            color = st.color_picker("Select a color", "#ffffff")
+        # save the color in the session state
+        st.session_state.colors[index] = color
+        # create the colors string
+        for i, c in st.session_state.colors.items():
+            st.session_state.color_text += str(i) + ":" + c + " "
+    ### display the custom colors
+    else:
+        st.session_state.color_text = None
 
 
 if __name__ == "__main__":
@@ -84,7 +83,7 @@ if __name__ == "__main__":
         st.session_state.animation = False
     if 'editable' not in st.session_state:
         st.session_state.editable = False
-    if 'node_label' not in st.session_state:
+    if 'labels' not in st.session_state:
         st.session_state.node_label = True
     if 'height' not in st.session_state:
         st.session_state.height = 300
@@ -113,22 +112,7 @@ if __name__ == "__main__":
     if "&" in structure:
         st.warning("Experimental: the dot-bracket notation contains multiple strands")
 
-    with st.expander("Advanced sequence generation parameters"):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            # st.markdown("Set Timeout (S)", help="Set to 0 to stop when hitting the target")
-            pop_size = st.number_input("Population Size", min_value=4, value=12)
-            gc_content = st.slider("GC Content Range", min_value=0.0, max_value=1.0, value=(0.45, 0.55))
-        with col2:
-            gen_size = st.number_input("Max N° Generations", min_value=0, value=0,
-                                       help="Set to 0 to stop when hitting the target")          
-            mut_rate = st.number_input("Mutation Rate", min_value=0.0, max_value=1.0, value=0.005)
-        with col3:  
-            ssm_window = st.number_input("SSM Window Size", min_value=1, value=10,
-                            help="Size of the window for the Sequence Symmetry Minimization (SSM)")
-            cx_rate = st.number_input("Crossover Rate", min_value=0.0, max_value=1.0, value=0.99)
-
-    if st.checkbox("RNA display parameters"):
+    with st.popover("RNA display options"):
         forna_options(len(structure))
 
     # Initialize the FORNA link for the target structure
@@ -214,14 +198,15 @@ if __name__ == "__main__":
     #                     colors = st.session_state.color_text,
     #                     key='optimized_forna')
 
-    #     if 'origami' in st.session_state and st.session_state.origami:
-    #         if st.button("Load the sequence to the Origami"):
-    #             try:
-    #                 st.session_state.origami.sequence = st.session_state.rna_origami_seq
-    #                 if 'code' in st.session_state:
-    #                     st.session_state.code.append('origami.sequence = "' + st.session_state.rna_origami_seq + '"')
-    #                 st.success("Sequence Loaded to the Origami")
-    #                 save_origami(filename)
-    #             except Exception as e:
-    #                 st.error(f"Error: {e}")
+        if 'origami' in st.session_state and st.session_state.origami:
+            if st.button("Load the sequence to the Origami"):
+                try:
+                    st.session_state.origami.sequence = st.session_state.rna_origami_seq
+                    if 'code' in st.session_state:
+                        st.session_state.code.append('origami.sequence = "' + st.session_state.rna_origami_seq + '"')
+                    st.success("Sequence Loaded to the Origami")
+                except Exception as e:
+                    st.error(f"Error: {e}")
+            if all(n in 'AUCG' for n in st.session_state.rna_origami_seq):
+                save_origami(filename)
                     

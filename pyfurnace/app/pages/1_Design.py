@@ -1,8 +1,10 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 ### import the design functions
 from utils import check_import_pyfurnace, load_logo, save_origami
 check_import_pyfurnace()
 from utils.design_functions import initiate_session_state, simple_origami, origami_general_options, make_motif_menu, origami_display_menu, display_structure_sequence
+from utils.st_fixed_container import sticky_container
 
 ### set the logo of the app
 
@@ -14,25 +16,35 @@ if __name__ == "__main__":
     st.write("## Design RNA origami")
 
     ### make the general options for the RNA origami
-    origami_general_options(origami)
-    simple_ori =  st.toggle("Make a simple Origami", 
-                            key='simple_origami', 
-                            help='Start by creating a simple Origami rather than starting from scratch')
-    if simple_ori:
-        simple_origami()
+    origami_general_options(origami, expanded=False)
+
+    cols = st.columns([1] * 7)   
+    with cols[0]:    
+        with st.popover("Make a simple Origami",
+                        help='Start by creating a simple Origami rather than starting from scratch'):
+            simple_origami()
+    with cols[3]:
+        st.selectbox('OxView 3D ColorMap:', ['Reds', None] + plt.colormaps() , key='oxview_colormap', help='Change the color of the OxView visualization.')
+    with cols[-1]:
+        st.toggle('Gradient Stran Path', key='gradient', help='Toggle the gradient color scheme for the nucleotides')
+
 
     ### option menu to manage the motifs in the origami
-    if not simple_ori:
-        st.write("#### Add Motifs to the Origami:")
+    st.write("#### Add Motifs to the Origami:")
+    # with st.popover(":green[Add Motifs to the Origami:]",
+    #                 use_container_width=True,):
+    #     make_motif_menu(origami)
+    with sticky_container(mode="top", border=False):
         make_motif_menu(origami)
-    elif st.session_state.origami:
-        st.markdown(':orange[Close] the "Make a simple Origami" toggle :orange[to edit] the origami.')
+        st.divider()
+
+
     ### add separator
     # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)
  
     ### display the RNA origami structure
     # st.write('#### Structure of your RNA origami')
-    st.divider()
+    # st.divider()
 
     ### select the render mode
     if not st.session_state.origami:

@@ -2,11 +2,12 @@ import inspect
 from pyfurnace.design import utils, start_end_stem  # Import the module with the variables
 
 import streamlit as st
-import hydralit_components as hc
+from streamlit_option_menu import option_menu
+from streamlit_option_menu import option_menu
 from .motif_command import MotifCommand
 from .general_edit_command import GeneralEditCommand
 from .tetraloop_command import TetraLoopCommand
-from .. import second_hc_theme
+from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
 
 # Filter and collect the motif utils
@@ -14,10 +15,6 @@ util_names = [ut_name for ut_name, obj in inspect.getmembers(utils.motif_lib) if
 
 # Add the tetraloop option
 util_names = ['Tetraloop'] + util_names
-
-# Add the other motif utils
-option_data = [{'icon': MOTIF_ICONS[name], 
-                'label': name.replace('_', ' ')} for name in util_names]
 
 class ConnectionsCommand(MotifCommand):
     
@@ -28,7 +25,15 @@ class ConnectionsCommand(MotifCommand):
 
         ### Create new motif
         else:
-            util_option = hc.option_bar(option_definition=option_data, key='UtilsOption', override_theme=second_hc_theme, horizontal_orientation=True)
+            util_option = option_menu(
+                                    None, 
+                                    util_names,
+                                    icons=[MOTIF_ICONS[name] for name in util_names],
+                                    menu_icon="cast",  
+                                    orientation="horizontal",
+                                    styles=second_menu_style,
+                                    key='UtilsOption',
+                                    )
 
             if util_option == 'Tetraloop':
                 TetraLoopCommand().execute()

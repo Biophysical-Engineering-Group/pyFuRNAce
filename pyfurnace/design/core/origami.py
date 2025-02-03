@@ -539,7 +539,15 @@ class Origami(Callback):
     def motif(self):
         if isinstance(self._motif, Motif):
             return self._motif
-        self._motif = Motif.concat([Motif.concat(line, align=False, unlock_strands=self._ss_assembly, lock_coords=False) for line in self.assembled], axis=0, align=False, lock_coords=True, unlock_strands=self.ss_assembly)
+        mot = None
+        for line in self.assembled:
+            mot_line = Motif.concat(line, align=False, unlock_strands=self._ss_assembly, lock_coords=False)
+            if mot is None:
+                mot = mot_line
+                continue
+            mot = Motif.concat([mot, mot_line], axis=0, align=False, lock_coords=True, unlock_strands=self._ss_assembly)
+        # self._motif = Motif.concat([Motif.concat(line, align=False, unlock_strands=self._ss_assembly, lock_coords=False) for line in self.assembled], axis=0, align=False, lock_coords=True, unlock_strands=self.ss_assembly)
+        self._motif = mot
         return self._motif
     
     @property
@@ -902,7 +910,7 @@ class Origami(Callback):
         return
         ### make a strand map of sequence index --> motif position
     
-    def _updated_motif(self, *args, **kwargs):
+    def _updated_motif(self, **kwargs):
         self._helices = None
         self._motif = None
         self._junctions = None
@@ -911,7 +919,8 @@ class Origami(Callback):
         self._shift_map = None
         self._assembled = None
         self._pseudoknots = None
-        self._trigger_callbacks(*args, **kwargs)
+        self._trigger_callbacks(**kwargs)
+        # self._trigger_callbacks()
 
     def to_road(self):
         ori_str = str(self)

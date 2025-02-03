@@ -2,9 +2,21 @@ from . import CONFS_PATH
 from ..core.symbols import *
 from ..core.coordinates_3d import Coords
 from ..core.strand import Strand
-from ..core.basepair import BasePair
 from ..core.motif import Motif
 from .loops import Loop
+
+# Shared functionality for all Aptamers
+class Aptamer(Motif):
+    pass
+
+# Create the Aptamer class also inheriting from the selected base class
+def create_aptamer(*args, inherit_from: classmethod = None, **kwargs):
+    aptamer = Aptamer(*args, **kwargs)
+    if inherit_from:
+        aptamer = type("Aptamer", (Aptamer, inherit_from), {})(*args, **kwargs)
+    else:
+        aptamer = Aptamer(*args, **kwargs)
+    return aptamer
 
 ###
 # FLAPS
@@ -15,26 +27,30 @@ def Ispinach(**kwargs):
     strand1 = Strand("─CUG─UU─GA─GUAGAGUGUGGGCUC─")
     strand1._coords = Coords.load_from_file(CONFS_PATH / "Ispinach_1.dat")
 
-    strand2 = Strand("─GUGAG──GGUCGGG──UC────CAG─", start=(26, 2), direction=(-1, 0))
+    strand2 = Strand("─GUGAGG─GU─CGG─G─UC────CAG─", start=(26, 2), direction=(-1, 0))
     strand2._coords = Coords.load_from_file(CONFS_PATH / "Ispinach_2.dat")
 
-    base_pairing = BasePair({(1, 0): (1, 2), (2, 0): (2, 2), (3, 0): (3, 2), (8, 0): (8, 2), (9, 0): (9, 2), (23, 0): (23, 2), (25, 0): (25, 2)})
     kwargs.setdefault('join', False)
-    return Motif([strand1, strand2], basepair=base_pairing, **kwargs) 
+    return create_aptamer([strand1, strand2], 
+                          **kwargs)
 
 def Mango(open_left = False, **kwargs):
     # PDB: 5V3F
     strand = Strand("─GUGC─GAA─GG─GAC─GG─UGC╰│╭────GG─AGA─GG─AGA─GCAC─", start=(23, 2), direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Mango.dat")
-
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand, 
+                          open_left=open_left, 
+                          **kwargs)
 
 def MalachiteGreen(open_left = False, **kwargs):
     # PDB: 1Q8N
     strand = Strand("─GGAUCC───CG─A──CUGGCGA╰│╭GAGCCAGGUAACGAAUGGAUCC─", start=(23, 2), direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "MalachiteGreen.dat")
-
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
 
 def MalachiteGreenShort(**kwargs):
     # PDB: 1Q8N
@@ -44,7 +60,8 @@ def MalachiteGreenShort(**kwargs):
     strand2 = Strand("CAGGUAACGAAUGG", start=(13, 2), direction=(-1, 0))
     strand2._coords = Coords.load_from_file(CONFS_PATH / "MalachiteGreenShort_2.dat")
     kwargs.setdefault('join', False)
-    return Motif(strands=[strand1, strand2], **kwargs)
+    return create_aptamer(strands=[strand1, strand2], 
+                          **kwargs)
             
 def Broccoli(**kwargs):
     # PDB: 7ZJ5
@@ -54,7 +71,8 @@ def Broccoli(**kwargs):
     strand2 = Strand("CUG─UC─GA─GUAGAGUGUG─GGCUCC", start=(26, 2), direction=(-1, 0))
     strand2._coords = Coords.load_from_file(CONFS_PATH / "Broccoli_2.dat")
     kwargs.setdefault('join', False)
-    return Motif([strand1, strand2], **kwargs) 
+    return create_aptamer([strand1, strand2], 
+                          **kwargs) 
 
 
 def Pepper(**kwargs):
@@ -65,7 +83,8 @@ def Pepper(**kwargs):
     strand2 = Strand("GCAGGC─ACUG─GCGCC─────────GGGA", start=(29, 2), direction=(-1, 0))
     strand2._coords = Coords.load_from_file(CONFS_PATH / "Pepper_2.dat")
     kwargs.setdefault('join', False)
-    return Motif([strand1, strand2], **kwargs) 
+    return create_aptamer([strand1, strand2], 
+                          **kwargs) 
       
 
 ###
@@ -77,7 +96,8 @@ def Biotin(**kwargs):
     strand = Strand("────GGACCGU─CA───╮│╯GAGGACACGGU─────╭U╰AAAAA─────GUCCUCU")
     strand._coords = Coords.load_from_file(CONFS_PATH / "Biotin.dat")
     kwargs.setdefault('join', False)
-    return Motif(strands=strand, **kwargs)
+    return create_aptamer(strands=strand, 
+                          **kwargs)
 
 ###
 # Protein binding aptamers
@@ -89,8 +109,10 @@ def MS2(open_left = False, **kwargs):
     strand._coords =  Coords.load_from_file(CONFS_PATH / "MS2.dat", 
                                             topology_file=CONFS_PATH / "MS2.top",
                                             protein=True)
-    
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand, 
+                          open_left=open_left, 
+                          **kwargs)
 
 def PP7(open_left = False, **kwargs):
     # PDB: 2QUX
@@ -98,8 +120,10 @@ def PP7(open_left = False, **kwargs):
     strand._coords = Coords.load_from_file(CONFS_PATH / "PP7.dat", 
                                             topology_file=CONFS_PATH / "PP7.top",
                                             protein=True)
-
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
 
 def TAR_TAT(open_left = False, **kwargs):
     # PDB: 6MCE
@@ -107,7 +131,10 @@ def TAR_TAT(open_left = False, **kwargs):
     strand._coords = Coords.load_from_file(CONFS_PATH / "TAR_TAT.dat", 
                                             topology_file=CONFS_PATH / "TAR_TAT.top",
                                             protein=True)
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
 
 def L7Ae(**kwargs):
     # PDB: 1RLG
@@ -118,35 +145,48 @@ def L7Ae(**kwargs):
                                             topology_file=CONFS_PATH / "L7Ae_2.top",
                                             protein=True)
     kwargs.setdefault('join', False)
-    return Motif([strand1, strand2], **kwargs)
+    return create_aptamer([strand1, strand2], 
+                          **kwargs)
 
 def Pip3(open_left = False, **kwargs):
     # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
     # Pubblication: https://doi.org/10.1038/ncb3473
     strand = Strand('GGGUAGACUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3.dat")
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
     
 def Pip3_mut1(open_left = False, **kwargs):
     # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
     # Pubblication: https://doi.org/10.1038/ncb3473
     strand = Strand('GGGUCGACUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3_mut1.dat")
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
 
 def Pip3_mut3(open_left = False, **kwargs):
     # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
     # Pubblication: https://doi.org/10.1038/ncb3473
     strand = Strand('GGGUAGCCUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3_mut3.dat")
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
 
 def Pip3_mut5(open_left = False, **kwargs):
     # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
     # Pubblication: https://doi.org/10.1038/ncb3473
     strand = Strand('GGGUAGACGC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3_mut5.dat")
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
 
 def Streptavidin(open_left = False, **kwargs):
     # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
@@ -155,4 +195,7 @@ def Streptavidin(open_left = False, **kwargs):
                     start=(41, 2),
                     direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Streptavidin.dat")
-    return Loop(strands=strand, open_left=open_left, **kwargs)
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)

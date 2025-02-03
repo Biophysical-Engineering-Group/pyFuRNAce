@@ -87,7 +87,12 @@ def origami_general_options(origami, expanded=True):
         #     unsafe_allow_html=True,
         # )
 
-        st.slider('Origami font size', min_value=2, max_value=50, value=14, key='origami_font_size')
+        col1, col2 = st.columns(2)
+        with col1:
+            st.slider('Origami font size', min_value=2, max_value=50, value=14, key='origami_font_size')
+        with col2:
+            st.slider('Oxview frame size (disable and renable the OxView to apply changes)',
+                      min_value=0, max_value=2000, value=500, key='oxview_frame_size')
 
 def simple_origami():
     with st.form(key='simple_origami_form'):
@@ -138,7 +143,8 @@ def motif_text_format(motif):
                 motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '<' + s.directionality[0] + '>'
             if s[-1] not in '35' and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' ':
                 motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '<' + s.directionality[1] + '>'
-        motif_str = '\n'.join([''.join(line) for line in motif_list])
+        remove_empty = [line for line in motif_list if any([char != ' ' for char in line])]
+        motif_str = '\n'.join([''.join(line) for line in remove_empty])
     else:
         motif_str = str(motif)
     preview_txt = motif_str.replace(' ', '&nbsp;').replace('\n', '<br />').replace('<5>', '<span style="color: #D52919;">5</span>').replace('<3>', '<span style="color: #D52919;">3</span>')
@@ -257,7 +263,9 @@ def make_motif_menu(origami):
     #         redo()
     #     motif_add = False
     if motif_add:
-        st.divider()
+        # st.divider()
+        # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)
+        st.markdown("<hr style='margin-top:-0em;margin-bottom:-1em' />", unsafe_allow_html=True)
         add_motif(origami)
 
 def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
@@ -780,19 +788,23 @@ def undo(key=''):
 #     update_code('\n\n'.join(st.session_state.code + [last_action]))
 #     st.rerun()
 
-@st.fragment
-def origami_display_menu():
+def origami_select_display():
     option_data = {"Origami 2D View": "bi bi-align-start", 
-                   "Origami 3D View": "bi bi-layers", 
-                   "Origami Split View": "bi bi-fullscreen-exit"}
+                "Origami 3D View": "bi bi-layers", 
+                "Origami Split View": "bi bi-fullscreen-exit"}
 
     selected_display = option_menu(None,
-                                   list(option_data.keys()),
-                                   icons=list(option_data.values()),
-                                   orientation='horizontal',
-                                   key='DisplayMenu',
-                                   styles=main_menu_style
-                                   )
+                                list(option_data.keys()),
+                                icons=list(option_data.values()),
+                                orientation='horizontal',
+                                key='DisplayMenu',
+                                styles=main_menu_style
+                                )
+    return selected_display
+    
+
+@st.fragment
+def origami_build_view(selected_display):
     ### Display the RNA origami structure with clickable elements and modify them in case
     warnings.filterwarnings("ignore") # ignore numpy warnings
     if selected_display == 'Origami 2D View':
@@ -803,7 +815,7 @@ def origami_display_menu():
     elif selected_display == 'Origami Split View':
         col1, col2 = st.columns(2)
         with col1:
-            clicked = display_origami(split_view=True)
+            clicked = display_origami()
         with col2:
             display3d()
         clicked_options(clicked)
@@ -835,6 +847,7 @@ def display3d():
                     topology=topo,      # path to the topology file
                     width='99%',                # width of the viewer frame
                     colormap=st.session_state.oxview_colormap, # colormap for the viewer
+                    height=st.session_state.oxview_frame_size, # height of the viewer frame
                     index_colors=index_colors, # color the bases in the viewer
                     key='display_nano')  
 
@@ -940,7 +953,7 @@ def build_origami_content(origami):
     return content
 
 
-def display_origami(split_view=False):
+def display_origami():
     ### SHORTCUTS NOT READY YET!!!
     # if not split_view:
     #     def move_selection(x = 0, y = 0):

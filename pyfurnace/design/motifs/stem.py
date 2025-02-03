@@ -138,7 +138,7 @@ class Stem(Motif):
         ### Create the top and bottom strands
         if sequence: # if a sequence is provided, it has the priority
             self._length = seq_len  * getattr(self, '_sign', 1)
-            strands = [Strand(sequence, coords=top_coord), Strand(sequence.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=Direction.LEFT, coords=bot_coord)]
+            strands = [Strand(sequence, coords=top_coord), Strand(sequence.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=(-1, 0), coords=bot_coord)]
         else:
             self._length = length
             if seq_len <= 3 and strong_bases:
@@ -182,7 +182,7 @@ class Stem(Motif):
                 #     seq = ''.join(['K' if (i * 2) % get_wobble_interval() == 0 else 'N' for i in range(1, seq_len + 1)])
             else:
                 seq = 'N' * seq_len
-            strands = [Strand(seq, coords=top_coord), Strand(seq.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=Direction.LEFT, coords=bot_coord)]
+            strands = [Strand(seq, coords=top_coord), Strand(seq.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=(-1, 0), coords=bot_coord)]
 
         if return_strands:
             return strands

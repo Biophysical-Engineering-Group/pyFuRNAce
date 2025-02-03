@@ -17,12 +17,12 @@ class Callback:
         if callback not in self._callbacks:
             self._callbacks.append(callback)
 
-    def _trigger_callbacks(self, *args, **kwargs):
+    def _trigger_callbacks(self, **kwargs):
         """Trigger all registered callbacks."""
         if not hasattr(self, '_callbacks'):
             return
         for callback in self._callbacks:
-            callback(self, **kwargs)
+            callback(**kwargs)
         
     def _clear_callbacks(self):
         self._callbacks = []

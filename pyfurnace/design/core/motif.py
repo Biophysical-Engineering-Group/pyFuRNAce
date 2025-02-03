@@ -1,5 +1,6 @@
 from math import copysign
 import warnings
+import numpy as np
 from inspect import signature
 try:
     from oxDNA_analysis_tools.external_force_utils.force_reader import write_force_file
@@ -14,7 +15,7 @@ from .callback import Callback
 from .sequence import Sequence
 from .strand import Strand, StrandsBlock
 from .basepair import BasePair
-
+from .position import Position
 
 class Motif(Callback):
     """
@@ -86,7 +87,7 @@ class Motif(Callback):
             autopairing = False
         else:
             if basepair:
-                self.basepair = basepair
+                # convert the basepair dictionary to a dictionary of Position objects
                 autopairing = False
             else:
                 autopairing = autopairing
@@ -184,7 +185,7 @@ class Motif(Callback):
                     pos1 = (x-1,y)
                     pos2 = (x+1,y)
                 if pos1 is not None:
-                    basepair[pos1] = pos2
+                    basepair[Position(pos1)] = Position(pos2)
         return cls(strands=strand_list, basepair=basepair, **kwargs)
 
     @classmethod
@@ -304,25 +305,28 @@ class Motif(Callback):
     @staticmethod
     def join_strands(strands):
         """ Try to join consecutive strands. Return the list of joined strands. """
-        joined_strands = []
+        joined_strands = set()
         # order the strand so you start joinig the 5' strand
         strands = sorted(strands, key=lambda x: int('5' in x.strand))
-        for ind1, s1 in enumerate(strands):
-            if not s1 or ind1 in joined_strands: # if the strand is empty, or is already joined skip it
+        strands = [s for s in strands if s] # remove the empty strands
+    
+        ind1 = 0
+        for ind1, s1 in enumerate(strands[:-1]):
+            if ind1 in joined_strands: # if the strand is empty, or is already joined skip it
                 continue 
-            current_len = -1
             # join the strand with the consecutive strands until no more strands are joined
-            while current_len != len(joined_strands):
-                current_len = len(joined_strands)
-                for ind2, s2 in enumerate(strands): # check if the consecutive position is the end or start 
-                    # skip the second strand if: it's empty, it's the same strand, the strands are already joined
-                    if not s2 or ind1 == ind2 or ind2 in joined_strands: 
-                        continue 
-                    joined = Strand.join_strands(s1, s2) # join the strands
-                    if joined is not None: # if the strands are joined
-                        joined_strands.append(ind2) # add the index of the second strand to the joined strands
-                        strands[ind1] = joined # replace the first strand with the joined strand
-                        s1 = joined # update the first strand
+
+            for ind2, s2 in enumerate(strands):
+                # skip the second strand if: it's empty, it's the same strand, the strands are already joined
+                if ind1 == ind2 or ind2 in joined_strands: 
+                    continue 
+
+                joined = Strand.join_strands(s1, s2) # try to join the strands
+                if joined is not None: # if the strands are joined
+                    joined_strands.add(ind2) # add the index of the second strand to the joined strands
+                    strands[ind1] = joined # replace the first strand with the joined strand
+                    s1 = joined # update the first strand
+
         return [s for i, s in enumerate(strands) if i not in joined_strands] # return the strands that are not joined
 
     @staticmethod
@@ -807,6 +811,10 @@ class Motif(Callback):
         """
         if not isinstance(basepair_dict, (dict, BasePair)):
             raise ValueError(f"{basepair_dict} must be a dictionary or a BasePair object. Got {type(basepair_dict)} instead.")
+        try:
+            basepair_dict = {Position(k): Position(v) for k, v in basepair_dict.items()}
+        except Exception as e:
+            raise ValueError(f"Error converting the basepair dictionary to a dictionary of Position objects: {e}")
         self.autopairing = False
         self._basepair = BasePair(basepair_dict, callback = self._updated_basepair)
         self._trigger_callbacks()
@@ -854,7 +862,7 @@ class Motif(Callback):
         for index, pos in enumerate(base_positions): # iterate over the base positions
             paired = pair_map[index]
             if paired is not None: # in the index of the base position is paired to something
-                basepair_dict[pos] = base_positions[paired] # pair the current position to the position of the paired index
+                basepair_dict[Position(pos)] = Position(base_positions[paired])
         self.basepair = basepair_dict # set the basepair dictionary
         self._structure = structure
     
@@ -921,7 +929,7 @@ class Motif(Callback):
             if vertically:
                 pos1 = (pos1[0], idx_lines - pos1[1]) # flip the vertical position
                 pos2 = (pos2[0], idx_lines - pos2[1]) # flip the vertical position
-            new_basepair_dict[pos1] = pos2
+            new_basepair_dict[Position(pos1)] = Position(pos2) # save the new basepair
         self._basepair = new_basepair_dict # save the new basepair
         for ind, strand in enumerate(self):
             if strand_index and ind not in strand_index: # if we want to flip only speficif strands, don't flip the unspecified strands
@@ -967,7 +975,7 @@ class Motif(Callback):
         for k, v in self._basepair.items():
             if k in strand.map or v in strand.map:
                 continue
-            new_basepair[k] = v
+            new_basepair[Position(k)] = Position(v)
         self._basepair = new_basepair
         strand._clear_callbacks()
         self._updated_strands()
@@ -1044,7 +1052,7 @@ class Motif(Callback):
                 for k, v in self._basepair.items():
                     new_k = (num_lines - 1 - k[1], k[0])
                     new_v = (num_lines - 1 - v[1], v[0])
-                    new_bp[new_k] = new_v
+                    new_bp[Position(new_k)] = Position(new_v)
                 self._basepair = new_bp
         return self
 
@@ -1055,6 +1063,10 @@ class Motif(Callback):
             The number of positions to shift the motif in the x and y direction.
         """
         Strand._check_position(input_pos_dir = direction)
+        try:
+            direction = Position(direction)
+        except Exception as e:
+            raise ValueError(f"Error converting the direction to a Position object: {e}")
         min_pos = self.min_pos
         # check if the shift will bring the strands to negative positions
         if min_pos[0] + direction[0] < 0 or min_pos[1] + direction[1] < 0:
@@ -1077,7 +1089,8 @@ class Motif(Callback):
                 if pos in s.map: # the strand has a junction in the opposite direction of the horizontal shift
                     extend_strand.append(Strand('─'*abs(direction[0]), start=(pos[0], pos[1] + direction[1]), direction=(int(copysign(1, direction[1])), 0)))
             # for each strand shift the starting position
-            s.start = (s.start[0] + direction[0], s.start[1] + direction[1])
+            # s.start = (s.start[0] + direction[0], s.start[1] + direction[1])
+            s.shift(direction)
             #loop through the strands forming the extensions
             for s2 in extend_strand:
                 s.join(s2) # join the strand to the vertical extension
@@ -1352,7 +1365,7 @@ class Motif(Callback):
     ### PROTECTED METHODS
     ###
 
-    def _updated_strands(self, *args, **kwargs):
+    def _updated_strands(self, **kwargs):
         """ Update the motif when the strands are changed. 
         This is a callback function that is called when the strands are changed. 
         The callback has to contains *args and **kwargs to be compatible with the Callback class."""
@@ -1367,13 +1380,13 @@ class Motif(Callback):
         if self.autopairing:
             self._basepair = BasePair()
             self._structure = None
-        self._trigger_callbacks()
+        self._trigger_callbacks(**kwargs)
 
-    def _updated_basepair(self, *args, **kwargs):
+    def _updated_basepair(self, **kwargs):
         """ Update the basepair dictionary when the sequence is changed. 
         The callback has to contains *args and **kwargs to be compatible with the Callback class."""
         self._structure = None # reset the dot bracket
-        self._trigger_callbacks()
+        self._trigger_callbacks(**kwargs)
         
     def _calculate_basepair(self):
         """
@@ -1398,7 +1411,7 @@ class Motif(Callback):
                             base2 = bmap2[pos2]
                             if base2 in base_pairing[base1]: # check the base pairing works
                                 # append position and connected symbol 
-                                basepair[pos1] = pos2
+                                basepair[Position(pos2)] = Position(pos1)
                                 break # don't test other directions
         # update the basepair
         self._basepair = basepair

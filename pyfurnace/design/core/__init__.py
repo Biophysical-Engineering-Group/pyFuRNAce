@@ -1,4 +1,5 @@
 from .symbols import *
+from .position import Position, Direction
 from .sequence import Sequence
 from .coordinates_3d import Coords, ProteinCoords
 from .strand import Strand, StrandsBlock

@@ -2,6 +2,7 @@ import warnings
 import copy
 from .symbols import *
 from .callback import Callback
+from .position import Position, Direction
 from .sequence import Sequence
 from .coordinates_3d import Coords
 try:
@@ -410,7 +411,7 @@ class Strand(Callback):
     @staticmethod
     def _check_position(input_pos_dir, direction=False):
         """ Check the input position or direction. If direction=True, also check the constrains for a direction"""
-        if isinstance(input_pos_dir, Direction):
+        if isinstance(input_pos_dir, (Direction, Position)):
             return True 
         if not (isinstance(input_pos_dir, (tuple, list)) and len(input_pos_dir) == 2 and isinstance(input_pos_dir[0], int) and isinstance(input_pos_dir[1], int)):
             raise ValueError(f'The 2D coordinates must be a tuple/list of (x,y) integer values. Got {input_pos_dir} instead.')
@@ -506,13 +507,18 @@ class Strand(Callback):
         build_strand += str(new_sequence)[seq_ind:]
         self._strand = build_strand
         self._reset_maps()
-        self._trigger_callbacks()
+        self._trigger_callbacks(**kwargs)
 
     def _reset_maps(self):
         """ Reset the strand map, base map and direction map"""
+        # Main map parameters
         self._map = None
         self._base_map = None
         self._direction_map = None
+        # # Additional parameters calculated from the map
+        # self._end = None
+        # self._prev_pos = None
+        # self._next_pos = None
 
     def _combine_pk_info(self, other):
         if not hasattr(self, 'pk_info') and not hasattr(other, 'pk_info'):
@@ -531,6 +537,7 @@ class Strand(Callback):
     ### 
     ### STATIC METHODS
     ###
+
 
     @staticmethod
     def join_strands(strand1, strand2):
@@ -570,6 +577,7 @@ class Strand(Callback):
             directionality = strand1.directionality if strand1.sequence else strand2.directionality
             # create a new joined strand
             joined_strand = Strand(strand1.strand + strand2.strand, directionality=directionality, start=strand1.start, direction=strand1.direction, coords=coords, callbacks = strand1.callbacks)
+            
             # update the pseudoknots information
             new_pk_info = strand1._combine_pk_info(strand2)
         # case 4: <--(1),<--(2)
@@ -581,6 +589,7 @@ class Strand(Callback):
             directionality = strand1.directionality if strand1.sequence else strand2.directionality
             # create a new joined strand
             joined_strand = Strand(strand2.strand + strand1.strand, directionality=directionality, start=strand2.start, direction=strand2.direction, coords=coords, callbacks = strand1.callbacks)
+
             # update the pseudoknots information
             new_pk_info = strand2._combine_pk_info(strand1)
         else: # no joining possible
@@ -676,7 +685,6 @@ class Strand(Callback):
         self._update_sequence_insertion(self._strand[::-1])
         self._reset_maps()
         # don't trigger the callbacks, the strand is the same for the Motif perspective
-        self._changed_map = True
         seq_len = len(self.sequence)
 
         # adjust the pseudoknots information
@@ -702,11 +710,10 @@ class Strand(Callback):
         self._check_position(x_y_tuple)
         x, y = x_y_tuple.value if isinstance(x_y_tuple, Direction) else tuple(x_y_tuple)
         self._start = (self.start[0] + x, self.start[1] + y)
-        self._map = None
-        self._base_map = None
-        self._direction_map = None
+        self._reset_maps()
         self._trigger_callbacks()
         return self
+    
 
     def insert(self, idx, val):
         """ Insert a sequence at index
@@ -914,6 +921,9 @@ class Strand(Callback):
         for attr in self.__dict__.keys():
             if attr not in new_stand.__dict__.keys():
                 setattr(new_stand, attr, copy.deepcopy(getattr(self, attr)))
+            # don't copy the list because this copies the callbacks
+            elif type(getattr(self, attr)) in (int, float, str, bool, tuple, dict):
+                setattr(new_stand, attr, copy.copy(getattr(self, attr)))
         return new_stand
 
 

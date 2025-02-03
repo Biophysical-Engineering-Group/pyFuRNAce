@@ -123,9 +123,14 @@ def simple_origami(dt_list: list, helix_kl: int = 1, main_stem: list = None, lef
                 if kl_index == start and add_start_end: # add the start motif after the first stem
                     half_l_stem = (stem_len - abs(dt)) // 2
                     half_r_stem = stem_len - abs(dt) - half_l_stem
-                    helix += [Stem(half_l_stem), start_end_stem(), Stem(half_r_stem), Dovetail(dt)]
+                    helix += [Stem(half_l_stem)
+                                .shift((1,0)).extend_junctions(), 
+                              start_end_stem(), 
+                              Stem(half_r_stem), Dovetail(dt)]
                 else:
-                    helix += [Stem(main_stem[helix_in][kl_index] - abs(dt)), Dovetail(dt)]
+                    helix += [Stem(main_stem[helix_in][kl_index] - abs(dt))
+                                .shift((6,0)).extend_junctions(), 
+                              Dovetail(dt)]
             # add a kissing normal loop repeat
             else:
                 helix += [Stem(left_stem), KissingDimer(), Stem(right_stem), Dovetail(dt)]

@@ -1,95 +1,130 @@
+from typing import Any, List
+import numpy as np
+from scipy.spatial.transform import Rotation as R
+
 try:
     from oxDNA_analysis_tools.PDB_oxDNA import PDB_oxDNA
     from oxDNA_analysis_tools.UTILS.RyeReader import conf_to_str, get_top_string
     oat_installed = True
 except ImportError:
     oat_installed = False
-import numpy as np
-from scipy.spatial.transform import Rotation as R
 
-class ProteinCoords():
-    def __init__(self, sequence: str='', coords: np.ndarray = np.array(())):
-        # initialize the sequence and coordinates
-        self._sequence = None
-        self._coords = np.array(())
-        # assign the values
+class ProteinCoords:
+    """
+    Represents a protein's sequence and its corresponding 3D coordinates.
+    
+    Attributes
+    ----------
+    sequence : str
+        The amino acid sequence of the protein.
+    coords : np.ndarray
+        A NumPy array containing the 3D coordinates associated with the sequence.
+    """
+    
+    def __init__(self, sequence: str = '', coords: np.ndarray = np.array(())) -> None:
+        """
+        Initialize the ProteinCoords instance with a sequence and coordinates.
+        
+        Parameters
+        ----------
+        sequence : str, optional
+            The amino acid sequence of the protein (default is an empty string).
+        coords : np.ndarray, optional
+            A NumPy array of shape (N, 3) representing the 3D coordinates (default is an empty array).
+        """
+        self._sequence: str = ''
+        self._coords: np.ndarray = np.array(())
         self.sequence = sequence
         self.coords = coords
-
-    def __str__(self):
+    
+    def __str__(self) -> str:
+        """Return a string representation of the ProteinCoords instance."""
         return f'ProteinCoords({self._sequence})'
     
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Return a string representation of the ProteinCoords instance."""
         return f'ProteinCoords({self._sequence})'
     
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> np.ndarray:
+        """Retrieve coordinates by index."""
         return self.coords[key]
     
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: int, value: np.ndarray) -> None:
+        """Set coordinates at a specific index."""
         self.coords[key] = value
-
-    def __len__(self):
+    
+    def __len__(self) -> int:
+        """Return the length of the sequence."""
         return len(self.sequence)
     
-    # def __deepcopy__(self, memo=None):
-    #     new_obj = ProteinCoords(self.sequence, self.coords.copy())
-    #     return new_obj
-
     @property
-    def sequence(self):
+    def sequence(self) -> str:
+        """Get the protein sequence."""
         return self._sequence
     
     @sequence.setter
-    def sequence(self, sequence):
+    def sequence(self, sequence: str) -> None:
+        """
+        Set the protein sequence and ensure it matches the coordinate length.
+        
+        Parameters
+        ----------
+        sequence : str
+            The amino acid sequence.
+        
+        Raises
+        ------
+        ValueError
+            If the sequence length does not match the coordinate length.
+        """
         if not isinstance(sequence, str):
             raise ValueError("The sequence must be a string")
         if self._sequence and self._coords.size > 0 and len(sequence) != len(self.coords):
             raise ValueError("The sequence must have the same length as the coords")
         self._sequence = sequence
-
+    
     @property
-    def coords(self):
+    def coords(self) -> np.ndarray:
+        """Get the 3D coordinates."""
         return self._coords
     
     @coords.setter
-    def coords(self, coords):
+    def coords(self, coords: np.ndarray) -> None:
+        """
+        Set the 3D coordinates and ensure they match the sequence length.
+        
+        Parameters
+        ----------
+        coords : np.ndarray
+            A NumPy array of shape (N, 3) representing the coordinates.
+        
+        Raises
+        ------
+        ValueError
+            If the coordinates are not a valid NumPy array or do not match the sequence length.
+        """
         if isinstance(coords, (list, tuple)):
             coords = np.array(coords)
         if not isinstance(coords, np.ndarray):
             raise ValueError("The coords must be a numpy array")
         if self._sequence and self._coords.size > 0 and len(self.sequence) != len(coords):
-            raise ValueError("The coords must have the same length as the sequence: expected len {len(self.sequence)}, got {len(coords)} coordinates")
+            raise ValueError(f"The coords must have the same length as the sequence: expected len {len(self.sequence)}, got {len(coords)} coordinates")
         self._coords = np.array(coords)
-
-    def copy(self):
+    
+    def copy(self) -> 'ProteinCoords':
+        """Create a copy of the ProteinCoords instance."""
         return ProteinCoords(self.sequence, np.copy(self.coords))
-
-    def transform(self, T):
-        # Separate position, base vector, and normal vector
-        if self._coords.size == 0:
-            return self
+    
+    def transform(self, T_matrix: np.ndarray) -> None:
+        """
+        Apply a transformation matrix to the coordinates.
         
-        positions = self._coords[:, 0]
-        base_vectors = self._coords[:, 1]
-        normal_vectors = self._coords[:, 2]
-
-        # Apply the transformation to all positions
-        positions_homogeneous = np.hstack((positions, np.ones((positions.shape[0], 1))))
-        transformed_positions = (T @ positions_homogeneous.T).T[:, :3]
-
-        # Extract the rotation matrix
-        rotation_matrix = T[:3, :3]
-
-        # Apply the rotation to all base and normal vectors
-        transformed_base_vectors = base_vectors @ rotation_matrix.T
-        transformed_normal_vectors = normal_vectors @ rotation_matrix.T
-
-        # Update the coordinates in place
-        self._coords[:, 0] = transformed_positions
-        self._coords[:, 1] = transformed_base_vectors
-        self._coords[:, 2] = transformed_normal_vectors
-
-        return self
+        Parameters
+        ----------
+        T_matrix : np.ndarray
+            A 4x4 transformation matrix.
+        """
+        Coords.transform_array(self._coords, T_matrix)
 
 class Coords():
     def __init__(self, input_array=np.array(()), dummy_ends=(np.array(()), np.array(())), proteins: list = None):
@@ -172,25 +207,7 @@ class Coords():
         """Apply the transformation matrix T to the coordinates"""
         # Separate position, base vector, and normal vector
         if self._array.size > 0:
-            positions = self._array[:, 0]
-            base_vectors = self._array[:, 1]
-            normal_vectors = self._array[:, 2]
-
-            # Apply the transformation to all positions
-            positions_homogeneous = np.hstack((positions, np.ones((positions.shape[0], 1))))
-            transformed_positions = (T @ positions_homogeneous.T).T[:, :3]
-
-            # Extract the rotation matrix
-            R = T[:3, :3]
-
-            # Apply the rotation to all base and normal vectors
-            transformed_base_vectors = base_vectors @ R.T
-            transformed_normal_vectors = normal_vectors @ R.T
-
-            # Update the coordinates in place
-            self._array[:, 0] = transformed_positions
-            self._array[:, 1] = transformed_base_vectors
-            self._array[:, 2] = transformed_normal_vectors
+            self.transform_array(self._array, T)
 
         if self._dummy_ends[0].size > 0:
             new_pos, new_bv, new_nv = Coords.apply_transformation(T, self._dummy_ends[0][0], self._dummy_ends[0][1], self._dummy_ends[0][2])
@@ -363,8 +380,9 @@ class Coords():
         # Convert position to homogeneous coordinates
         p_homogeneous = np.append(p, 1)
         # Apply the transformation to the position
-        p_transformed_homogeneous = T @ p_homogeneous
-        p_transformed = p_transformed_homogeneous[:3]
+        p_transformed_homogeneous = T @ p_homogeneous.T
+        p_transformed = p_transformed_homogeneous.T[:3]
+
         # Extract the rotation matrix
         rotation_matrix = T[:3, :3]
         rotation = R.from_matrix(rotation_matrix)
@@ -699,6 +717,35 @@ class Coords():
 
         print(f'Coords({coords.tolist()}{dummy_text}{protein_text})')
         
+    @staticmethod
+    def transform_array(array, T_matrix: np.ndarray) -> None:
+        """
+        Apply a transformation matrix to the coordinates inplace.
+        
+        Parameters
+        ----------
+        T_matrix : np.ndarray
+            A 4x4 transformation matrix.
+        """
+        if array.size == 0:
+            return
+        
+        positions = array[:, 0]
+        base_vectors = array[:, 1]
+        normal_vectors = array[:, 2]
+        
+        positions_homogeneous = np.hstack((positions, np.ones((positions.shape[0], 1))))
+        transformed_positions = (T_matrix @ positions_homogeneous.T).T[:, :3]
+        
+        rotation_matrix = T_matrix[:3, :3]
+        rotation = R.from_matrix(rotation_matrix)
+        
+        transformed_base_vectors = rotation.apply(base_vectors)
+        transformed_normal_vectors = rotation.apply(normal_vectors)
+        
+        array[:, 0] = transformed_positions
+        array[:, 1] = transformed_base_vectors
+        array[:, 2] = transformed_normal_vectors
 
     @staticmethod
     def cleanup_from_oxdna_file(filename, dummy_ends=(False, False), extend = (0, 0), return_coords=False, topology_file=None, protein=False):

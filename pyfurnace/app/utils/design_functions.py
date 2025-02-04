@@ -317,7 +317,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                 if st.session_state.line_index >= len(st.session_state.origami):
                     return 
                 if len(st.session_state.origami) > 0:
-                    del_line = st.button("Delete", key = 'del_line', help="Delete the choosen line")
+                    del_line = st.button("Delete Line", key = 'del_line', help="Delete the choosen line")
                     if del_line:
                         st.session_state.origami.pop(st.session_state.line_index) #remove choosen helix 
                         st.session_state.code.append(f'origami.pop({st.session_state.line_index})')
@@ -347,7 +347,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         with subcol2:
             ### Delete motif
             if len(origami[st.session_state.line_index]) > 0:
-                delete_button = st.button(':red[Delete]', key = 'delete_motif')
+                delete_button = st.button(':red[Delete Motif]', key = 'delete_motif')
                 if delete_button:
                     if st.session_state.motif_index == len(origami[st.session_state.line_index]):
                         st.session_state.motif_index -= 1
@@ -419,9 +419,9 @@ def add_motif(origami):
 
     ### Add motif
     def f_subcol3():
-            button_label = 'Insert'
+            button_label = 'Insert Motif'
             if st.session_state.motif_index == len(origami[st.session_state.line_index]):
-                button_label = 'Add'
+                button_label = 'Add Motif'
             add_button = st.button(f'**:green[{button_label}]**', key = 'insert_motif', help="Insert the motif at the choosen position")
             if add_button:
                 origami.insert((st.session_state.line_index, st.session_state.motif_index), motif) # add motif into choosen position
@@ -869,7 +869,9 @@ def build_origami_content(origami):
             for protein in s.coords.proteins:
                 tot_len += len(protein)
         cmap = plt.get_cmap(st.session_state.oxview_colormap)
-        c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len)]
+        oxview_offset = tot_len // 5
+        c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len + oxview_offset)]
+        c_map = c_map[oxview_offset:]
     
     # Prepare the string to add 5' and 3' symbols for the strands
     motif_list = [[' '] * (motif.num_char + 2)] + [[' '] + [char for char in line] + [' '] for line in origami_str.split('\n')] + [[' '] * (motif.num_char + 2)]

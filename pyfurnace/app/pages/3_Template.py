@@ -1,12 +1,12 @@
 import streamlit as st
 from pathlib import Path
-import hydralit_components as hc
+from streamlit_option_menu import option_menu
 import re
 from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio.SeqUtils import gc_fraction, molecular_weight
 import warnings
-from utils import load_logo
+from utils import load_logo, main_menu_style
 from utils.template_functions import symbols, write_format_text, check_dimer, sanitize_input, reference
 
 def convert_tab(seq):
@@ -190,13 +190,16 @@ if __name__ == "__main__":
     
     # create the tabs with the functions
     st.write("\n") # add space between initial menu and motif menu
-    option_data = [
-                    {'icon': "bi bi-arrow-repeat", 'label':"Convert"},
-                    {'icon': "bi bi-align-center",'label':"Align"},
-                    {'icon': "bi bi-bar-chart-steps", 'label':"Dimer"},
-                ]
-    first_theme = {'txc_inactive': '#262730','menu_background':'#F0F2F6','txc_active':'white','option_active':'#116656'}
-    selected_operation = hc.option_bar(option_definition=option_data, override_theme=first_theme, key='PrimaryOption', horizontal_orientation=True)
+    option_data = {'Convert': "bi bi-arrow-repeat",
+                     'Align': "bi bi-align-center",
+                     'Dimer': "bi bi-bar-chart-steps"}
+
+    selected_operation = option_menu(None, 
+                                    list(option_data.keys()),
+                                    icons=list(option_data.values()),
+                                    menu_icon="cast", 
+                                    orientation="horizontal",
+                                    styles=main_menu_style)
 
     if not seq:
         st.stop()

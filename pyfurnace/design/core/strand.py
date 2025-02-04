@@ -18,7 +18,15 @@ class Strand(Callback):
     ### MAGIC METHODS
     ###
 
-    def __init__(self, strand: str = '', directionality: str = '53', start: tuple = (0,0), direction: Direction=Direction.RIGHT, coords: Coords=None, strands_block = None, **kwargs):
+    def __init__(self, 
+                 strand: str = '', 
+                 directionality: str = '53', 
+                 start: Position = Position(0,0), 
+                 direction: Direction=Direction.RIGHT, 
+                 coords: Coords=None, 
+                 strands_block = None, 
+                 **kwargs):
+        
         super().__init__(**kwargs) # register the callback
         ### strings properties
         self._sequence = Sequence(sequence='', directionality=directionality, callback=self._updated_sequence)
@@ -29,14 +37,14 @@ class Strand(Callback):
 
         ### check the 2D direction 
         self._check_position(direction, True)
-        self._direction = direction.value if isinstance(direction, Direction) else tuple(direction)
+        self._direction = direction.value if isinstance(direction, Direction) else Position(direction)
 
         ### check the start position
         if start == "min":
             self._start = self.minimal_dimensions[1]
         else:
             self._check_position(start)
-            self._start = tuple(start)
+            self._start = Position(start)
         ### map properties
         self._reset_maps()
         if coords is None:
@@ -116,7 +124,7 @@ class Strand(Callback):
     def __contains__(self, other):
         """Check if a position or a substrand in included in the strand."""
         # check a position (a tuple or list containing two integers)
-        if isinstance(other, (tuple, list)) and len(other) == 2 and isinstance(other[0], int) and isinstance(other[1], int):
+        if isinstance(other, (Position, tuple, list)) and len(other) == 2 and isinstance(other[0], int) and isinstance(other[1], int):
             return other in self.map
         if isinstance(other, Sequence):
             return other in self.sequence
@@ -195,14 +203,14 @@ class Strand(Callback):
 
     @property
     def start(self):
-        """ Start position of the strand in the 2d representation: a tuple of x,y coordinates. """
+        """ Start position of the strand in the 2d representation: a Position/tuple of x,y coordinates. """
         return self._start
 
     @start.setter
     def start(self, new_start):
-        """ Start position setter: check that the inpur is a tuple/list of x,y coordinates. """
+        """ Start position setter: check that the inpur is a Position/tuple of x,y coordinates. """
         self._check_position(new_start)
-        self._start = tuple(new_start)
+        self._start = Position(new_start)
         self._reset_maps()
         self._trigger_callbacks()
 
@@ -215,7 +223,7 @@ class Strand(Callback):
     def direction(self, new_direction):
         """ The starting direction setter: a tuple of x,y coordinates in which one coordinate is 0 and the other is +- 1. """
         self._check_position(new_direction, True)
-        self._direction = new_direction.value if isinstance(new_direction, Direction) else tuple(new_direction)
+        self._direction = new_direction.value if isinstance(new_direction, Direction) else Position(new_direction)
         self._reset_maps()
         self._trigger_callbacks()
     
@@ -271,10 +279,10 @@ class Strand(Callback):
     @property
     def minimal_dimensions(self):
         """ Get the minimal size of the canvas and the suggested start (without taking into account structural errors)"""
-        start = [0, 0]
-        pos = [0,0]
-        pos_max = [0, 0]
-        direction = self.direction
+        start = Position(0,0)
+        pos = Position(0,0)
+        pos_max = Position(0,0)
+        direction = Position(self.direction)
         for sym in self:
             # check that the structure does not reach negative coordinates (x,y), in case add 1 to all positions
             for i in range(2):
@@ -285,15 +293,17 @@ class Strand(Callback):
                 # check if we find a nex maximum element in x,y
                 if pos[i] > pos_max[i]:
                     pos_max[i] = pos[i]
+
             ### UPDATE DIRECTIONS ###
             if sym in "╰╮\\":
-                direction = direction[::-1]
+                direction = Position(direction[1], direction[0])
             elif sym in "╭╯/":
-                direction = [-x for x in direction[::-1]]
+                direction = Position(-direction[1], -direction[0])
+
             # calculate new position
-            pos[0] += direction[0]
-            pos[1] += direction[1]
-        return tuple(pos_max), tuple(start)
+            pos += direction
+
+        return Position(pos_max), Position(start)
     
     @property
     def coords(self):
@@ -340,14 +350,15 @@ class Strand(Callback):
 
     def _calculate_map(self):
         """ A function to calculate the map """
-        pos = list(self.start)
-        direction = self.direction
-        self._prev_pos = (pos[0] - direction[0], pos[1] - direction[1])
+        pos = Position(self.start)
+        direction = Position(self.direction)
+        self._prev_pos = pos - direction
         pos_dict = {}
         dir_dict = {}
         new_strand = []  # Use list for efficient string concatenation
         translated = self.strand.translate(symb_to_road)
-        for sym in translated:
+        for i, sym in enumerate(translated):
+
             # Convert the symbol to road symbols
             if sym == '/':
                 if direction[0] == -1 or direction[1] == -1:
@@ -365,7 +376,20 @@ class Strand(Callback):
                     sym = '↑'
                 else:
                     sym = '↓'
-            
+            elif sym in "⊗⊙":
+                if sym == "⊗":
+                    new_strand.append("⊗")
+                    pos_dict[pos] = "⊗"
+                    dir_dict[pos] = direction + Position(0, 0, 1)
+                    pos = pos + Position(0, 0, 1)
+                    sym = "⊗"
+                elif sym == "⊙":
+                    new_strand.append("⊙")
+                    pos_dict[pos] = "⊙"
+                    dir_dict[pos] = direction - Position(0, 0, 1)
+                    pos = pos - Position(0, 0, 1)
+                    sym = "⊙"
+
             # Append the new symbol to the strand list
             new_strand.append(sym)
 
@@ -373,31 +397,29 @@ class Strand(Callback):
             if pos[0] < 0 or pos[1] < 0:
                 raise MotifStructureError(f"The strand reaches negative x,y coordinates: {pos}. The current map is: {pos_dict}. The last direction is: {direction}. Current strand: {''.join(new_strand)}")
 
-            pos_tuple = tuple(pos)
             
             # Check symbols and directions
             if direction[0] and any((sym == "│", direction[0] == 1 and sym in "╰╭", direction[0] == -1 and sym in "╮╯")):
                 raise MotifStructureError(f"The x direction of the strand (dx: {direction[0]}) is not compatible with the next symbol ({sym}). Current strand: {''.join(new_strand)}. Full strand: {self.strand}")
             elif direction[1] and any((sym == "─", direction[1] == 1 and sym in "╭╮", direction[1] == -1 and sym in "╰╯")):
                 raise MotifStructureError(f"The y direction of the strand (dy: {direction[1]}) is not compatible with the next symbol ({sym}). Current strand: {''.join(new_strand)}. Full strand: {self.strand}")
-            elif pos_tuple in pos_dict and sym not in "┼":
-                warnings.warn(f"The strand is doing a crossing not allowed, '{sym}' is trying to overwrite the symbol '{pos_dict[pos_tuple]}'. The symbol will be overwritten with '┼'.", AmbiguosStructure, stacklevel=3)
+            elif pos in pos_dict and sym not in "┼":
+                warnings.warn(f"The strand is doing a crossing not allowed, '{sym}' is trying to overwrite the symbol '{pos_dict[pos]}'. The symbol will be overwritten with '┼'.", AmbiguosStructure, stacklevel=3)
                 sym = '┼'
                 new_strand[-1] = sym
 
             # Add symbol to the map
-            pos_dict[pos_tuple] = sym
+            pos_dict[pos] = sym
 
             # Update directions
             if sym in "╰╮\\":
-                direction = (direction[1], direction[0])
+                direction = Position(direction[1], direction[0])
             elif sym in "╭╯/":
-                direction = (-direction[1], -direction[0])
-            dir_dict[pos_tuple] = direction
+                direction = Position(-direction[1], -direction[0])
+            dir_dict[pos] = direction
 
             # Update positions
-            pos[0] += direction[0]
-            pos[1] += direction[1]
+            pos += direction
 
         # Update the strand symbols
         new_strand = ''.join(new_strand)
@@ -405,15 +427,15 @@ class Strand(Callback):
             self._strand = new_strand
         self._map = pos_dict
         self._direction_map = dir_dict
-        self._end = (pos[0] - direction[0], pos[1] - direction[1])
-        self._next_pos = tuple(pos)
+        self._end = pos - direction
+        self._next_pos = pos
 
     @staticmethod
     def _check_position(input_pos_dir, direction=False):
         """ Check the input position or direction. If direction=True, also check the constrains for a direction"""
         if isinstance(input_pos_dir, (Direction, Position)):
             return True 
-        if not (isinstance(input_pos_dir, (tuple, list)) and len(input_pos_dir) == 2 and isinstance(input_pos_dir[0], int) and isinstance(input_pos_dir[1], int)):
+        if not (isinstance(input_pos_dir, (Position, tuple, list)) and len(input_pos_dir) == 2 and isinstance(input_pos_dir[0], int) and isinstance(input_pos_dir[1], int)):
             raise ValueError(f'The 2D coordinates must be a tuple/list of (x,y) integer values. Got {input_pos_dir} instead.')
         if direction and len(set(input_pos_dir) & {-1, 0, 1}) != 2:
             raise ValueError(f'2D direction not allowed. The allowed values are: right (1, 0); bottom (0, 1); left (-1, 0); top (0, -1). Got {input_pos_dir} instead.')
@@ -490,7 +512,7 @@ class Strand(Callback):
                 self._sequence.directionality = self._sequence.directionality[::-1]
                 # warnings.warn(f"The strand ends with the '{term_sym}' symbol but the sequence directionality is '{self._sequence.directionality}'.", AmbiguosStructure, stacklevel=3)
 
-    def _updated_sequence(self, new_sequence, **kwargs):
+    def _updated_sequence(self, new_sequence = None, **kwargs):
         if isinstance(new_sequence, str):
             new_sequence = Sequence(new_sequence, self._sequence.directionality, callback=self._updated_sequence)
         if len(new_sequence) != len(self._sequence):
@@ -612,7 +634,7 @@ class Strand(Callback):
     ### METHODS
     ###
 
-    def draw_strand(self, canvas: list = None, return_draw=True):
+    def draw_strand(self, canvas: list = None, return_draw=True, plane: int = 0):
         """ Draw the 2D structure of the strand and draw it on a canvas (a list of strings). 
         If the canvas is not given, it is calculated considering the maximum x,y positions.
         --------------------------------------------------------------------------------------
@@ -637,6 +659,8 @@ class Strand(Callback):
         ### ADD A SYMBOL AND CHECK THE CANVAS ###
         for pos, sym in map2d.items():
             canv_sym = canvas[pos[1]][pos[0]]
+            if len(pos) > 2 and pos[2] != plane:
+                continue
             # the strand is crossing a symbol in the canvas
             if canv_sym != ' ' and canv_sym not in "┼+" and sym not in "┼+":
                 current_canvas = '\n'.join(canvas)
@@ -701,14 +725,14 @@ class Strand(Callback):
         self._sequence.reverse()
         return self
     
-    def shift(self, x_y_tuple):
+    def shift(self, x_y_shift):
         """ Shift the strand in the 2D representation.
         --------------------------------------------------------------------------------------
-        x_y_tuple: tuple
+        x_y_shift: Position, Direction or tuple
             the shift in the x and y direction
         """
-        self._check_position(x_y_tuple)
-        x, y = x_y_tuple.value if isinstance(x_y_tuple, Direction) else tuple(x_y_tuple)
+        self._check_position(x_y_shift)
+        x, y = x_y_shift.value if isinstance(x_y_shift, Direction) else Position(x_y_shift)
         self._start = (self.start[0] + x, self.start[1] + y)
         self._reset_maps()
         self._trigger_callbacks()

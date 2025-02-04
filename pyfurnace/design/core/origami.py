@@ -1,3 +1,4 @@
+from functools import wraps
 from .symbols import *
 from .callback import Callback
 from .sequence import Sequence
@@ -428,9 +429,11 @@ class Origami(Callback):
     @sequence.setter
     def sequence(self, new_seq):
         """Set the sequence of the origami"""
-        if not isinstance(new_seq, (str, Sequence)) or len(new_seq) != len(self.sequence):
-            raise ValueError(f"The new sequence must be a string or a Sequence object with the same lenght of the current sequence ({len(self.sequence)}). Got type: {type(new_seq)}; with length: {len(new_seq)}")
-        new_seq = new_seq.replace('&', '') # remove the '&' symbol
+        # remove the '&' symbol
+        new_seq = new_seq.replace('&', '') 
+        seq_no_amp = self.sequence.replace('&', '') 
+        if not isinstance(new_seq, (str, Sequence)) or len(new_seq) != len(seq_no_amp):
+            raise ValueError(f"The new sequence must be a string or a Sequence object with the same lenght of the current sequence ({len(self.sequence)}). Got type: {type(new_seq)}; with length: {len(new_seq)}, excluding the '&' symbols.")
         offset = 0 # adjust the offset if there are multiple strands
         origami_motif = self.motif
         motif_map = self.map
@@ -741,11 +744,10 @@ class Origami(Callback):
         return [(y, x) for y, line in enumerate(self._matrix) for x, m in enumerate(line) if condition(m)]
 
 
-    def save_3d_model(self, filename: str = 'origami', forces: bool = False, return_text: bool = False, pdb=False, **kwargs):
-        """
-        Save the origami as an oxDNA file
-        """
-        return self.motif.save_3d_model(filename, forces=forces, return_text=return_text, pdb=pdb, **kwargs)
+    def save_3d_model(self, *args, **kwargs):
+        return self.motif.save_3d_model(*args, **kwargs)
+    
+    save_3d_model = wraps(Motif.save_3d_model)(save_3d_model)
 
     def append(self, item, copy=False):
         """ Append a motif to the last line of the Origami"""

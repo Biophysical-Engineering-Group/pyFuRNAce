@@ -1,5 +1,5 @@
 from collections.abc import MutableMapping
-from typing import Any, Dict, Iterator, Tuple, Union
+from typing import Any, Dict, Iterator
 
 # PyFurnace imports
 from .symbols import *

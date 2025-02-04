@@ -156,7 +156,7 @@ def test_motif_append_and_pop(m_two_strands):
     motif = m_two_strands.copy()
     initial_len = len(motif)
     initial_structure = motif.structure
-    motif.append(strand)
+    motif.append(strand, join=False)
     assert len(motif) == initial_len + 1
     popped = motif.pop()
     assert popped == strand

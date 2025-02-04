@@ -49,7 +49,7 @@ class Sequence(Callback):
             if idx < 0:
                 idx = len(self) + idx
             self._sequence = str(self._sequence[: idx] + val + self._sequence[idx+1:])
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
 
     def __add__(self, other):
         self._check_addition(other)
@@ -66,7 +66,7 @@ class Sequence(Callback):
     def __iadd__(self, other):
         self._check_addition(other)
         self._sequence = self._sequence + str(other)
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
         return self
 
     def __radd__(self, other):
@@ -118,7 +118,7 @@ class Sequence(Callback):
         if new_directionality not in ('53', '35'):
                 raise ValueError(f"Sequence directionality not allowed. It must be either '53' or '35', got {new_directionality} instead.")
         self._directionality = new_directionality
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
 
     ### 
     ### CHECK METHODS
@@ -157,7 +157,7 @@ class Sequence(Callback):
         new_sequence = str(self._sequence.translate(dictionary))
         self._check_line(new_sequence)
         self._sequence = new_sequence
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
         return self
 
     def reverse(self, inplace=True):
@@ -165,7 +165,7 @@ class Sequence(Callback):
         if not inplace:
             return Sequence(self._sequence, directionality=self._directionality[::-1], callback=self.callbacks)
         self._directionality = self._directionality[::-1]
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
         return self
 
     def complement(self):
@@ -227,7 +227,7 @@ class Sequence(Callback):
         seq_line = list(self._sequence)
         popped_val = seq_line.pop(idx)
         self._sequence = "".join(seq_line)
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
         return popped_val
     
     def replace(self, old, new):
@@ -240,7 +240,7 @@ class Sequence(Callback):
         """        
         self._check_line(new)
         self._sequence = str(self._sequence.replace(old, new))
-        self._trigger_callbacks()
+        self._trigger_callbacks(new_sequence = self._sequence)
         return self
     
     def upper(self):

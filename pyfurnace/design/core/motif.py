@@ -306,9 +306,12 @@ class Motif(Callback):
     def join_strands(strands):
         """ Try to join consecutive strands. Return the list of joined strands. """
         joined_strands = set()
-        # order the strand so you start joinig the 5' strand
-        strands = sorted(strands, key=lambda x: int('5' in x.strand))
         strands = [s for s in strands if s] # remove the empty strands
+        # ordering strand is:
+        # - the strands with 5' end
+        # - strand with the lowest y start position
+        # - strand with the lowest x start position
+        strands = sorted(strands, key=lambda s: (-int('5' in s.strand), *s.start[::-1]))
     
         ind1 = 0
         for ind1, s1 in enumerate(strands[:-1]):
@@ -1234,7 +1237,13 @@ class Motif(Callback):
         return ''.join(barriers), score
 
     
-    def save_3d_model(self, filename: str = 'motif', forces: bool = False, pk_forces: bool = False, return_text: bool = False, pdb=False, **kwargs):
+    def save_3d_model(self, filename: str = 'motif', 
+                      config: bool = True,
+                      topology: bool = True,
+                      forces: bool = False, 
+                      pk_forces: bool = False, 
+                      return_text: bool = False, 
+                      pdb=False, **kwargs):
         """ Save the motif in a oxDNA file format. """
         def get_kwargs_names(func):
             sig = signature(func)
@@ -1260,19 +1269,23 @@ class Motif(Callback):
                 seq = str(s.sequence[::-1])
                 coord_array = s.coords[::-1]
             # add the coordinates to the conformations text
-            for pos, a1, a3 in coord_array:
-                conf_text += f'{pos[0]} {pos[1]} {pos[2]} {a1[0]} {a1[1]} {a1[2]} {a3[0]} {a3[1]} {a3[2]}\n'
+            if config:
+                for pos, a1, a3 in coord_array:
+                    conf_text += f'{pos[0]} {pos[1]} {pos[2]} {a1[0]} {a1[1]} {a1[2]} {a3[0]} {a3[1]} {a3[2]}\n'
 
             # add the sequence to the topology text
-            topology_text += seq + ' type=RNA circular=false \n'
+            if topology:
+                topology_text += seq + ' type=RNA circular=false \n'
 
             # add the proteins to the conformation text
             try:
                 for protein in s.coords.proteins:
-                    for pos, a1, a3 in protein.coords:
-                        conf_text += f'{pos[0]} {pos[1]} {pos[2]} {a1[0]} {a1[1]} {a1[2]} {a3[0]} {a3[1]} {a3[2]}\n'
+                    if config:
+                        for pos, a1, a3 in protein.coords:
+                            conf_text += f'{pos[0]} {pos[1]} {pos[2]} {a1[0]} {a1[1]} {a1[2]} {a3[0]} {a3[1]} {a3[2]}\n'
                     # add the proteins to the topology text
-                    topology_text += f'{protein.sequence} type=peptide circular=false \n'
+                    if topology:
+                        topology_text += f'{protein.sequence} type=peptide circular=false \n'
                     n_nucleotides += len(protein)
                     n_strands += 1
             except Exception as e:
@@ -1285,11 +1298,13 @@ class Motif(Callback):
 
         # save the files
         conf_file = f'{filename}.dat'
-        with open(conf_file, 'w') as f:
-            f.write(conf_text)
+        if config:
+            with open(conf_file, 'w') as f:
+                f.write(conf_text)
         top_file = f'{filename}.top'
-        with open(top_file, 'w') as f:
-            f.write(topology_text)
+        if topology:
+            with open(top_file, 'w') as f:
+                f.write(topology_text)
 
         ### save the external forces
         if not forces and not pk_forces:

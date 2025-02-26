@@ -9,7 +9,7 @@ biopython
 ViennaRNA
 deap
 pandas
-matplotlib.pyplot
+matplotlib
 pytest
 st-oxview
 streamlit-shortcuts

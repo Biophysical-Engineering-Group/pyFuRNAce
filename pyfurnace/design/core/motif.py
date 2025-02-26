@@ -1,6 +1,5 @@
 from math import copysign
 import warnings
-import numpy as np
 from inspect import signature
 try:
     from oxDNA_analysis_tools.external_force_utils.force_reader import write_force_file
@@ -15,7 +14,7 @@ from .callback import Callback
 from .sequence import Sequence
 from .strand import Strand, StrandsBlock
 from .basepair import BasePair
-from .position import Position
+from .position import Position, Direction
 
 class Motif(Callback):
     """
@@ -313,22 +312,37 @@ class Motif(Callback):
         # - strand with the lowest x start position
         strands = sorted(strands, key=lambda s: (-int('5' in s.strand), *s.start[::-1]))
     
-        ind1 = 0
         for ind1, s1 in enumerate(strands[:-1]):
             if ind1 in joined_strands: # if the strand is empty, or is already joined skip it
                 continue 
+
             # join the strand with the consecutive strands until no more strands are joined
+            while True:
+                current_len = len(joined_strands)
+                for ind2, s2 in enumerate(strands): 
+                    # skip the second strand if: it's the same strand or the strands are already joined
+                    if ind1 == ind2 or ind2 in joined_strands: 
+                        continue 
 
-            for ind2, s2 in enumerate(strands):
-                # skip the second strand if: it's empty, it's the same strand, the strands are already joined
-                if ind1 == ind2 or ind2 in joined_strands: 
-                    continue 
+                    # skip if the motifs are not joinable for sure
+                    if len(set((s1.prev_pos,
+                                s1.start,
+                                s1.end,
+                                s1.next_pos,
+                                s2.prev_pos,
+                                s2.start,
+                                s2.end,
+                                s2.next_pos))) == 8:
+                        continue
+                    
+                    joined = Strand.join_strands(s1, s2) # join the strands
+                    if joined is not None: # if the strands are joined
+                        joined_strands.add(ind2) # add the index of the second strand to the joined strands
+                        strands[ind1] = joined # replace the first strand with the joined strand
+                        s1 = joined # update the first strand
 
-                joined = Strand.join_strands(s1, s2) # try to join the strands
-                if joined is not None: # if the strands are joined
-                    joined_strands.add(ind2) # add the index of the second strand to the joined strands
-                    strands[ind1] = joined # replace the first strand with the joined strand
-                    s1 = joined # update the first strand
+                if current_len == len(joined_strands):
+                    break
 
         return [s for i, s in enumerate(strands) if i not in joined_strands] # return the strands that are not joined
 
@@ -771,7 +785,11 @@ class Motif(Callback):
             return self._junctions
         
         ### update the junctions
-        junctions_dict = {(1,0): [], (0,1): [], (-1,0): [], (0,-1): []} # initialize the dictionary
+        junctions_dict = {Direction.RIGHT: [], # right
+                          Direction.DOWN: [], # bottom
+                          Direction.LEFT: [], # left
+                          Direction.UP: []} # top
+                        #   (0,1): [], (-1,0): [], (0,-1): []} # initialize the dictionary
         #                  right,    bottom,     left,      top
 
         ### collect the junctions
@@ -780,7 +798,7 @@ class Motif(Callback):
                 continue
             # skip if the the start is '5' or '3' and the strand is not just the symbol
             if s.map[s.start] not in '35' or len(s.map) == 1: 
-                junction_dir = (-s.direction[0], -s.direction[1]) # for the direction, invert the signes to have the direction of the junction
+                junction_dir = Direction(tuple([-x for x in s.direction])) # for the direction, invert the signes to have the direction of the junction
                 junctions_dict[junction_dir].append(s.start) # add the position to the junction
             # skip if the the end is '5' or '3' and the strand is not just the symbol
             if s.map[s.end] not in '35' or len(s.map) == 1: 

@@ -107,6 +107,10 @@ class BasePair(MutableMapping, Callback):
     def __len__(self) -> int:
         """Return the number of key-value pairs in the dictionary."""
         return len(self._store)
+    
+    ### 
+    ### PUBLIC METHODS
+    ###
 
     def keys(self) -> Any:
         """Return the dictionary's keys."""

@@ -34,6 +34,10 @@ class Callback:
         if 'callbacks' in kwargs:
             self._callbacks += kwargs['callbacks']  # Multiple callback registration
 
+    ### 
+    ### PROPERTIES
+    ###
+
     @property
     def callbacks(self) -> List[Callable[..., None]]:
         """
@@ -45,23 +49,21 @@ class Callback:
             A list of registered callback functions.
         """
         return self._callbacks
+    
+    ### 
+    ### PROTECTED METHODS
+    ###
 
-    def register_callback(self, callback: Callable[..., None]) -> None:
+    def _clear_callbacks(self) -> None:
         """
-        Register a new callback function to be executed when an event occurs.
-        
-        Parameters
-        ----------
-        callback : Callable[..., None]
-            The callback function to register.
+        Clear all registered callbacks from the object.
         
         Notes
         -----
-        - A callback function should accept keyword arguments (`**kwargs`).
-        - If the callback is already registered, it will not be added again.
+        This method is useful for resetting the object's callback state,
+        effectively removing all previously registered callbacks.
         """
-        if callback not in self._callbacks:
-            self._callbacks.append(callback)
+        self._callbacks = []
 
     def _trigger_callbacks(self, **kwargs: Any) -> None:
         """
@@ -83,13 +85,23 @@ class Callback:
         for callback in self._callbacks:
             callback(**kwargs)
 
-    def _clear_callbacks(self) -> None:
+    ###
+    ### PUBLIC METHODS
+    ### 
+    
+    def register_callback(self, callback: Callable[..., None]) -> None:
         """
-        Clear all registered callbacks from the object.
+        Register a new callback function to be executed when an event occurs.
+        
+        Parameters
+        ----------
+        callback : Callable[..., None]
+            The callback function to register.
         
         Notes
         -----
-        This method is useful for resetting the object's callback state,
-        effectively removing all previously registered callbacks.
+        - A callback function should accept keyword arguments (`**kwargs`).
+        - If the callback is already registered, it will not be added again.
         """
-        self._callbacks = []
+        if callback not in self._callbacks:
+            self._callbacks.append(callback)

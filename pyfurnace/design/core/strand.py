@@ -376,26 +376,27 @@ class Strand(Callback):
                     sym = '↑'
                 else:
                     sym = '↓'
-            elif sym in "⊗⊙":
-                if sym == "⊗":
-                    new_strand.append("⊗")
-                    pos_dict[pos] = "⊗"
-                    dir_dict[pos] = direction + Position(0, 0, 1)
-                    pos = pos + Position(0, 0, 1)
-                    sym = "⊗"
-                elif sym == "⊙":
-                    new_strand.append("⊙")
-                    pos_dict[pos] = "⊙"
-                    dir_dict[pos] = direction - Position(0, 0, 1)
-                    pos = pos - Position(0, 0, 1)
-                    sym = "⊙"
+            elif sym == "⊗":
+                direction = direction + Position(0, 0, 1)
+                # new_strand.append("⊗")
+                # pos_dict[pos] = "⊗"
+                # dir_dict[pos] = direction + Position(0, 0, 1)
+                # pos = pos + Position(0, 0, 1)
+                # sym = "⊗"
+            elif sym == "⊙":
+                direction = direction - Position(0, 0, 1)
+                # new_strand.append("⊙")
+                # pos_dict[pos] = "⊙"
+                # dir_dict[pos] = direction - Position(0, 0, 1)
+                # pos = pos - Position(0, 0, 1)
+                # sym = "⊙"
 
             # Append the new symbol to the strand list
             new_strand.append(sym)
 
             # Check for invalid positions and raise error early
-            if pos[0] < 0 or pos[1] < 0:
-                raise MotifStructureError(f"The strand reaches negative x,y coordinates: {pos}. The current map is: {pos_dict}. The last direction is: {direction}. Current strand: {''.join(new_strand)}")
+            if any(c < 0 for c in pos):
+                raise MotifStructureError(f"The strand reaches negative coordinates: {pos}. The current map is: {pos_dict}. The last direction is: {direction}. Current strand: {''.join(new_strand)}")
 
             
             # Check symbols and directions
@@ -658,6 +659,8 @@ class Strand(Callback):
         
         ### ADD A SYMBOL AND CHECK THE CANVAS ###
         for pos, sym in map2d.items():
+            if plane > 0 and len(pos) < 3:
+                continue
             canv_sym = canvas[pos[1]][pos[0]]
             if len(pos) > 2 and pos[2] != plane:
                 continue

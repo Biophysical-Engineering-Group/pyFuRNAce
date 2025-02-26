@@ -5,9 +5,6 @@ from .callback import Callback
 
 
 class Sequence(Callback):
-    ### 
-    ### MAGIC METHODS
-    ###
 
     def __init__(self, sequence: str = '', directionality: str = '53', **kwargs):
         super().__init__(**kwargs)

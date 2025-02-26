@@ -34,9 +34,6 @@ class Position(tuple):
         else:
             # Handle individual integer arguments
             pos_tuple = tuple(args)
-            
-        if len(pos_tuple) <3:
-            pos_tuple = pos_tuple + (0,)*(3-len(pos_tuple))
 
         if not all(isinstance(x, int) for x in pos_tuple):
             raise TypeError("Position arguments must be integers or a tuple/list of integers.")
@@ -151,6 +148,45 @@ class Position(tuple):
         """
         tuple1, tuple2 = self._adjust(self, other)
         return Position([a - b for a, b in zip(tuple1, tuple2)])
+    
+    def __eq__(self, value) -> bool:
+        """
+        Check if this Position is equal to another object.
+
+        Parameters
+        ----------
+        value : object
+            The object to compare with.
+
+        Returns
+        -------
+        bool
+            True if equal, otherwise False.
+        """
+        if not isinstance(value, (Position, tuple, list)):
+            return False
+        iter1, iter2 = self._adjust(self, value)
+        return all(a == b for a, b in zip(iter1, iter2))
+
+    def __hash__(self) -> int:
+        """
+        Return the hash value of the Position. 
+        Removing trailing zeros of dimenstions > 2 from the tuple 
+        before hashing to make sure that equivalent Positions 
+        with different dimensions are treated as equal.
+
+        Returns
+        -------
+        int
+            The hash value of the Position based on its contents.
+        """
+        # Remove trailing zeros before hashing
+        s_len = len(self)
+        # Find the number of trailing zeros after the first two dimensions
+        n_trail_zero = next((i for i, x in enumerate(reversed(self[2:])) if x != 0), s_len)
+        # Remove trailing zeros and hash
+        no_trail_zero = tuple(self[:s_len - n_trail_zero + 2])
+        return hash(no_trail_zero)
 
     @staticmethod
     def _adjust(iter1: Union[Tuple[int, ...], 'Position'], 
@@ -179,6 +215,8 @@ class Position(tuple):
             if not isinstance(pos, (tuple, list, Position, Direction)):
                 raise TypeError(f"Cannot adjust Position with {type(pos)}")
 
+        if len(iter1) == len(iter2):
+            return iter1, iter2
         iter1, iter2 = tuple(iter1), tuple(iter2)
         max_length = max(len(iter1), len(iter2))
         iter1 = Position(iter1 + (0,) * (max_length - len(iter1)))
@@ -190,10 +228,10 @@ class Direction(Enum):
     """
     An enumeration representing cardinal directions in a 2D space.
     """
-    UP = (0, -1)
-    DOWN = (0, 1)
-    LEFT = (-1, 0)
-    RIGHT = (1, 0)
+    UP = Position(0, -1)
+    DOWN = Position(0, 1)
+    LEFT = Position(-1, 0)
+    RIGHT = Position(1, 0)
 
     def __str__(self) -> str:
         """
@@ -215,14 +253,11 @@ class Direction(Enum):
         str
             A symbolic string representing the direction.
         """
-        if self == Direction.UP:
-            return "^"
-        if self == Direction.DOWN:
-            return "v"
-        if self == Direction.LEFT:
-            return "<"
-        if self == Direction.RIGHT:
-            return ">"
+        return {Direction.UP: "^",
+                Direction.DOWN: "v",
+                Direction.LEFT: "<",
+                Direction.RIGHT: ">",
+                }[self]
 
     def __mul__(self, other: Union['Direction', 'Position', int]) -> 'Position':
         """
@@ -238,13 +273,7 @@ class Direction(Enum):
         Position
             The resulting Position after multiplication.
         """
-        if isinstance(other, Direction):
-            return Position((self.value[0] * other.value[0], self.value[1] * other.value[1]))
-        if isinstance(other, Position):
-            return Position((self.value[0] * other[0], self.value[1] * other[1]))
-        if isinstance(other, int):
-            return Position((self.value[0] * other, self.value[1] * other))
-        return NotImplemented
+        return self.value * other
 
     def __add__(self, other: Union['Direction', 'Position', int]) -> 'Position':
         """
@@ -260,13 +289,8 @@ class Direction(Enum):
         Position
             The resulting Position after addition.
         """
-        if isinstance(other, Direction):
-            return Position((self.value[0] + other.value[0], self.value[1] + other.value[1]))
-        if isinstance(other, Position):
-            return Position((self.value[0] + other[0], self.value[1] + other[1]))
-        if isinstance(other, int):
-            return Position((self.value[0] + other, self.value[1] + other))
-        return NotImplemented
+        return self.value + other
+        
 
     def __sub__(self, other: Union['Direction', 'Position', int]) -> 'Position':
         """
@@ -282,13 +306,7 @@ class Direction(Enum):
         Position
             The resulting Position after subtraction.
         """
-        if isinstance(other, Direction):
-            return Position((self.value[0] - other.value[0], self.value[1] - other.value[1]))
-        if isinstance(other, Position):
-            return Position((self.value[0] - other[0], self.value[1] - other[1]))
-        if isinstance(other, int):
-            return Position((self.value[0] - other, self.value[1] - other))
-        return NotImplemented
+        return self.value - other
 
     def __hash__(self) -> int:
         """
@@ -299,7 +317,7 @@ class Direction(Enum):
         int
             The hash value.
         """
-        return hash(self.value)
+        return self.value.__hash__()
 
     def __eq__(self, value: object) -> bool:
         """
@@ -315,6 +333,4 @@ class Direction(Enum):
         bool
             True if equal, otherwise False.
         """
-        if isinstance(value, Direction):
-            return self.value == value.value
-        return self.value == value
+        return self.value.__eq__(value)

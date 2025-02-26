@@ -950,3 +950,7 @@ class Origami(Callback):
 
     def copy(self):
         return Origami(self._matrix, ss_assembly=self.ss_assembly, align=self.align, copy=True)
+    
+    def reload(self):
+        self._updated_motif()
+        self._assemble()

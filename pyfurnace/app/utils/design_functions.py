@@ -498,7 +498,7 @@ def custom(current_custom_motif):
         st.session_state["custom_strands"] = [pf.Strand('')]
 
     ### add instructions and common symbols
-    with st.expander("Instructions and common symbols", expanded=False):
+    with st.popover("Instructions and common symbols"):
         st.markdown("*:orange[Click on the grid to add a strand. To continue the strand, click again on any point on the same line or column. Curves simbols and crossings are calculated automatically.]*")
         st.write('Common strand symbols to copy and use:')
         common_pyroad_sym = ["─", "│", "╭", "╮", "╰", "╯", "^", "┼", '┊', "&"]
@@ -760,7 +760,7 @@ def update_code(code_text):
         st.session_state.origami = local_context['origami']  # Retrieve the modified origami variable
         st.success("Nanostructure updated successfully!")
     except Exception as e:
-        st.error(f"Error in executing the code: {str(e)}")
+        st.error(f"Error in executing the code: {e}")
         return False
     st.session_state.code = code_text.split('\n\n')
     st.rerun()

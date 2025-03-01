@@ -1,5 +1,6 @@
 import random
 import warnings
+from typing import Tuple
 from .basepair import BasePair
 
 ###
@@ -255,6 +256,120 @@ def dot_bracket_to_stacks(dot_bracket, only_opening=False):
         last_stack_pair = stack_pair
         current_pair_sym = symbol
     return ''.join(reduced_dot_bracket), stacks
+
+def folding_barriers(structure: str,
+                     kl_delay: int = 150) -> Tuple[str, int]:
+    """
+    Compute the folding barriers for a given RNA secondary structure.
+    This function is based on ROAD: https://www.nature.com/articles/s41557-021-00679-1
+    This function analyzes the dot-bracket representation of the RNA secondary structure 
+    to determine folding barriers based on base pair topology and kinetic delay.
+
+    Parameters
+    ----------
+    structure : str
+        The dot-bracket notation representing the secondary structure of the RNA. 
+        If folding barriers is called from a Motif or Origami, the structure is already
+        provided by the object in the dot-bracket format.
+    kl_delay : int, optional, default=150
+        The number of nucleotides (nts) of delay before kissing loops (KLs) snap closed.
+        A typical realistic value is around 350 (~1 second), while a more conservative 
+        setting is 150 by default.
+
+    Returns
+    -------
+    Tuple[str, int]
+        A tuple containing:
+        - A string representing the barrier map where:
+        'N' = no barrier (0 penalty),
+        'w' = opening pair weak barrier (1 penalty),
+        'W' = cloding pair weak barrier (1 penalty),
+        'S' = strong barrier (2 penalty).
+        - An integer score indicating the total penalty based on barrier strengths.
+
+    Notes
+    -----
+    The function assigns barrier strengths based on the topology of base pairs 
+    and kinetic constraints, ensuring proper folding predictions.
+    """
+    ss_len = len(structure)
+    s_map = dot_bracket_to_pair_map(structure)
+    barriers = [''] * len(structure)
+
+    # don't count the nucleotides in the 3' terminal position
+    terminal_3_bonus = 16
+
+    current_barr_count = 0
+    for ind in range(ss_len):
+        # get the bracket at the position
+        bra = structure[ind]
+        if bra == '&':
+            barriers[ind] = '&'
+            continue
+
+        # set the default barrier to 'N'
+        barriers[ind] = 'N'
+
+        if ind > ss_len - terminal_3_bonus:
+            if s_map[ind] is not None:
+                barriers[s_map[ind]] = 'N'
+            continue
+
+        ### unpaired nts are not barriers and reset the current barrier count
+        if bra == '.':
+            barriers[ind] = 'N'
+            current_barr_count = 0
+
+        ### opening pairs may be barriers or not, 
+        # indicate them with 'w', reset the barrier count
+        elif bra == '(':
+            barriers[ind] = 'w'
+            current_barr_count = 0
+
+        ### closing pairs may be barriers or not, 
+        # depending on the topology count
+        elif bra == ')':
+            # if the opening pair is not blocked, 
+            # we close and reset the current barrier count
+            if barriers[s_map[ind]] == 'w':
+                barriers[ind] = 'N'
+                barriers[s_map[ind]] = 'N'
+                current_barr_count = 0
+
+            # if the closing pair is already blocked, then 
+            # we mark the barrier reached and start counting
+            elif barriers[s_map[ind]] == 'S':
+                # if the current barrier count is greater than 5, wa mark it with 'S'
+                if current_barr_count > 5:
+                    barriers[ind] = 'S'
+                    barriers[s_map[ind]] = 'W'
+                # if the current barrier count is less than 5, we mark it with 'W'
+                else:
+                    barriers[ind] = 'W'
+                    barriers[s_map[ind]] = 'W'
+                current_barr_count += 1
+
+        # if the index is bigger than the kl_delay, 
+        # we check if the internal KLs are closed
+        if ind > kl_delay:
+            
+            # we check if the KLs are closed, 
+            # if yes, we mark them with 'N'
+            close_sym = structure[ind - kl_delay]
+            if close_sym not in '(.)' and close_sym in db_pairs.values():
+                barriers[ind - kl_delay] == 'N'
+                barriers[s_map[ind - kl_delay]] == 'N'
+
+                # for each nt in the delay, we check if there are any barriers, 
+                # if yes, we mark them with 'S'
+                for k in range(s_map[ind - kl_delay], ind-kl_delay):
+                    if barriers[k] == 'w':
+                        barriers[k] = 'S'
+                        
+    penalty = {'S': 2, 'W': 1, 'w': 1, 'N': 0, '&': 0}
+    repl = [penalty[i] for i in barriers]
+    score = sum(repl)
+    return ''.join(barriers), score
 
 class Node():
     def __init__(self, index = None, label = "5'", parent=None, seq="", **kwargs):

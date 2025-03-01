@@ -759,6 +759,11 @@ def update_code(code_text):
         exec(code_text, {'__builtins__': __builtins__, 'pf': pf}, local_context)
         st.session_state.origami = local_context['origami']  # Retrieve the modified origami variable
         st.success("Nanostructure updated successfully!")
+
+        # select the end of the origami
+        st.session_state.line_index = len(st.session_state.origami) - 1
+        st.session_state.motif_index = len(st.session_state.origami[-1])
+
     except Exception as e:
         st.error(f"Error in executing the code: {e}")
         return False

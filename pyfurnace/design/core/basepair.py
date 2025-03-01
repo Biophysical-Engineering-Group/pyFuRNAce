@@ -1,7 +1,7 @@
 from collections.abc import MutableMapping
 from typing import Any, Dict, Iterator
 
-# PyFurnace imports
+# pyFuRNAce IMPORTS
 from .symbols import *
 from .callback import Callback
 
@@ -107,6 +107,12 @@ class BasePair(MutableMapping, Callback):
     def __len__(self) -> int:
         """Return the number of key-value pairs in the dictionary."""
         return len(self._store)
+    
+    def __eq__(self, other: Any) -> bool:
+        """Check if two Basepair or dictionary have the same key-value pairs."""
+        if not isinstance(other, (BasePair, dict)):
+            return False
+        return all(self[k] == other[k] for k in self.keys())
     
     ### 
     ### PUBLIC METHODS

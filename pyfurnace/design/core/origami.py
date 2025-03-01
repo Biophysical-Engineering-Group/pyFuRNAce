@@ -743,11 +743,13 @@ class Origami(Callback):
             raise ValueError(f'The condition must be a function or a Motif object, but {condition} was given.')
         return [(y, x) for y, line in enumerate(self._matrix) for x, m in enumerate(line) if condition(m)]
 
-
+    @wraps(Motif.save_3d_model)
     def save_3d_model(self, *args, **kwargs):
         return self.motif.save_3d_model(*args, **kwargs)
     
-    save_3d_model = wraps(Motif.save_3d_model)(save_3d_model)
+    @wraps(Motif.folding_barriers) # inherit the documentation from the function
+    def folding_barriers(self, kl_delay: int = 150) -> Tuple[str, int]:
+        return self.motif.folding_barriers(kl_delay=kl_delay)
 
     def append(self, item, copy=False):
         """ Append a motif to the last line of the Origami"""

@@ -21,30 +21,38 @@ class Strand(Callback):
     def __init__(self, 
                  strand: str = '', 
                  directionality: str = '53', 
-                 start: Position = Position(0,0), 
-                 direction: Direction=Direction.RIGHT, 
+                 start: Position = None, 
+                 direction: Direction=None, 
                  coords: Coords=None, 
                  strands_block = None, 
                  **kwargs):
         
         super().__init__(**kwargs) # register the callback
         ### strings properties
-        self._sequence = Sequence(sequence='', directionality=directionality, callback=self._updated_sequence)
+        self._sequence = Sequence(sequence='', 
+                                  directionality=directionality, 
+                                  callback=self._updated_sequence)
         strand = strand.upper()
         if not isinstance(strand, Sequence):
             self._check_line(strand)
         self._update_sequence_insertion(strand)
 
         ### check the 2D direction 
-        self._check_position(direction, True)
-        self._direction = direction.value if isinstance(direction, Direction) else Position(direction)
+        if direction is None:
+            self.direction = Direction.RIGHT
+        else:
+            self._check_position(direction, True)
+            self._direction = direction.value if isinstance(direction, Direction) else Position(direction)
 
         ### check the start position
         if start == "min":
             self._start = self.minimal_dimensions[1]
+        elif start is None:
+            self._start = Position.zero()
         else:
             self._check_position(start)
             self._start = Position(start)
+
         ### map properties
         self._reset_maps()
         if coords is None:
@@ -79,7 +87,7 @@ class Strand(Callback):
 
     def __add__(self, other):
         other = self._check_addition(other)
-        coords = Coords.combine_coords(self, self.coords, other, other.coords)
+        coords = Coords.combine_coords(self, other)
         new_strand = Strand(str(self)+ str(other), 
                             self.sequence.directionality, 
                             self.start, self.direction, 
@@ -93,7 +101,7 @@ class Strand(Callback):
     def __iadd__(self, other):
         other = self._check_addition(other)
         self.strand = self.strand + other.strand
-        coords = Coords.combine_coords(self, self.coords, other, other.coords)
+        coords = Coords.combine_coords(self, other)
         self._coords = coords
         self._trigger_callbacks()
         new_pk_info = self._combine_pk_info(other)
@@ -105,9 +113,17 @@ class Strand(Callback):
         if other == 0:
             return self
         elif isinstance(other, str):
-            return Strand(other + str(self), directionality=self.directionality, start=self.start, direction=self.direction, callbacks=self._callbacks)
+            return Strand(other + str(self), 
+                          directionality=self.directionality, 
+                          start=self.start, 
+                          direction=self.direction, 
+                          callbacks=self._callbacks)
         elif isinstance(other, Sequence):
-            return Strand(str(other) + str(self), directionality=self.directionality, start=self.start, direction=self.direction, callbacks=self._callbacks)
+            return Strand(str(other) + str(self), 
+                          directionality=self.directionality, 
+                          start=self.start, 
+                          direction=self.direction, 
+                          callbacks=self._callbacks)
         else:
             return self.__add__(other)
         
@@ -124,7 +140,7 @@ class Strand(Callback):
     def __contains__(self, other):
         """Check if a position or a substrand in included in the strand."""
         # check a position (a tuple or list containing two integers)
-        if isinstance(other, (Position, tuple, list)) and len(other) == 2 and isinstance(other[0], int) and isinstance(other[1], int):
+        if isinstance(other, (Position, tuple)):
             return other in self.map
         if isinstance(other, Sequence):
             return other in self.sequence
@@ -279,31 +295,39 @@ class Strand(Callback):
     @property
     def minimal_dimensions(self):
         """ Get the minimal size of the canvas and the suggested start (without taking into account structural errors)"""
-        start = Position(0,0)
-        pos = Position(0,0)
-        pos_max = Position(0,0)
-        direction = Position(self.direction)
+        start = Position.zero()
+        pos = Position.zero()
+        pos_max = [0, 0]
+        direction = self.direction
+
         for sym in self:
-            # check that the structure does not reach negative coordinates (x,y), in case add 1 to all positions
-            for i in range(2):
-                if pos[i] < 0:
-                    for l in (start, pos, pos_max):
-                        # add +1 to the element that is negative
-                        l[i] += 1
-                # check if we find a nex maximum element in x,y
-                if pos[i] > pos_max[i]:
-                    pos_max[i] = pos[i]
+            # check that the structure does not reach negative coordinates, in case add 1 to all positions
+            negative = Position((int(x<0) for x in pos))
+
+            if any(negative):
+                # add +1 to the element that is negative
+                start += negative
+                pos += negative
+
+            # check if we find a nex maximum element in x,y
+            for i, v in enumerate(pos):
+                if v > pos_max[i]:
+                    pos_max[i] = v
 
             ### UPDATE DIRECTIONS ###
             if sym in "╰╮\\":
-                direction = Position(direction[1], direction[0])
+                direction = direction.swap_xy()
             elif sym in "╭╯/":
-                direction = Position(-direction[1], -direction[0])
+                direction = direction.swap_xy_change_sign()
+            elif sym == "⊗":
+                direction += Position((0, 0, 1))
+            elif sym == "⊙":
+                direction -= Position((0, 0, 1))
 
             # calculate new position
             pos += direction
 
-        return Position(pos_max), Position(start)
+        return Position(pos_max), start
     
     @property
     def coords(self):
@@ -350,8 +374,8 @@ class Strand(Callback):
 
     def _calculate_map(self):
         """ A function to calculate the map """
-        pos = Position(self.start)
-        direction = Position(self.direction)
+        pos = self.start
+        direction = self.direction
         self._prev_pos = pos - direction
         pos_dict = {}
         dir_dict = {}
@@ -377,14 +401,14 @@ class Strand(Callback):
                 else:
                     sym = '↓'
             elif sym == "⊗":
-                direction = direction + Position(0, 0, 1)
+                direction = direction + Position((0, 0, 1))
                 # new_strand.append("⊗")
                 # pos_dict[pos] = "⊗"
                 # dir_dict[pos] = direction + Position(0, 0, 1)
                 # pos = pos + Position(0, 0, 1)
                 # sym = "⊗"
             elif sym == "⊙":
-                direction = direction - Position(0, 0, 1)
+                direction = direction - Position((0, 0, 1))
                 # new_strand.append("⊙")
                 # pos_dict[pos] = "⊙"
                 # dir_dict[pos] = direction - Position(0, 0, 1)
@@ -414,9 +438,9 @@ class Strand(Callback):
 
             # Update directions
             if sym in "╰╮\\":
-                direction = Position(direction[1], direction[0])
+                direction = direction.swap_xy()
             elif sym in "╭╯/":
-                direction = Position(-direction[1], -direction[0])
+                direction = direction.swap_change_sign_xy()
             dir_dict[pos] = direction
 
             # Update positions
@@ -436,7 +460,9 @@ class Strand(Callback):
         """ Check the input position or direction. If direction=True, also check the constrains for a direction"""
         if isinstance(input_pos_dir, (Direction, Position)):
             return True 
-        if not (isinstance(input_pos_dir, (Position, tuple, list)) and len(input_pos_dir) == 2 and isinstance(input_pos_dir[0], int) and isinstance(input_pos_dir[1], int)):
+        if isinstance(input_pos_dir, (Direction, Position)):
+            return True
+        if not (isinstance(input_pos_dir, (tuple, list))) and isinstance(input_pos_dir[0], int) and isinstance(input_pos_dir[1], int):
             raise ValueError(f'The 2D coordinates must be a tuple/list of (x,y) integer values. Got {input_pos_dir} instead.')
         if direction and len(set(input_pos_dir) & {-1, 0, 1}) != 2:
             raise ValueError(f'2D direction not allowed. The allowed values are: right (1, 0); bottom (0, 1); left (-1, 0); top (0, -1). Got {input_pos_dir} instead.')
@@ -595,7 +621,7 @@ class Strand(Callback):
         if s1_end_next == strand2.start:
             strand1._check_addition(strand2, copy=False) # check right direction for addition
             # join the coordinates
-            coords = Coords.combine_coords(strand1, strand1.coords, strand2, strand2.coords)
+            coords = Coords.combine_coords(strand1, strand2)
             # set the directionality of the strand with the sequence
             directionality = strand1.directionality if strand1.sequence else strand2.directionality
             # create a new joined strand
@@ -607,7 +633,7 @@ class Strand(Callback):
         elif s1_start_prev == strand2.end:
             strand1._check_addition(strand2, copy=False) # check right direction for addition
             # join the coordinates
-            coords = Coords.combine_coords(strand2, strand2.coords, strand1, strand1.coords)
+            coords = Coords.combine_coords(strand2, strand1)
             # setting the strand set the callbacks
             directionality = strand1.directionality if strand1.sequence else strand2.directionality
             # create a new joined strand
@@ -693,19 +719,20 @@ class Strand(Callback):
                 new_x = max(map2d.keys(), key=lambda x: x[0])[0] - self._start[0]
             if vertically:
                 new_y = max(map2d.keys(), key=lambda x: x[1])[1] - self._start[1]
-            self._start = (new_x, new_y)
+            self._start = self._start.replace(x=new_x, y=new_y)
+
         if horizontally:
-            self._direction = (-self._direction[0], self._direction[1])
+            self._direction = self._direction.replace(x=-self._direction[0], y=self._direction[1])
             self._strand = self._strand.translate(horiz_flip) 
         if vertically:
-            self._direction = (self._direction[0], -self._direction[1])
+            self._direction = self._direction.replace(x=self._direction[0], y=-self._direction[1])
             self._strand = self._strand.translate(verti_flip)
         self._trigger_callbacks() # trigger the callbacks only once
 
     def invert(self):
         """ Invert the start/end sides to build the structure"""
         end = self.end
-        self._direction = (- self.end_direction[0], - self.end_direction[1])
+        self._direction = self._direction * -1
         self._start = end
         self._sequence._directionality = self._sequence._directionality[::-1]
         self._coords.reverse_in_place()
@@ -728,15 +755,14 @@ class Strand(Callback):
         self._sequence.reverse()
         return self
     
-    def shift(self, x_y_shift):
+    def shift(self, shift_position):
         """ Shift the strand in the 2D representation.
         --------------------------------------------------------------------------------------
-        x_y_shift: Position, Direction or tuple
+        shift_position: Position, Direction or tuple
             the shift in the x and y direction
         """
-        self._check_position(x_y_shift)
-        x, y = x_y_shift.value if isinstance(x_y_shift, Direction) else Position(x_y_shift)
-        self._start = (self.start[0] + x, self.start[1] + y)
+        self._check_position(shift_position)
+        self._start += shift_position
         self._reset_maps()
         self._trigger_callbacks()
         return self
@@ -801,7 +827,7 @@ class Strand(Callback):
         if s1_end_next == other.start:
             self._check_addition(other, copy=False) # check right direction for addition
             # join the coordinates
-            coords = Coords.combine_coords(self, self.coords, other, other.coords)
+            coords = Coords.combine_coords(self, other)
             # setting the strand set the callbacks
             if not self._sequence: # if the sequence is empty, set the sequence of the other strand, so the direction is set correctly
                 self._sequence = other.sequence
@@ -819,7 +845,7 @@ class Strand(Callback):
         elif s1_start_prev == other.end:
             self._check_addition(other, copy=False) # check right direction for addition
             # join the coordinates
-            coords = Coords.combine_coords(other, other.coords, self, self.coords)
+            coords = Coords.combine_coords(other, self)
             # setting the strand set the callbacks
             self._start = other.start
             self._direction = other.direction

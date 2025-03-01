@@ -1,6 +1,6 @@
 import pytest
 from pyfurnace.design import Strand
-from pyfurnace.design import RIGHT, LEFT, UP, DOWN
+from pyfurnace.design import RIGHT, LEFT
 
 
 # Test Fixture

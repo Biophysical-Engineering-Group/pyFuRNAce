@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial.transform import Rotation as R
-from typing import Any, Tuple, List, Union, Literal
+from typing import Tuple, List, Union, Literal
 
 ### OAT IMPORTS
 try:
@@ -10,10 +10,11 @@ try:
 except ImportError:
     oat_installed = False
 
+
 class ProteinCoords:
     """
     Represents a protein's sequence and its corresponding 3D coordinates.
-    
+
     Attributes
     ----------
     sequence : str
@@ -21,11 +22,11 @@ class ProteinCoords:
     coords : np.ndarray
         A NumPy array containing the 3D coordinates associated with the sequence.
     """
-    
+
     def __init__(self, sequence: str = '', coords: np.ndarray = np.array(())) -> None:
         """
         Initialize the ProteinCoords instance with a sequence and coordinates.
-        
+
         Parameters
         ----------
         sequence : str, optional
@@ -37,75 +38,78 @@ class ProteinCoords:
         self._coords: np.ndarray = np.array(())
         self.sequence = sequence
         self.coords = coords
-    
+
     def __str__(self) -> str:
         """Return a string representation of the ProteinCoords instance."""
         return f'ProteinCoords({self._sequence})'
-    
+
     def __repr__(self) -> str:
         """Return a string representation of the ProteinCoords instance."""
         return f'ProteinCoords({self._sequence})'
-    
+
     def __getitem__(self, key: int) -> np.ndarray:
         """Retrieve coordinates by index."""
         return self.coords[key]
-    
+
     def __setitem__(self, key: int, value: np.ndarray) -> None:
         """Set coordinates at a specific index."""
         self.coords[key] = value
-    
+
     def __len__(self) -> int:
         """Return the length of the sequence."""
         return len(self.sequence)
-    
+
     ###
     ### PROPERTIES
     ###
-    
+
     @property
     def coords(self) -> np.ndarray:
         """Get the 3D coordinates."""
         return self._coords
-    
+
     @coords.setter
     def coords(self, coords: np.ndarray) -> None:
         """
         Set the 3D coordinates and ensure they match the sequence length.
-        
+
         Parameters
         ----------
         coords : np.ndarray
             A NumPy array of shape (N, 3) representing the coordinates.
-        
+
         Raises
         ------
         ValueError
-            If the coordinates are not a valid NumPy array or do not match the sequence length.
+            If the coordinates are not a valid NumPy array or do not
+            match the sequence length.
         """
         if isinstance(coords, (list, tuple)):
             coords = np.array(coords)
         if not isinstance(coords, np.ndarray):
             raise ValueError("The coords must be a numpy array")
-        if self._sequence and self._coords.size > 0 and len(self.sequence) != len(coords):
-            raise ValueError(f"The coords must have the same length as the sequence: expected len"
-                             f" {len(self.sequence)}, got {len(coords)} coordinates")
+        if (self._sequence and self._coords.size > 0
+                and len(self.sequence) != len(coords)):
+            raise ValueError(f"The coords and the sequence must have the same length:"
+                             f" expected len{len(self.sequence)},"
+                             f"  got {len(coords)} coordinates")
         self._coords = np.array(coords)
-    
+
     @property
     def sequence(self) -> str:
         """Get the protein sequence."""
         return self._sequence
-    
+
     @sequence.setter
     def sequence(self, sequence: str) -> None:
         """
         Set the protein sequence and ensure it matches the coordinate length.
-        
+
         Parameters
         ----------
         sequence : str
             The amino acid sequence.
-        
+
         Raises
         ------
         ValueError
@@ -113,22 +117,23 @@ class ProteinCoords:
         """
         if not isinstance(sequence, str):
             raise ValueError("The sequence must be a string")
-        if self._sequence and self._coords.size > 0 and len(sequence) != len(self.coords):
+        if (self._sequence and self._coords.size > 0 
+                and len(sequence) != len(self.coords)):
             raise ValueError("The sequence must have the same length as the coords")
         self._sequence = sequence
 
     ###
     ### PUBLIC METHODS
     ###
-    
+
     def copy(self) -> 'ProteinCoords':
         """Create a copy of the ProteinCoords instance."""
         return ProteinCoords(self.sequence, np.copy(self.coords))
-    
+
     def transform(self, T_matrix: np.ndarray) -> None:
         """
         Apply a transformation matrix to the coordinates.
-        
+
         Parameters
         ----------
         T_matrix : np.ndarray
@@ -195,7 +200,7 @@ class Coords:
     def __getitem__(self, key: int) -> np.ndarray:
         """Get item from array."""
         return self.array[key]
-    
+
     def __setitem__(self, key: int, value: np.ndarray) -> None:
         """Set item in array."""
         self.array[key] = value
@@ -203,11 +208,11 @@ class Coords:
     def __str__(self) -> str:
         """Return a string representation of the coordinates."""
         return f'Coords({self.array.tolist()})'
-    
+
     def __len__(self) -> int:
         """Return the number of elements in the coordinates array."""
         return len(self.array)
-    
+
     ###
     ### PROPERTIES
     ###
@@ -216,7 +221,7 @@ class Coords:
     def array(self) -> np.ndarray:
         """Return the coordinates array."""
         return self._array
-    
+
     @array.setter
     def array(self, new_array: Union[np.ndarray, List, Tuple]) -> None:
         """
@@ -235,7 +240,7 @@ class Coords:
     def dummy_ends(self) -> Tuple[np.ndarray, np.ndarray]:
         """Return the dummy ends."""
         return self._dummy_ends
-    
+
     @dummy_ends.setter
     def dummy_ends(self, new_dummy: Tuple[np.ndarray, np.ndarray]) -> None:
         """
@@ -255,7 +260,7 @@ class Coords:
     def proteins(self) -> List['ProteinCoords']:
         """Return the list of proteins."""
         return self._proteins
-    
+
     @proteins.setter
     def proteins(self, proteins: List['ProteinCoords']) -> None:
         """
@@ -269,17 +274,17 @@ class Coords:
         if not isinstance(proteins, list) or any(not isinstance(p, ProteinCoords) for p in proteins):
             raise ValueError("The proteins argument must be a list of ProteinCoords instances")
         self._proteins = proteins
-    
+
     @property
     def shape(self) -> Tuple[int, ...]:
         """Return the shape of the coordinates array."""
         return self.array.shape
-    
+
     @property
     def size(self) -> int:
         """Return the size of the coordinates array."""
         return self.array.size
-    
+
     ###
     ### STATIC METHODS
     ###
@@ -714,7 +719,7 @@ class Coords:
                 out_double.append([p, a1, a3])  # Append nucleotide properties for double helix
 
         return Coords(out + out_double[::-1])
-  
+
     @staticmethod
     def compute_transformation_matrix(p1: np.ndarray, 
                                       b1: np.ndarray, 
@@ -807,7 +812,7 @@ class Coords:
                                               return_coords=True, 
                                               topology_file=topology_file,
                                               protein=protein)
-    
+
     @staticmethod
     def load_from_text(conf_text: str,
                        dummy_ends: Tuple[bool, bool] = (False, False), 
@@ -1059,7 +1064,7 @@ class Coords:
             True if the object is empty, otherwise False.
         """
         return self.size == 0 and self._dummy_ends[0].size == 0 and self._dummy_ends[1].size == 0
-  
+
     def reverse_in_place(self) -> None:
         """
         Reverse the order of the coordinates in place.

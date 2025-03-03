@@ -7,7 +7,7 @@ from .strand import Strand, StrandsBlock
 from .motif import Motif
 from .origami import Origami
 
-### DIRECTION short names
+# DIRECTION short names
 UP = Direction.UP
 DOWN = Direction.DOWN
 LEFT = Direction.LEFT

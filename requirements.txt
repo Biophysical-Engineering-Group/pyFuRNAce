@@ -1,6 +1,5 @@
 numpy
 pyperclip
-gtk
 streamlit==1.43.0
 st-click-detector
 streamlit_option_menu

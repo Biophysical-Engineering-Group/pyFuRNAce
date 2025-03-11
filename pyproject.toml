@@ -27,7 +27,7 @@ keywords = ["RNA", "DNA", "nucleic acids", "bioinformatics", "design"]
 dependencies = [
     "numpy",
     "pyperclip",
-    "streamlit>=1.38.0",
+    "streamlit>=1.43.0",
     "st-click-detector",
     "hydralit_components",
     "streamlit_code_editor",

@@ -1,6 +1,6 @@
 numpy
 pyperclip
-streamlit==1.39.0
+streamlit==1.43.0
 st-click-detector
 streamlit_option_menu
 streamlit_code_editor

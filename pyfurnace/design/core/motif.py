@@ -605,7 +605,7 @@ class Motif(Callback):
                 tot_seq += str(s.sequence)
             tot_seq += '&'
 
-        self._sequence = tot_seq.strip('&') # remove separator at the end
+        self._sequence = Sequence(tot_seq.strip('&')) # remove separator at the end
         return self._sequence
 
     @sequence.setter

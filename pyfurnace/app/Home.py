@@ -17,5 +17,5 @@ if __name__ == '__main__':
     st.page_link("pages/3_Template.py", label=":orange[Template:]", icon=":material/genetics:")
     st.markdown("- Prepare the DNA template for you RNA Origami, align structures and search for dimers.")
 
-    st.page_link("pages/4_Primers.py", label=":orange[Primers:]", icon=":material/sync_alt:")
-    st.markdown("- Design primers for your DNA template.")
+    st.page_link("pages/4_Prepare.py", label=":orange[Prepare:]", icon=":material/sync_alt:")
+    st.markdown("- Design primers for your DNA template or prepare the Origami for OxDNA simulation.")

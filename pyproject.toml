@@ -26,6 +26,7 @@ keywords = ["RNA", "DNA", "nucleic acids", "bioinformatics", "design"]
 
 dependencies = [
     "numpy",
+    "pyperclip",
     "streamlit>=1.38.0",
     "st-click-detector",
     "hydralit_components",
@@ -56,7 +57,30 @@ target-version = ["py310", "py312", "py312"]
 
 [tool.flake8]
 max-line-length = 88
-ignore = ["E203", "W503"]  # Compatible with `black`
+ignore = ["E203", "W503", "E266"]  # Compatible with `black`
+extend-ignore = ["C408"]  # Optional: Ignore dict literal linting
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    ".eggs",
+    "*.egg",
+    "*.egg-info",
+    "build",
+    "dist",
+    "tests",
+]
+max-complexity = 10  # Optional: Set code complexity limit
+
+[tool.flake8-class-order]
+order = [
+    "magic_method",
+    "property_method",
+    "class_method",
+    "static_method",
+    "protected_method",
+    "public_method"
+]
 
 [tool.mypy]
 strict = true

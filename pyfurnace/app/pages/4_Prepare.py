@@ -4,11 +4,12 @@ from functools import partial
 from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio.SeqUtils import gc_fraction
+from streamlit_option_menu import option_menu
 import json
 import warnings
 from pathlib import Path
 ### import the template functions
-from utils import load_logo
+from utils import load_logo, main_menu_style
 from utils.template_functions import symbols, write_format_text, check_dimer, reference, sanitize_input
 
 # https://www.bioinformatics.org/sms/iupac.html
@@ -197,6 +198,22 @@ if __name__ == "__main__":
     ### set the logo of the app
     load_logo()
     warnings.filterwarnings("ignore") # ignore warnings
+
+    # create the tabs with the functions
+    st.header('Prepare', help='Design primers for your DNA template or prepare the Origami for OxDNA simulation.')
+    option_data = {'Primers': "bi bi-arrow-left-right",
+                   'MD simulations': "bi bi-cpu"}
+
+    selected_operation = option_menu(None, 
+                                    list(option_data.keys()),
+                                    icons=list(option_data.values()),
+                                    menu_icon="cast", 
+                                    orientation="horizontal",
+                                    styles=main_menu_style)
+    
+    if selected_operation == 'MD simulations':
+        st.write('Coming soon')
+        st.stop()
 
     if 'streamlit_cwd' not in st.session_state:
         st.session_state.streamlit_cwd = str(Path(__file__).resolve().parent.parent)

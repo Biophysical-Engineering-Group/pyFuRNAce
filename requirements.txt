@@ -1,4 +1,5 @@
 numpy
+pyperclip
 streamlit==1.39.0
 st-click-detector
 streamlit_option_menu

@@ -23,6 +23,7 @@ nucleotides = {"A",
                "B", # C or G or U
                "N", # any nucleotide
                "X", # any nucleotide for external Kissing Loops in ROAD
+               '&', # separator
                }
 
 # https://www.bioinformatics.org/sms/iupac.html
@@ -42,6 +43,7 @@ iupac_code = {"A": {"A"},
               "B": {"C", "G", "U"}, # C or G or U
               "N": {"A", "U", "C", "G"}, # any nucleotide
               "X": {"A", "U", "C", "G"}, # any nucleotide for external Kissing Loops in ROAD
+              "&": {"&"}, # separator
               }
 
 base_pairing = {"A": {"B", "D", "H", "K", "N", "U", "W", "Y"},
@@ -60,6 +62,7 @@ base_pairing = {"A": {"B", "D", "H", "K", "N", "U", "W", "Y"},
                 "B": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
                 "N": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
                 "X": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y", "X"},
+                "&": {"&"} # separator
                 }
 
 db_pairs = {"(": ")", "[": "]", "{": "}", "<": ">", "A": "a", "B": "b", "C": "c", "D": "d", "E": "e", "F": "f", "G": "g", "H": "h", "I": "i", "J": "j", "K": "k", "L": "l", "M": "m", "N": "n", "O": "o", "P": "p", "Q": "q", "R": "r", "S": "s", "T": "t", "U": "u", "V": "v", "W": "w", "X": "x", "Y": "y", "Z": "z"}

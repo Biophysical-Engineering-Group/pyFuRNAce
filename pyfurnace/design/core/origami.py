@@ -433,7 +433,7 @@ class Origami(Callback):
         new_seq = new_seq.replace('&', '') 
         seq_no_amp = self.sequence.replace('&', '') 
         if not isinstance(new_seq, (str, Sequence)) or len(new_seq) != len(seq_no_amp):
-            raise ValueError(f"The new sequence must be a string or a Sequence object with the same lenght of the current sequence ({len(self.sequence)}). Got type: {type(new_seq)}; with length: {len(new_seq)}, excluding the '&' symbols.")
+            raise ValueError(f"The new sequence must be a string or a Sequence object with the same lenght of the current sequence ({len(seq_no_amp)}). Got type: {type(new_seq)}; with length: {len(new_seq)}, excluding the '&' symbols.")
         offset = 0 # adjust the offset if there are multiple strands
         origami_motif = self.motif
         motif_map = self.map
@@ -940,7 +940,7 @@ class Origami(Callback):
         name = path.split('/')[-1].split('\\')[-1]
         with open(path + '.txt', 'w') as f:
             f.write(f'>{name}\n')
-            f.write(self.sequence + '\n')
+            f.write(str(self.sequence) + '\n')
             f.write(self.structure + '\n\n')
             if to_road:
                 f.write(self.to_road())

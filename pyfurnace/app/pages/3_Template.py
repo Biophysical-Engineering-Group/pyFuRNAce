@@ -1,6 +1,7 @@
 import streamlit as st
 from pathlib import Path
 from streamlit_option_menu import option_menu
+from st_copy_to_clipboard import st_copy_to_clipboard
 import re
 from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
@@ -49,24 +50,39 @@ def convert_tab(seq):
     col1, col2, col3 = st.columns(3)
     with col1:
         st.write("Reverse:")
-        write_format_text(seq[::-1])
+        subcol1, subcol2 = st.columns([6, 1])
+        with subcol1:
+            write_format_text(seq[::-1])
+        with subcol2:
+            st_copy_to_clipboard(str(seq[::-1]), before_copy_label='📋', show_text=False)
     with col2:
         st.write("Complement:")
-        write_format_text(complement)
+        subcol1, subcol2 = st.columns([6, 1])
+        with subcol1:
+            write_format_text(complement)
+        with subcol2:
+            st_copy_to_clipboard(str(complement), before_copy_label='📋', show_text=False)
     with col3:
         st.write("Reverse complement:")
         if seq_type == 'DNA':
-            write_format_text(seq.reverse_complement())
+            rev_complement = seq.reverse_complement()
         else:
-            write_format_text(seq.reverse_complement_rna())
+            rev_complement = seq.reverse_complement_rna()
+        
+        subcol1, subcol2 = st.columns([6, 1])
+        with subcol1:
+            write_format_text(rev_complement)
+        with subcol2:
+            st_copy_to_clipboard(str(rev_complement), before_copy_label='📋', show_text=False)
 
     if seq_type == 'DNA':
         st.write("RNA transcribed:")
         write_format_text(seq.transcribe())
+
     # if the sequence is RNA, create a DNA template 
     else:
         col1, col2 = st.columns([1, 5])
-        st.write("## DNA template:")
+        # st.write("#### DNA template:")
         promoter = st.text_input("**Select a promoter** (default: T7 promoter)", value='TAATACGACTCACTATA')
         # take a specific promoter sequence for the DNA template and check that the RNA sequence starts with G
         if promoter == 'TAATACGACTCACTATA' and seq[0] != 'G':
@@ -82,7 +98,7 @@ def convert_tab(seq):
 
         ### Save the DNA template in the session state and add a link to the primer page
         st.session_state["dna_template"] = str(dna_template)
-        st.page_link("pages/4_Primers.py", label=":orange[Prepare the Primers for the DNA template]", icon=":material/sync_alt:")
+        st.page_link("pages/4_Prepare.py", label=":orange[Prepare the Primers for the DNA template]", icon=":material/sync_alt:")
         
         # non-coding strand
         col1, col2 = st.columns([1, 5]) 
@@ -160,14 +176,19 @@ if __name__ == "__main__":
     
     if "rna_origami_seq" not in st.session_state:
         st.session_state["rna_origami_seq"] = ''
-    st.header('Template')
+    st.header('Template', help='Prepare the DNA template for you RNA Origami, align structures and search for dimers.')
     # take the input sequence and sanitize it
-    seq = sanitize_input(st.text_input("Input sequence:", value = st.session_state["rna_origami_seq"]))
+    seq = sanitize_input(st.text_input("Input sequence (DNA or RNA):", value = st.session_state["rna_origami_seq"]))
     # check the symbols in the sequence
     if set(seq) - symbols:
         st.warning('The sequence contains symbols not included in the [IUPAC alphabet](https://www.bioinformatics.org/sms/iupac.html).', icon="⚠️")
     
+    if seq != st.session_state["rna_origami_seq"]:
+        st.session_state["rna_origami_seq"] = seq
+        st.rerun()
+    
     seq = Seq(seq)
+    seq_type = 'DNA'
     if 'T' in seq and 'U' in seq:
         st.error('Both T and U found in the sequence', icon=":material/personal_injury:")
         # create a porper biopython symbol
@@ -175,7 +196,7 @@ if __name__ == "__main__":
         seq_type = 'DNA'
     elif "U" in seq:
         seq_type = 'RNA'
-    else:
+    elif seq:
         seq_type = st.radio(
             "Choose the sequence type: (usually auto-detected)",
             ["DNA", "RNA"],
@@ -191,8 +212,8 @@ if __name__ == "__main__":
     # create the tabs with the functions
     st.write("\n") # add space between initial menu and motif menu
     option_data = {'Convert': "bi bi-arrow-repeat",
-                     'Align': "bi bi-align-center",
-                     'Dimer': "bi bi-bar-chart-steps"}
+                   'Align': "bi bi-align-center",
+                   'Dimer': "bi bi-bar-chart-steps"}
 
     selected_operation = option_menu(None, 
                                     list(option_data.keys()),

@@ -1,5 +1,6 @@
 from pathlib import Path
 from copy import deepcopy
+import pyperclip
 import tempfile
 import sys
 import streamlit as st
@@ -56,6 +57,11 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo_
     #     </style>
     #     """)
 
+def copy_to_clipboard(to_copy, *args, **kwargs):
+    kwargs.setdefault('icon',  ":material/content_copy:")
+    if st.button(*args, **kwargs):
+        pyperclip.copy(to_copy)
+        st.success('', icon="✅")
 
 def save_origami(origami_name='Origami'):
     if not st.session_state.origami:
@@ -72,7 +78,7 @@ def save_origami(origami_name='Origami'):
             st.stop()
 
         if file_type == 'PDB':
-            if any(nucl not in "AUCG" for nucl in origami.sequence):
+            if any(nucl not in "AUCG&" for nucl in origami.sequence):
                 st.error('The sequence contains non-standard nucleotides. PDB format only supports A, U, C, G.')
                 st.stop()
             with tempfile.TemporaryDirectory() as tmpdirname:
@@ -85,7 +91,10 @@ def save_origami(origami_name='Origami'):
                     st.warning('No PDB file found')
                     pdb_text = None
             if pdb_text:
-                st.download_button('Download PDB', pdb_text, f"{ori_name}.pdb")
+                st.download_button('Download PDB', 
+                                   pdb_text, 
+                                   f"{ori_name}.pdb",
+                                   on_click="ignore")
         
         elif file_type == 'oxDNA':
             with tempfile.TemporaryDirectory() as tmpdirname:
@@ -103,12 +112,21 @@ def save_origami(origami_name='Origami'):
                     st.warning('No forces file found')
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.download_button('Download Configuration', conf_text, f"{ori_name}.dat")
+                st.download_button('Download Configuration', 
+                                   conf_text, 
+                                   f"{ori_name}.dat",
+                                   on_click="ignore")
             with col2:
-                st.download_button('Download Topology', topo_text, f"{ori_name}.top")
+                st.download_button('Download Topology', 
+                                   topo_text, 
+                                   f"{ori_name}.top",
+                                   on_click="ignore")
             with col3:
                 if forces:
-                    st.download_button('Download Forces', forces, f"{ori_name}_forces.txt")
+                    st.download_button('Download Forces', 
+                                       forces, 
+                                       f"{ori_name}_forces.txt",
+                                       on_click="ignore")
 
         else:
             if file_type == 'py' and 'code' in st.session_state:
@@ -126,7 +144,10 @@ def save_origami(origami_name='Origami'):
                     file_type = 'txt'
                 text_data = f'>{ori_name}\n{info}\n{origami_str}'
                 
-            st.download_button('Download', text_data, f"{ori_name}.{file_type}")
+            st.download_button('Download', 
+                               text_data, 
+                               f"{ori_name}.{file_type}",
+                               on_click="ignore")
     
 
 

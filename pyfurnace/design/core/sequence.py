@@ -1,21 +1,53 @@
 import warnings
 import random
+from typing import Literal
 from .symbols import *
 from .callback import Callback
 
 
 class Sequence(Callback):
+    """
+    Represents a nucleotide sequence with directionality.
 
-    def __init__(self, sequence: str = '', directionality: str = '53', **kwargs):
+    Attributes
+    ----------
+    directionality : str
+        The directionality of the sequence ('53' or '35').
+    """
+
+    def __init__(self, 
+                 sequence: str = None, 
+                 directionality: Literal['53', '35'] = '53', 
+                 **kwargs) -> None:
+        """
+        Initializes a Sequence object.
+
+        Parameters
+        ----------
+        sequence : str, optional
+            The nucleotide sequence.
+        directionality : str, optional
+            The directionality of the sequence ('53' or '35') (default is '53').
+        **kwargs : Any
+            Arbitrary keyword arguments to pass to the Callback class.
+
+        Raises
+        ------
+        ValueError
+            If the directionality is not '53' or '35'.
+        """
         super().__init__(**kwargs)
         if directionality not in ('53', '35'):
-            raise ValueError(f"Sequence directionality not allowed. It must be either '53' or '35', got {directionality} instead.")
+            raise ValueError(f"Sequence directionality not allowed. "
+                             f"It must be either '53' or '35', "
+                             f"got {directionality} instead.")
+        
         self._directionality = directionality
         self._check_line(sequence)
         self._sequence = str(sequence).upper().translate(only_nucl)
 
     def __repr__(self):
-        return self._directionality[0] + ' ' + self._sequence + ' ' + self._directionality[1]
+        return f"{self._directionality[0]} {self._sequence} {self._directionality[1]}"
     
     def __str__(self):
         return self._sequence
@@ -85,6 +117,9 @@ class Sequence(Callback):
                 return str(self) == str(other)
         return False
     
+    def __hash__(self):
+        return hash(str(self.__repr__()))
+    
     def __contains__(self, other):
         """Check if a subsequence is included in the sequence"""
         if isinstance(other, (str, Sequence)):
@@ -124,8 +159,8 @@ class Sequence(Callback):
     def _check_line(self, line):
         if not isinstance(line, (str, Sequence)):
             raise ValueError(f"The sequence must be a string or a sequence object. Got {type(line)} instead.")
-        if isinstance(line, str) and line.translate(nucl_to_none):
-            warnings.warn(f"Warning: The string '{line}' contains nucleotides not allowed in ROAD that will be removed. The allowed nucleotides are: {nucl_to_none}.", AmbiguosStructure, stacklevel=3)
+        if isinstance(line, str) and line.translate(nucl_to_none).replace('&', ''):
+            warnings.warn(f"Warning: The string '{line}' contains nucleotides not allowed in ROAD that will be removed. The allowed nucleotides are: {nucleotides.union('&')}.", AmbiguosStructure, stacklevel=3)
         if self.directionality[0] in line[1:] or self.directionality[1] in line[:-1]:
             raise ValueError(f"The start/end symbols '{self.directionality}' are not at the end of the sequence: '{line}'") 
         return True
@@ -258,13 +293,13 @@ class Sequence(Callback):
         """        
         return self._sequence.split(sep)
     
-    def get_random_sequence(self, target_structure=None, pair_map=None):
-        if not target_structure and not pair_map:
+    def get_random_sequence(self, structure=None, pair_map=None):
+        if not structure and not pair_map:
             return ''.join([random.choice(list(iupac_code[nucleotide])) for nucleotide in self._sequence])
-        elif target_structure and len(target_structure) != len(self):
-            raise ValueError(f"The target dot-bracket must have the same length as the sequence. Got {len(target_structure)}, expected {len(self)}.")
+        elif structure and len(structure) != len(self):
+            raise ValueError(f"The target dot-bracket must have the same length as the sequence. Got {len(structure)}, expected {len(self)}.")
         if not pair_map:
-            pair_map = dot_bracket_to_pair_map(target_structure)
+            pair_map = dot_bracket_to_pair_map(structure)
         # make a first random sequence
         seq = [random.choice(list(iupac_code[nucleotide])) for nucleotide in self._sequence]
         # paired the nucleotied that are paired in the target structure

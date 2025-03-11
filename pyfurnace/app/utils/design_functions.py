@@ -8,11 +8,10 @@ from st_click_detector import click_detector
 from st_oxview import oxview_from_text
 from code_editor import code_editor
 import warnings
-from st_copy_to_clipboard import st_copy_to_clipboard
 # from streamlit_shortcuts import button
 import matplotlib.pyplot as plt
 ### Custom libraries
-from . import main_menu_style, second_menu_style
+from . import main_menu_style, second_menu_style, copy_to_clipboard
 import pyfurnace as pf
 from utils.commands import *
 
@@ -40,10 +39,10 @@ funny_bootstrap_icons = ['robot', 'trash', 'umbrella', 'camera', 'cart', 'cpu', 
 
 def origami_general_options(origami, expanded=True):
     with st.expander('General settings', expanded=expanded):
-        col1, col2, col3, col4 = st.columns(4)
+        cols = st.columns(5)
 
         ### select alignment
-        with col1:
+        with cols[0]:
             # with st.expander('Align Lines:'):
                 alignment = st.radio("Alignment type:", ['To the left', 'Junctions alignment: first', 'Line center'], index=0, key='alignment')
                 
@@ -54,7 +53,7 @@ def origami_general_options(origami, expanded=True):
                     st.session_state.code.append(f"origami.align = '{alignment}' # Align the lines")
         
         ### select the sequence direction
-        with col2:
+        with cols[1]:
             top_strand_dir = st.radio("Sequence direction in the helix top strand:", ['53', '35'], key='top_strand',  
                                       help=""" PyFuRNAce uses the 5' to 3' direction as the top strand of the helix.
                                                 To allow compatibility with previus ROAD blueprint, you can change the direction of the top strand.
@@ -64,19 +63,25 @@ def origami_general_options(origami, expanded=True):
             else:
                 st.session_state.flip = True
 
-        with col3:
+        with cols[2]:
             st.toggle('Optimize the blueprint for ROAD', 
                       value=True,
                       key='to_road', 
                       help='Optimize the blueprint for the ROAD software. This sobstitues the Kissing Loops basepairngs with "*"; and the short stem basepairings with "!".')
 
-        with col4:
+        with cols[3]:
             def submit_ss_rna():
                 st.session_state.code.append(f"origami.ss_assembly = {st.session_state.single_stranded}")
                 st.session_state.origami.ss_assembly = st.session_state.single_stranded
 
             st.toggle("Single stranded 3D assembly", key='single_stranded', on_change=submit_ss_rna, help='The Origami 3d assembly is created concatenating the single strands, rather than concatenating the double strands.')
 
+        with cols[4]:
+            new_sticky = st.toggle('Stiky motif menu', value=st.session_state.motif_menu_sticky, key='sticky_menu', help='Keep the motif menu and origami visualization menu to stick to the top of the page.')
+            if new_sticky != st.session_state.motif_menu_sticky:
+                st.session_state.motif_menu_sticky = new_sticky
+                st.rerun()
+            
         # font_size = st.slider('Font size:', min_value=4, max_value=40, value=14, key='general_font_size', help='Change the font size of the motif preview.')
         # st.markdown(
         #     f"""
@@ -113,14 +118,13 @@ The connection between helice (Dovetails) are obtained roughly with this lookup 
         angle_list = [int(x) for x in dt_text.split(",") if x and x.strip()]
         dt_list = pf.convert_angles_to_dt(angle_list)
         main_stem_default = 11 * ((max([abs(dt) for dt in dt_list], default=0) + 17) // 11 + 1)
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
         with col1:
-            helix_kl = st.number_input('Kissing Loop repeats:', min_value=1, value=1, help='number of KL repeats in the helix')
+            helix_kl = st.number_input('Kissing loop repeats:', min_value=1, value=1, help='number of KL repeats in the helix')
         with col2:
-            main_stem = st.number_input('Consecutive stem length (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
+            main_stem = st.number_input('Repeats length (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
             main_stem = [main_stem] * helix_kl
         with col3:
-            st.write('\n'); st.write('\n')
             terminal_helix = st.toggle('Add terminal helices',
                                        value=True,
                                         help='Add the first and last helix with 0bp dovetails')
@@ -172,6 +176,8 @@ def initiate_session_state():
         st.session_state.motif = pf.Motif()
     # if "redo" not in st.session_state:
     #     st.session_state.redo = []
+    if 'motif_menu_sticky' not in st.session_state:
+        st.session_state.motif_menu_sticky = True
     if "copied_motif" not in st.session_state:
         st.session_state.copied_motif = None
     if "copied_motif_text" not in st.session_state:
@@ -214,7 +220,6 @@ def make_motif_menu(origami):
     #update Pk index
     st.session_state.max_pk_index = max([abs(int(x.pk_index.replace("'", ""))) for line in origami[lambda m: hasattr(m, 'pk_index')] for x in line], default=0) + 1
 
-    st.write("\n") # add space between initial menu and motif menu
     option_data = {'Connections': 'bi-sliders',
                    'Structural': 'bi-bricks',
                    'Kissing Loops': 'bi-heart-half',
@@ -242,7 +247,7 @@ def make_motif_menu(origami):
         AptamersCommand().execute()
     elif selected_motif == 'Custom':
         ### Adding the menu here, otherwise there are issues choosing the custom motif with st.fragment when the edit mode is off
-        col1, col2 = st.columns([5, 1])
+        col1, col2 = st.columns([5, 1], vertical_alignment='bottom')
         with col1:
             motif_selected = option_menu(None,
                                         [l[0] for l in st.session_state.custom_motifs],
@@ -298,7 +303,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         st.session_state.code.append('origami.append([]) # Add empty line')
         origami_len = 1
     
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5, col6 = st.columns([1, 1.5, 1.5, 1, 1, 1], vertical_alignment='bottom')
 
     with col1:
         if f_col1: f_col1()
@@ -334,7 +339,8 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                         st.session_state.code.append(f'origami.pop({st.session_state.line_index})')
                         st.session_state.line_index -= 1
                         st.rerun() # rerun app
-
+            else:
+                st.button(':green[Have fun --->]', type='tertiary')
 
     if st.session_state.line_index >= len(origami):
         return
@@ -369,7 +375,6 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
 
     ### duplicate the current line
     with col4:
-        st.write("\n"); st.write("\n") # align the button with the shown preview
         if st.button("Duplicate Line", key='duplicate_line'):
             # warnings.filterwarnings("ignore") # ignore kl energy warning
             origami.duplicate_line(line_index, insert_idx=len(origami))
@@ -379,19 +384,24 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
     
     ### copy/pase motif
     with col5:
-        st.write("\n"); st.write("\n") # align the button with the shown preview
         subcol1, subcol2 = st.columns(2)
         with subcol1:
             copy_motif()
         # Paste motif
-        if st.session_state.copied_motif:
-            with subcol2:
-                paste_button = st.button('Paste Motif', key = 'paste_motif')
-                if paste_button:
-                    origami.insert((line_index, motif_index), st.session_state.copied_motif)
-                    st.session_state.code.append(st.session_state.copied_motif_text + f'\norigami.insert(({line_index}, {motif_index}), motif) # Paste motif')
-                    # st.session_state.redo = []
-                    st.rerun()
+        with subcol2:
+            paste_button = st.button('Paste Motif', key = 'paste_motif')
+            if paste_button:
+                if not st.session_state.copied_motif:
+                    st.warning('No motif copied')
+                    return
+                origami.insert((line_index, motif_index), st.session_state.copied_motif)
+                st.session_state.code.append(st.session_state.copied_motif_text + f'\norigami.insert(({line_index}, {motif_index}), motif) # Paste motif')
+                # st.session_state.redo = []
+                st.rerun()
+
+    # Uno action
+    with col6:
+        undo(key='motif_undo')
 
 
 def add_motif(origami):
@@ -467,7 +477,7 @@ def copy_motif(key='', motif=None, motif_slice=None):
 @st.fragment
 def generate_custom_motif_text(strand, x_size=50, y_size=10):
     ### update the content
-    content = ""
+    content = f"<div style='font-family: monospace; font-size: {st.session_state['origami_font_size']}px;'>"
     current_motif = st.session_state.motif
     for y in range(y_size):
         for x in range(x_size):
@@ -479,6 +489,7 @@ def generate_custom_motif_text(strand, x_size=50, y_size=10):
             else:
                 content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: grey; opacity: 0.5;">•</a>'
         content += '<br />'
+    content += "</div>"
     return content
 
 @st.fragment
@@ -536,18 +547,16 @@ def custom(current_custom_motif):
         st.write("Finish editing the motif to add the motif to the origami.")
         st.stop()
 
-    cols = st.columns(4)
+    cols = st.columns(4, vertical_alignment='bottom')
     with cols[0]:
-        st.write('\n'); st.write('\n')
         if st.button("Add Strand", key="add_strand"):
             st.session_state["custom_strands"].append(pf.Strand(''))
-            current_custom_motif.append(pf.Strand(''))
+            current_custom_motif.append(pf.Strand(''), copy=False, join=False)
     with cols[1]:
         x_dots = st.number_input("Canvas X size", min_value=1, value=100, key="x_size")
     with cols[2]:
         y_dots = st.number_input("Canvas Y size", min_value=1, value=10, key="y_size")
     with cols[3]:
-        st.write('\n'); st.write('\n')
         if st.button("Clear", key="clear_strand"):
             st.session_state["custom_strands"] = [pf.Strand('')]
             current_custom_motif.replace_all_strands([pf.Strand('')], copy=False)
@@ -704,9 +713,9 @@ def custom(current_custom_motif):
     with col2:
         start_y = st.number_input("Start Y:", min_value=0, value=strand.start[1], key=f'start_y_custom')
     with col3:
-        strand_direction_ind = [d.value for d in pf.Direction].index(strand.direction)
-        new_dir = st.selectbox('Start Direction:', ['Up', 'Down', 'Left', 'Right'], index=strand_direction_ind, key=f'dir_custom')
-        new_dir_tuple = pf.Direction[new_dir.upper()].value
+        strand_direction_ind = [d for d in pf.Direction].index(strand.direction)
+        new_dir = st.selectbox('Start Direction:', ['Up', 'Right', 'Down', 'Left'], index=strand_direction_ind, key=f'dir_custom')
+        new_dir_tuple = pf.Direction[new_dir.upper()]
     with col4:
         seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(strand.directionality), key=f'seq_dir_custom')
     with col5:
@@ -775,7 +784,7 @@ def code():
         st.session_state["last_code_id"] = ''
     code_text = '\n\n'.join(st.session_state.code)
 
-    render_lines = st.slider("Number of lines to render:", min_value=1, max_value=1000, value=15, key="render_lines")
+    render_lines = st.slider("Number of lines to render:", min_value=1, max_value=200, value=15, key="render_lines")
 
     response_dict = code_editor(code_text, 
                                 buttons=code_editor_buttons,
@@ -795,7 +804,10 @@ def undo(key=''):
     if len(st.session_state.code) <= 3:
         st.warning("Nothing to undo.")
         return
-    undo_button = st.button("Undo", key=f'undo{key}', help="Undo the last action.")
+    undo_button = st.button("Undo", 
+                            key=f'undo{key}', 
+                            use_container_width=False,
+                            help="Undo the last action.")
     if not undo_button:
         return
     # st.session_state.redo.append(st.session_state.code[-1])
@@ -909,7 +921,7 @@ def build_origami_content(origami):
     origami_str = '\n'.join([''.join(line) for line in motif_list])
 
     content = "<div style='white-space: nowrap; overflow-x: auto;'>"
-    content += f'<div style="display:inline-block; font-size: {st.session_state.origami_font_size}px;">Line:<br />'  # add a column with the line number
+    content += f'<div style="display:inline-block; font-family: monospace; font-size: {st.session_state.origami_font_size}px;">Line:<br />'  # add a column with the line number
     line_nr = -2
     origami_list = origami_str.split('\n')
     origami_list_len = len(origami_list)
@@ -1004,17 +1016,17 @@ def display_origami():
         clicked = click_detector(content, key=f"origami_click_detector{st.session_state.origami_click_detector_counter}")
     except pf.MotifStructureError as e:
         st.error(f"Structure error: \n {e}", icon=":material/personal_injury:")
-        undo('error')
+        undo('error', key='error')
         st.stop()
     except pf.AmbiguosStructure as e:
         st.error(f"Ambigouse Structure: \n {e}", icon=":material/theater_comedy:")
-        undo('warning')
+        undo('warning', key='warning')
         st.write("You can try flipping the motif or changing the sequence direction.")
         st.stop()
     return clicked
 
 def clicked_options(clicked):
-    undo()
+    # undo()
     # col1, _ , _, col2, _ = st.columns([1] * 5)
     # with col1:
     #     undo()
@@ -1074,21 +1086,32 @@ def display_structure_sequence():
             structure_list[i] = '<span style="color: #D52919; line-height:1;">' + structure_list[i] + "</span>"
             sequence_list[i] = '<span style="color: #D52919; line-height:1;">' + sequence_list[i] + "</span>"
 
+        ### Pseudoknots info
+        pseudoknot_text = '; '.join([str(pk_dict) for pk_dict in origami.pseudoknots]) + ';'
+        remove_syms = str.maketrans('', '', "{}'\"")
+        pseudoknot_text = pseudoknot_text.translate(remove_syms)
+
         st.markdown(f'**Structure length: :green[{str(len(origami.structure.replace('&', '')))}]**')
         scrollable_text(f"""
             Structure:</br>{''.join(structure_list)}</br>
             Sequence:</br>{''.join(sequence_list)}</br></br>
             """)
+        scrollable_text(f"""
+            Pseudoknots info:</br>{pseudoknot_text}
+            """)
 
         st.session_state.generate_structure = origami.structure
-        st.session_state.generate_sequence = origami.sequence
-        col1, col2, col3, = st.columns(3)
+        st.session_state.generate_sequence = str(origami.sequence)
+        st.session_state.generate_pseudoknots = pseudoknot_text
+        col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.page_link("pages/2_Generate.py", label="**:orange[Generate the sequence]**", icon=":material/network_node:")
         with col2:
-            st_copy_to_clipboard(origami.structure, before_copy_label='Copy Structure📋', show_text=False)
+            copy_to_clipboard(origami.structure, 'Copy structure', key='copy_struct')
         with col3:
-            st_copy_to_clipboard(origami.sequence, before_copy_label='Copy Sequence📋', show_text=False)
+            copy_to_clipboard(str(origami.sequence), 'Copy sequence', key='copy_seq')
+        with col4:
+            copy_to_clipboard(pseudoknot_text, 'Copy pseudoknots', key='copy_pk')
         
 
 def edit(x, y):
@@ -1138,9 +1161,10 @@ def edit(x, y):
                 with col2:
                         start_y = st.number_input("Start Y:", min_value=0, value=s.start[1], key=f'start_y_{x}_{y}_{i}')
                 with col3:
-                    strand_direction_ind = [d.value for d in pf.Direction].index(s.direction)
-                    new_dir = st.selectbox('Start Direction:', ['Up', 'Down', 'Left', 'Right'], index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
-                    new_dir_tuple = pf.Direction[new_dir.upper()].value
+                    direction_list = ['Up', 'Right', 'Down', 'Left']
+                    strand_direction_ind = [i for i, d in enumerate(pf.Direction) if d == s.direction][0]
+                    new_dir = st.selectbox('Start Direction:', direction_list, index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
+                    new_dir_tuple = pf.Direction[new_dir.upper()]
                 with col4:
                     seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(s.directionality), key=f'seq_dir_{x}_{y}_{i}')
                 with col5:
@@ -1195,7 +1219,7 @@ def scrollable_text(text: str):
             background-color: #fafafa;
             padding: 10px;
             border-radius: 20px; /* Rounded corners */
-            font-size: {st.session_state.origami_font_size + 2}px;
+            font-size: {st.session_state.origami_font_size + 1}px;
         }}
         </style>
         <div class="scroll-box">{text}</div>

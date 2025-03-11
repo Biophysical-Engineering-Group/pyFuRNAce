@@ -13,22 +13,24 @@ def format_text(text):
 
 def forna_options(lenght):
     ### checkboxes for the options
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
     with col1:
         st.session_state.zoomable = st.checkbox("Zoomable", value=True, help = """Enable zooming in and out the structure""")
     with col2:
         st.session_state.animation = st.checkbox("Interact", value=False, help = """Enable interaction with the structure""")
     with col3:
         st.session_state.node_label = st.checkbox("Label", value=True, help = """Show the nucleotide label""")
+    
     ### second row of options
+    col1, col2, col3 = st.columns(3, vertical_alignment='center')
     with col1:
         ### color scheme options
         scheme_options = ["sequence", "structure", "positions", "color range", "custom"]
-        st.session_state.color_scheme = st.selectbox("Select a color scheme", scheme_options, index=1)
+        st.session_state.color_scheme = st.selectbox("Color scheme", scheme_options, index=1)
     with col2:
         st.session_state.height = st.slider("Frame height", 10, 800, 300, help = """Set the height of the frame""")
     with col3:
-        st.session_state.label_interval = st.slider("Label interval", 0,  max(lenght, 10), min(lenght, 10), help = """Show the nucleotide number every n nucleotides""")
+        st.session_state.label_interval = st.slider("Label every", 0,  max(lenght, 10), min(lenght, 10), help = """Show the nucleotide number every n nucleotides""")
 
     st.session_state.color_text = ''
     st.session_state.colors = {}
@@ -36,9 +38,9 @@ def forna_options(lenght):
     if st.session_state.color_scheme == "color range":
         st.session_state.color_scheme = "custom"
         with col2: # start color
-            first = st.color_picker("Select a color", "#ff0000")
+            first = st.color_picker("Start color", "#ff0000")
         with col3: # end color
-            last = st.color_picker("Select a color", "#00ff00")
+            last = st.color_picker("End color", "#00ff00")
         # create the colors range
         first = Color(first)
         last = Color(last)
@@ -67,7 +69,6 @@ if __name__ == "__main__":
     # somehow st components cause `Thread 'MainThread': missing ScriptRunContext!` 
     # warning when using multiprocessing
     from st_forna_component import forna_component
-    from st_copy_to_clipboard import st_copy_to_clipboard
 
     load_logo()
 
@@ -99,12 +100,16 @@ if __name__ == "__main__":
         st.session_state.generate_structure = ""
     if 'generate_sequence' not in st.session_state:
         st.session_state.generate_sequence = ""
+    if 'generate_pseudoknots' not in st.session_state:
+        st.session_state.generate_pseudoknots = ""
     if 'rna_origami_seq' not in st.session_state:
         st.session_state.rna_origami_seq = ""
 
-    st.write("### Generate an RNA Origami Sequence")
+    st.header('Generate', help='Generate the RNA sequence that matches the desired dot-bracket notation (and sequence constraints) for the nanostructure.')
     structure = st.text_input("RNA Strucutre (dot-bracket notation)", value=st.session_state.generate_structure)
     sequence_constraint = st.text_input("Sequence Constraints", value=st.session_state.generate_sequence)
+    pseudoknot_info = st.text_input("Pseudoknot Constraints (semicolon-separated)", value=st.session_state.generate_pseudoknots)
+    
     if not sequence_constraint:
         sequence_constraint = "N" * len(structure.replace("&", ""))
 
@@ -112,13 +117,14 @@ if __name__ == "__main__":
     if "&" in structure:
         st.warning("Experimental: the dot-bracket notation contains multiple strands")
 
-    with st.popover("RNA display options"):
-        forna_options(len(structure))
+    with st.columns([1.3, 3])[0]:
+        with st.popover("RNA display options", use_container_width=True):
+            forna_options(len(structure))
 
-    # Initialize the FORNA link for the target structure
+    # # Initialize the FORNA link for the target structure
     if structure:
-        st.write("#### Target Structure")
-        st.write(format_text(structure))
+    #     st.write("#### Target Structure")
+    #     st.write(format_text(structure))
         edited = forna_component(structure = structure, 
                                 sequence = sequence_constraint,
                                 height = st.session_state.height,

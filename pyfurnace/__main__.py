@@ -8,6 +8,7 @@ def main():
                       'server.enableStaticServing': True,
                       'logger.level': 'error',
                       'global.showWarningOnDirectExecution': False,
+                      'client.toolbarMode': "minimal",
                     }
     config_str = ' '.join([f'--{key} "{value}"' for key, value in config_options.items()])
     app_path = str(pathlib.Path(__file__).parent.resolve() / 'app' / 'Home.py')

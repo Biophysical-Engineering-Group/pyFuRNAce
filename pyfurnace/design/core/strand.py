@@ -14,10 +14,6 @@ except ImportError:
 
 class Strand(Callback):
 
-    ### 
-    ### MAGIC METHODS
-    ###
-
     def __init__(self, 
                  strand: str = '', 
                  directionality: str = '53', 
@@ -732,7 +728,7 @@ class Strand(Callback):
     def invert(self):
         """ Invert the start/end sides to build the structure"""
         end = self.end
-        self._direction = self._direction * -1
+        self._direction = self.end_direction * -1
         self._start = end
         self._sequence._directionality = self._sequence._directionality[::-1]
         self._coords.reverse_in_place()

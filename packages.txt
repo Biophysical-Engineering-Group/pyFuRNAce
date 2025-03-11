@@ -1,2 +1,2 @@
-xsel
+xselect
 xclip

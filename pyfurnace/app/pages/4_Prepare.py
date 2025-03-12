@@ -150,12 +150,13 @@ def primers_tab(seq):
         st.stop()
 
     # show the settings for the two primers: choose the number of bases and show the gc content and melting temperature
+    st.write('\n')
     col1, col2 = st.columns(2, gap='large')
     mts = [0, 0]
     # settings for the coding primer
     with col1:
         with st.columns(5)[2]:
-            st.markdown('##### Forward')
+            st.markdown('###### Forward')
 
         c_bases = st.slider('Primer length:', min_value=1, max_value=50, value = 21, 
                             key="coding_primer")
@@ -172,12 +173,12 @@ def primers_tab(seq):
         with subcol1:
             st.markdown(f"GC content: {round(gc_fraction(c_primer, ambiguous='ignore') * 100, 1)}%")
         with subcol2:
-            st.markdown(f":orange[Tm: {round(mts[0], 1)}°C]")
+            st.markdown(f"**:green[Tm: {round(mts[0], 1)}°C]**")
 
     # settings for the non-coding primer
     with col2:
         with st.columns(5)[2]:
-            st.markdown('##### Reverse')
+            st.markdown('###### Reverse')
 
         nc_bases = st.slider('Primer length:', min_value=1, max_value=50, value = 21, 
                              key="non_coding_primer")
@@ -194,7 +195,7 @@ def primers_tab(seq):
         with subcol1:
             st.markdown(f"GC content: {round(gc_fraction(nc_primer, ambiguous='ignore') * 100, 1)}%")
         with subcol2:
-            st.markdown(f":orange[Tm: {round(mts[1], 1)}°C]")
+            st.markdown(f"**:green[Tm: {round(mts[1], 1)}°C]**")
 
     # show the primers preview, check the self-dimerization of the primer and check the dimer between the primers and the sequence
     with st.expander("Dimerization preview"):
@@ -203,12 +204,12 @@ def primers_tab(seq):
         st.divider()
         col1, col2 = st.columns(2, gap='large')
         with col1:
-            self_dimer1 = check_dimer(c_primer, c_primer)
-            write_format_text('Self-Dimer coding primer\n' + self_dimer1)
+            self_dimer1 = check_dimer(c_primer, c_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
+            write_format_text('Self-Dimer forward primer\n' + self_dimer1)
         with col2:
-            self_dimer2 = check_dimer(nc_primer, nc_primer)
-            write_format_text('Self-Dimer non-coding primer\n' + self_dimer2)
-        self_dimer12 = check_dimer(c_primer, nc_primer)
+            self_dimer2 = check_dimer(nc_primer, nc_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
+            write_format_text('Self-Dimer reverse primer\n' + self_dimer2)
+        self_dimer12 = check_dimer(c_primer, nc_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
         write_format_text('Dimer between primers\n' + self_dimer12)
 
     # add a warning if the melting temperature of the primers is too different

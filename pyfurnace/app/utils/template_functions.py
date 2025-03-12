@@ -19,18 +19,20 @@ def upload_setting_button():
 def check_dimer(seq1, seq2, dict_format = False, basepair = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}):
     """ Check the dimer between two sequences and return the best dimer found. If dict_format is True, return a dictionary with all the dimers found. """
     dimers_dict = {}
+    basepair = str.maketrans(basepair)
     # add spaces to the top sequence so it can be aligned with the bottom sequence
     top_seq = ' ' * (len(seq2) -1) + str(seq1) + ' ' * len(seq2)
     # take the second sequence and reverse it to align it with the first sequence
     bottom_seq = str(seq2[::-1])
     # initialize the best dimer found
-    max_match = ['', '' , '']
+    max_match = [top_seq, ' ' * len(top_seq), bottom_seq]
     # iterate over the sequences to find the best dimer
     for start_ind in range(len(seq1)+len(seq2)-2):
         bp = '' # initialize the basepair line
         for ind, b in enumerate(bottom_seq):
             # iterate over the bottom sequence to check simple basepairing with the top sequence at the same index
             if b.translate(basepair) == top_seq[ind] and b != ' ' and top_seq[ind] != ' ':
+                print(b, b.translate(basepair), top_seq[ind])
                 bp = bp + '┊'
             else:
                 bp = bp + ' '

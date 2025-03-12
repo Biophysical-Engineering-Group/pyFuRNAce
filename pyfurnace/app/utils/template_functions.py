@@ -63,7 +63,7 @@ def reference(primers=False):
     """ Add the references to the app"""
     for _ in range(4):
         st.write('\n')
-    with st.popover("**References**"):
+    with st.popover("References"):
     # st.markdown("**References**")
         st.markdown("[1] [Biopython documentation](https://biopython.org/docs/1.75/api/Bio.SeqUtils.MeltingTemp.html). Cock, P.J.A. et al. Biopython: freely available Python tools for computational molecular biology and bioinformatics. Bioinformatics 2009 Jun 1; 25(11) 1422-3 https://doi.org/10.1093/bioinformatics/btp163 pmid:19304878")
         if primers:

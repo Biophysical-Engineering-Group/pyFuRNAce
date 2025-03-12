@@ -1,13 +1,12 @@
 import streamlit as st
 from pathlib import Path
 from streamlit_option_menu import option_menu
-from st_copy_to_clipboard import st_copy_to_clipboard
 import re
 from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio.SeqUtils import gc_fraction, molecular_weight
 import warnings
-from utils import load_logo, main_menu_style
+from utils import load_logo, main_menu_style, copy_to_clipboard
 from utils.template_functions import symbols, write_format_text, check_dimer, sanitize_input, reference
 
 def convert_tab(seq):
@@ -49,31 +48,18 @@ def convert_tab(seq):
     # convert the sequence to the different formats: reverse, complement, reverse complement, RNA transcribed (for DNA), DNA template (for RNA)
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.write("Reverse:")
-        subcol1, subcol2 = st.columns([6, 1])
-        with subcol1:
-            write_format_text(seq[::-1])
-        with subcol2:
-            st_copy_to_clipboard(str(seq[::-1]), before_copy_label='📋', show_text=False)
+        copy_to_clipboard(seq[::-1], "Reverse:")
+        write_format_text(seq[::-1])
     with col2:
-        st.write("Complement:")
-        subcol1, subcol2 = st.columns([6, 1])
-        with subcol1:
-            write_format_text(complement)
-        with subcol2:
-            st_copy_to_clipboard(str(complement), before_copy_label='📋', show_text=False)
+        copy_to_clipboard(complement, "Complement:")
+        write_format_text(complement)
     with col3:
-        st.write("Reverse complement:")
         if seq_type == 'DNA':
             rev_complement = seq.reverse_complement()
         else:
             rev_complement = seq.reverse_complement_rna()
-        
-        subcol1, subcol2 = st.columns([6, 1])
-        with subcol1:
-            write_format_text(rev_complement)
-        with subcol2:
-            st_copy_to_clipboard(str(rev_complement), before_copy_label='📋', show_text=False)
+        copy_to_clipboard(rev_complement, "Reverse complement:")
+        write_format_text(rev_complement)
 
     if seq_type == 'DNA':
         st.write("RNA transcribed:")
@@ -91,21 +77,15 @@ def convert_tab(seq):
         col1, col2 = st.columns([1, 5])    
 
         # coding strand
+        col1, col2 = st.columns([1, 9], vertical_alignment='center')
         with col1:
-            st.write("Coding strand (5' to 3')") 
+            copy_to_clipboard(dna_template, "Coding strand:")
         with col2:
             write_format_text(dna_template)
 
         ### Save the DNA template in the session state and add a link to the primer page
         st.session_state["dna_template"] = str(dna_template)
         st.page_link("pages/4_Prepare.py", label=":orange[Prepare the Primers for the DNA template]", icon=":material/sync_alt:")
-        
-        # non-coding strand
-        col1, col2 = st.columns([1, 5]) 
-        with col1:
-            st.write("Non-coding strand  (5' to 3')") 
-        with col2:
-            write_format_text(dna_template.reverse_complement())
 
 def align_tab(seq):
     """ Align two sequences and highlight the aligned bases"""

@@ -1085,6 +1085,8 @@ def display_structure_sequence():
         for i in indexes:
             structure_list[i] = '<span style="color: #D52919; line-height:1;">' + structure_list[i] + "</span>"
             sequence_list[i] = '<span style="color: #D52919; line-height:1;">' + sequence_list[i] + "</span>"
+            # structure_list[i] = f":orange[{structure_list[i]}]"
+            # sequence_list[i] = f":orange[{sequence_list[i]}]"
 
         ### Pseudoknots info
         pseudoknot_text = '; '.join([str(pk_dict) for pk_dict in origami.pseudoknots]) + ';'
@@ -1093,12 +1095,9 @@ def display_structure_sequence():
 
         st.markdown(f'**Structure length: :green[{str(len(origami.structure.replace('&', '')))}]**')
         scrollable_text(f"""
-            Structure:</br>{''.join(structure_list)}</br>
-            Sequence:</br>{''.join(sequence_list)}</br></br>
-            """)
-        scrollable_text(f"""
-            Pseudoknots info:</br>{pseudoknot_text}
-            """)
+            >Origami</br>{''.join(sequence_list)}</br>{''.join(structure_list)}</br></br>Pseudoknots info:</br>{pseudoknot_text}""")
+
+        st.markdown("<hr style='margin-top:-0em;margin-bottom:-1em' />", unsafe_allow_html=True)
 
         st.session_state.generate_structure = origami.structure
         st.session_state.generate_sequence = str(origami.sequence)
@@ -1107,12 +1106,11 @@ def display_structure_sequence():
         with col1:
             st.page_link("pages/2_Generate.py", label="**:orange[Generate the sequence]**", icon=":material/network_node:")
         with col2:
-            copy_to_clipboard(origami.structure, 'Copy structure', key='copy_struct')
+            copy_to_clipboard(origami.structure, 'Structure')
         with col3:
-            copy_to_clipboard(str(origami.sequence), 'Copy sequence', key='copy_seq')
+            copy_to_clipboard(origami.sequence, 'Sequence')
         with col4:
-            copy_to_clipboard(pseudoknot_text, 'Copy pseudoknots', key='copy_pk')
-        
+            copy_to_clipboard(pseudoknot_text, 'Pseudoknots')
 
 def edit(x, y):
     origami = st.session_state.origami

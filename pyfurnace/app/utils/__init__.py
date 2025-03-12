@@ -1,6 +1,5 @@
 from pathlib import Path
 from copy import deepcopy
-import pyperclip
 import tempfile
 import sys
 import streamlit as st
@@ -57,11 +56,54 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo_
     #     </style>
     #     """)
 
-def copy_to_clipboard(to_copy, *args, **kwargs):
-    kwargs.setdefault('icon',  ":material/content_copy:")
-    if st.button(*args, **kwargs):
-        pyperclip.copy(to_copy)
-        st.success('', icon="✅")
+def copy_to_clipboard(text_to_copy, button_text=''):
+    st.components.v1.html(f"""
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+        <script>
+            function copyToClipboard() {{
+                button = document.querySelector('.copy_button');
+                navigator.clipboard.writeText("{text_to_copy}")
+                button.innerHTML = '<span class="material-symbols-outlined">done</span>Copied!';
+                setTimeout(() => {{
+                     button.style.backgroundColor = 'white';  // Change label after copying
+                     button.innerHTML = '<span class="material-symbols-outlined">content_copy</span>{button_text}';
+                }}, 1000);
+        }}
+        </script>
+        <style>
+            .copy_container {{
+                display: inline-block;  /* Ensures no extra space around */
+                margin: 0;
+                padding: 0;
+            }}
+            
+            .copy_button {{
+                display: inline-flex;
+                background-color: inherit;
+                margin: 0rem;
+                margin-left: -0.5rem;
+                margin-top: -0.5rem;
+                align-items: center;
+                border-radius: 0.5rem;
+                font-size: inherit;
+                font-weight: 350;
+                cursor: pointer;
+                border: none;
+                }}
+            .copy_button:hover {{
+                color: #00856A;
+                border-color: #00856A;
+                }}
+
+        </style>
+        <div class="copy_container">
+            <button class="stButton copy_button" onclick="copyToClipboard()">
+                <span class="material-symbols-outlined">content_copy</span>
+                {button_text}
+            </button>
+        </div>
+        """, height=25)
 
 def save_origami(origami_name='Origami'):
     if not st.session_state.origami:

@@ -76,7 +76,6 @@ if __name__ == "__main__":
     ### display the dot-bracket notation and sequence constraints and link to the Generate page
     des_func.display_structure_sequence()
     ### Download the RNA origami structure
-    st.markdown("""<hr style="height:5px;border:none;color:#CCCCCC;background-color:#CCCCCC;" /> """, unsafe_allow_html=True)
     save_origami()
 
     

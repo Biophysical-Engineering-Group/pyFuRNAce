@@ -57,6 +57,9 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo_
     #     """)
 
 def copy_to_clipboard(text_to_copy, button_text=''):
+    copied_text = 'Copied!'
+    if not button_text:
+        copied_text = ''
     st.components.v1.html(f"""
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
@@ -64,7 +67,7 @@ def copy_to_clipboard(text_to_copy, button_text=''):
             function copyToClipboard() {{
                 button = document.querySelector('.copy_button');
                 navigator.clipboard.writeText("{text_to_copy}")
-                button.innerHTML = '<span class="material-symbols-outlined">done</span>Copied!';
+                button.innerHTML = '<span class="material-symbols-outlined">done</span>{copied_text}';
                 setTimeout(() => {{
                      button.style.backgroundColor = 'white';  // Change label after copying
                      button.innerHTML = '<span class="material-symbols-outlined">content_copy</span>{button_text}';

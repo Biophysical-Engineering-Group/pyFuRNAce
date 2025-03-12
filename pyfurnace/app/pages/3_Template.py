@@ -15,7 +15,7 @@ def convert_tab(seq):
     """
     # format the input sequence
     # st.write(f"Your sequence ({len(seq)} nt):")
-    st.write(f'Sequence type: {seq_type}, length: {len(seq)} bases')
+    st.write(f'Sequence type: {seq_type}. Length: {len(seq)} bases')
     # write_format_text(seq)
         
     # calculate the main properties of the sequence
@@ -24,17 +24,17 @@ def convert_tab(seq):
         st.write("GC content (%)")
         write_format_text(round(gc_fraction(seq, ambiguous='ignore')*100, 2))
     with col2:
-        st.write("Molecular weight")
-        write_format_text(f'{molecular_weight(seq, seq_type):.3e} Da')
+        st.write("Molecular weight (Dalton)")
+        write_format_text(f'{molecular_weight(seq, seq_type):.3e}')
     with col3:
-        st.write("Composition")
+        st.write("Nucleotide composition")
         bases = set(str(seq))
         t = ''
         for b in bases:
-            t = t + f"{b}x{str(seq).count(b)}; "
+            t = t + f"{b}: {str(seq).count(b)}; "
         write_format_text(t)
     with col4:
-        st.write("Tm (°C)")
+        st.write("Melting temperature (°C)")
         if seq_type == 'RNA':
             nn_table = mt.RNA_NN3
             complement = seq.complement_rna()
@@ -85,7 +85,7 @@ def convert_tab(seq):
 
         ### Save the DNA template in the session state and add a link to the primer page
         st.session_state["dna_template"] = str(dna_template)
-        st.page_link("pages/4_Prepare.py", label=":orange[Prepare the Primers for the DNA template]", icon=":material/sync_alt:")
+        st.page_link("pages/4_Prepare.py", label=":orange[Prepare the primers for the DNA template]", icon=":material/sync_alt:")
 
 def align_tab(seq):
     """ Align two sequences and highlight the aligned bases"""

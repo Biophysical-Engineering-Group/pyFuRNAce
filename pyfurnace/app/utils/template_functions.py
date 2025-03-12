@@ -59,11 +59,12 @@ def check_dimer(seq1, seq2, dict_format = False, basepair = {'A': 'U', 'U': 'A',
 
 def reference(primers=False):
     """ Add the references to the app"""
-    for _ in range(3):
+    for _ in range(4):
         st.write('\n')
-    st.markdown("**References**")
-    st.markdown("[1] [Biopython documentation](https://biopython.org/docs/1.75/api/Bio.SeqUtils.MeltingTemp.html). Cock, P.J.A. et al. Biopython: freely available Python tools for computational molecular biology and bioinformatics. Bioinformatics 2009 Jun 1; 25(11) 1422-3 https://doi.org/10.1093/bioinformatics/btp163 pmid:19304878")
-    if primers:
-        st.markdown("[2] [IDT suggested annealing temperature](https://eu.idtdna.com/pages/support/faqs/how-do-you-calculate-the-annealing-temperature-for-pcr-). Rychlik W, Spencer WJ, Rhoads RE. Optimization of the annealing temperature for DNA amplification in vitro. Nucleic Acids Res. 1990;18(21):6409-6412.")
-        st.markdown("[3] [Phusion suggested annealing temperature](https://www.thermofisher.com/de/de/home/brands/thermo-scientific/molecular-biology/molecular-biology-learning-center/molecular-biology-resource-library/spotlight-articles/optimizing-tm-and-annealing.html)")
+    with st.popover("**References**"):
+    # st.markdown("**References**")
+        st.markdown("[1] [Biopython documentation](https://biopython.org/docs/1.75/api/Bio.SeqUtils.MeltingTemp.html). Cock, P.J.A. et al. Biopython: freely available Python tools for computational molecular biology and bioinformatics. Bioinformatics 2009 Jun 1; 25(11) 1422-3 https://doi.org/10.1093/bioinformatics/btp163 pmid:19304878")
+        if primers:
+            st.markdown("[2] [IDT suggested annealing temperature](https://eu.idtdna.com/pages/support/faqs/how-do-you-calculate-the-annealing-temperature-for-pcr-). Rychlik W, Spencer WJ, Rhoads RE. Optimization of the annealing temperature for DNA amplification in vitro. Nucleic Acids Res. 1990;18(21):6409-6412.")
+            st.markdown("[3] [Phusion suggested annealing temperature](https://www.thermofisher.com/de/de/home/brands/thermo-scientific/molecular-biology/molecular-biology-learning-center/molecular-biology-resource-library/spotlight-articles/optimizing-tm-and-annealing.html)")
 

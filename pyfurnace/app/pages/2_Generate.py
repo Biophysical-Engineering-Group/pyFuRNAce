@@ -106,9 +106,9 @@ if __name__ == "__main__":
         st.session_state.rna_origami_seq = ""
 
     st.header('Generate', help='Generate the RNA sequence that matches the desired dot-bracket notation (and sequence constraints) for the nanostructure.')
-    structure = st.text_input("RNA Strucutre (dot-bracket notation)", value=st.session_state.generate_structure)
-    sequence_constraint = st.text_input("Sequence Constraints", value=st.session_state.generate_sequence)
-    pseudoknot_info = st.text_input("Pseudoknot Constraints (semicolon-separated)", value=st.session_state.generate_pseudoknots)
+    structure = st.text_input("RNA strucutre (dot-bracket notation)", value=st.session_state.generate_structure)
+    sequence_constraint = st.text_input("Sequence constraints", value=st.session_state.generate_sequence)
+    pseudoknot_info = st.text_input("Pseudoknot constraints (semicolon-separated)", value=st.session_state.generate_pseudoknots)
     
     if not sequence_constraint:
         sequence_constraint = "N" * len(structure.replace("&", ""))
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         filename =  st.text_input('Name of RNA origami', value='Origami')
     with col2: 
         st.write("\n"); st.write("\n"); 
-        if st.button("Generate RNA Sequence"):
+        if st.button("Generate RNA sequence"):
             generate = False
     if not generate:
         # Initialize the UI elements

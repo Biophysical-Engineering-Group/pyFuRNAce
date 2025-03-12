@@ -256,7 +256,7 @@ def make_motif_menu(origami):
                                         orientation="horizontal",
                                         styles=second_menu_style)
         with col2:
-            new_name = st.text_input(":green[Add Custom Motif with Name:]", key=f'new_custom_motif{st.session_state.custom_key}')
+            new_name = st.text_input(":green[Add custom motif with name:]", key=f'new_custom_motif{st.session_state.custom_key}')
             if new_name:
                 icon = funny_bootstrap_icons[0]
                 funny_bootstrap_icons[:] = funny_bootstrap_icons[1:] + [funny_bootstrap_icons[0]]
@@ -311,7 +311,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
     ### Select the line in which to add the motif
     with col2:
         line_index = min(line_index, origami_len - 1)
-        line_index = st.number_input("**Select Line Index:**", min_value=-1, max_value=origami_len - 1, value=line_index, key=f'select_line_index{st.session_state.origami_click_detector_counter}')
+        line_index = st.number_input("**Select line index:**", min_value=-1, max_value=origami_len - 1, value=line_index, key=f'select_line_index{st.session_state.origami_click_detector_counter}')
         st.session_state.current_line_occupied = False
         if line_index < origami_len and origami[line_index]:
             st.session_state.current_line_occupied = True
@@ -333,7 +333,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                 if st.session_state.line_index >= len(st.session_state.origami):
                     return 
                 if len(st.session_state.origami) > 0:
-                    del_line = st.button("Delete Line", key = 'del_line', help="Delete the choosen line")
+                    del_line = st.button("Delete line", key = 'del_line', help="Delete the choosen line")
                     if del_line:
                         st.session_state.origami.pop(st.session_state.line_index) #remove choosen helix 
                         st.session_state.code.append(f'origami.pop({st.session_state.line_index})')
@@ -350,7 +350,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         max_val = len(origami[line_index])
         if motif_index > max_val:
             motif_index = max_val
-        motif_index = st.number_input("**Select Motif Index:**", min_value=0, max_value=max_val, value=motif_index, key = f'select_motif_index_{st.session_state.origami_click_detector_counter}')
+        motif_index = st.number_input("**Select motif index:**", min_value=0, max_value=max_val, value=motif_index, key = f'select_motif_index_{st.session_state.origami_click_detector_counter}')
         if motif_index != st.session_state.motif_index:
             st.session_state.motif_index = motif_index
             if clicked_indexes:
@@ -364,7 +364,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         with subcol2:
             ### Delete motif
             if len(origami[st.session_state.line_index]) > 0:
-                delete_button = st.button(':red[Delete Motif]', key = 'delete_motif')
+                delete_button = st.button(':red[Delete motif]', key = 'delete_motif')
                 if delete_button:
                     if st.session_state.motif_index == len(origami[st.session_state.line_index]):
                         st.session_state.motif_index -= 1
@@ -375,7 +375,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
 
     ### duplicate the current line
     with col4:
-        if st.button("Duplicate Line", key='duplicate_line'):
+        if st.button("Duplicate line", key='duplicate_line'):
             # warnings.filterwarnings("ignore") # ignore kl energy warning
             origami.duplicate_line(line_index, insert_idx=len(origami))
             st.session_state.code.append(f'origami.duplicate_line({line_index}, insert_idx={len(origami)}) # Duplicate line')
@@ -389,7 +389,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
             copy_motif()
         # Paste motif
         with subcol2:
-            paste_button = st.button('Paste Motif', key = 'paste_motif')
+            paste_button = st.button('Paste motif', key = 'paste_motif')
             if paste_button:
                 if not st.session_state.copied_motif:
                     st.warning('No motif copied')
@@ -440,9 +440,9 @@ def add_motif(origami):
 
     ### Add motif
     def f_subcol3():
-            button_label = 'Insert Motif'
+            button_label = 'Insert motif'
             if st.session_state.motif_index == len(origami[st.session_state.line_index]):
-                button_label = 'Add Motif'
+                button_label = 'Add motif'
             add_button = st.button(f'**:green[{button_label}]**', key = 'insert_motif', help="Insert the motif at the choosen position")
             if add_button:
                 origami.insert((st.session_state.line_index, st.session_state.motif_index), motif) # add motif into choosen position
@@ -461,7 +461,7 @@ def add_motif(origami):
 
 
 def copy_motif(key='', motif=None, motif_slice=None):
-    copy_button = st.button('Copy Motif', key = f'copy_motif{key}')
+    copy_button = st.button('Copy motif', key = f'copy_motif{key}')
     if copy_button:
         if not motif:
             st.session_state.copied_motif = st.session_state.motif
@@ -499,7 +499,7 @@ def custom(current_custom_motif):
     st.session_state.motif = current_custom_motif
 
     if not st.session_state["custom_edit"]:
-        if st.button(":orange[Edit the Motif]", key="edit_strand"):
+        if st.button(":orange[Edit the motif]", key="edit_strand"):
             st.session_state["custom_edit"] = True
             st.rerun()
         return
@@ -549,13 +549,13 @@ def custom(current_custom_motif):
 
     cols = st.columns(4, vertical_alignment='bottom')
     with cols[0]:
-        if st.button("Add Strand", key="add_strand"):
+        if st.button("Add strand", key="add_strand"):
             st.session_state["custom_strands"].append(pf.Strand(''))
             current_custom_motif.append(pf.Strand(''), copy=False, join=False)
     with cols[1]:
-        x_dots = st.number_input("Canvas X size", min_value=1, value=100, key="x_size")
+        x_dots = st.number_input("Canvas x size", min_value=1, value=100, key="x_size")
     with cols[2]:
-        y_dots = st.number_input("Canvas Y size", min_value=1, value=10, key="y_size")
+        y_dots = st.number_input("Canvas y size", min_value=1, value=10, key="y_size")
     with cols[3]:
         if st.button("Clear", key="clear_strand"):
             st.session_state["custom_strands"] = [pf.Strand('')]
@@ -568,7 +568,7 @@ def custom(current_custom_motif):
     with col1:
         strand_num = st.radio("Selected strand:", list(range(len(strands))), index=len(strands)-1)
         strand = strands[strand_num]
-        if st.button("Delete Strand", key="delete_strand"):
+        if st.button("Delete strand", key="delete_strand"):
             st.session_state["custom_strands"].pop(strand_num)
             current_custom_motif.pop(strand_num)
             if not st.session_state["custom_strands"]:
@@ -610,7 +610,7 @@ def custom(current_custom_motif):
             start = strand.start
             direction = (pos[0] - start[0], pos[1] - start[1])
             if direction[0] and direction[1]:
-                st.error("Invalid Strand, the strand can't form diagonal lines.")
+                st.error("Invalid strand, the strand can't form diagonal lines.")
                 return
             # the Start horizontally
             if direction[0]:
@@ -657,7 +657,7 @@ def custom(current_custom_motif):
                 if normal_direction == strand.end_direction:
                     strand.strand = strand.strand + sym * distance
                 elif normal_direction not in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-                    st.error("Invalid Strand. The strand can't form diagonal lines.")
+                    st.error("Invalid strand. The strand can't form diagonal lines.")
                 elif direction_difference == (-1, 1):
                     strand.strand = strand.strand[:-1] + "╮" + sym * distance
                 elif direction_difference == (1, 1):
@@ -667,7 +667,7 @@ def custom(current_custom_motif):
                 elif direction_difference == (1, -1):
                     strand.strand = strand.strand[:-1] + "╰" + sym * distance
                 else:
-                    st.error("Invalid Strand")
+                    st.error("Invalid strand")
 
     def update_strand(coords=None):
         nonlocal strand, strand_num, current_custom_motif
@@ -709,19 +709,19 @@ def custom(current_custom_motif):
     ### Show the strand options
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
     with col1:
-        start_x = st.number_input("Start X:", min_value=0, value=strand.start[0], key=f'start_x_custom')
+        start_x = st.number_input("Start x:", min_value=0, value=strand.start[0], key=f'start_x_custom')
     with col2:
-        start_y = st.number_input("Start Y:", min_value=0, value=strand.start[1], key=f'start_y_custom')
+        start_y = st.number_input("Start y:", min_value=0, value=strand.start[1], key=f'start_y_custom')
     with col3:
         strand_direction_ind = [d for d in pf.Direction].index(strand.direction)
-        new_dir = st.selectbox('Start Direction:', ['Up', 'Right', 'Down', 'Left'], index=strand_direction_ind, key=f'dir_custom')
+        new_dir = st.selectbox('Start direction:', ['Up', 'Right', 'Down', 'Left'], index=strand_direction_ind, key=f'dir_custom')
         new_dir_tuple = pf.Direction[new_dir.upper()]
     with col4:
         seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(strand.directionality), key=f'seq_dir_custom')
     with col5:
         new_strand = st.text_input(f'New strand (strand directionality: {strand.directionality}) ', value=str(strand), key=f'strand_custom')
-    coords = st.file_uploader(f"Strand 3D Coordinates (oxDNA format)", type=['dat'], key=f'custom_{st.session_state.upload_key}', 
-                                help='Upload a Oxview configuration ".dat" file with the 3D coordinates of one strand.')
+    coords = st.file_uploader(f"Strand 3D coordinates (OxDNA format)", type=['dat'], key=f'custom_{st.session_state.upload_key}', 
+                                help='Upload an Oxview configuration ".dat" file with the 3D coordinates of one strand.')
     dummy_cols = st.columns(7)
     with dummy_cols[2]:
         dummy_start = st.toggle('Start dummy base', key=f'dummy_start_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the beginning of the strand.')
@@ -743,7 +743,7 @@ def custom(current_custom_motif):
 
     ### check the base pair symbols of the motif
     current_structure = current_custom_motif.structure
-    new_db = st.text_input('Add Dot-Bracket notation:', value=current_structure,  key=f'structure_custom', help='Add the dot-bracket notation of the motif for each strand, separated by a "&". If the paired bases are more than one position apart, the pairing symbol "┊" is not shown.')
+    new_db = st.text_input('Add dot-bracket notation:', value=current_structure,  key=f'structure_custom', help='Add the dot-bracket notation of the motif for each strand, separated by a "&". If the paired bases are more than one position apart, the pairing symbol "┊" is not shown.')
     if new_db != current_structure:
         current_custom_motif.structure = new_db
 
@@ -825,9 +825,9 @@ def undo(key=''):
 #     st.rerun()
 
 def origami_select_display():
-    option_data = {"Origami 2D View": "bi bi-align-start", 
-                "Origami 3D View": "bi bi-layers", 
-                "Origami Split View": "bi bi-fullscreen-exit"}
+    option_data = {"Origami 2D view": "bi bi-square", 
+                   "Origami 3D view": "bi bi-box", 
+                   "Origami split view": "bi bi-window-split"}
 
     selected_display = option_menu(None,
                                 list(option_data.keys()),
@@ -843,12 +843,12 @@ def origami_select_display():
 def origami_build_view(selected_display):
     ### Display the RNA origami structure with clickable elements and modify them in case
     warnings.filterwarnings("ignore") # ignore numpy warnings
-    if selected_display == 'Origami 2D View':
+    if selected_display == 'Origami 2D view':
         clicked = display_origami()
         clicked_options(clicked)
-    elif selected_display == 'Origami 3D View':
+    elif selected_display == 'Origami 3D view':
         display3d()
-    elif selected_display == 'Origami Split View':
+    elif selected_display == 'Origami Split view':
         col1, col2 = st.columns(2)
         with col1:
             clicked = display_origami()
@@ -1019,7 +1019,7 @@ def display_origami():
         undo('error', key='error')
         st.stop()
     except pf.AmbiguosStructure as e:
-        st.error(f"Ambigouse Structure: \n {e}", icon=":material/theater_comedy:")
+        st.error(f"Ambigouse structure: \n {e}", icon=":material/theater_comedy:")
         undo('warning', key='warning')
         st.write("You can try flipping the motif or changing the sequence direction.")
         st.stop()
@@ -1067,7 +1067,7 @@ def clicked_options(clicked):
             copy_motif('selected', motif=motif, motif_slice=motif_slice)
 
 def display_structure_sequence():
-    st.write("#### Origami Structure and sequence constraints:")
+    st.write("#### Origami structure and sequence constraints:")
     origami = st.session_state.origami
     if origami.structure:
         structure_list = [char for char in origami.structure]
@@ -1097,7 +1097,7 @@ def display_structure_sequence():
         scrollable_text(f"""
             >Origami</br>{''.join(sequence_list)}</br>{''.join(structure_list)}</br></br>Pseudoknots info:</br>{pseudoknot_text}""")
 
-        st.markdown("<hr style='margin-top:-0em;margin-bottom:-1em' />", unsafe_allow_html=True)
+        st.markdown("<hr style='margin-top:-0em;margin-bottom:-1em;color:white;border-color:white' />", unsafe_allow_html=True)
 
         st.session_state.generate_structure = origami.structure
         st.session_state.generate_sequence = str(origami.sequence)
@@ -1155,13 +1155,13 @@ def edit(x, y):
             for i, s in enumerate(motif_copy):
                 col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
                 with col1:
-                    start_x = st.number_input("Start X:", min_value=0, value=s.start[0], key=f'start_x_{x}_{y}_{i}')
+                    start_x = st.number_input("Start x:", min_value=0, value=s.start[0], key=f'start_x_{x}_{y}_{i}')
                 with col2:
-                        start_y = st.number_input("Start Y:", min_value=0, value=s.start[1], key=f'start_y_{x}_{y}_{i}')
+                        start_y = st.number_input("Start y:", min_value=0, value=s.start[1], key=f'start_y_{x}_{y}_{i}')
                 with col3:
                     direction_list = ['Up', 'Right', 'Down', 'Left']
                     strand_direction_ind = [i for i, d in enumerate(pf.Direction) if d == s.direction][0]
-                    new_dir = st.selectbox('Start Direction:', direction_list, index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
+                    new_dir = st.selectbox('Start direction:', direction_list, index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
                     new_dir_tuple = pf.Direction[new_dir.upper()]
                 with col4:
                     seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(s.directionality), key=f'seq_dir_{x}_{y}_{i}')
@@ -1184,7 +1184,7 @@ def edit(x, y):
 
             ### check the base pair symbols of the motif
             current_structure = motif_copy.structure
-            new_db = st.text_input('Add Dot-Bracket notation:', value=current_structure,  key=f'structure_{x}_{y}', help='Add the dot-bracket notation of the motif for each strand, separated by a "&". If the paired bases are more than one position apart, the pairing symbol "┊" is not shown.')
+            new_db = st.text_input('Add dot-bracket notation:', value=current_structure,  key=f'structure_{x}_{y}', help='Add the dot-bracket notation of the motif for each strand, separated by a "&". If the paired bases are more than one position apart, the pairing symbol "┊" is not shown.')
             if new_db != current_structure:
                 motif_copy.structure = new_db
                 st.session_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'

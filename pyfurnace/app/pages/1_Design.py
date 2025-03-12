@@ -18,22 +18,22 @@ if __name__ == "__main__":
     des_func.origami_general_options(st.session_state.origami, 
                                      expanded=False)
 
-    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3])   
+    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3], vertical_alignment='center') 
     with cols[0]:    
-        with st.popover("Make a simple Origami",
+        with st.popover("Make a simple origami",
                         use_container_width=False,
-                        help='Start by creating a simple Origami rather than starting from scratch'):
+                        help='Start by creating a simple origami rather than starting from scratch'):
             des_func.simple_origami()
     with cols[2]:
-        st.write('OxView 3D ColorMap:')
+        st.write('OxView 3D colormap:')
     with cols[3]:
-        st.selectbox('OxView 3D ColorMap:', 
+        st.selectbox('OxView 3D colormap:', 
                      ['Reds', None] + plt.colormaps(),
                      key='oxview_colormap',
                      label_visibility='collapsed', 
                      help='Change the color of the OxView visualization.')
     with cols[5]:
-        st.toggle('Color Gradient Path', 
+        st.toggle('Color gradient path', 
                   key='gradient', 
                   help='Toggle the gradient color scheme for the nucleotides')
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     #                 use_container_width=True,):
     #     make_motif_menu(origami)
     def motif_menu_expander():
-        with st.expander("**Add Motifs to the Origami:**", expanded=True):
+        with st.expander("**Add motifs to the origami:**", expanded=True):
             des_func.make_motif_menu(st.session_state.origami)
             # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)
             # st.markdown("<hr style='margin-top:+0em;border:none;margin-bottom:-1em;color:#FFFFFFw;background-color:#FFFFFF;' />", unsafe_allow_html=True)
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     ### select the render mode
     if not st.session_state.origami:
-        st.success('The Origami is empty, add a Motif!')
+        st.success('The origami is empty, add a motif!')
         st.stop()
     else:
         des_func.origami_build_view(view_opt)

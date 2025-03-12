@@ -63,7 +63,7 @@ def primers_tab(seq):
                     st.session_state[key] = val
         
             # select the energy model
-            st.write('Energy Model:')
+            st.write('Energy model:')
             col1, col2, col3 = st.columns([2, 2, 1])
             with col1:
                 # select the melting temperature method
@@ -150,31 +150,58 @@ def primers_tab(seq):
         st.stop()
 
     # show the settings for the two primers: choose the number of bases and show the gc content and melting temperature
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2, gap='large')
     mts = [0, 0]
     # settings for the coding primer
     with col1:
-        c_bases = st.slider('Forward primer length:', min_value=1, max_value=50, value = 21, key="coding_primer")
+        with st.columns(5)[2]:
+            st.markdown('##### Forward')
+
+        c_bases = st.slider('Primer length:', min_value=1, max_value=50, value = 21, 
+                            key="coding_primer")
         c_primer = seq[:c_bases]
-        copy_to_clipboard(c_primer, "Coding primer:")
-        write_format_text(c_primer)
+
+        subcol1, subcol2 = st.columns([11,1], vertical_alignment='center')
+        with subcol1:
+            write_format_text(c_primer)
+        with subcol2:
+            copy_to_clipboard(c_primer, "")
+
         mts[0] = round(mt_correct(c_primer),2)
-        st.write(f"GC content: {round(gc_fraction(c_primer, ambiguous='ignore') * 100, 1)}%; Tm: {round(mts[0], 1)}°C")
+        subcol1, subcol2 = st.columns(2)
+        with subcol1:
+            st.markdown(f"GC content: {round(gc_fraction(c_primer, ambiguous='ignore') * 100, 1)}%")
+        with subcol2:
+            st.markdown(f":orange[Tm: {round(mts[0], 1)}°C]")
+
     # settings for the non-coding primer
     with col2:
-        nc_bases = st.slider('Reverese primer length:', min_value=1, max_value=50, value = 21, key="non_coding_primer")
+        with st.columns(5)[2]:
+            st.markdown('##### Reverse')
+
+        nc_bases = st.slider('Primer length:', min_value=1, max_value=50, value = 21, 
+                             key="non_coding_primer")
         nc_primer = seq[-nc_bases:].reverse_complement()
-        copy_to_clipboard(nc_primer, "Reverse primer:")
-        write_format_text(nc_primer)
+        
+        subcol1, subcol2 = st.columns([11,1], vertical_alignment='center')
+        with subcol1:
+            write_format_text(nc_primer)
+        with subcol2:
+            copy_to_clipboard(nc_primer, "")
+
         mts[1] = round(mt_correct(nc_primer),2)
-        st.write(f"GC content: {round(gc_fraction(nc_primer, ambiguous='ignore') * 100, 1)}%; Tm: {round(mts[1], 1)}°C")
+        subcol1, subcol2 = st.columns(2)
+        with subcol1:
+            st.markdown(f"GC content: {round(gc_fraction(nc_primer, ambiguous='ignore') * 100, 1)}%")
+        with subcol2:
+            st.markdown(f":orange[Tm: {round(mts[1], 1)}°C]")
 
     # show the primers preview, check the self-dimerization of the primer and check the dimer between the primers and the sequence
-    with st.expander("Primers Preview"):
+    with st.expander("Dimerization preview"):
         st.markdown(f"""<div style="text-align: center;"><span style="color: #FF5733">{c_primer}</span>{seq[c_bases]}[...]{seq[-nc_bases-1:]}</div>""", unsafe_allow_html=True)
         st.markdown(f"""<div style="text-align: center;">{seq[:c_bases+1].complement()}[...]{seq[-nc_bases]}<span style="color: #FF5733">{nc_primer[::-1]}</span></div>""", unsafe_allow_html=True)
         st.divider()
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns(2, gap='large')
         with col1:
             self_dimer1 = check_dimer(c_primer, c_primer)
             write_format_text('Self-Dimer coding primer\n' + self_dimer1)
@@ -183,19 +210,19 @@ def primers_tab(seq):
             write_format_text('Self-Dimer non-coding primer\n' + self_dimer2)
         self_dimer12 = check_dimer(c_primer, nc_primer)
         write_format_text('Dimer between primers\n' + self_dimer12)
-        
-            
 
-    st.divider()
     # add a warning if the melting temperature of the primers is too different
+    anneal_color = 'green'
     if abs(mts[0] - mts[1]) >= 5:
         st.warning('The difference of Tm should be below 5°C', icon="⚠️")
+        anneal_color = 'red'
                     
     # take into account the two main method to calculate the PCR annealing temperature: IDT method and Phusion Buffer method
-    col1, col2, col3 = st.columns([2, 1, 3])
+    col1, col2 = st.columns(2, gap='large', vertical_alignment='bottom')
     ann_methods = ['IDT method [2]', 'Phusion method [3]']
     with col1:
         annealing_model = st.selectbox("Calculate annealing:", ann_methods)
+        
     # the IDT method takes into account the GC melting temperature of the whole DNA sequence 
     if annealing_model == ann_methods[0]:
         t_anneal = round(0.3 * min(mts) + 0.7 * mt.chem_correction(mt.Tm_GC(seq, valueset=7, Na=na, K=k, Tris=tris, Mg=mg, dNTPs=dntps, saltcorr=correction_met), DMSO=dmso) - 14.9, 2)
@@ -207,10 +234,10 @@ def primers_tab(seq):
             t_anneal = min(mts) + 3
         if t_anneal < 50:
             st.warning('Is suggested a temperature of annealing higher than 50°C.', icon="⚠️")
+            anneal_color = 'red'
     # write the annealing temperature in big
-    with col3:
-        st.write('\n')
-        st.subheader(f"T annealing: {t_anneal}")
+    with col2:
+        st.markdown(f"### Anneal at: :{anneal_color}[{t_anneal}°C]")
 
 # def auto_primer(sequence, target_temp):
 

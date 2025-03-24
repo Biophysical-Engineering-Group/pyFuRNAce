@@ -69,7 +69,7 @@ db_pairs = {"(": ")", "[": "]", "{": "}", "<": ">", "A": "a", "B": "b", "C": "c"
 all_pk_symbols =     ('[', ']', '{', '}', '<', '>', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
 road_symbols =  nucleotides | {"." "(", ")"} | set(all_pk_symbols) | {
                 "─", "│", "╭", "╮", "╰", "╯", "^", "*", "┼", "┊", '~', '◦',  # ROAD special symbols
-                '↑', '↓', "⊗", "⊙", # Pyfurnace special symbols
+                '↑', '↓', "⊗", "⊙", "▄", "█", # Pyfurnace special symbols
                 "-", "|", "+", ":", "=", "!", " ", "/", "\\", "3", "5", "&"} 
 bp_symbols = {"┊", "=", ":", "!", "*"}
 # turns = {"╭", "╮", "╰", "╯", "/", "\\"} 
@@ -284,10 +284,10 @@ def folding_barriers(structure: str,
     Tuple[str, int]
         A tuple containing:
         - A string representing the barrier map where:
-        'N' = no barrier (0 penalty),
-        'w' = opening pair weak barrier (1 penalty),
-        'W' = cloding pair weak barrier (1 penalty),
-        'S' = strong barrier (2 penalty).
+        '─' = no barrier (0 penalty),
+        '▂' = opening pair weak barrier (1 penalty),
+        '▄' = cloding pair weak barrier (1 penalty),
+        '█' = strong barrier (2 penalty).
         - An integer score indicating the total penalty based on barrier strengths.
 
     Notes
@@ -295,6 +295,7 @@ def folding_barriers(structure: str,
     The function assigns barrier strengths based on the topology of base pairs 
     and kinetic constraints, ensuring proper folding predictions.
     """
+    structure = structure.replace('&', '')
     ss_len = len(structure)
     s_map = dot_bracket_to_pair_map(structure)
     barriers = [''] * len(structure)
@@ -306,27 +307,27 @@ def folding_barriers(structure: str,
     for ind in range(ss_len):
         # get the bracket at the position
         bra = structure[ind]
-        if bra == '&':
-            barriers[ind] = '&'
-            continue
+        # if bra == '&':
+        #     barriers[ind] = '&'
+        #     continue
 
         # set the default barrier to 'N'
-        barriers[ind] = 'N'
+        barriers[ind] = '─'
 
         if ind > ss_len - terminal_3_bonus:
             if s_map[ind] is not None:
-                barriers[s_map[ind]] = 'N'
+                barriers[s_map[ind]] = '─'
             continue
 
         ### unpaired nts are not barriers and reset the current barrier count
         if bra == '.':
-            barriers[ind] = 'N'
+            barriers[ind] = '─'
             current_barr_count = 0
 
         ### opening pairs may be barriers or not, 
         # indicate them with 'w', reset the barrier count
         elif bra == '(':
-            barriers[ind] = 'w'
+            barriers[ind] = '▂'
             current_barr_count = 0
 
         ### closing pairs may be barriers or not, 
@@ -334,22 +335,22 @@ def folding_barriers(structure: str,
         elif bra == ')':
             # if the opening pair is not blocked, 
             # we close and reset the current barrier count
-            if barriers[s_map[ind]] == 'w':
-                barriers[ind] = 'N'
-                barriers[s_map[ind]] = 'N'
+            if barriers[s_map[ind]] == '▂':
+                barriers[ind] = '─'
+                barriers[s_map[ind]] = '─'
                 current_barr_count = 0
 
             # if the closing pair is already blocked, then 
             # we mark the barrier reached and start counting
-            elif barriers[s_map[ind]] == 'S':
+            elif barriers[s_map[ind]] == '█':
                 # if the current barrier count is greater than 5, wa mark it with 'S'
                 if current_barr_count > 5:
-                    barriers[ind] = 'S'
-                    barriers[s_map[ind]] = 'W'
+                    barriers[ind] = '█'
+                    barriers[s_map[ind]] = '▄'
                 # if the current barrier count is less than 5, we mark it with 'W'
                 else:
-                    barriers[ind] = 'W'
-                    barriers[s_map[ind]] = 'W'
+                    barriers[ind] = '▄'
+                    barriers[s_map[ind]] = '▄'
                 current_barr_count += 1
 
         # if the index is bigger than the kl_delay, 
@@ -360,30 +361,30 @@ def folding_barriers(structure: str,
             # if yes, we mark them with 'N'
             close_sym = structure[ind - kl_delay]
             if close_sym not in '(.)' and close_sym in db_pairs.values():
-                barriers[ind - kl_delay] == 'N'
-                barriers[s_map[ind - kl_delay]] == 'N'
+                barriers[ind - kl_delay] == '─'
+                barriers[s_map[ind - kl_delay]] == '─'
 
                 # for each nt in the delay, we check if there are any barriers, 
                 # if yes, we mark them with 'S'
                 for k in range(s_map[ind - kl_delay], ind-kl_delay):
-                    if barriers[k] == 'w':
-                        barriers[k] = 'S'
-                        
-    penalty = {'S': 2, 'W': 1, 'w': 1, 'N': 0, '&': 0}
+                    if barriers[k] == '▂':
+                        barriers[k] = '█'
+
+    penalty = {'█': 2, '▄': 1, '▂': 1, '─': 0}#, '&': 0}
     repl = [penalty[i] for i in barriers]
     score = sum(repl)
     return ''.join(barriers), score
 
 class Node():
-    def __init__(self, index = None, label = "5'", parent=None, seq="", **kwargs):
+    def __init__(self, index = None, label = "5'", parent=None, seq=None, **kwargs):
         self.index = index
         self.label = label
         self.paired_index = None
         self.parent = parent
         self.seq = seq
+        self.children = []
         if parent is not None:
             parent.children.append(self)
-        self.children = []
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -415,24 +416,26 @@ class Node():
     
         return None  # Return None if not found
 
-def dot_bracket_to_tree(dot_bracket, sequence_constraints=None):
+def dot_bracket_to_tree(dot_bracket, sequence=None):
     # Remove pseudoknots from the dot bracket
     dot_bracket = dot_bracket.translate(pseudo_to_dot)
     root = Node()
     current_node = root
     for i, label in enumerate(dot_bracket):
-        if sequence_constraints is not None:
-            seq_const = sequence_constraints[i]
+        if sequence is not None:
+            seq_const = sequence[i]
         else:
             seq_const = None
         if label == "(": # add a new node, move to the new node
             new_node = Node(i, label, current_node, seq = seq_const)
             current_node = new_node
-        elif label == ".": # add a children to the current node, do not move
-            new_node = Node(i, label, current_node, seq = seq_const)
         elif label == ")": # add the paired index to the parent, move to the parent node
             current_node.paired_index = i
             current_node = current_node.parent
+        elif label == ".": # add a children to the current node, do not move
+            new_node = Node(i, label, current_node, seq = seq_const)
+        elif label == '&':
+             new_node = Node(None, label, current_node)
     return root
 
 def tree_to_dot_bracket(node, dot_bracket=None, seq_constraints=False):

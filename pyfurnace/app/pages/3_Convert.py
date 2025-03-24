@@ -156,7 +156,7 @@ if __name__ == "__main__":
     
     if "rna_origami_seq" not in st.session_state:
         st.session_state["rna_origami_seq"] = ''
-    st.header('Template', help='Prepare the DNA template for you RNA Origami, align structures and search for dimers.')
+    st.header('Convert', help='Prepare the DNA template for you RNA Origami, align structures and search for dimers.')
     # take the input sequence and sanitize it
     seq = sanitize_input(st.text_input("Input sequence (DNA or RNA):", value = st.session_state["rna_origami_seq"]))
     # check the symbols in the sequence

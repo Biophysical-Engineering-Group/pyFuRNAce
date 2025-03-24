@@ -180,7 +180,7 @@ if __name__ == "__main__":
     #     st.write(format_text(st.session_state.rna_origami_seq))
     #     col1, col2, col3 = st.columns(3)
     #     with col1:
-    #         st.page_link("pages/3_Template.py", 
+    #         st.page_link("pages/3_Convert.py", 
     #                      label=":orange[Prepare the DNA template]", 
     #                      icon=":material/genetics:")
     #     with col2:

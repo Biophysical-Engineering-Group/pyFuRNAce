@@ -48,7 +48,7 @@ if __name__ == "__main__":
             des_func.make_motif_menu(st.session_state.origami)
             # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)
             # st.markdown("<hr style='margin-top:+0em;border:none;margin-bottom:-1em;color:#FFFFFFw;background-color:#FFFFFF;' />", unsafe_allow_html=True)
-            # st.markdown("<hr style='margin-top:+0.5em;margin-bottom:+1.0em;' />", unsafe_allow_html=True)        
+            st.markdown("<hr style='margin-top:+0.5em;margin-bottom:+1.0em;' />", unsafe_allow_html=True)        
             # st.divider()
             view_opt = des_func.origami_select_display()
         return view_opt

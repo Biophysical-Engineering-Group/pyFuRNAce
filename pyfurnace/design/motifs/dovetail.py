@@ -16,7 +16,7 @@ from .stem import Stem
 #                     [-0.60643229,  0.16817856,  0.77714596,  0.32818404],
 #                     [ 0.        ,  0.        ,  0.        ,  1.        ],])
 
-### DAE PARALLEL FROM PDB MEAN extra refined for ss-assembly
+### DAE PARALLEL FROM PDB MEAN refined for ss-assembly
 DAE_T_53 = np.array([[-0.82936192, -0.04732277, -0.55670411, -0.60615603],
                      [-0.0473231 , -0.98687633,  0.15438835, -0.23843062],
                      [-0.55670399,  0.15438806,  0.81623819, -0.84790395],

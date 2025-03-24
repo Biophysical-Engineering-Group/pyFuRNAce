@@ -109,7 +109,7 @@ def simple_origami():
                                 key='dt_text_list',
                                 help= f"""
 The program calculates the best connections bewteen the helices to fit the given angles.
-The connection between helice (Dovetails) are obtained roughly with this lookup table (angle --> dt):
+The connection between helices (Dovetails) are obtained roughly with this lookup table (angle --> dt):
 {pf.angles_dt_dict}
 """)
 
@@ -521,30 +521,44 @@ def custom(current_custom_motif):
     
     if st.toggle('Text input', key='Text input', help='Create a motif on a blank text area by typing the motif strand and basepairing.'):
         # make a motif list adding a space around the motif
+        motif_lines = str(current_custom_motif).split('\n')
+        add_line = False
+        add_char = False
         if current_custom_motif:
-            motif_list = [[' '] * (current_custom_motif.num_char + 2)] + [[' '] + [char for char in line] + [' '] for line in str(current_custom_motif).split('\n')] + [[' '] * (current_custom_motif.num_char + 2)]
+            if any(line[0] != ' ' for line in motif_lines):
+                add_char = True
+
+            motif_list = [[' '] * add_char + [char for char in line] + [' '] for line in motif_lines]
+
+            if motif_lines[0].strip():
+                add_line = True
+                motif_list = [[' '] * (current_custom_motif.num_char + 2)] + motif_list
+            if motif_lines[-1].strip():
+                motif_list += [[' '] * (current_custom_motif.num_char + 2)]
+
         else:
-            motif_list = [[]]
+            motif_list = [['']]
         # Add the  5 before the start of each motif.
         for s in current_custom_motif:
-            if s.directionality == '53' and motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] == ' ': # add 5' to the start of the strand
-                motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '5'
-            elif s.directionality == '35' and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' ': # add 5' to the end of the strand
-                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = 5
-        current_custom_motif_str = '\n'.join([''.join(line) for line in motif_list])
+            if s.directionality == '53' and motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] == ' ': # add 5' to the start of the strand
+                motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] = '5'
+            elif s.directionality == '35' and motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] == ' ': # add 5' to the end of the strand
+                motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] = 5
+
+        current_custom_motif_str = '\n'.join(''.join(line) for line in motif_list)
 
         strand_text = st.text_area("Motif text: draw a motif where each Strand starts with a 5", value=current_custom_motif_str, key="Motif_text", help='Draw a motif, where each strand has to start with "5". If you want to start a strand with 5, add an additional 5 at the beginning of the strand.')
         if strand_text != current_custom_motif_str:
             if '5' not in strand_text:
                 st.warning('Don\'t forget to start the strand with "5"')
             else:
-                new_motif = pf.Motif.from_text(strand_text)
+                new_motif = pf.Motif.from_text(strand_text).strip()
                 current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
                 current_custom_motif.basepair = new_motif.basepair
                 st.rerun()
         st.write('Current motif preview:')
         scrollable_text(motif_text_format(current_custom_motif))
-        st.write("Finish editing the motif to add the motif to the origami.")
+        finish_editing(current_custom_motif)
         st.stop()
 
     cols = st.columns(4, vertical_alignment='bottom')
@@ -747,11 +761,14 @@ def custom(current_custom_motif):
     if new_db != current_structure:
         current_custom_motif.structure = new_db
 
+    finish_editing(current_custom_motif)
+    st.stop()
+
+def finish_editing(current_custom_motif):
     if st.button(':green[Finish editing to add motif to the origami]', key="end_edit"):
         st.session_state["custom_edit"] = False
         current_custom_motif.replace_all_strands(st.session_state["custom_strands"], copy=False)
         st.rerun()
-    st.stop()
 
 def update_code(code_text):
     # Check for forbidden keywords
@@ -801,7 +818,7 @@ def code():
 def undo(key=''):
     if not st.session_state.origami:
         return
-    if len(st.session_state.code) <= 3:
+    if len(st.session_state.code) <= 1:
         st.warning("Nothing to undo.")
         return
     undo_button = st.button("Undo", 
@@ -827,7 +844,8 @@ def undo(key=''):
 def origami_select_display():
     option_data = {"Origami 2D view": "bi bi-square", 
                    "Origami 3D view": "bi bi-box", 
-                   "Origami split view": "bi bi-window-split"}
+                   "Origami split view": "bi bi-window-split",
+                   'Folding barrier': "bi bi-graph-up"}
 
     selected_display = option_menu(None,
                                 list(option_data.keys()),
@@ -843,12 +861,15 @@ def origami_select_display():
 def origami_build_view(selected_display):
     ### Display the RNA origami structure with clickable elements and modify them in case
     warnings.filterwarnings("ignore") # ignore numpy warnings
+
     if selected_display == 'Origami 2D view':
         clicked = display_origami()
         clicked_options(clicked)
+
     elif selected_display == 'Origami 3D view':
         display3d()
-    elif selected_display == 'Origami Split view':
+
+    elif selected_display == 'Origami split view':
         col1, col2 = st.columns(2)
         with col1:
             clicked = display_origami()
@@ -856,6 +877,41 @@ def origami_build_view(selected_display):
             display3d()
         clicked_options(clicked)
 
+    elif selected_display == 'Folding barrier':
+        barriers, score = st.session_state.origami.folding_barriers()
+        clicked = display_origami(barriers=barriers)
+        clicked_options(clicked)
+        
+        help_message = "The folding barriers are a simplified calculation to check " \
+        "if a structure is feasible to form co-transcriptionally. They are calculated considering that " \
+        "pseudoknots lock the structure in a specific conformation; preventing the formation" \
+        "of successive stems. A barrier happens when a stem is open before the formation of a " \
+        "pseudoknots, and is closed after the formation of the pseudoknot (after a 150-bases delay). " \
+        "The penalty is calculated as W (weak barrier): 1 point, S (strong barrier): 2 points, " \
+        "and the total penalty is the sum of the points." 
+
+        cols = st.columns(4, vertical_alignment='center')
+        with cols[0]:
+            if score < 30:
+                st.success(f"Low folding barrier penalty: {score}.")
+            elif score < 100:
+                st.warning(f"Medium folding barrier penalty: {score}.")
+            else:
+                st.error(f"High folding barrier penalty: {score}.")
+        with cols[1]:
+            st.markdown("", help=help_message)
+        with cols[2]:
+            if score > 30:
+                if st.button('Try to fix the folding pathway', key='fix_pathway',
+                          help="Try to change the starting position of the sequence, "
+                          "keeping the same structure, to reduce the folding pathway penalty."
+                          "This function is designed for canonical RNA Origami structures, it"
+                          "may not work for other complex structures."):
+                    # calculate the simplfied dot bracket
+                    code_lines = st.session_state.code
+                    code_lines += ['\norigami = origami.improve_folding_pathway(kl_delay=150)\n']
+                    update_code('\n'.join(code_lines))
+                    
 def display3d():
     origami = st.session_state.origami
     
@@ -874,9 +930,10 @@ def display3d():
                 shifted = tuple([pos[0] + motif_shift[0], pos[1] + motif_shift[1]])
                 index_colors[origami.sequence_index_map[shifted]] = 1
 
-    for s in origami.strands:
-        for protein in s.coords.proteins:
-            index_colors += [0] * len(protein)
+    if index_colors:
+        for s in origami.strands:
+            for protein in s.coords.proteins:
+                index_colors += [0] * len(protein)
 
     conf, topo = origami.save_3d_model("origami", return_text=True)
     oxview_from_text(configuration=conf, # path to the configuration file
@@ -887,16 +944,26 @@ def display3d():
                     index_colors=index_colors, # color the bases in the viewer
                     key='display_nano')  
 
-def build_origami_content(origami):
+def build_origami_content(barriers=None):
+    barriers_colors ={'▂':'#FFBA08', '▄':'#FFBA08', '█':'#D00000'}
     highlight_color = '#D00000'
     normal_color = '#333333' # 80% black
-    if st.session_state.to_road:
-        origami_str = origami.to_road()
-    else:
-        origami_str = str(origami)
 
+    origami = st.session_state.origami
     motif = origami.motif
 
+    if barriers:
+        origami_lines = origami.barrier_repr(barriers=barriers, 
+                                             return_list=True)
+    else:
+        if st.session_state.to_road:
+            origami_str = origami.to_road()
+
+        else:
+            origami_str = str(origami)
+        origami_lines = origami_str.split('\n')
+
+        
     # create color gradient
     if st.session_state.gradient:
         tot_len = 0
@@ -910,7 +977,7 @@ def build_origami_content(origami):
         c_map = c_map[oxview_offset:]
     
     # Prepare the string to add 5' and 3' symbols for the strands
-    motif_list = [[' '] * (motif.num_char + 2)] + [[' '] + [char for char in line] + [' '] for line in origami_str.split('\n')] + [[' '] * (motif.num_char + 2)]
+    motif_list = [[' '] * (motif.num_char + 2)] + [[' '] + [char for char in line] + [' '] for line in origami_lines] + [[' '] * (motif.num_char + 2)]
     for s in motif:  # Add the 5' and 3' symbols to the motif as 1 and 2
         if not s.sequence:
             continue
@@ -918,12 +985,11 @@ def build_origami_content(origami):
             motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '1'
         if s.sequence and s[-1] not in '35' and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' ':
             motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2'
-    origami_str = '\n'.join([''.join(line) for line in motif_list])
+    origami_list = [''.join(line) for line in motif_list]
 
     content = "<div style='white-space: nowrap; overflow-x: auto;'>"
     content += f'<div style="display:inline-block; font-family: monospace; font-size: {st.session_state.origami_font_size}px;">Line:<br />'  # add a column with the line number
     line_nr = -2
-    origami_list = origami_str.split('\n')
     origami_list_len = len(origami_list)
 
     for y, line in enumerate(origami_list):
@@ -950,6 +1016,8 @@ def build_origami_content(origami):
         for x, char in enumerate(line):
             ori_pos = (x - 1, y - 1)
             color = normal_color
+            if barriers_colors and char in barriers_colors:
+                color = barriers_colors[char]
 
             if char == ' ':
                 content += '<span style="line-height:1;">&nbsp;</span>'
@@ -963,7 +1031,7 @@ def build_origami_content(origami):
                 motif_slice = origami.map[ori_pos]
                 if st.session_state.gradient: 
                     index = st.session_state.origami.sequence_index_map.get(ori_pos)
-                    if index:
+                    if index is not None:
                         color = c_map[index]
 
                 # This is the selected motif
@@ -991,7 +1059,7 @@ def build_origami_content(origami):
     return content
 
 
-def display_origami():
+def display_origami(barriers=None):
     ### SHORTCUTS NOT READY YET!!!
     # if not split_view:
     #     def move_selection(x = 0, y = 0):
@@ -1012,7 +1080,7 @@ def display_origami():
     #             streamlit_shortcuts.button("Move Right", on_click=move_selection, shortcut="Shift+ArrowRight", hint=True, kwargs={"x" : 1})
 
     try:
-        content = build_origami_content(st.session_state.origami)
+        content = build_origami_content(barriers=barriers)
         clicked = click_detector(content, key=f"origami_click_detector{st.session_state.origami_click_detector_counter}")
     except pf.MotifStructureError as e:
         st.error(f"Structure error: \n {e}", icon=":material/personal_injury:")

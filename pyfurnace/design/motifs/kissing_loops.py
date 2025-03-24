@@ -101,10 +101,8 @@ class KissingLoop(Loop):
         if sequence:
             if seq_len and len(sequence) != seq_len:
                 raise ValueError(f"The sequence length doesn't match the length required for this kissing loop, which is {seq_len}.")
-            elif not seq_len: # if the sequence length is not defined, calculate the length
-                seq_len = len(sequence)
             if all([s in 'ACGU' for s in sequence]):
-                self._energy = round(RNA.fold(sequence + '&' + sequence.translate(nucl_to_pair)[::-1])[1], 2)
+                self._energy = round(RNA.fold(f"{sequence}&{sequence.translate(nucl_to_pair)[::-1]}")[1], 2)
                 self._energy_tolerance = 0
         else:
             sequence = 'N' * seq_len
@@ -115,7 +113,9 @@ class KissingLoop(Loop):
             return self._strands
         
         ### create the strand
-        strand = Strand('─' * seq_len + '╰│╭' + sequence, start=(seq_len, 2), direction=(-1, 0))
+        strand = Strand(f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭", 
+                        start=(seq_len + 2, 2),
+                        direction=(-1, 0))
         pk_info = {"id": [self._pk_index], 'ind_fwd': [(0, seq_len - 1)], 'E': [self._energy], 'dE': [self._energy_tolerance]}
         setattr(strand, 'pk_info', pk_info)
 
@@ -134,6 +134,7 @@ class KissingLoop(Loop):
                             **kwargs)
 
 class KissingLoop120(KissingLoop):
+    """ Structure from PDB: 1BJ2"""
 
     def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
         kwargs['seq_len'] = 7
@@ -142,6 +143,7 @@ class KissingLoop120(KissingLoop):
                                                 dummy_ends=(True, True))
 
 class KissingLoop180(KissingLoop):
+    """ Structure generated from a perfect helix"""
 
     def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
         kwargs['seq_len'] = 6
@@ -151,27 +153,19 @@ class KissingLoop180(KissingLoop):
         return super().get_kissing_sequence()[2:-1]
 
     def _create_strands(self, sequence = "", return_strand = False, pk_index = 0):
-        self._pk_index = self._check_pk_index(pk_index)
-        if sequence:
-            if self._seq_len and len(sequence) != self._seq_len:
-                raise ValueError(f"The sequence length doesn't match the length required for this kissing loop, which is {self._seq_len}.")
-            if all([s in 'ACGU' for s in sequence]):
-                self._energy = round(RNA.fold('A' + sequence + 'A&A' + sequence.translate(nucl_to_pair)[::-1] + 'A')[1], 2)
-                self._energy_tolerance = 0
-            sequence = sequence
-        else:
-            sequence = 'N' * self._seq_len
-        
         # if the strands are already created, just update the sequence
         if hasattr(self, '_strands'):
             self._strands[0].sequence = 'AA' + sequence + 'A'
             return self._strands
+        
+        strand = super()._create_strands(sequence, return_strand=True, pk_index=pk_index)[0]
         # create the strand
-        strand = Strand(f"A╭╯────A───╰╭{sequence}─╯│╭─A", start=(10, 2), direction=(-1, 0))
+        strand.start = (10, 2)
+        strand.strand = 'AA' + strand.strand + '─A'
+        strand.pk_info['ind_fwd'] = [(2, 7)]
+        
         ### COORDINATES FROM OXVIEW HELIX 
         strand._coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop180.dat')
-        pk_info = {"id": [self._pk_index], 'ind_fwd': [(2, 7)], 'E': [self._energy], 'dE': [self._energy_tolerance]}
-        setattr(strand, 'pk_info', pk_info)
 
         # if we don't want to replace the strands, just return the strand
         if return_strand:
@@ -192,33 +186,25 @@ class BranchedKissingLoop(KissingLoop):
         return self[strand_ind].sequence[:-1]
 
     def _create_strands(self, sequence = "", return_strand = False, pk_index = 0):
-        self._pk_index = self._check_pk_index(pk_index)
-        if sequence:
-            if self._seq_len and len(sequence) != self._seq_len:
-                raise ValueError(f"The sequence length doesn't match the length required for this kissing loop, which is {self._seq_len}.")
-            if all([s in 'ACGU' for s in sequence]):
-                self._energy = round(RNA.fold(sequence + '&' + sequence.translate(nucl_to_pair)[::-1])[1], 2)
-                self._energy_tolerance = 0
-            sequence = sequence
-        else:
-            sequence = 'N' * self._seq_len
-        
         # if the strands are already created, just update the sequence
         if hasattr(self, '_strands'):
             strand_ind = [i for i, s in enumerate(self) if len(s.sequence) == 7][0]
             self._strands[strand_ind].sequence = sequence + 'A'
             return self._strands
+        
+        strand = super()._create_strands(sequence, return_strand=True, pk_index=pk_index)[0]
         # create the strand
-        kissing_strand = Strand(f'╮──╰╭{sequence}─╯│╭A', start=(3, 3), direction=(0, -1))
-        kissing_strand._coords = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_1.dat',
+        strand.start = (9, 3)
+        strand.direction = (0, -1)
+        strand.strand = '│╮' + strand.strand + '─A'
+        strand.pk_info['ind_fwd'] = [(0, 5)]
+        strand._coords = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_1.dat',
                                                        dummy_ends=(True, False))
-        pk_info = {"id": [self._pk_index], 'ind_fwd': [(0, 5)], 'E': [self._energy], 'dE': [self._energy_tolerance]}
-        setattr(kissing_strand, 'pk_info', pk_info)
 
-        connect_strand = Strand('╭╯────╭', start=(9, 2), direction=(-1, 0))
+        connect_strand = Strand('╭│', start=(10, 2), direction=(-1, 0))
         connect_strand._coords = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_2.dat',
                                                        dummy_ends=(True, True))
-        strands = [kissing_strand, connect_strand]
+        strands = [strand, connect_strand]
         # if we don't want to replace the strands, just return the strand
         if return_strand:
             return strands
@@ -264,11 +250,14 @@ class KissingDimer(KissingLoop180):
         bottom_strand.sequence = 'AA' + rev_comp + 'A'  # the second strand is the reverse complement of the first
 
         ### create the second
-        top_strand = Strand(f"A╯╭────A───╮╯{seq}─╭│╯─A", directionality='53', start=(0, 1), direction=(1, 0))
+        top_strand = KissingLoop180(open_left=True, 
+                                    sequence=seq, 
+                                    pk_index=self._pk_index, 
+                                    energy=self._energy, 
+                                    energy_tolerace=self._energy_tolerance)[0]
+        
         ## COORDINATES FROM OXVIEW HELIX
         top_strand._coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop180_2.dat')
-        pk_info = {"id": [self._pk_index], 'ind_fwd': [(2, 7)], 'E': [self._energy], 'dE': [self._energy_tolerance]}
-        setattr(top_strand, 'pk_info', pk_info)
 
         strands = [top_strand, bottom_strand]
 
@@ -285,6 +274,75 @@ class KissingDimer(KissingLoop180):
     def set_bot_sequence(self, new_seq):
         """ Set the sequence of the top strand"""
         self.set_sequence(new_seq.translate(nucl_to_pair)[::-1])
+
+
+class KissingDimer120(KissingLoop120):
+    
+    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+        """
+        Attributes of the class KissingDimer, which is a daugther class of the class Motif.
+        -----------------------------------------------------------------------------------
+        sequence: str
+            nucelotide sequnce in the internal KL
+        """
+        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+
+    ### 
+    ### METHODS
+    ###
+
+    def _create_strands(self, sequence="", return_strand=False, pk_index = 0):
+        new_pk_index = self._check_pk_index(pk_index)
+        # the bottom pk_index is the inverse of the top one
+        if "'" == new_pk_index[-1]:
+            bottom_pk_index = new_pk_index[:-1]
+        else:
+            bottom_pk_index = new_pk_index + "'"
+
+        bottom_strand = super()._create_strands(sequence, return_strand=True, pk_index=bottom_pk_index)[0]
+        seq = bottom_strand.sequence
+        rev_comp = seq.translate(nucl_to_pair)[::-1]
+    
+        self._pk_index = new_pk_index # add the pk_index to override the pk_index of the bottom strand
+
+        ### if the strands are already created, just update the sequence and return the strands
+        if hasattr(self, '_strands'):
+            self._strands[1].sequence = rev_comp
+            return self._strands
+        
+        ### shift the second strand to make space for the second one
+        bottom_strand.start = (10, 3)
+        bottom_strand.sequence = rev_comp  # the second strand is the reverse complement of the first
+
+        ### create the second
+        top_strand = KissingLoop120(open_left=True, 
+                                    sequence=seq, 
+                                    pk_index=self._pk_index, 
+                                    energy=self._energy, 
+                                    energy_tolerace=self._energy_tolerance)[0]
+        
+        ## COORDINATES FROM OXVIEW HELIX
+        # changing the bottom strand because the top strand
+        # coordinates are set at the end of KL120
+        bottom_strand._coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop120_2.dat', 
+                                                        dummy_ends=(True, True))
+
+        strands = [top_strand, bottom_strand]
+
+        ### if we don't want to replace the strands, just return the strand, otherwise replace the strands
+        if return_strand:
+            return strands
+        # replace the strands
+        self.replace_all_strands(strands, copy=False, join=False)
+
+    def set_top_sequence(self, new_seq):
+        """ Set the sequence of the top strand """
+        self.set_sequence(new_seq)
+
+    def set_bot_sequence(self, new_seq):
+        """ Set the sequence of the top strand"""
+        self.set_sequence(new_seq.translate(nucl_to_pair)[::-1])
+
 
 class BranchedDimer(BranchedKissingLoop):
     # strand 0: branched KL
@@ -330,10 +388,13 @@ class BranchedDimer(BranchedKissingLoop):
         strands[1].start = (strands[1].start[0] + 3, strands[1].start[1] + 1)
 
         ### create the top strand
-        top_strand = Strand(f"A╯╭────A───╮╯{sequence}─╭│╯─A", directionality='53', start=(0, 1), direction=(1, 0))
+        top_strand = KissingLoop180(open_left=True,
+                                    sequence=sequence, 
+                                    pk_index=self._pk_index, 
+                                    energy=self._energy, 
+                                    energy_tolerace=self._energy_tolerance)[0]
+        ## COORDINATES FROM OXVIEW HELIX
         top_strand._coords = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_3.dat')
-        pk_info = {"id": [self._pk_index], 'ind_fwd': [(2, 7)], 'E': [self._energy], 'dE': [self._energy_tolerance]}
-        setattr(top_strand, 'pk_info', pk_info)
 
         strands.insert(0, top_strand)
         ### if we don't want to replace the strands, just return the strand, otherwise replace the strands

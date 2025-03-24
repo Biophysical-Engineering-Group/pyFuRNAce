@@ -9,8 +9,9 @@ MOTIF_ICONS = {
     # Structural motifs
     'Stem': "bi bi-layers",
     'Dovetail': "bi bi-fullscreen-exit",
-    'LambdaTurn': "bi bi-arrow-90deg-right",
-    'ThreeWayJunction': "bi bi-pin-map",
+    'LambdaTurn': "bi bi-sign-turn-slight-right",
+    'ThreeWayJunction': "bi bi-sign-intersection-side",
+    "Bend90": "bi bi-arrow-90deg-right",
 
     # Kissing loop motifs
     'KissingDimer': "bi bi-yin-yang",
@@ -18,6 +19,8 @@ MOTIF_ICONS = {
     'KissingLoop120': "bi bi-triangle-half",
     'BranchedKissingLoop': 'bi bi-align-top',
     'BranchedDimer': 'bi bi-tree',
+    'KissingDimer120': 'bi bi-send',
+
 
     # Common aptamers
     "Broccoli": "bi bi-lightbulb",

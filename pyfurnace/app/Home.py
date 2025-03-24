@@ -14,7 +14,7 @@ if __name__ == '__main__':
     st.page_link("pages/2_Generate.py", label=":orange[Generate:]", icon=":material/network_node:")
     st.markdown("- Generate the RNA sequence that matches the desired dot-bracket notation for the nanostructure.")
 
-    st.page_link("pages/3_Template.py", label=":orange[Template:]", icon=":material/genetics:")
+    st.page_link("pages/3_Convert.py", label=":orange[Template:]", icon=":material/genetics:")
     st.markdown("- Prepare the DNA template for you RNA Origami, align structures and search for dimers.")
 
     st.page_link("pages/4_Prepare.py", label=":orange[Prepare:]", icon=":material/sync_alt:")

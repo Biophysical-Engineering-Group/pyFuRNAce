@@ -32,7 +32,6 @@ def check_dimer(seq1, seq2, dict_format = False, basepair = {'A': 'U', 'U': 'A',
         for ind, b in enumerate(bottom_seq):
             # iterate over the bottom sequence to check simple basepairing with the top sequence at the same index
             if b.translate(basepair) == top_seq[ind] and b != ' ' and top_seq[ind] != ' ':
-                print(b, b.translate(basepair), top_seq[ind])
                 bp = bp + '┊'
             else:
                 bp = bp + ' '

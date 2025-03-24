@@ -26,6 +26,7 @@ from .strand import Strand, StrandsBlock
 from .basepair import BasePair
 from .position import Position, Direction
 
+
 class Motif(Callback):
     """
     Represents a structural motif in an RNA Origami design.
@@ -379,6 +380,18 @@ class Motif(Callback):
         for s in self._strands:
             if s:
                 return True
+        return False
+    
+    def __contains__(self, other: Union['Strand', 'Sequence', str, 'BasePair']) -> bool:
+        """Check if the motif contains a strand, sequence, or base pair."""
+        if type(other) == Strand:
+            return other in self._strands
+        elif type(other) == Sequence:
+            return other in self.sequence
+        elif type(other) == str:
+            return any(other in s for s in self._strands)
+        elif type(other) == BasePair:
+            return other in self.basepair
         return False
 
     def __eq__(self, other: Any) -> bool:

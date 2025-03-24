@@ -187,7 +187,7 @@ def save_origami(origami_name='Origami'):
                 if file_type == 'txt with info':
                     info = f"\nSequence:{origami.sequence}\nStructure:\n{origami.structure}\nPseudoknots info:\n{origami.pseudoknots}\n"
                     file_type = 'txt'
-                text_data = f'>{ori_name}\n{info}\n{origami_str}'
+                text_data = f'>{ori_name}\n{info}\n{origami_str}\n\nFolding Barriers:\n{origami.barrier_repr()}'
                 
             st.download_button('Download', 
                                text_data, 

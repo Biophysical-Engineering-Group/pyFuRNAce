@@ -12,6 +12,7 @@ from .structural import *
 
 TL = TetraLoop
 KD = KissingDimer
+KD120 = KissingDimer120
 KL180 = KissingLoop180
 KL120 = KissingLoop120
 BKL = BranchedKissingLoop

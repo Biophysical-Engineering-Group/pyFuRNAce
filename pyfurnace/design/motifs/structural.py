@@ -42,3 +42,17 @@ def ThreeWayJunction(**kwargs):
 #     |//
 #     5 
 # """
+
+def Bend90(**kwargs):
+    # PDB: 3P59; DOI: https://doi.org/10.1073/pnas.1101130108
+    strand1 = Strand("─GAACUAC─")
+    strand1._coords = Coords.load_from_file(CONFS_PATH / "Bend90.dat",
+                                            dummy_ends=(True, True),
+                                            )
+    strand2 = Strand("─G─────C─", start=(8, 2), direction=(-1, 0))
+    strand2._coords = Coords.load_from_file(CONFS_PATH / "Bend90_2.dat", 
+                                            dummy_ends=(True, True),
+                                            )
+    kwargs.setdefault('join', False)
+    return Motif([strand1, strand2], **kwargs)
+                               

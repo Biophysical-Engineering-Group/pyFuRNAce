@@ -88,7 +88,7 @@ def Pepper(**kwargs):
       
 
 ###
-# Molecule binding aptamers
+# Substrate binding aptamers
 ###
 
 def Biotin(**kwargs):
@@ -97,6 +97,46 @@ def Biotin(**kwargs):
     strand._coords = Coords.load_from_file(CONFS_PATH / "Biotin.dat")
     kwargs.setdefault('join', False)
     return create_aptamer(strands=strand, 
+                          **kwargs)
+
+def PIP3(open_left = False, **kwargs):
+    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
+    # Pubblication: https://doi.org/10.1038/ncb3473
+    strand = Strand('GGGUAGACUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
+    strand._coords = Coords.load_from_file(CONFS_PATH / "PIP3.dat")
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
+    
+def PIP3_mut1(open_left = False, **kwargs):
+    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
+    # Pubblication: https://doi.org/10.1038/ncb3473
+    strand = Strand('GGGUCGACUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
+    strand._coords = Coords.load_from_file(CONFS_PATH / "PIP3_mut1.dat")
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
+
+def PIP3_mut3(open_left = False, **kwargs):
+    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
+    # Pubblication: https://doi.org/10.1038/ncb3473
+    strand = Strand('GGGUAGCCUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
+    strand._coords = Coords.load_from_file(CONFS_PATH / "PIP3_mut3.dat")
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
+
+def PIP3_mut5(open_left = False, **kwargs):
+    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
+    # Pubblication: https://doi.org/10.1038/ncb3473
+    strand = Strand('GGGUAGACGC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
+    strand._coords = Coords.load_from_file(CONFS_PATH / "PIP3_mut5.dat")
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
                           **kwargs)
 
 ###
@@ -148,46 +188,6 @@ def L7Ae(**kwargs):
     return create_aptamer([strand1, strand2], 
                           **kwargs)
 
-def Pip3(open_left = False, **kwargs):
-    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
-    # Pubblication: https://doi.org/10.1038/ncb3473
-    strand = Strand('GGGUAGACUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
-    strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3.dat")
-    kwargs['inherit_from'] = Loop
-    return create_aptamer(strands=strand,
-                          open_left=open_left,
-                          **kwargs)
-    
-def Pip3_mut1(open_left = False, **kwargs):
-    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
-    # Pubblication: https://doi.org/10.1038/ncb3473
-    strand = Strand('GGGUCGACUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
-    strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3_mut1.dat")
-    kwargs['inherit_from'] = Loop
-    return create_aptamer(strands=strand,
-                          open_left=open_left,
-                          **kwargs)
-
-def Pip3_mut3(open_left = False, **kwargs):
-    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
-    # Pubblication: https://doi.org/10.1038/ncb3473
-    strand = Strand('GGGUAGCCUC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
-    strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3_mut3.dat")
-    kwargs['inherit_from'] = Loop
-    return create_aptamer(strands=strand,
-                          open_left=open_left,
-                          **kwargs)
-
-def Pip3_mut5(open_left = False, **kwargs):
-    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
-    # Pubblication: https://doi.org/10.1038/ncb3473
-    strand = Strand('GGGUAGACGC╰│╭──────GCUC', start=(10, 2), direction=(-1, 0))
-    strand._coords = Coords.load_from_file(CONFS_PATH / "Pip3_mut5.dat")
-    kwargs['inherit_from'] = Loop
-    return create_aptamer(strands=strand,
-                          open_left=open_left,
-                          **kwargs)
-
 def Streptavidin(open_left = False, **kwargs):
     # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
     # Pubblication: https://doi.org/10.1093/nar/gkt956
@@ -195,6 +195,34 @@ def Streptavidin(open_left = False, **kwargs):
                     start=(41, 2),
                     direction=(-1, 0))
     strand._coords = Coords.load_from_file(CONFS_PATH / "Streptavidin.dat")
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
+
+def Thrombin_exosite1(open_left = False, **kwargs):
+    # PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)
+    # Pubblication: https://doi.org/10.1111/j.1538-7836.2012.04679.x
+    strand = Strand("─GGCG─GUCGAUC─ACACA╭╰GUUC╮A╯A─AC─╰││╮GUAA╰U╭AA──╯││╭─GCCAAUG╮U╯ACGAGGC╭╰────A─GA─CGACUCGCC─",
+                    start=(26, 5),
+                    direction=(-1, 0))
+    strand._coords = Coords.load_from_file(CONFS_PATH / "Thrombin_exosite1.dat")
+    
+    kwargs['inherit_from'] = Loop
+    return create_aptamer(strands=strand,
+                          open_left=open_left,
+                          **kwargs)
+
+R9D_14T = Thrombin_exosite1
+
+def Thrombin_exosite2(open_left = False, **kwargs):
+    # PDB: 5DO4 (replace Fluorinated ribose with regular ribose)
+    strand = Strand("-GGG-AACA-AAG-CUGA\\|/AGUA-CUU----A-CCC-",
+                    start=(18, 2),
+                    direction=(-1, 0))
+    strand._coords = Coords.load_from_file(CONFS_PATH / "Thrombin_exosite2.dat",
+                                            topology_file=CONFS_PATH / "Thrombin_exosite2.top",
+                                            protein=True)
     kwargs['inherit_from'] = Loop
     return create_aptamer(strands=strand,
                           open_left=open_left,

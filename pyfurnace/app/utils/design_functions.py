@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 import streamlit as st
+import tempfile
 from streamlit_option_menu import option_menu
 from st_click_detector import click_detector
 from st_oxview import oxview_from_text
@@ -492,6 +493,105 @@ def generate_custom_motif_text(strand, x_size=50, y_size=10):
     content += "</div>"
     return content
 
+def custom_text_input(current_custom_motif):
+    # make a motif list adding a space around the motif
+    motif_lines = str(current_custom_motif).split('\n')
+    add_line = False
+    add_char = False
+    if current_custom_motif:
+        if any(line[0] != ' ' for line in motif_lines):
+            add_char = True
+
+        motif_list = [[' '] * add_char + [char for char in line] + [' '] for line in motif_lines]
+
+        if motif_lines[0].strip():
+            add_line = True
+            motif_list = [[' '] * (current_custom_motif.num_char + 2)] + motif_list
+        if motif_lines[-1].strip():
+            motif_list += [[' '] * (current_custom_motif.num_char + 2)]
+
+    else:
+        motif_list = [['']]
+    # Add the  5 before the start of each motif.
+    for s in current_custom_motif:
+        if s.directionality == '53' and motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] == ' ': # add 5' to the start of the strand
+            motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] = '5'
+        elif s.directionality == '35' and motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] == ' ': # add 5' to the end of the strand
+            motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] = 5
+
+    current_custom_motif_str = '\n'.join(''.join(line) for line in motif_list)
+
+    strand_text = st.text_area("Motif text: draw a motif where each Strand starts with a 5", value=current_custom_motif_str, key="Motif_text", help='Draw a motif, where each strand has to start with "5". If you want to start a strand with 5, add an additional 5 at the beginning of the strand.')
+    if strand_text != current_custom_motif_str:
+        if '5' not in strand_text:
+            st.warning('Don\'t forget to start the strand with "5"')
+        else:
+            new_motif = pf.Motif.from_text(strand_text).strip()
+            current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
+            current_custom_motif.basepair = new_motif.basepair
+            st.rerun()
+
+def structure_converter(current_custom_motif):
+    ### Add the structure converter
+    col1, col2 = st.columns(2)
+    with col1:
+        structure = st.text_input("Dot-bracket structure:", 
+                                 value=current_custom_motif.structure,
+                                 key="Dot-bracket_structure", 
+                                 help="Add a dot-bracket structure to convert it into a 3D motif.")
+    with col2:
+        sequence = st.text_input("Sequence:", 
+                                 value=current_custom_motif.sequence, 
+                                 key="Sequence", 
+                                 help="Add the sequence of the motif.")
+        if not sequence:
+            sequence = None
+    if structure and structure != current_custom_motif.structure or\
+        sequence and sequence != current_custom_motif.sequence:
+        new_motif = pf.Motif.from_structure(structure, sequence=sequence)
+        current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
+        current_custom_motif.basepair = new_motif.basepair
+        st.rerun()
+
+def upload_3d_interface(strand, strand_num):
+    file_3d = st.file_uploader(f"3D coordinates (OxDNA format) of **strand {strand_num}**", type=['dat', 'pdb'], key=f'custom_{st.session_state.upload_key}', 
+                            help='Upload an Oxview configuration ".dat" file with the 3D coordinates of one strand.')
+    dummy_cols = st.columns(5)
+    with dummy_cols[1]:
+        dummy_start = st.toggle('Start dummy base', key=f'dummy_start_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the beginning of the strand.')
+    with dummy_cols[3]:
+        dummy_end = st.toggle('End dummy base', key=f'dummy_end_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the end of the strand.')
+    if file_3d:
+        pdb_format = file_3d.name.endswith('.pdb')
+        strand.coords = pf.Coords.load_from_text(file_3d.getvalue().decode('utf-8'), 
+                                                dummy_ends=(dummy_start, dummy_end), 
+                                                pdb_format=pdb_format,
+                                                return_coords=True)
+    return file_3d
+
+def update_strand(strand, strand_num, current_custom_motif, coords=None):
+    st.session_state["custom_strands"][strand_num] = strand
+    current_custom_motif.replace_all_strands(st.session_state["custom_strands"], copy=False)
+    if coords:
+        st.success("3D coordinates uploaded successfully!", icon=":material/view_in_ar:")
+        sleep(2)
+        update_file_uploader()
+    st.rerun()
+
+def strand_number_button(current_custom_motif):
+    strands = [s.copy() for s in st.session_state["custom_strands"]]
+    strand_num = st.radio("Selected strand:", list(range(len(strands))), index=len(strands)-1)
+    strand = strands[strand_num]
+
+    if st.button("Delete strand", key="delete_strand") and current_custom_motif:
+        st.session_state["custom_strands"].pop(strand_num)
+        current_custom_motif.pop(strand_num)
+        if not st.session_state["custom_strands"]:
+            st.session_state["custom_strands"].append(pf.Strand(''))
+        st.rerun()
+    return strand, strand_num
+
+
 @st.fragment
 def custom(current_custom_motif):
     ### Silence the warnings
@@ -508,54 +608,41 @@ def custom(current_custom_motif):
     if not current_custom_motif:
         st.session_state["custom_strands"] = [pf.Strand('')]
 
-    ### add instructions and common symbols
-    with st.popover("Instructions and common symbols"):
-        st.markdown("*:orange[Click on the grid to add a strand. To continue the strand, click again on any point on the same line or column. Curves simbols and crossings are calculated automatically.]*")
-        st.write('Common strand symbols to copy and use:')
-        common_pyroad_sym = ["─", "│", "╭", "╮", "╰", "╯", "^", "┼", '┊', "&"]
-        cols = st.columns(len(common_pyroad_sym))
-        for i, sym in enumerate(common_pyroad_sym):
-            with cols[i]:
-                st.code(sym)
+    col1, col2 = st.columns([4, 1], vertical_alignment='bottom')
+    with col1:
+        method = st.segmented_control('Build the motif with:',
+                                    ['Structure conveter',
+                                    'Drawing Tool', 
+                                    'Full text input',
+                                    ],
+                                    default='Structure conveter',
+                                    help='Structure conveter: Convert a dot-bracket structure into a 3D motif automatically.\n\n'
+                                    'Drawing Tool: Draw each strand on a grid by clicking on the positions where you want the strand to go;'
+                                    'curves and crossings are calculated automatically.\n\n'
+                                    'Full text input: Create a motif on a blank text area by typing the motif strand and basepairing.\n'
+                                    )
+        
+    with col2:
+        ### add instructions and common symbols
+        with st.popover("Common symbols to copy"):
+            common_pyroad_sym = ["─", "│", "╭", "╮", "╰", "╯", "^", "┼", '┊', "&"]
+            cols = st.columns(len(common_pyroad_sym))
+            for i, sym in enumerate(common_pyroad_sym):
+                with cols[i]:
+                    copy_to_clipboard(sym, sym)
 
-    
-    if st.toggle('Text input', key='Text input', help='Create a motif on a blank text area by typing the motif strand and basepairing.'):
-        # make a motif list adding a space around the motif
-        motif_lines = str(current_custom_motif).split('\n')
-        add_line = False
-        add_char = False
-        if current_custom_motif:
-            if any(line[0] != ' ' for line in motif_lines):
-                add_char = True
-
-            motif_list = [[' '] * add_char + [char for char in line] + [' '] for line in motif_lines]
-
-            if motif_lines[0].strip():
-                add_line = True
-                motif_list = [[' '] * (current_custom_motif.num_char + 2)] + motif_list
-            if motif_lines[-1].strip():
-                motif_list += [[' '] * (current_custom_motif.num_char + 2)]
-
-        else:
-            motif_list = [['']]
-        # Add the  5 before the start of each motif.
-        for s in current_custom_motif:
-            if s.directionality == '53' and motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] == ' ': # add 5' to the start of the strand
-                motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] = '5'
-            elif s.directionality == '35' and motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] == ' ': # add 5' to the end of the strand
-                motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] = 5
-
-        current_custom_motif_str = '\n'.join(''.join(line) for line in motif_list)
-
-        strand_text = st.text_area("Motif text: draw a motif where each Strand starts with a 5", value=current_custom_motif_str, key="Motif_text", help='Draw a motif, where each strand has to start with "5". If you want to start a strand with 5, add an additional 5 at the beginning of the strand.')
-        if strand_text != current_custom_motif_str:
-            if '5' not in strand_text:
-                st.warning('Don\'t forget to start the strand with "5"')
-            else:
-                new_motif = pf.Motif.from_text(strand_text).strip()
-                current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
-                current_custom_motif.basepair = new_motif.basepair
-                st.rerun()
+    if method == 'Structure conveter':
+        structure_converter(current_custom_motif)
+    elif method == 'Full text input':
+        custom_text_input(current_custom_motif)
+    if method != 'Drawing Tool':
+        subcol1, subcol2 = st.columns([1, 5])
+        with subcol1:
+            strand, strand_nr = strand_number_button(current_custom_motif)
+        with subcol2:
+            coords = upload_3d_interface(strand, strand_nr)
+            if coords:
+                update_strand(strand, strand_nr, current_custom_motif, coords)
         st.write('Current motif preview:')
         scrollable_text(motif_text_format(current_custom_motif))
         finish_editing(current_custom_motif)
@@ -575,40 +662,15 @@ def custom(current_custom_motif):
             st.session_state["custom_strands"] = [pf.Strand('')]
             current_custom_motif.replace_all_strands([pf.Strand('')], copy=False)
 
-    strands = [s.copy() for s in st.session_state["custom_strands"]]
-
     # Update and display the motif text
     col1, col2 = st.columns([2, 7])
     with col1:
-        strand_num = st.radio("Selected strand:", list(range(len(strands))), index=len(strands)-1)
-        strand = strands[strand_num]
-        if st.button("Delete strand", key="delete_strand"):
-            st.session_state["custom_strands"].pop(strand_num)
-            current_custom_motif.pop(strand_num)
-            if not st.session_state["custom_strands"]:
-                st.session_state["custom_strands"].append(pf.Strand(''))
-            st.rerun()
+        strand, strand_num = strand_number_button(current_custom_motif)
     with col2:
         try:
             clicked = click_detector(generate_custom_motif_text(strand, x_size=x_dots, y_size=y_dots), key="custom_motif_click_detector") 
         except Exception as e:
             st.error(str(e))
-
-    # def shortcut_move(direction, nucleotide=None):
-    #     nonlocal strand
-    #     if not strand.map:
-    #         next_x = 1
-    #         next_y = 1
-    #     else:
-    #         next_x = strand.end[0] + direction[0]
-    #         next_y = strand.end[1] + direction[1]
-    #     clicked_text = f"{next_x},{next_y}"
-    #     try:
-    #         move_strand(clicked_text, add_nucl=nucleotide)
-    #     except pf.MotifStructureError as e:
-    #         st.error(str(e))
-    #         return
-    #     update_strand()
 
     def move_strand(clicked, add_nucl=None):
         nonlocal strand
@@ -683,16 +745,6 @@ def custom(current_custom_motif):
                 else:
                     st.error("Invalid strand")
 
-    def update_strand(coords=None):
-        nonlocal strand, strand_num, current_custom_motif
-        st.session_state["custom_strands"][strand_num] = strand
-        current_custom_motif.replace_all_strands(st.session_state["custom_strands"], copy=False)
-        if coords:
-            st.success("3D coordinates uploaded successfully!", icon=":material/view_in_ar:")
-            sleep(2)
-            update_file_uploader()
-        st.rerun()
-
     ### Update the strand on click
     if clicked and clicked != st.session_state["last_clicked_position"]:
         try:
@@ -734,26 +786,18 @@ def custom(current_custom_motif):
         seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(strand.directionality), key=f'seq_dir_custom')
     with col5:
         new_strand = st.text_input(f'New strand (strand directionality: {strand.directionality}) ', value=str(strand), key=f'strand_custom')
-    coords = st.file_uploader(f"Strand 3D coordinates (OxDNA format)", type=['dat'], key=f'custom_{st.session_state.upload_key}', 
-                                help='Upload an Oxview configuration ".dat" file with the 3D coordinates of one strand.')
-    dummy_cols = st.columns(7)
-    with dummy_cols[2]:
-        dummy_start = st.toggle('Start dummy base', key=f'dummy_start_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the beginning of the strand.')
-    with dummy_cols[4]:
-        dummy_end = st.toggle('End dummy base', key=f'dummy_end_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the end of the strand.')
     
     ### update the strand
     strand.start = (start_x, start_y)
     strand.direction = new_dir_tuple
     strand.strand = new_strand
     strand.directionality = seq_dir
-    if coords:
-        strand.coords = pf.Coords.load_from_text(coords.getvalue().decode('utf-8'), dummy_ends=(dummy_start, dummy_end), return_coords=True)
+    added_coords = upload_3d_interface(strand, strand_num)
 
     # compare the strand with the version strand: if the strand is different, update it and rerun
     old_strand = st.session_state["custom_strands"][strand_num]
-    if strand != old_strand or coords:
-        update_strand(coords=coords)
+    if strand != old_strand or added_coords:
+        update_strand(strand, strand_num, current_custom_motif, coords=added_coords)
 
     ### check the base pair symbols of the motif
     current_structure = current_custom_motif.structure
@@ -982,9 +1026,9 @@ def build_origami_content(barriers=None):
         if not s.sequence:
             continue
         if s.sequence and s[0] not in '35' and motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] == ' ':
-            motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '1'
+            motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '1' if s.directionality == '53' else '2'
         if s.sequence and s[-1] not in '35' and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' ':
-            motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2'
+            motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2' if s.directionality == '53' else '1'
     origami_list = [''.join(line) for line in motif_list]
 
     content = "<div style='white-space: nowrap; overflow-x: auto;'>"

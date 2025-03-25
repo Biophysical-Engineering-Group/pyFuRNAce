@@ -349,77 +349,6 @@ class Coords:
         return p_trans, b_trans, n_trans
 
     @staticmethod
-    def cleanup_from_oxdna_file(filename: str,
-                                dummy_ends: Tuple[bool, bool] = (False, False),
-                                extend: Tuple[int, int] = (0, 0), 
-                                return_coords: bool = True,
-                                topology_file: str = None,
-                                protein: bool = False
-                                ) -> Union["Coords", None]:
-        """
-        Load and cleanup coordinates from an oxDNA configuration or PDB file.
-
-        Parameters
-        ----------
-        filename : str
-            Path to the oxDNA configuration or PDB file.
-        dummy_ends : Tuple[bool, bool], default is (False, False)
-            A tuple indicating whether the coordinates have dummy ends at the beginning or end.
-        extend : Tuple[int, int], default is (0, 0)
-            Number of nucleotides to extend the coordinates at the beginning and end. 
-        return_coords : bool, default False
-            Whether to return the coordinates object or print the code to create it.
-        topology_file : str, optional
-            The path to the topology file (only required for proteins).
-        protein : bool, default False
-            Whether to load protein coordinates.
-
-        Returns
-        -------
-        Coords or None
-            A Coords object if `return_coords` is True, otherwise None.
-        """
-        # Check if the file is a pdb file
-        pdb = False
-        top_text = None # initialize the topology text
-
-        # check the path
-        if type(filename) != str:
-            try:
-                filename = str(filename)
-            except Exception as e:
-                raise ValueError("The filename must be a string or a path-like object, got ", 
-                                 type(filename))
-            
-        # check the file extension
-        if filename.endswith('.pdb') or filename.endswith('.PDB'):
-            pdb = True
-
-        if pdb and not oat_installed:
-            raise ValueError("oxDNA_analysis_tools not installed. Please install it to use the pdb option")
-        
-        # read the file
-        with open(filename, 'r') as f:
-            conf_text = f.read()
-
-        if pdb:
-            confs, systems = PDB_oxDNA(conf_text)
-            print(confs, systems)
-            conf_text = conf_to_str(confs[0])
-            top_text = get_top_string(systems[0])
-
-        elif topology_file:
-            with open(topology_file, 'r') as f:
-                top_text = f.read()
-
-        return Coords.load_from_text(conf_text, 
-                                     dummy_ends, 
-                                     extend, 
-                                     return_coords, 
-                                     top_text=top_text, 
-                                     protein=protein)
-
-    @staticmethod
     def combine_coords(strand1: "Strand", 
                        strand2: "Strand", 
                        ) -> "Coords":
@@ -783,7 +712,8 @@ class Coords:
                        dummy_ends: Tuple[bool, bool] = (False, False),
                        extend: Tuple[int, int] = (0, 0), 
                        topology_file: str = None,
-                       protein: bool = False
+                       protein: bool = False,
+                       return_coords: bool = True,
                        ) -> "Coords":
         """
         Load and cleanup coordinates from an oxDNA configuration or PDB file.
@@ -800,18 +730,45 @@ class Coords:
             The path to the topology file (only required for proteins).
         protein : bool, default False
             Whether to load protein coordinates.
+        return_coords : bool, default True
+            Whether to return the coordinates object or print the code to create it.
 
         Returns
         -------
         Coords
             An instance of the Coords class with the cleaned-up coordinates.
         """
-        return Coords.cleanup_from_oxdna_file(filename, 
-                                              dummy_ends, 
-                                              extend, 
-                                              return_coords=True, 
-                                              topology_file=topology_file,
-                                              protein=protein)
+        # Check if the file is a pdb file
+        pdb = False
+        top_text = None # initialize the topology text
+
+        # check the path
+        if type(filename) != str:
+            try:
+                filename = str(filename)
+            except Exception as e:
+                raise ValueError("The filename must be a string or a path-like object, got ", 
+                                 type(filename))
+            
+        # check the file extension
+        if filename.endswith('.pdb') or filename.endswith('.PDB'):
+            pdb = True
+        
+        # read the file
+        with open(filename, 'r') as f:
+            conf_text = f.read()
+            
+        if not pdb and topology_file:
+            with open(topology_file, 'r') as f:
+                top_text = f.read()
+
+        return Coords.load_from_text(conf_text, 
+                                     dummy_ends, 
+                                     extend, 
+                                     return_coords, 
+                                     top_text=top_text, 
+                                     pdb_format=pdb,
+                                     protein=protein)
 
     @staticmethod
     def load_from_text(conf_text: str,
@@ -819,10 +776,11 @@ class Coords:
                        extend: Tuple[int, int] = (0, 0), 
                        return_coords: bool = True,
                        top_text: str = None,
+                       pdb_format: bool = False,
                        protein: bool = False
                        ) -> Union["Coords", None]:
         """
-        Load and cleanup coordinates from an oxDNA configuration text.
+        Load and cleanup coordinates from an oxDNA or PDB configuration text.
 
         Parameters
         ----------
@@ -836,6 +794,8 @@ class Coords:
             Whether to return the coordinates object or print the code to create it.
         top_text : str, optional
             The topology file text (only required for proteins).
+        pdb_format : bool, default False
+            Whether the configuration text is in PDB format.
         protein : bool, default False
             Whether to load protein coordinates.
 
@@ -844,6 +804,15 @@ class Coords:
         Coords or None
             A Coords object if `return_coords` is True, otherwise None.
         """
+        if pdb_format:
+            if not oat_installed:
+                raise ValueError("oxDNA_analysis_tools not installed. Please install it to use the pdb option")
+            confs, systems = PDB_oxDNA(conf_text)
+            print(f'Coords({confs[0]})')
+            print(f'Topology({get_top_string(systems[0])})')
+            conf_text = conf_to_str(confs[0])
+            top_text = get_top_string(systems[0])
+        
         lines = conf_text.split('\n')
 
         ### EXTRACT THE COORDINATES 

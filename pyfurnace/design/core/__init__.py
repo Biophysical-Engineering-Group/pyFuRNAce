@@ -5,7 +5,7 @@ from .sequence import Sequence
 from .coordinates_3d import Coords, ProteinCoords
 from .strand import Strand, StrandsBlock
 from .motif import Motif
-from .origami import Origami, structure_to_motif
+from .origami import Origami
 
 # DIRECTION short names
 UP = Direction.UP

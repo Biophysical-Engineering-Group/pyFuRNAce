@@ -490,6 +490,7 @@ class Origami(Callback):
             offset_ind = self.sequence_index_map[(shift[0] + pos[0], shift[1] + pos[1])]
             pk_start, pk_end = pk_info['ind_fwd'][info_nr]
             start_end_tuple = (offset_ind + pk_start, offset_ind + pk_end)
+
             if forward:
                 pk_dict[pk_index]['ind_fwd'].append(start_end_tuple)
             else:
@@ -520,6 +521,8 @@ class Origami(Callback):
                     reverse = pk_index[-1] == "'"
                     if pk_index[0] == '0':
                         pk_index = pk_index_0
+                    elif reverse:
+                        pk_index = pk_index[:-1]
                     add_pk(strand, pk_index, info_nr, shift, forward=not reverse)
 
         # make the average energy and average tolerance
@@ -1017,141 +1020,3 @@ class Origami(Callback):
     def reload(self):
         self._updated_motif()
         self._assemble()
-
-
-def structure_to_motif(structure: Union[str, dict, BasePair, Node], 
-                       sequence: Optional[str] = None,
-                       **kwargs) -> Motif:
-    """
-    Convert a structure representation to a Motif object.
-
-    Parameters
-    ----------
-    structure : Union[str, dict, BasePair, Node]
-        The structure representation to convert.
-    sequence : str, optional
-        The sequence or sequence constraints of the motif.
-    **kwargs
-        Additional keyword arguments to pass to the Motif constructor.
-
-    Returns
-    -------
-    Motif
-        The Motif object created from the structure representation.
-    """
-    if sequence is None:
-        sequence = 'N' * len(structure)
-
-    # sanity check
-    if type(structure) == str:
-        node = dot_bracket_to_tree(structure, sequence=sequence)
-        pair_map = dot_bracket_to_pair_map(structure)
-    elif isinstance(structure, (BasePair, dict)):
-        node = dot_bracket_to_tree(pair_map_to_dot_bracket(structure), 
-                                   sequence=sequence)
-        pair_map = structure
-    elif isinstance(structure, Node):
-        node = structure
-        pair_map = dot_bracket_to_pair_map(tree_to_dot_bracket(node))
-    else:
-        raise ValueError(f"Invalid structure representation: {structure}")
-    
-    origami = Origami([[]], align='first')
-    current_index = [0, 0]
-
-    def recursive_build_origami(node, insert_at=None, flip=False, depth=-1):
-        if not node:
-            return
-        
-        if insert_at is None:
-            insert_at = current_index
-
-        motif = None
-        if node.label == '&':
-            return
-        
-        elif node.label == '(':
-            motif = Motif(Strand(node.seq),
-                          Strand(sequence[pair_map[node.index]],
-                                 start=(0, 2), directionality='35'),
-                          basepair={(0,0): (0, 2)},
-                         )
-            
-        elif node.label == '.':
-            motif = Motif(Strand(node.seq),
-                          Strand('-', start=(0, 2))
-                          )
-            
-        if motif:
-            origami.insert(insert_at,
-                        motif.flip(flip, flip)
-                        )
-            current_index[1] += 1 # increment the x index
-        depth += 1
-
-        if node.children:
-            child_inds = []
-
-            for i, child in enumerate(node.children):
-                insert_at = None
-                flip = False
-
-                # bulge after a stem
-                if child.label == '.' and any(c.label=='(' for c in node.children[: i]):
-                    
-                    insert_at = child_inds.pop()
-                    flip = True
-
-                # only unpaired and cut stem
-                elif child.label in '.&' and all(c.label in '.&' for c in node.children):
-                    if '&' in [c.label for c in node.children[: i]]:
-                        insert_at = child_inds.pop()
-                        flip = True
-
-                # multiple stems
-                elif child.label == '&' \
-                    or (child.label == '(' and any(c.label=='(' for c in node.children[: i])):
-                    connect_down = Motif(Strand('──'),
-                                         Strand('╮', start=(0,2)),
-                                         Strand('╭', start=(1,2), direction=(0,-1))
-                                         )
-                    connect_up = Motif(Strand('││╰─', direction=(0, 1)),
-                                       Strand('╰', start=(1, 0), direction=(0, 1))
-                                       )
-                    if child_inds:
-                        insert_connect = child_inds.pop()
-                    else:
-                        insert_connect = current_index
-
-                    origami.insert(insert_connect, connect_down)
-                    origami.append([connect_up])
-
-                    current_index[0] += 1 # increment the y index
-                    current_index[1] = len(origami[-1]) # set the x index to the end of the line
-
-                    for i in range(insert_connect[0] + 1, current_index[0]):
-                        origami.insert((i, 0),
-                                        Motif(Strand('│', direction=(0, 1)),
-                                              Strand('│', direction=(0, 1), start=(1, 0))
-                                              )
-                                      )
-
-                if insert_at is None:
-                    insert_at = current_index.copy()
-                    
-                child_inds.append(insert_at)
-                recursive_build_origami(child, insert_at=insert_at, flip=flip, depth=depth)
-
-            # this could not work in the case a stem doesn't end with at least
-            # one unpaired nucleotide, but that dooes never happen in natural
-            # structures, so we can ignore this case
-            if not any(c.children or c.label =='&' for c in node.children):
-                origami.append(Motif(Strand('╮│╯')))
-                current_index[1] -= 1 # decrement the x index
-
-
-    recursive_build_origami(node)
-
-    motif = origami.motif
-
-    return motif

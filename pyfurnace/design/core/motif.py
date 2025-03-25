@@ -1095,7 +1095,7 @@ class Motif(Callback):
         origami = Origami([[]], align='first')
         current_index = [0, 0]
 
-        def recursive_build_origami(node, insert_at=None, flip=False, depth=-1):
+        def recursive_build_origami(node, insert_at=None, flip=False):
             """ Recursively build the origami from the tree representation. """
 
             nonlocal current_index
@@ -1126,7 +1126,6 @@ class Motif(Callback):
                             motif.flip(flip, flip)
                             )
                 current_index[1] += 1 # increment the x index
-            depth += 1
 
             # recursive call for the children
             if node.children:
@@ -1154,6 +1153,10 @@ class Motif(Callback):
                     elif (child.label == '&' or
                             (child.label == '(' 
                              and any(c.label=='(' for c in node.children[: i]))):
+                        # use a fake connector to adjust alignment
+                        fake_connect_down = Motif(Strand('──'),
+                                                  Strand('──', start=(0,2)),
+                                                 )
                         connect_down = Motif(Strand('──'),
                                             Strand('╮', start=(0,2)),
                                             Strand('╭', start=(1,2), direction=(0,-1))
@@ -1166,7 +1169,14 @@ class Motif(Callback):
                         else:
                             insert_connect = current_index
 
-                        origami.insert(insert_connect, connect_down)
+                        # insert the face connector to calculate the shift
+                        origami.insert(insert_connect, fake_connect_down)
+                        origami._assemble()
+                        # get the shift of the fake connector
+                        shift_x = origami.shift_map[tuple(insert_connect)][0]
+                        # replace the fake connect with the real one
+                        origami[insert_connect] = connect_down
+                        connect_up.shift((shift_x, 0))
                         origami.append([connect_up])
 
                         # increment the y index
@@ -1175,12 +1185,17 @@ class Motif(Callback):
                         current_index[1] = len(origami[-1]) 
 
                         for i in range(insert_connect[0] + 1, current_index[0]):
+                            # add the vertical connector
                             origami.insert((i, 0),
                                             Motif(Strand('│', direction=(0, 1)),
                                                   Strand('│', direction=(0, 1), 
                                                          start=(1, 0))
-                                                  )
+                                                  ).shift((shift_x, 0))
                                            )
+                            # remove the shift from the right
+                            for m in origami[i, 1:]:
+                                if m.min_pos[0] > shift_x:
+                                    m.shift((-shift_x, 0))
 
                     if insert_at is None:
                         insert_at = current_index.copy()
@@ -1188,8 +1203,7 @@ class Motif(Callback):
                     child_inds.append(insert_at)
                     recursive_build_origami(child, 
                                             insert_at=insert_at, 
-                                            flip=flip, 
-                                            depth=depth)
+                                            flip=flip)
 
                 # this could not work in the case a stem doesn't end with at least
                 # one unpaired nucleotide, but that dooes never happen in natural

@@ -34,7 +34,7 @@ class KissingLoopsCommand(MotifCommand):
                 st.session_state.modified_motif_text += f"\nmotif.energy_tolerance = {tolerance}"
                 motif.energy_tolerance = tolerance
             if pk_index and pk_index != motif.pk_index:
-                st.session_state.modified_motif_text += f"\nmotif.pk_index = '{pk_index}'"
+                st.session_state.modified_motif_text += f'\nmotif.pk_index = "{pk_index}"'
                 motif.pk_index = pk_index
         ### Create new motif
         else:
@@ -53,7 +53,7 @@ class KissingLoopsCommand(MotifCommand):
                 motif = kl_class(open_left = flip, sequence = top_seq)
                 st.session_state.motif_buffer = f"motif = pf.{name}(open_left = {flip}, sequence = '{top_seq}')"
             else:
-                st.session_state.motif_buffer = f"motif = pf.{name}(open_left = {flip}, energy = {kl_energy}, energy_tolerance = {tolerance}, pk_index = {pk_index})"
+                st.session_state.motif_buffer = f'motif = pf.{name}(open_left = {flip}, energy = {kl_energy}, energy_tolerance = {tolerance}, pk_index = "{pk_index}")'
                 motif = kl_class(open_left = flip, energy = kl_energy, energy_tolerance = tolerance, pk_index = pk_index)
             # save the motif in the session state
             st.session_state.motif = motif

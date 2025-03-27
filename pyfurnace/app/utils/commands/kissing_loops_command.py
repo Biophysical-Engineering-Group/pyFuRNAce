@@ -8,10 +8,10 @@ from ..motifs_icons import MOTIF_ICONS
 
 kl_name_map = { 'Dimer': "KissingDimer",
                 '180°' :"KissingLoop180",
-                '120°': "KissingLoop120",
-                'Branched KL': 'BranchedKissingLoop',
-                'Branched Dimer': "BranchedDimer",
                 'Dimer 120°': "KissingDimer120",
+                '120°': "KissingLoop120",
+                'Branched Dimer': "BranchedDimer",
+                'Branched KL': 'BranchedKissingLoop',
             }
 
 class KissingLoopsCommand(MotifCommand):

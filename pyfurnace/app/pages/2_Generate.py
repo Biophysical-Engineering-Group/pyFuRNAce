@@ -7,6 +7,7 @@ import tempfile
 ################################OWN####LIBRARIES#######################################
 from utils import check_import_pyfurnace, load_logo, save_origami
 check_import_pyfurnace()
+import pyfurnace as pf
 
 def format_text(text):
     return "```\n" + text + "\n```"
@@ -153,7 +154,7 @@ if __name__ == "__main__":
         # Initialize the progress bar
         progress_bar.progress(0, "Initializing...")
         # Generate the RNA origami
-        tot_strands = structure.count("&") + 1
+        pf.generate_road(structure, sequence_constraint, pseudoknot_info)
 
         
         with tempfile.TemporaryDirectory() as tmpdirname:

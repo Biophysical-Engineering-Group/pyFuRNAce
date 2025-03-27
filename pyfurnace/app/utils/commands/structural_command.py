@@ -10,6 +10,9 @@ from ..motifs_icons import MOTIF_ICONS
 
 
 struct_names = [ut_name for ut_name, obj in inspect.getmembers(structural) if inspect.isfunction(obj)]
+
+# ignore the three-way junction
+del struct_names[struct_names.index('ThreeWayJunction')]
           
 struct_names = ['Stem', 'Dovetail'] + struct_names
 

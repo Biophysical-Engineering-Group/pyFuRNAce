@@ -1,4 +1,4 @@
-import inspect
+from copy import deepcopy
 import streamlit as st
 from streamlit_option_menu import option_menu
 from pyfurnace.design.motifs import aptamers, aptamers_list
@@ -14,6 +14,11 @@ common_aptamers = ['Broccoli',
                    "Streptavidin",
                     ]
 
+inactive_menu = deepcopy(second_menu_style)
+inactive_menu['nav-link']['--hover-color'] = '#f0f2f6'
+inactive_menu['nav-link-selected']['background-color']  = '#f0f2f6'
+inactive_menu['nav-link-selected']['color'] = '#31333e'
+inactive_menu['nav-link-selected']['font-weight'] = 'normal'
 
 class AptamersCommand(MotifCommand):
 
@@ -23,7 +28,7 @@ class AptamersCommand(MotifCommand):
         with col1:
             aptamers_box = st.selectbox(":green[Search an Aptamer or]", 
                                         ['No selection'] + aptamers_list, 
-                                        key='aptamers_ddd',
+                                        key='aptamers_box',
                                         )
         with col2:
             st.markdown(
@@ -34,13 +39,15 @@ class AptamersCommand(MotifCommand):
                 """,
                 unsafe_allow_html=True,
             )
+            menu_style = second_menu_style
+            if aptamers_box != 'No selection':
+                menu_style = inactive_menu
             aptamer_selection = option_menu(None,
                                             common_aptamers,
                                             icons=[MOTIF_ICONS[name] for name in common_aptamers],
                                             menu_icon="cast",
                                             orientation="horizontal",
-                                            styles=second_menu_style,
-                                            key='AptamerOption',
+                                            styles=menu_style,
                                             )
 
         if aptamers_box != 'No selection':

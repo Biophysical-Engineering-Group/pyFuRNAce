@@ -40,7 +40,7 @@ funny_bootstrap_icons = ['robot', 'trash', 'umbrella', 'camera', 'cart', 'cpu', 
 
 def origami_general_options(origami, expanded=True):
     with st.expander('General settings', expanded=expanded):
-        cols = st.columns(5)
+        cols = st.columns(3)
 
         ### select alignment
         with cols[0]:
@@ -53,32 +53,35 @@ def origami_general_options(origami, expanded=True):
                     origami.align = alignment
                     st.session_state.code.append(f"origami.align = '{alignment}' # Align the lines")
         
-        ### select the sequence direction
-        with cols[1]:
-            top_strand_dir = st.radio("Sequence direction in the helix top strand:", ['53', '35'], key='top_strand',  
-                                      help=""" PyFuRNAce uses the 5' to 3' direction as the top strand of the helix.
-                                                To allow compatibility with previus ROAD blueprint, you can change the direction of the top strand.
-                                                Some functionalialities may not work properly with the 3' to 5' direction.""")
-            if top_strand_dir == '53':
-                st.session_state.flip = False
-            else:
-                st.session_state.flip = True
+        # not really useful
+        # ### select the sequence direction
+        # with cols[1]:
+        #     top_strand_dir = st.radio("Sequence direction in the helix top strand:", ['53', '35'], key='top_strand',  
+        #                               help=""" PyFuRNAce uses the 5' to 3' direction as the top strand of the helix.
+        #                                         To allow compatibility with previus ROAD blueprint, you can change the direction of the top strand.
+        #                                         Some functionalialities may not work properly with the 3' to 5' direction.""")
+        #     if top_strand_dir == '53':
+        #         st.session_state.flip = False
+        #     else:
+        #         st.session_state.flip = True
 
-        with cols[2]:
+        with cols[1]:
             st.toggle('Optimize the blueprint for ROAD', 
                       value=True,
                       key='to_road', 
-                      help='Optimize the blueprint for the ROAD software. This sobstitues the Kissing Loops basepairngs with "*"; and the short stem basepairings with "!".')
+                      help='Optimize the blueprint for the ROAD software. This substitutes the Kissing Loops base pairings with "*"; and the short stem base pairings with "!".')
 
-        with cols[3]:
-            def submit_ss_rna():
-                st.session_state.code.append(f"origami.ss_assembly = {st.session_state.single_stranded}")
-                st.session_state.origami.ss_assembly = st.session_state.single_stranded
+        # Not really useful
+        # with cols[2]:
+        #     def submit_ss_rna():
+        #         st.session_state.code.append(f"origami.ss_assembly = {st.session_state.single_stranded}")
+        #         st.session_state.origami.ss_assembly = st.session_state.single_stranded
 
-            st.toggle("Single stranded 3D assembly", key='single_stranded', on_change=submit_ss_rna, help='The Origami 3d assembly is created concatenating the single strands, rather than concatenating the double strands.')
+        #     st.toggle("Single stranded 3D assembly", key='single_stranded', on_change=submit_ss_rna, 
+        #               help='The Origami 3d assembly is created concatenating each RNA strand rather than concatenating the motifs')
 
-        with cols[4]:
-            new_sticky = st.toggle('Stiky motif menu', value=st.session_state.motif_menu_sticky, key='sticky_menu', help='Keep the motif menu and origami visualization menu to stick to the top of the page.')
+        with cols[2]:
+            new_sticky = st.toggle('Sticky motif menu', value=st.session_state.motif_menu_sticky, key='sticky_menu', help='Keep the motif menu and origami visualization menu to stick to the top of the page.')
             if new_sticky != st.session_state.motif_menu_sticky:
                 st.session_state.motif_menu_sticky = new_sticky
                 st.rerun()
@@ -212,6 +215,8 @@ def initiate_session_state():
         st.session_state.oxview_selected = ()
     if 'flip' not in st.session_state:
         st.session_state.flip = False
+    if 'selected_motif' not in st.session_state:
+        st.session_state.selected_motif = ''
 
 def update_file_uploader():
     st.session_state.upload_key += 1
@@ -229,12 +234,22 @@ def make_motif_menu(origami):
                    'Edit': 'bi-bandaid',
                    'Code': 'bi-code'}
     
+    select_ind = 0
+    if st.session_state.selected_motif in option_data:
+        select_ind = list(option_data).index(st.session_state.selected_motif)        
+    
     selected_motif = option_menu(None, 
                                 list(option_data.keys()),
                                 icons=list(option_data.values()),
                                 menu_icon="cast", 
                                 orientation="horizontal",
-                                styles=main_menu_style)
+                                manual_select=select_ind,
+                                styles=main_menu_style,
+                                key='motif_menu')
+    
+    if selected_motif != st.session_state.selected_motif:
+        st.session_state.selected_motif = selected_motif
+        st.rerun()
 
     motif_add = True
 
@@ -478,7 +493,7 @@ def copy_motif(key='', motif=None, motif_slice=None):
 @st.fragment
 def generate_custom_motif_text(strand, x_size=50, y_size=10):
     ### update the content
-    content = f"<div style='font-family: monospace; font-size: {st.session_state['origami_font_size']}px;'>"
+    content = f"<div style='font-family: monospace; font-size: {st.session_state['origami_font_size'] + 8}px;'>"
     current_motif = st.session_state.motif
     for y in range(y_size):
         for x in range(x_size):
@@ -517,7 +532,7 @@ def custom_text_input(current_custom_motif):
         if s.directionality == '53' and motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] == ' ': # add 5' to the start of the strand
             motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] = '5'
         elif s.directionality == '35' and motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] == ' ': # add 5' to the end of the strand
-            motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] = 5
+            motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] = '5'
 
     current_custom_motif_str = '\n'.join(''.join(line) for line in motif_list)
 
@@ -546,28 +561,32 @@ def structure_converter(current_custom_motif):
                                  help="Add the sequence of the motif.")
         if not sequence:
             sequence = None
-    if structure and structure != current_custom_motif.structure or\
-        sequence and sequence != current_custom_motif.sequence:
-        new_motif = pf.Motif.from_structure(structure, sequence=sequence)
+    if (structure and structure != current_custom_motif.structure or
+            sequence and sequence != current_custom_motif.sequence):
+        try:
+            new_motif = pf.Motif.from_structure(structure, sequence=sequence)
+        except Exception as e:
+            st.error(f"Error: {e}")
+            return
         current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
         current_custom_motif.basepair = new_motif.basepair
         st.rerun()
 
-def upload_3d_interface(strand, strand_num):
+def upload_3d_interface(strand, strand_num, current_custom_motif):
     file_3d = st.file_uploader(f"3D coordinates (OxDNA format) of **strand {strand_num}**", type=['dat', 'pdb'], key=f'custom_{st.session_state.upload_key}', 
                             help='Upload an Oxview configuration ".dat" file with the 3D coordinates of one strand.')
-    dummy_cols = st.columns(5)
+    dummy_cols = st.columns(2)
+    with dummy_cols[0]:
+        dummy_start = st.toggle('Start dummy nucleotide', key=f'dummy_start_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the beginning of the strand.')
     with dummy_cols[1]:
-        dummy_start = st.toggle('Start dummy base', key=f'dummy_start_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the beginning of the strand.')
-    with dummy_cols[3]:
-        dummy_end = st.toggle('End dummy base', key=f'dummy_end_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the end of the strand.')
+        dummy_end = st.toggle('End dummy nucleotide', key=f'dummy_end_custom', help='The dummy base is a base in the coordinates that is not part of the sequence, but it is used to connect other strands to the end of the strand.')
     if file_3d:
         pdb_format = file_3d.name.endswith('.pdb')
         strand.coords = pf.Coords.load_from_text(file_3d.getvalue().decode('utf-8'), 
                                                 dummy_ends=(dummy_start, dummy_end), 
                                                 pdb_format=pdb_format,
                                                 return_coords=True)
-    return file_3d
+        update_strand(strand, strand_num, current_custom_motif, coords=True)
 
 def update_strand(strand, strand_num, current_custom_motif, coords=None):
     st.session_state["custom_strands"][strand_num] = strand
@@ -578,12 +597,12 @@ def update_strand(strand, strand_num, current_custom_motif, coords=None):
         update_file_uploader()
     st.rerun()
 
-def strand_number_button(current_custom_motif):
+def strand_number_button(current_custom_motif, delete=True):
     strands = [s.copy() for s in st.session_state["custom_strands"]]
-    strand_num = st.radio("Selected strand:", list(range(len(strands))), index=len(strands)-1)
+    strand_num = st.radio("Select strand:", list(range(len(strands))), index=len(strands)-1)
     strand = strands[strand_num]
 
-    if st.button("Delete strand", key="delete_strand") and current_custom_motif:
+    if delete and st.button("Delete strand", key="delete_strand") and current_custom_motif:
         st.session_state["custom_strands"].pop(strand_num)
         current_custom_motif.pop(strand_num)
         if not st.session_state["custom_strands"]:
@@ -604,7 +623,7 @@ def custom(current_custom_motif):
             st.rerun()
         return
     
-    st.session_state["custom_strands"] = current_custom_motif._strands.copy()
+    st.session_state["custom_strands"] = [s.copy() for s in current_custom_motif]
     if not current_custom_motif:
         st.session_state["custom_strands"] = [pf.Strand('')]
 
@@ -636,17 +655,19 @@ def custom(current_custom_motif):
     elif method == 'Full text input':
         custom_text_input(current_custom_motif)
     if method != 'Drawing Tool':
-        subcol1, subcol2 = st.columns([1, 5])
-        with subcol1:
-            strand, strand_nr = strand_number_button(current_custom_motif)
-        with subcol2:
-            coords = upload_3d_interface(strand, strand_nr)
-            if coords:
-                update_strand(strand, strand_nr, current_custom_motif, coords)
-        st.write('Current motif preview:')
-        scrollable_text(motif_text_format(current_custom_motif))
-        finish_editing(current_custom_motif)
-        st.stop()
+
+        with st.popover("Upload 3D coordinates"):
+            subcol1, subcol2 = st.columns([1, 4])
+            with subcol1:
+                strand, strand_nr = strand_number_button(current_custom_motif, delete=False)
+            with subcol2:
+                upload_3d_interface(strand, strand_nr, current_custom_motif)
+
+        if current_custom_motif:
+            st.write('Current motif preview:')
+            scrollable_text(motif_text_format(current_custom_motif))
+            finish_editing(current_custom_motif)
+        return
 
     cols = st.columns(4, vertical_alignment='bottom')
     with cols[0]:
@@ -654,9 +675,9 @@ def custom(current_custom_motif):
             st.session_state["custom_strands"].append(pf.Strand(''))
             current_custom_motif.append(pf.Strand(''), copy=False, join=False)
     with cols[1]:
-        x_dots = st.number_input("Canvas x size", min_value=1, value=100, key="x_size")
+        x_dots = st.number_input("Canvas x size", min_value=1, value=64, key="x_size")
     with cols[2]:
-        y_dots = st.number_input("Canvas y size", min_value=1, value=10, key="y_size")
+        y_dots = st.number_input("Canvas y size", min_value=1, value=8, key="y_size")
     with cols[3]:
         if st.button("Clear", key="clear_strand"):
             st.session_state["custom_strands"] = [pf.Strand('')]
@@ -792,12 +813,13 @@ def custom(current_custom_motif):
     strand.direction = new_dir_tuple
     strand.strand = new_strand
     strand.directionality = seq_dir
-    added_coords = upload_3d_interface(strand, strand_num)
+    with st.popover('Add strand 3D coordinates'):
+        upload_3d_interface(strand, strand_num, current_custom_motif)
 
     # compare the strand with the version strand: if the strand is different, update it and rerun
     old_strand = st.session_state["custom_strands"][strand_num]
-    if strand != old_strand or added_coords:
-        update_strand(strand, strand_num, current_custom_motif, coords=added_coords)
+    if strand != old_strand:
+        update_strand(strand, strand_num, current_custom_motif)
 
     ### check the base pair symbols of the motif
     current_structure = current_custom_motif.structure

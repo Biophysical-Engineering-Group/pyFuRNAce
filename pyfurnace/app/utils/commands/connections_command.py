@@ -13,6 +13,9 @@ from ..motifs_icons import MOTIF_ICONS
 # Filter and collect the motif utils
 util_names = [ut_name for ut_name, obj in inspect.getmembers(utils.motif_lib) if inspect.isfunction(obj)]
 
+# ignore the simple vertical connection
+del util_names[util_names.index('vertical_link')]
+
 # Add the tetraloop option
 util_names = ['Tetraloop'] + util_names
 

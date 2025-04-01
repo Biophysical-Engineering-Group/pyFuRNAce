@@ -64,7 +64,6 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
 
     ### COPY THE PYTHON PATH AND ADD RNAfold
     python_path = sys.executable # Get path to the current Python interpreter
-    print(f"Python path: {python_path}")
     python_dir = os.path.dirname(python_path)
 
     # Prepend it to PATH
@@ -130,7 +129,6 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
 
     for line in process.stdout:
         line = line.strip()
-        print(line)
 
         # update the stage
         if stages[n_stage] in line and n_stage < len(stages) - 1:

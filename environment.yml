@@ -8,14 +8,14 @@ dependencies:
   - pip
   - matplotlib
   - pip:
-    - st-click-detector
-    - streamlit_code_editor
-    - matplotlib
-    - st_forna_component
-    - biopython
-    - ViennaRNA
-    - deap
-    - pytest
-    - st-oxview
-    - numpy
-    - git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi
+      - st-click-detector
+      - streamlit_code_editor
+      - matplotlib
+      - st_forna_component
+      - biopython
+      - ViennaRNA
+      - deap
+      - pytest
+      - st-oxview
+      - numpy
+      - git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi

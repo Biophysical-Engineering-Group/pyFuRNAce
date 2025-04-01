@@ -36,7 +36,7 @@ dependencies = [
     "deap",
     "pytest",
     "st-oxview",
-    "@git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
+    "oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
 ]
 
 [project.optional-dependencies]

@@ -7,7 +7,7 @@ name = "pyfurnace"
 version = "0.0.1" 
 description = "A Python package for designing RNA nanostructures with GUI."
 readme = "README.md"  
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = {text = "GNU General Public License v3 (GPLv3)"}
 authors = [
     {name = "Luca Monari", email = "l.monari@zmbh.uni-heidelberg.de"} 
@@ -19,7 +19,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Bio-Informatics"
 ]
-requires-python = ">=3.10"
 keywords = ["RNA", "DNA", "nucleic acids", "bioinformatics", "design"]
 
 dependencies = [

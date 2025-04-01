@@ -28,6 +28,7 @@ dependencies = [
     "streamlit_code_editor",
     "colour",
     "st_forna_component",
+    "streamlit_option_menu",
     "biopython",
     "ViennaRNA",
     "deap",

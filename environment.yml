@@ -3,18 +3,17 @@ channels:
 - conda-forge
 - bioconda
 dependencies:
+- python=3.12
 - viennarna
-- pip
-- pip:
-  - streamlit>=1.43.0
-  - st-click-detector
-  - streamlit_code_editor
-  - matplotlib
-  - st_forna_component
-  - biopython
-  - ViennaRNA
-  - deap
-  - pytest
-  - st-oxview
-  - numpy
-  - oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi
+- streamlit>=1.43.0
+- st-click-detector
+- streamlit_code_editor
+- matplotlib
+- st_forna_component
+- biopython
+- ViennaRNA
+- deap
+- pytest
+- st-oxview
+- numpy
+- oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi

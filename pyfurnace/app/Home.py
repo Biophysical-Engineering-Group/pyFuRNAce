@@ -1,8 +1,14 @@
 import streamlit as st
 from utils import load_logo
+import subprocess
+import os
 
 if __name__ == '__main__':
     load_logo() 
+    env = os.environ.copy()
+    out = subprocess.check_output(['python', '-m', 'site'],
+                                  env=env).decode("utf-8").strip()
+    st.write(out)
 
     st.write("# Hello and Welcome to pyFuRNAce!")
 

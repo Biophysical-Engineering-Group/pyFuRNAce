@@ -136,18 +136,43 @@ if __name__ == "__main__":
 
     # # Initialize the FORNA link for the target structure
     if structure:
-    #     st.write("#### Target Structure")
-    #     st.write(format_text(structure))
+    #     st.markdown("#### Target Structure")
+    #     st.markdown(format_text(structure))
         edited = partial_forna(structure = structure, 
                                 sequence = sequence_constraint,
                                 key='target_forna')
         
     generate = True
-    col1, col2 = st.columns(2)
+
+    if sequence_constraint and sequence_constraint[0] != 'G':
+        col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
+        with col1:
+            st.warning("The RNA sequence doens't start with G.")
+        with col2:
+            new_start = st.text_input("Start the sequence with", value='GGGA',
+                                      help='The transcription of the RNA sequence often '
+                                      'often requires at least one G at the start of the sequence.')
+        with col3:
+            if st.button('Apply the sequence start'):
+
+                seq_list = list(sequence_constraint)
+                # pair_map = pf.dot_bracket_to_pair_map(structure) # unnecessary
+
+                for i in range(len(new_start)):
+                    seq_list[i] = new_start[i]
+                    ### NOT NECESSARY
+                    # paired = pair_map[i]
+                    # if paired is not None:
+                    #     paired_nucl = new_start[i].translate(pf.nucl_to_pair)
+                    #     seq_list[paired] = paired_nucl
+
+                st.session_state.generate_sequence = "".join(seq_list)
+                st.rerun()
+    
+    col1, col2 = st.columns(2, vertical_alignment='bottom')
     with col1:
         filename =  st.text_input('Name of RNA origami', value='Origami')
     with col2: 
-        st.write("\n"); st.write("\n"); 
         if st.button("Generate RNA sequence"):
             generate = False
     if not generate:
@@ -193,11 +218,19 @@ if __name__ == "__main__":
             diversity_text = f":red[high {diversity}]"
 
         cols = st.columns(4, vertical_alignment='bottom')
-        st.markdown(f"### Last Optimized sequence (ensemble diversity: {diversity_text})", 
-                    help='here you can find the last optimized sequence')
+        st.markdown("### Last Optimized sequence "
+                    f"(ensemble diversity: {diversity_text})", 
+                    help='The ensemble diversity is the average distance between the '
+                    'structures in the ensemble (the set of all the possible structures '
+                    'that can be formed by the sequence). A lower value means that the '
+                    'structures are more similar to each other (and therefore more '
+                    'similar to the Minimum Free Energy structure). A higher value '
+                    'means that the structures are more diverse and there are less '
+                    'chances to obtain the minimum free energy structure. '
+                    )
         
 
-        st.write(format_text(st.session_state.rna_origami_seq))
+        st.markdown(format_text(st.session_state.rna_origami_seq))
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.page_link("pages/3_Convert.py", 
@@ -213,28 +246,47 @@ if __name__ == "__main__":
                                    data=fp,
                                    file_name = f"{filename}.zip",
                                    mime = "application/zip",
+                                   on_click='ignore',
                                    )
 
         col1, col2 = st.columns(2)
         with col1:
             with st.columns(3)[1]:
-                st.markdown("#### MFE Structure")
+                st.markdown("#### MFE Structure", 
+                            help='The Minimum Free Energy (MFE) structure is the structure with '
+                            'the lowest free energy. It is the most stable structure that can be '
+                            'formed by the sequence. '
+                            )
+                
             subcol1, subcol2 = st.columns(2)
             with subcol1:
-                st.write(f'Energy: {round(folds[1], 2)} Kcal/mol')
+                st.markdown(f'Energy: {round(folds[1], 2)} Kcal/mol')
             with subcol2:
-                st.write(f'Frequency in the ensemble: {round(folds[2] * 100, 4)} %')
+                st.markdown(f'Frequency in the ensemble: {round(folds[2] * 100, 4)} %',
+                         help = 'The MFE frequency in the ensemble is the probability of '
+                            'obtaining the MFE structure among all the possible structures '
+                            'that can be formed by the sequence.'
+                            )
             partial_forna(structure = folds[0],
                           sequence = sequence,
                           key='struct_mfe')
         with col2:
             with st.columns(3)[1]:
-                st.markdown("#### Centroid Structure")
+                st.markdown("#### Centroid Structure",
+                            help='The centroid structure is the structure that is the most similar to '
+                            'the average structure of the ensemble. It is the closest structure to '
+                            'represent the average of all the possible structures that can be '
+                            'formed by the sequence. '
+                            )
             subcol1, subcol2 = st.columns(2)
             with subcol1:
-                st.write(f'Energy: {round(folds[4], 2)} Kcal/mol')
+                st.markdown(f'Energy: {round(folds[4], 2)} Kcal/mol')
             with subcol2:
-                st.write(f'Frequency in the ensemble: {round(folds[5] * 100, 4)} %')
+                st.markdown(f'Frequency in the ensemble: {round(folds[5] * 100, 4)} %',
+                         help = 'The centroid frequency in the ensemble is the probability of '
+                            'obtaining the centroid structure among all the possible structures '
+                            'that can be formed by the sequence.'
+                            )
             partial_forna(structure = folds[3],
                           sequence = sequence,
                           key='struct_centroid')

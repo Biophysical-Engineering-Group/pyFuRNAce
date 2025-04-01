@@ -272,7 +272,7 @@ if __name__ == "__main__":
                           key='struct_mfe')
         with col2:
             with st.columns(3)[1]:
-                st.markdown("#### Centroid Structure",
+                st.markdown("#### Centroid",
                             help='The centroid structure is the structure that is the most similar to '
                             'the average structure of the ensemble. It is the closest structure to '
                             'represent the average of all the possible structures that can be '

@@ -1,12 +1,9 @@
 name: pyfurnace
 channels:
 - conda-forge
+- bioconda
 dependencies:
-- python=3.8
-- scikit-learn
-- pandas
-- numpy
-- matplotlib
+- viennarna
 - pip
 - pip:
   - streamlit>=1.43.0

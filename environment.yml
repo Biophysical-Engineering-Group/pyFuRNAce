@@ -1,17 +1,20 @@
 name: pyfurnace
 channels:
-- conda-forge
-- bioconda
+  - conda-forge
+  - bioconda
 dependencies:
-- viennarna
-- st-click-detector
-- streamlit_code_editor
-- matplotlib
-- st_forna_component
-- biopython
-- ViennaRNA
-- deap
-- pytest
-- st-oxview
-- numpy
-- oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi
+  - python=3.12
+  - viennarna
+  - pip
+  - pip:
+    - st-click-detector
+    - streamlit_code_editor
+    - matplotlib
+    - st_forna_component
+    - biopython
+    - ViennaRNA
+    - deap
+    - pytest
+    - st-oxview
+    - numpy
+    - git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi

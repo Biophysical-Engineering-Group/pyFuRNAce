@@ -145,16 +145,13 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
 
         prev_line = line
 
-    # Wait for process to finish
+    # wait for process to finish
     process.wait()
-
-    try:
-        with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
-            lines = f.readlines()
-            last_seq = lines[2].strip()
-    except:
-        return last_seq, structure, None
-
+    
+    # read the results
+    with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
+        lines = f.readlines()
+        last_seq = lines[2].strip()
 
     # create a temporary zip file with all the info
     temp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)

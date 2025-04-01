@@ -3,23 +3,13 @@ import subprocess
 import tempfile
 import shutil
 import warnings
-from time import sleep
 
 from ..design.core.symbols import *
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
 
-def generate_road(structure, sequence, pseudoknots, name='origami', rnafold_path=None, callback=None, directory=None, zip_directory=False):
-    revolvr_local_path = __file__.replace('road.py', 'revolvr.pl')
-
-    # CHECK RNAfold installation
-    if rnafold_path is None:
-        try:
-            rnafold_path = subprocess.check_output(['which', 'RNAfold']).decode("utf-8").strip()
-        except subprocess.CalledProcessError:
-            rnafold_path = '/home/adminuser/.conda/bin/RNAfold'
-            if not os.path.exists(rnafold_path):
-                raise ValueError("RNAfold not found. Please install it or provide the path to the executable.")
+def generate_road(structure, sequence, pseudoknots, name='origami', callback=None, directory=None, zip_directory=False):
+    road_dir = __file__.replace('road.py', 'road_bin')
         
     # Sanity check
     if '&' in sequence or '&' in structure:
@@ -73,7 +63,6 @@ def generate_road(structure, sequence, pseudoknots, name='origami', rnafold_path
 
     ### COPY THE PATH AND ADD RNAfold
     env = os.environ.copy()
-    env["PATH"] = f"{env['PATH']}:{rnafold_path}"
 
     ### CHECK THE TEMPORARY DIRECTORY
     if directory is None:
@@ -93,6 +82,7 @@ def generate_road(structure, sequence, pseudoknots, name='origami', rnafold_path
         f.write(f"{name}\n{structure}\n{sequence}\n")
 
     # read the revolvr file
+    revolvr_local_path = os.path.join(road_dir, 'revolvr.pl')
     with open(revolvr_local_path, 'r') as f:
         revolvr_text = f.read()
         
@@ -106,6 +96,10 @@ def generate_road(structure, sequence, pseudoknots, name='origami', rnafold_path
     out_revolvr = os.path.join(directory, 'revolvr.pl')
     with open(out_revolvr, 'w') as f:
         f.write(revolvr_text)
+
+    shutil.copyfile(os.path.join(road_dir, 'viennarna_funcs.py'),
+                    os.path.join(directory, 'viennarna_funcs.py')
+                    )
     
     command = f'perl "{out_revolvr}" "{directory}"'
     process = subprocess.Popen(command,

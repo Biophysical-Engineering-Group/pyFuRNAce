@@ -76,6 +76,8 @@ $output_file_path = $output_file_path."\/";
 my $start_time = time;       	 #start a timer
 my $timeout_length = 7200; 		#length of timeout in seconds - default is set to 2h
 
+my $full_seq = '';	#full sequence of the design, used for printing out the final design
+
 
 
 ##########
@@ -191,17 +193,11 @@ sub fold { #outputs to $fold
 
 	if($dont_fold==0){
 
-		qx(echo $_[0] > seq.txt);
+		$full_seq = $_[0];
 
-		my $outputs = qx(rnafold --noPS < seq.txt);
-		my @results = split(' ', $outputs);
-
-		$counter = 0; $fold = "";
-
-		foreach(@results){
-			if($counter == 1){ $fold = "$_\n"; }
-			$counter ++;
-		}
+		my $outputs = qx(python viennarna_funcs.py fold "$full_seq");
+		chomp($outputs);         # Remove trailing newline
+		$fold = "$outputs";  # Store output directly
 
 		$sequence_catalog[$unique_sequence_id]=$_[0];
 		$fold_catalog[$unique_sequence_id]=$fold;
@@ -210,20 +206,9 @@ sub fold { #outputs to $fold
 }
 
 sub distance { #outputs to $distance
-	open(my $din, '>', 'dist.txt');
-	print $din "$_[0]";
-	print $din "$_[1]";
-	close $din;
-
-	my $outputs = qx(rnadistance < dist.txt);
-	my @results = split(' ', $outputs);
-
-	my $counter = 0; $distance = "";
-
-	foreach(@results){
-		if($counter == 1){ $distance = "$_\n"; }
-		$counter ++;
-	}
+	my $outputs = qx(python viennarna_funcs.py distance "$_[0]" "$_[1]");
+	chomp($outputs);         # Remove trailing newline
+	$distance = "$outputs";  # Store output directly
 }
 
 sub map {
@@ -2072,25 +2057,29 @@ sub duplex { #outputs to $distance
 	}
 	
 	if($dont_fold==0){
-		open(my $duin, '>', 'KLtest.txt');
-			print $duin "$_[0]\n";
-			print $duin "$_[1]\n";
-		close $duin;
+		# open(my $duin, '>', 'KLtest.txt');
+		# 	print $duin "$_[0]\n";
+		# 	print $duin "$_[1]\n";
+		# close $duin;
 
-		$outputs = qx(rnaduplex < KLtest.txt);
+		# $outputs = qx(rnaduplex < KLtest.txt);
+		$outputs = qx(python viennarna_funcs.py duplex "$_[0]" "$_[1]");
 		@results = split(' ', $outputs);
+		$parens = $results[0];
+		$KLenergy = $results[1];
+		chomp($KLenergy);
 
-		$counter = 0; $KLenergy = "";
+		# $counter = 0; $KLenergy = "";
 
-		foreach(@results){
-			if($counter == 0){ $parens = "$_"; }
-			if($counter == 4){ $KLenergy = "$_"; }
-			if($counter == 5){ $KLenergy = "$KLenergy$_"; }
-			$counter ++;
-		}
+		# foreach(@results){
+		# 	if($counter == 0){ $parens = "$_"; }
+		# 	if($counter == 4){ $KLenergy = "$_"; }
+		# 	if($counter == 5){ $KLenergy = "$KLenergy$_"; }
+		# 	$counter ++;
+		# }
    
-		my $KLenergy_clean = $KLenergy =~ qr/(-||' ')(\d+).(\d+)/; ##parse out the number from the (-X.XX) in parenthesis
-		$KLenergy=$&;  ##store the regex part back into the variable	
+		# my $KLenergy_clean = $KLenergy =~ qr/(-||' ')(\d+).(\d+)/; ##parse out the number from the (-X.XX) in parenthesis
+		# $KLenergy=$&;  ##store the regex part back into the variable	
 		
 		$duplex_catalog[$unique_duplex_id]="$_[0].$_[1]";
 		$duplex_out_catalog[$unique_duplex_id]=$KLenergy;
@@ -2394,10 +2383,12 @@ sub analyzeKL {
 
 sub export {
 		
-		my $ensemblediversity = qx(rnafold --noPS -p < seq.txt);
+		# my $ensemblediversity = qx(rnafold --noPS -p < seq.txt);
+		my $ensemblediversity = qx(python viennarna_funcs.py diversity "$full_seq");
+		chomp($ensemblediversity);
 	   
-		my $ensemblediversity_clean = $ensemblediversity =~ qr/;\s*(.+)$/; ##parse out everything after the semicolon
-		$ensemblediversity=$&;  ##store the regex part back into the variable	
+		# my $ensemblediversity_clean = $ensemblediversity =~ qr/;\s*(.+)$/; ##parse out everything after the semicolon
+		# $ensemblediversity=$&;  ##store the regex part back into the variable	
 		
 		if ($failed_initial_design == 1){
 			&printer(" WARNING: Misfolding within the locked-sequence required altering the target structure. \n");
@@ -2433,10 +2424,10 @@ sub export {
 }
 
 
-sub preview {
-	qx(perl trace_analysis.pl pattern.txt seq.txt > $output_file_path\_Preview.txt);
-	qx(echo '$name Iteration $attempts\n' >> $output_file_path\_Preview.txt);
-}
+# sub preview {
+# 	qx(perl trace_analysis.pl pattern.txt seq.txt > $output_file_path\_Preview.txt);
+# 	qx(echo '$name Iteration $attempts\n' >> $output_file_path\_Preview.txt);
+# }
 
 ##############################################################################################
 # Banner Graphics Subroutines

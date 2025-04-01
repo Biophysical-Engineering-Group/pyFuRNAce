@@ -28,7 +28,6 @@ dependencies = [
     "numpy",
     "streamlit>=1.43.0",
     "st-click-detector",
-    "hydralit_components",
     "streamlit_code_editor",
     "colour",
     "st_forna_component",
@@ -37,9 +36,7 @@ dependencies = [
     "deap",
     "pytest",
     "st-oxview",
-    "streamlit-shortcuts",
-    "st-copy-to-clipboard",
-    "oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
+    "@git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
 ]
 
 [project.optional-dependencies]

@@ -3,9 +3,7 @@ channels:
 - conda-forge
 - bioconda
 dependencies:
-- python=3.12
 - viennarna
-- streamlit>=1.43.0
 - st-click-detector
 - streamlit_code_editor
 - matplotlib

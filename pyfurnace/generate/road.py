@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import tempfile
 import shutil
@@ -61,8 +62,14 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
         avg_pk_dE /= len(pk_dict)
     structure = ''.join(struct_list)
 
-    ### COPY THE PATH AND ADD RNAfold
+    ### COPY THE PYTHON PATH AND ADD RNAfold
+    python_path = sys.executable # Get path to the current Python interpreter
+    print(f"Python path: {python_path}")
+    python_dir = os.path.dirname(python_path)
+
+    # Prepend it to PATH
     env = os.environ.copy()
+    env["PATH"] = python_dir + os.pathsep + os.environ["PATH"]
 
     ### CHECK THE TEMPORARY DIRECTORY
     if directory is None:

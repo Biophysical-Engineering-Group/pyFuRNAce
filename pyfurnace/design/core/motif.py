@@ -1069,9 +1069,14 @@ class Motif(Callback):
         if sequence is None:
             sequence = 'N' * len(structure)
 
+        if isinstance(structure, str) and len(structure) != len(sequence):
+            raise ValueError(f"The sequence length must be equal to the structure length."
+                             f" Got {len(sequence)} for {len(structure)}")
+
         # input dot-bracket notation
         if type(structure) == str:
-            node = dot_bracket_to_tree(structure, sequence=sequence)
+            node = dot_bracket_to_tree(structure, 
+                                       sequence=sequence)
             pair_map = dot_bracket_to_pair_map(structure)
         # input pair map
         elif isinstance(structure, (BasePair, dict)):
@@ -1086,10 +1091,6 @@ class Motif(Callback):
             structure = tree_to_dot_bracket(node)
         else:
             raise ValueError(f"Invalid structure representation: {structure}")
-        
-        if len(sequence) != len(structure):
-            raise ValueError(f"The sequence length must be equal to the structure length."
-                             f" Got {len(sequence)} for {len(structure)}")
         
         # initialize the origami object
         origami = Origami([[]], align='first')
@@ -1828,6 +1829,7 @@ class Motif(Callback):
         if self.autopairing:
             self._basepair = BasePair()
             self._structure = None
+        self._updated_basepair()
         self._trigger_callbacks(**kwargs)
 
     ### 
@@ -2177,6 +2179,7 @@ class Motif(Callback):
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands 
                                                  if not s._coords.is_empty()])
+        # this will also update the basepair dictionary
         self._updated_strands()
 
         return self
@@ -2229,6 +2232,7 @@ class Motif(Callback):
                   forces: bool = False, 
                   pk_forces: bool = False, 
                   return_text: bool = False, 
+                  sequence: str = None,
                   pdb: bool = False, 
                   **kwargs) -> Optional[Tuple[str, str]]:
         """
@@ -2253,6 +2257,8 @@ class Motif(Callback):
         return_text : bool, default=False
             If True, returns the generated oxDNA configuration and topology as strings
             instead of writing to files.
+        sequence : str, optional
+            If provided, uses the given sequence to generate the topology.
         pdb : bool, optional, default=False
             If True, exports a PDB (Protein Data Bank) file for visualization.
         **kwargs
@@ -2330,6 +2336,9 @@ class Motif(Callback):
             except Exception as e:
                 print('Problem with proteins', s, e)
 
+        if sequence:
+            topology_text = '\n'.join([f'{seq} type=RNA circular=false' for seq in sequence.split('&')]) + '\n'
+            
         topology_text = f'{n_nucleotides} {n_strands} 5->3\n' + topology_text
 
         if return_text:

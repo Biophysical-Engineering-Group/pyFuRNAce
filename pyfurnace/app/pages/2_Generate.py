@@ -1,11 +1,9 @@
-import os
-import zipfile
+from functools import partial
 import streamlit as st
 from colour import Color
 import warnings
-import tempfile
 ################################OWN####LIBRARIES#######################################
-from utils import check_import_pyfurnace, load_logo, save_origami
+from utils import check_import_pyfurnace, load_logo, save_origami, copy_to_clipboard
 check_import_pyfurnace()
 import pyfurnace as pf
 
@@ -105,6 +103,9 @@ if __name__ == "__main__":
         st.session_state.generate_pseudoknots = ""
     if 'rna_origami_seq' not in st.session_state:
         st.session_state.rna_origami_seq = ""
+    if 'rna_origami_folds' not in st.session_state:
+        st.session_state.rna_origami_folds = ()
+    
 
     st.header('Generate', help='Generate the RNA sequence that matches the desired dot-bracket notation (and sequence constraints) for the nanostructure.')
     structure = st.text_input("RNA strucutre (dot-bracket notation)", value=st.session_state.generate_structure)
@@ -122,20 +123,23 @@ if __name__ == "__main__":
         with st.popover("RNA display options", use_container_width=True):
             forna_options(len(structure))
 
+    partial_forna = partial(forna_component,
+                           height = st.session_state.height,
+                           animation = st.session_state.animation,
+                           zoomable = st.session_state.zoomable,
+                           label_interval = st.session_state.label_interval,
+                           node_label = st.session_state.node_label,
+                           editable = st.session_state.editable,
+                           color_scheme = st.session_state.color_scheme,
+                           colors = st.session_state.color_text)
+    
+
     # # Initialize the FORNA link for the target structure
     if structure:
     #     st.write("#### Target Structure")
     #     st.write(format_text(structure))
-        edited = forna_component(structure = structure, 
+        edited = partial_forna(structure = structure, 
                                 sequence = sequence_constraint,
-                                height = st.session_state.height,
-                                animation = st.session_state.animation,
-                                zoomable = st.session_state.zoomable,
-                                label_interval = st.session_state.label_interval,
-                                node_label = st.session_state.node_label,
-                                editable = st.session_state.editable,
-                                color_scheme = st.session_state.color_scheme,
-                                colors = st.session_state.color_text,
                                 key='target_forna')
         
     generate = True
@@ -149,64 +153,95 @@ if __name__ == "__main__":
     if not generate:
         # Initialize the UI elements
         progress_bar = st.empty()
-        best_info = st.empty()
-        stats = st.empty()
+        output_status = st.empty()
         # Initialize the progress bar
         progress_bar.progress(0, "Initializing...")
-        # Generate the RNA origami
-        pf.generate_road(structure, sequence_constraint, pseudoknot_info)
 
+        def callback_forna(structure, sequence, step, stage_name, n_stage):
+            # Update the progress bar
+            progress_bar.progress(n_stage, text = stage_name)
+            output_status.markdown(format_text(f"Structure:\n{structure}"
+                                               f"\nSequence:\n{sequence}"
+                                               f"\nSpool:\n{step}"))
+
+        opti_sequence, zip_out = pf.generate_road(structure, 
+                                                  sequence_constraint, 
+                                                  pseudoknot_info, 
+                                                  name=filename,
+                                                  callback=callback_forna,
+                                                  zip_directory=True)
         
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            try:
-                pass
-                ### TODO
-            except Exception as e:
-                st.error(f"Error: {e}")
+        st.session_state.rna_origami_seq = opti_sequence
+        st.session_state.zip_path = zip_out
+        st.session_state.rna_origami_folds = pf.fold_p(opti_sequence)
 
-    # TO FIX
-    #     # Clear the progress bar
-    #     progress_bar.progress(1.0, text = f"Generation Completed")
-    #     st.session_state.rna_origami_seq = full_seq
-    #     st.session_state.rna_origami_struct = full_struct
-    #     # Clear progess bar
-    #     update_ui(None, None, None, None)
-    #     # progress_bar.empty()
+        # Clear the progress bar
+        progress_bar.progress(1.0, text = f"Generation Completed")
+        output_status.empty()
 
-    #     # Display the file to download
-    
-    # if st.session_state.rna_origami_seq:
-    #     st.write("### Last Optimized sequence:")
-    
-    #     st.write(format_text(st.session_state.rna_origami_seq))
-    #     col1, col2, col3 = st.columns(3)
-    #     with col1:
-    #         st.page_link("pages/3_Convert.py", 
-    #                      label=":orange[Prepare the DNA template]", 
-    #                      icon=":material/genetics:")
-    #     with col2:
-    #         st_copy_to_clipboard(st.session_state.rna_origami_seq, 
-    #                              before_copy_label='Copy Sequence📋', 
-    #                              show_text=False)
-    #     with col3:
-    #         st.download_button("Download Results",
-    #                 st.session_state.zip_results,
-    #                 f"{filename}.zip")
-            
-    #     forna_component(structure = st.session_state.rna_origami_struct, 
-    #                     sequence = st.session_state.rna_origami_seq,
-    #                     height = st.session_state.height,
-    #                     animation = st.session_state.animation,
-    #                     zoomable = st.session_state.zoomable,
-    #                     label_interval = st.session_state.label_interval,
-    #                     node_label = st.session_state.node_label,
-    #                     editable = st.session_state.editable,
-    #                     color_scheme = st.session_state.color_scheme,
-    #                     colors = st.session_state.color_text,
-    #                     key='optimized_forna')
+
+    if st.session_state.rna_origami_seq:
+        sequence = st.session_state.rna_origami_seq
+        folds = st.session_state.rna_origami_folds
+
+        diversity = round(folds[6], 1)
+        if diversity < 30:
+            diversity_text = f":green[low {diversity}]"
+        elif diversity < 50:
+            diversity_text = f":orange[medium {diversity}]"
+        else:
+            diversity_text = f":red[high {diversity}]"
+
+        cols = st.columns(4, vertical_alignment='bottom')
+        st.markdown(f"### Last Optimized sequence (ensemble diversity: {diversity_text})", 
+                    help='here you can find the last optimized sequence')
+        
+
+        st.write(format_text(st.session_state.rna_origami_seq))
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.page_link("pages/3_Convert.py", 
+                         label=":orange[Prepare the DNA template]", 
+                         icon=":material/genetics:")
+        with col2:
+            copy_to_clipboard(folds[0], 'Structure')
+        with col3:
+            copy_to_clipboard(sequence, 'Sequence')
+        with col4:
+            with open(st.session_state.zip_path, "rb") as fp:
+                st.download_button("Download Optimization Files",
+                                   data=fp,
+                                   file_name = f"{filename}.zip",
+                                   mime = "application/zip",
+                                   )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            with st.columns(3)[1]:
+                st.markdown("#### MFE Structure")
+            subcol1, subcol2 = st.columns(2)
+            with subcol1:
+                st.write(f'Energy: {round(folds[1], 2)} Kcal/mol')
+            with subcol2:
+                st.write(f'Frequency in the ensemble: {round(folds[2] * 100, 4)} %')
+            partial_forna(structure = folds[0],
+                          sequence = sequence,
+                          key='struct_mfe')
+        with col2:
+            with st.columns(3)[1]:
+                st.markdown("#### Centroid Structure")
+            subcol1, subcol2 = st.columns(2)
+            with subcol1:
+                st.write(f'Energy: {round(folds[4], 2)} Kcal/mol')
+            with subcol2:
+                st.write(f'Frequency in the ensemble: {round(folds[5] * 100, 4)} %')
+            partial_forna(structure = folds[3],
+                          sequence = sequence,
+                          key='struct_centroid')
+
 
         if 'origami' in st.session_state and st.session_state.origami:
-            if st.button("Load the sequence to the Origami"):
+            if st.button("**:green[Load sequence into origami]**"):
                 try:
                     st.session_state.origami.sequence = st.session_state.rna_origami_seq
                     if 'code' in st.session_state:

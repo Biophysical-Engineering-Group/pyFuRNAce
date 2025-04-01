@@ -1,45 +1,55 @@
 import os
 import subprocess
 import tempfile
+import shutil
+import warnings
+from time import sleep
 
 from ..design.core.symbols import *
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
 
-def generate_road(structure, sequence, pseudoknots):
-    try:
-        # check if RNAfold is installed
-        rnafold_path = subprocess.check_output(['which', 'RNAfold']).decode("utf-8").strip()
-    except subprocess.CalledProcessError:
-        rnafold_path = '/home/adminuser/.conda/bin/RNAfold'
-        if not os.path.exists(rnafold_path):
-            raise ValueError("RNAfold not found. Please install it or provide the path to the executable.")
+def generate_road(structure, sequence, pseudoknots, name='origami', rnafold_path=None, callback=None, directory=None, zip_directory=False):
+    revolvr_local_path = __file__.replace('road.py', 'revolvr.pl')
+
+    # CHECK RNAfold installation
+    if rnafold_path is None:
+        try:
+            rnafold_path = subprocess.check_output(['which', 'RNAfold']).decode("utf-8").strip()
+        except subprocess.CalledProcessError:
+            rnafold_path = '/home/adminuser/.conda/bin/RNAfold'
+            if not os.path.exists(rnafold_path):
+                raise ValueError("RNAfold not found. Please install it or provide the path to the executable.")
         
+    # Sanity check
     if '&' in sequence or '&' in structure:
         raise ValueError("The ROAD algorithm does not support multistranded structures.")
     
-    ### PREPARE THE STUCTURE FILE
-
-    ### Fix the short stems
+    ### Fix the short stems with '{' ROAD symbols
     struct_list = list(structure)
     pair_map = dot_bracket_to_pair_map(structure)
     for dt in find_stems_in_multiloop(structure):
-        # force pairing in dovetails that are shorter than 4
-        if dt[-1] - dt[0] + 1 <= 3: 
+        # force pairing in dovetails that are shorter than 3
+        if dt[-1] - dt[0] + 1 <= 2: 
             for i in range(dt[0], dt[1] + 1):
                 struct_list[i] = '{'
                 struct_list[pair_map[i]] = '}'
 
-    ### Add the pseudoknots
+    ### ADD THE PSEUDOKNOTS ROAD NOTATION
     if type(pseudoknots) == dict:
         pk_dict = pseudoknots
     else:
         pk_dict = parse_pseudoknots(pseudoknots)
 
-    road_pk_notation = {'A' : '1', 'B' : '2', 'C' : '3', 'D' : '4', 'E' : '5', 'F' : '6', 'G' : '7', 'H' : '8', 'I' : '9'}
+    road_pk_notation = {'A' : '1', 'B' : '2', 'C' : '3', 'D' : '4', 'E' : '5', 
+                        'F' : '6', 'G' : '7', 'H' : '8', 'I' : '9'}
     external_pk_count = 0
+    avg_pk_E = 0
+    avg_pk_dE = 0
     for pk_info in pk_dict.values():
         used = False
+        avg_pk_E += pk_info['E']
+        avg_pk_dE += abs(pk_info['dE'])
         pk_sym = list(road_pk_notation)[external_pk_count]
         for (start, end) in pk_info['ind_fwd']:
             if struct_list[start] not in '.()':
@@ -56,23 +66,110 @@ def generate_road(structure, sequence, pseudoknots):
         if used:
             external_pk_count += 1
 
-    struct_list = ''.join(struct_list)
-    print(''.join(struct_list))
-    print(sequence)
+    if pk_dict:
+        avg_pk_E /= len(pk_dict)
+        avg_pk_dE /= len(pk_dict)
+    structure = ''.join(struct_list)
+
+    ### COPY THE PATH AND ADD RNAfold
+    env = os.environ.copy()
+    env["PATH"] = f"{env['PATH']}:{rnafold_path}"
+
+    ### CHECK THE TEMPORARY DIRECTORY
+    if directory is None:
+        tempdir = tempfile.TemporaryDirectory()
+        directory = tempdir.name
+    else:
+        if not os.path.exists(directory):
+            warnings.warn(f"Directory {directory} does not exist. Creating it.")
+            os.makedirs(directory)
+        tempdir = None
+        directory = directory
+
+    ### WORK IN THE DIRECTORY
         
-    # create temporary directory to store files
-    # with tempfile.TemporaryDirectory() as tmpdirname:
-    #     with tempfile.NamedTemporaryFile(dir=self.temp_folder, suffix='.stl', delete=False) as temp_file:
-    #         if isinstance(text, bytes):
-    #             temp_file.write(text)
-    #         elif isinstance(text, str):
-    #             temp_file.write(text.encode("utf-8"))  # Write the text content to the file
-    #         else:
-    #             raise ValueError(f"Invalid text type for the stl file")
-    #         temp_file.flush()  # Ensure all data is written to disk
-    #         file_path = temp_file.name.split(os.sep)[-1]  # Store the relative path
-    #         self.current_temp_files.append(temp_file.name)  # Keep track of the file for cleanup
+    # create the target input file
+    with open(os.path.join(directory, 'target.txt'), 'w') as f:
+        f.write(f"{name}\n{structure}\n{sequence}\n")
+
+    # read the revolvr file
+    with open(revolvr_local_path, 'r') as f:
+        revolvr_text = f.read()
+        
+    # replace the KL energy parameters
+    revolvr_text = revolvr_text.replace('my $MinKL = -7.2;',
+                                        f'my $MinKL = {avg_pk_E + avg_pk_dE};')
+    revolvr_text = revolvr_text.replace('my $MaxKL = -10.8;',
+                                        f'my $MaxKL = {avg_pk_E - avg_pk_dE};')
+
+    # create the revolvr file with specific KL parameters
+    out_revolvr = os.path.join(directory, 'revolvr.pl')
+    with open(out_revolvr, 'w') as f:
+        f.write(revolvr_text)
     
+    command = f'perl "{out_revolvr}" "{directory}"'
+    process = subprocess.Popen(command,
+                                shell=True,
+                                cwd=directory,
+                                env=env,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                text=True  #makes output strings
+                                )
+
+    # Read output in real time
+    last_seq = '' 
+    last_struct = ''
+    prev_line = ''
+    n_stage = 0
+    stages = ['Designing', 
+              'GC-Reduction & GC/UA-Rich Reduction', 
+              'Mapping Kissing Loops', 
+              'Optimization']
+
+    for line in process.stdout:
+        line = line.strip()
+
+        # update the stage
+        if stages[n_stage] in line and n_stage < len(stages) - 1:
+            n_stage += 1
+
+        # update the last sequence and structure
+        if prev_line and not prev_line.translate(nucl_to_none):
+            last_seq = prev_line
+            if line and any(s in line for s in '.()'):
+                last_struct = line
+        
+        if line and last_seq and last_struct and callback:
+            callback(last_struct, last_seq, line, stages[n_stage - 1], n_stage / len(stages))
+
+        prev_line = line
+
+    # Wait for process to finish
+    process.wait()
+
+    with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
+        lines = f.readlines()
+        last_seq = lines[2].strip()
+
+    # create a temporary zip file with all the info
+    temp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
+    temp_zip.close()  # Close so shutil can write to it
+
+    # Create a zip archive from the directory
+    shutil.make_archive(base_name=temp_zip.name.replace(".zip", ""), 
+                        format='zip', 
+                        root_dir=directory)
+
+    if tempdir is not None:
+        # Close the temporary directory
+        tempdir.cleanup()
+    
+    # Return the path to the zip file
+    if zip_directory:
+        return last_seq, temp_zip.name
+    return last_seq
+
 
 # out = subprocess.run("cd road_bin; perl RNAbuild.pl pattern.txt", shell=True, capture_output=True)
 # vrna_path = '/home/adminuser/.conda/bin/'

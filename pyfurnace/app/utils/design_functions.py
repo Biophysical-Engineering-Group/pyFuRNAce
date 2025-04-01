@@ -67,7 +67,7 @@ def origami_general_options(origami, expanded=True):
 
         with cols[1]:
             st.toggle('Optimize the blueprint for ROAD', 
-                      value=True,
+                      value=False,
                       key='to_road', 
                       help='Optimize the blueprint for the ROAD software. This substitutes the Kissing Loops base pairings with "*"; and the short stem base pairings with "!".')
 
@@ -122,26 +122,22 @@ The connection between helices (Dovetails) are obtained roughly with this lookup
         angle_list = [int(x) for x in dt_text.split(",") if x and x.strip()]
         dt_list = pf.convert_angles_to_dt(angle_list)
         main_stem_default = 11 * ((max([abs(dt) for dt in dt_list], default=0) + 17) // 11 + 1)
-        col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
+        col1, col2 = st.columns(2, vertical_alignment='bottom')
         with col1:
-            helix_kl = st.number_input('Kissing loop repeats:', min_value=1, value=1, help='number of KL repeats in the helix')
+            helix_kl = st.number_input('Kissing loop columns:', min_value=1, value=1, help='number of KL repeats in the helix')
         with col2:
-            main_stem = st.number_input('Repeats length (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
+            main_stem = st.number_input('Spacing between crossovers (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
             main_stem = [main_stem] * helix_kl
-        with col3:
-            terminal_helix = st.toggle('Add terminal helices',
-                                       value=True,
-                                        help='Add the first and last helix with 0bp dovetails')
 
         submitted = st.form_submit_button("Submit")
         if submitted:
             st.session_state.origami = pf.simple_origami(dt_list=angle_list, 
                                                          helix_kl=helix_kl, 
                                                          main_stem=main_stem, 
-                                                         add_terminal_helix=terminal_helix, 
+                                                         add_terminal_helix=True, 
                                                          align=st.session_state.origami.align, 
                                                          use_angles=True)
-            st.session_state.code.append(f'origami = pf.simple_origami(dt_list={angle_list}, helix_kl={helix_kl}, main_stem={main_stem}, add_terminal_helix={terminal_helix}, align="{st.session_state.origami.align}", use_angles=True) # Create a simple origami')
+            st.session_state.code.append(f'origami = pf.simple_origami(dt_list={angle_list}, helix_kl={helix_kl}, main_stem={main_stem}, add_terminal_helix=True, align="{st.session_state.origami.align}", use_angles=True) # Create a simple origami')
             # select the end of the origami
             st.session_state.line_index = len(st.session_state.origami) - 1
             st.session_state.motif_index = len(st.session_state.origami[-1])
@@ -239,13 +235,13 @@ def make_motif_menu(origami):
         select_ind = list(option_data).index(st.session_state.selected_motif)        
     
     selected_motif = option_menu(None, 
-                                list(option_data.keys()),
-                                icons=list(option_data.values()),
-                                menu_icon="cast", 
-                                orientation="horizontal",
-                                manual_select=select_ind,
-                                styles=main_menu_style,
-                                key='motif_menu')
+                                 list(option_data.keys()),
+                                 icons=list(option_data.values()),
+                                 menu_icon="cast", 
+                                 orientation="horizontal",
+                                 manual_select=select_ind,
+                                 styles=main_menu_style,
+                                 key='motif_menu')
     
     if selected_motif != st.session_state.selected_motif:
         st.session_state.selected_motif = selected_motif
@@ -355,8 +351,9 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                         st.session_state.code.append(f'origami.pop({st.session_state.line_index})')
                         st.session_state.line_index -= 1
                         st.rerun() # rerun app
-            else:
-                st.button(':green[Have fun --->]', type='tertiary')
+            # if there is the button to add a motif, add a empty button to align
+            elif f_subcol3: 
+                st.button('', type='tertiary')
 
     if st.session_state.line_index >= len(origami):
         return
@@ -555,8 +552,11 @@ def structure_converter(current_custom_motif):
                                  key="Dot-bracket_structure", 
                                  help="Add a dot-bracket structure to convert it into a 3D motif.")
     with col2:
+        default_seq = str(current_custom_motif.sequence)
+        if len(structure) > len(default_seq):
+            default_seq += 'N' * (len(structure) - len(default_seq))
         sequence = st.text_input("Sequence:", 
-                                 value=current_custom_motif.sequence, 
+                                 value=default_seq, 
                                  key="Sequence", 
                                  help="Add the sequence of the motif.")
         if not sequence:

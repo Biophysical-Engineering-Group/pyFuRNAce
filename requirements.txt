@@ -8,7 +8,6 @@ st_forna_component
 biopython
 ViennaRNA
 deap
-pandas
 matplotlib
 pytest
 st-oxview

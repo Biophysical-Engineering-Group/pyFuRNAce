@@ -25,6 +25,12 @@ main_menu_style = { "container": {
 second_menu_style = deepcopy(main_menu_style)
 second_menu_style['nav-link-selected']['background-color'] = '#D00000'
 
+inactive_menu_style = deepcopy(second_menu_style)
+inactive_menu_style['nav-link']['--hover-color'] = '#f0f2f6'
+inactive_menu_style['nav-link-selected']['background-color']  = '#f0f2f6'
+inactive_menu_style['nav-link-selected']['color'] = '#31333e'
+inactive_menu_style['nav-link-selected']['font-weight'] = 'normal'
+
 
 def check_import_pyfurnace():
     ### If the module is already imported, skip
@@ -43,10 +49,12 @@ def check_import_pyfurnace():
 
 def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo_lr.png")):
     # First instructions to run the app, set the layout and logo
+    # print('Loading logo')
+    # print(app_path / "static" / "logo_text.png")
     st.set_page_config(page_title=page_title, page_icon=page_icon, layout="wide", initial_sidebar_state='collapsed',)
     st.logo(str(app_path / "static" / "logo_text.png"), 
             icon_image=str(app_path / "static" / "logo_lr.png"),
-            link='https://pyfurnace.streamlit.app',
+            # link='https://pyfurnace.streamlit.app',
             size='large')
     # st.html("""
     #     <style>
@@ -123,12 +131,14 @@ def save_origami(origami_name='Origami'):
             st.stop()
 
         if file_type == 'PDB':
+            sequence = origami.sequence
             if any(nucl not in "AUCG&" for nucl in origami.sequence):
-                st.error('The sequence contains non-standard nucleotides. PDB format only supports A, U, C, G.')
-                st.stop()
+                st.warning('The sequence contains non-standard nucleotides (only A, U, C, G, and & are allowed)'
+                           'The PDB will be filled with a random sequence!')
+                sequence = origami.sequence.get_random_sequence(structure=origami.structure)
             with tempfile.TemporaryDirectory() as tmpdirname:
                 file_path = f"{tmpdirname}/origami"
-                origami.save_3d_model(file_path, pdb=True)
+                origami.save_3d_model(file_path, sequence=sequence, pdb=True)
                 try:
                     with open(f"{file_path}.pdb", 'r') as f:
                         pdb_text = f.read()

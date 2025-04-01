@@ -41,7 +41,7 @@ class ConnectionsCommand(MotifCommand):
             if util_option == 'Tetraloop':
                 TetraLoopCommand().execute()
                 return
-            if util_option == 'start end stem':
+            if util_option == 'start_end_stem':
                 start_end_stemCommand().execute()
                 return
             

@@ -1,0 +1,23 @@
+name: pyfurnace
+channels:
+- conda-forge
+dependencies:
+- python=3.8
+- scikit-learn
+- pandas
+- numpy
+- matplotlib
+- pip
+- pip:
+  - streamlit>=1.43.0
+  - st-click-detector
+  - streamlit_code_editor
+  - matplotlib
+  - st_forna_component
+  - biopython
+  - ViennaRNA
+  - deap
+  - pytest
+  - st-oxview
+  - numpy
+  - oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysi

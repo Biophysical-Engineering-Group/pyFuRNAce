@@ -31,15 +31,15 @@ class Position(tuple):
         if dimension not in [2, 3]:
             raise ValueError("Dimension must be 2 or 3.")
         if dimension == 2:
-            Direction.UP = Position((0, -1))
             Direction.RIGHT = Position((1, 0))
             Direction.DOWN = Position((0, 1))
             Direction.LEFT = Position((-1, 0))
+            Direction.UP = Position((0, -1))
         else:
-            Direction.UP = Position((0, -1, 0))
             Direction.RIGHT = Position((1, 0, 0))
             Direction.DOWN = Position((0, 1, 0))
             Direction.LEFT = Position((-1, 0, 0))
+            Direction.UP = Position((0, -1, 0))
             Direction.IN = Position((0, 0, 1))
             Direction.OUT = Position((0, 0, -1))
         cls._dimension = dimension
@@ -191,7 +191,7 @@ class Direction(metaclass=DirectionMeta):
     LEFT : Position
         The leftward direction.
     """
-    UP = Position((0, -1))
     RIGHT = Position((1, 0))
     DOWN = Position((0, 1))
     LEFT = Position((-1, 0))
+    UP = Position((0, -1))

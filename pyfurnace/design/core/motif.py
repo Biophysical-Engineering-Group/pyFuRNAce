@@ -461,10 +461,10 @@ class Motif(Callback):
 
     @property
     def junctions(self) -> Dict[Tuple[int, int], List[Tuple[int, int]]]:
-        '''
+        """
         A dictionary with Direction as key (right: (1,0), bottom: (0,1), 
         left: (-1,0), top: (0,1)) and an ordered list of junction positon as value.
-        '''
+        """
         ### if the junctions are already calculated return them
         if self._junctions:
             return self._junctions
@@ -581,7 +581,8 @@ class Motif(Callback):
 
     @property
     def pair_map(self) -> Dict[int, Union[int, None]]:
-        """Tha map of the paired indexes (alternative to the dot bracket notation)"""
+        """The dictionary of the paired indexes (alternative to the dot bracket 
+        notation). """
         if self._pair_map:
             return self._pair_map
         

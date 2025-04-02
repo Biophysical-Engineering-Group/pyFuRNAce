@@ -11,7 +11,7 @@ def main():
                       'client.toolbarMode': "minimal",
                     }
     config_str = ' '.join([f'--{key} "{value}"' for key, value in config_options.items()])
-    app_path = str(pathlib.Path(__file__).parent.resolve() / 'app' / 'Home.py')
+    app_path = str(pathlib.Path(__file__).parent.resolve() / 'app' / 'streamlit_app.py')
     subprocess.run(f'streamlit run {app_path} {config_str}', shell=True)
 
 if __name__ == "__main__":

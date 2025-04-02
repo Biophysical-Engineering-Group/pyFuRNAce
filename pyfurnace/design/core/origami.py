@@ -1011,7 +1011,7 @@ class Origami(Callback):
                 # check the type
                 if not isinstance(m, Motif):  
                     raise ValueError(f'Only Motif or subclass of Motif can be added to '
-                                     f'the Origami, but the object type {type(motif)} '
+                                     f'the Origami, but the object type {type(m)} '
                                      f'was added at position x: {x}, y: {y}.')
                 
                 # Copy, add the callback and save it

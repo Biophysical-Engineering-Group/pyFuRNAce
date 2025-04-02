@@ -550,12 +550,11 @@ class Origami(Callback):
         mot = None
         for line in self.assembled:
             mot_line = Motif.concat(line, align=False, unlock_strands=self._ss_assembly, lock_coords=False)
-            if mot is None:
-                mot = mot_line
-                continue
             mot = Motif.concat([mot, mot_line], axis=0, align=False, lock_coords=True, unlock_strands=self._ss_assembly)
-        # self._motif = Motif.concat([Motif.concat(line, align=False, unlock_strands=self._ss_assembly, lock_coords=False) for line in self.assembled], axis=0, align=False, lock_coords=True, unlock_strands=self.ss_assembly)
+        
         self._motif = mot
+        # much much slower options:
+        # self._motif = Motif.concat([Motif.concat(line, align=False, unlock_strands=self._ss_assembly, lock_coords=False) for line in self.assembled], axis=0, align=False, lock_coords=True, unlock_strands=self.ss_assembly)
         return self._motif
     
     @property

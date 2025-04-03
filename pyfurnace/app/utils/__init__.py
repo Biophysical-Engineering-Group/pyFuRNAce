@@ -120,7 +120,7 @@ def save_origami(origami_name='Origami'):
     if not st.session_state.origami:
         return
     origami = st.session_state.origami
-
+    st.divider()
     st.write('### Download RNA origami structure')
     col1, col2 = st.columns([1, 6])
     with col1:

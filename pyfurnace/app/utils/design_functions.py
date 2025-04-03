@@ -167,9 +167,9 @@ def motif_text_format(motif):
 
 def initiate_session_state():
     if 'origami' not in st.session_state:
-        st.session_state.origami = pf.Origami([])
+        st.session_state.origami = pf.Origami()
     if "code" not in st.session_state:
-        st.session_state.code = ["import pyfurnace as pf", "origami = pf.Origami([])"]
+        st.session_state.code = ["import pyfurnace as pf", "origami = pf.Origami()"]
         st.session_state.motif_buffer = ""
         st.session_state.mod_motif_buffer = ""
     if "motif" not in st.session_state:
@@ -1293,7 +1293,7 @@ def edit(x, y):
                 with col2:
                         start_y = st.number_input("Start y:", min_value=0, value=s.start[1], key=f'start_y_{x}_{y}_{i}')
                 with col3:
-                    direction_list = ['Up', 'Right', 'Down', 'Left']
+                    direction_list = [name for name in pf.Direction.__dict__ if '_' not in name]
                     strand_direction_ind = [i for i, d in enumerate(pf.Direction) if d == s.direction][0]
                     new_dir = st.selectbox('Start direction:', direction_list, index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
                     new_dir_tuple = pf.Direction[new_dir.upper()]

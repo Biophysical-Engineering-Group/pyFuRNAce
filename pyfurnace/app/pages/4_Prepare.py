@@ -31,15 +31,217 @@ def upload_setting_button():
     st.session_state['upload_setting'] = True
     return
 
-def primers_tab(seq):
+def calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs):
+
+    col1, col2 = st.columns(2, gap='large')
+    with col1:
+        subcol1, subcol2 = st.columns([11,1], vertical_alignment='center')
+        with subcol1:
+            write_format_text(c_primer)
+        with subcol2:
+            copy_to_clipboard(c_primer, "")
+
+        subcol1, subcol2, subcol3 = st.columns(3)
+        with subcol1:
+            st.markdown(f"GC content: {round(gc_fraction(c_primer, ambiguous='ignore') * 100, 1)}%")
+        with subcol2:
+            st.markdown(f"**:green[Tm: {round(mts[0], 1)}°C]**")
+        with subcol3:
+            st.markdown(f"Length: {len(c_primer)}")
+
+    with col2:
+        
+        subcol1, subcol2 = st.columns([11,1], vertical_alignment='center')
+        with subcol1:
+            write_format_text(nc_primer)
+        with subcol2:
+            copy_to_clipboard(nc_primer, "")
+
+        subcol1, subcol2, subcol3 = st.columns(3)
+        with subcol1:
+            st.markdown(f"GC content: {round(gc_fraction(nc_primer, ambiguous='ignore') * 100, 1)}%")
+        with subcol2:
+            st.markdown(f"**:green[Tm: {round(mts[1], 1)}°C]**")
+        with subcol3:
+            st.markdown(f"Length: {len(nc_primer)}")
+
+    # show the primers preview, check the self-dimerization of the primer and check the dimer between the primers and the sequence
+    c_bases = len(c_primer)
+    nc_bases = len(nc_primer)
+    with st.expander("Dimerization preview"):
+        st.markdown(f"""<div style="text-align: center;"><span style="color: #FF5733">{c_primer}</span>{seq[c_bases]}[...]{seq[-nc_bases-1:]}</div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div style="text-align: center;">{seq[:c_bases+1].complement()}[...]{seq[-nc_bases]}<span style="color: #FF5733">{nc_primer[::-1]}</span></div>""", unsafe_allow_html=True)
+        st.divider()
+        col1, col2 = st.columns(2, gap='large')
+        with col1:
+            self_dimer1 = check_dimer(c_primer, c_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
+            write_format_text('Self-Dimer forward primer\n' + self_dimer1)
+        with col2:
+            self_dimer2 = check_dimer(nc_primer, nc_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
+            write_format_text('Self-Dimer reverse primer\n' + self_dimer2)
+        self_dimer12 = check_dimer(c_primer, nc_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
+        write_format_text('Dimer between primers\n' + self_dimer12)
+
+    # add a warning if the melting temperature of the primers is too different
+    anneal_color = 'green'
+    if abs(mts[0] - mts[1]) >= 5:
+        st.warning('The difference of Tm should be below 5°C', icon="⚠️")
+        anneal_color = 'red'
+                    
+    # take into account the two main method to calculate the PCR annealing temperature: IDT method and Phusion Buffer method
+    col1, col2 = st.columns(2, gap='large', vertical_alignment='bottom')
+    ann_methods = ['IDT method [2]', 'Phusion method [3]']
+    with col1:
+        annealing_model = st.selectbox("Calculate annealing:", ann_methods)
+        
+    # the IDT method takes into account the GC melting temperature of the whole DNA sequence 
+    if annealing_model == ann_methods[0]:
+        method_kwargs = tm_kwargs.copy()
+        method_kwargs.pop('dNTPs')
+        method_kwargs.pop('DMSO')
+        t_anneal = round(0.3 * min(mts) + 0.7 * mt.chem_correction(mt.Tm_GC(seq, valueset=7, **method_kwargs), DMSO=tm_kwargs['DMSO']) - 14.9, 2)
+    # the Phusion method takes into account the Melting temperature of the primers
+    else:
+        if len(c_primer) <= 20 or len(nc_primer) <= 20:
+            t_anneal = min(mts)
+        else:
+            t_anneal = min(mts) + 3
+        if t_anneal < 50:
+            st.warning('Is suggested a temperature of annealing higher than 50°C.', icon="⚠️")
+            anneal_color = 'red'
+    # write the annealing temperature in big
+    with col2:
+        st.markdown(f"### Anneal at: :{anneal_color}[{t_anneal}°C]")
+
+
+def primers_tab(seq, mt_correct, tm_kwargs):
     """ Calculate the melting temperature of the primers and check the dimer between the primers and the sequence"""
+
+    # show the settings for the two primers: choose the number of bases and show the gc content and melting temperature
+    st.write('\n')
+    col1, col2 = st.columns(2, gap='large')
+    mts = [0, 0]
+    # settings for the coding primer
+    with col1:
+        with st.columns(5)[2]:
+            st.markdown('###### Forward')
+
+        c_bases = st.slider('Primer length:', min_value=5, max_value=50, value = 21, 
+                            key="coding_primer")
+        c_primer = seq[:c_bases]
+
+        mts[0] = round(mt_correct(c_primer),2)
+
+    # settings for the non-coding primer
+    with col2:
+        with st.columns(5)[2]:
+            st.markdown('###### Reverse')
+
+        nc_bases = st.slider('Primer length:', min_value=5, max_value=50, value = 21, 
+                             key="non_coding_primer")
+        nc_primer = seq[-nc_bases:].reverse_complement()
+
+        mts[1] = round(mt_correct(nc_primer),2)
+
+    calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs)
+
+def auto_primer(seq, mt_correct, tm_kwargs):
+    """ Automatically design the primers for the sequence"""
+    # check if the sequence is a DNA sequence
+    target_temp = st.number_input('Temperature (°C)', value=65, min_value=0, max_value=100, step=1)
+
+    if st.button("Design primers", key='auto_primer'):
+        st.write('Designing primers...')
+
+        final_mts = []
+        primers = []
+
+        # check the melting temperature of the primers
+        for direct in (1, -1):
+            prim_length = 10
+            primers_info = list()
+
+            while True:
+
+                to_prime = seq
+                if direct == -1:
+                    to_prime = seq.reverse_complement()
+                primer = to_prime[:prim_length]
+                tm = round(mt_correct(primer), 2)
+
+                if tm <= (target_temp - 2.5):
+                    prim_length += 1
+                    continue
+                elif tm >= (target_temp + 2.5):
+                    break
+
+                score = 0
+                if primer[-1] in 'GC':
+                    score += 1
+                if primer[-2] in 'GC':
+                    score += 1
+                if 18 < prim_length < 30:
+                    score += 1
+                elif prim_length < 18:
+                    score -= 17 - prim_length
+                if 40 < round(gc_fraction(primer, ambiguous='ignore') * 100, 1) < 60:
+                    score += 1
+
+                dimers = check_dimer(primer, 
+                                     primer, 
+                                     dict_format=True,
+                                     basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
+                max_dimer = max(dimers.keys())
+                score -= max_dimer / (len(primer) // 2)
+
+
+                primers_info.append((score, tm, primer))
+
+                prim_length += 1
+                if prim_length > len(seq) - 1 or not tm:
+                    st.error('No primer found for the sequence', icon=":material/personal_injury:")
+                    break
+
+            # sort the primers by score
+            primers_info.sort(reverse=True)
+            # st.write(primers_info)
+            final_mts.append(primers_info[0][1])
+            primers.append(primers_info[0][2])
+
+        calculate_annealing(seq, final_mts, primers[0], primers[1], tm_kwargs)
+        
+def primers_setup():
+
+    if "dna_template" not in st.session_state:
+        st.session_state["dna_template"] = ''
+    # st.header('Primer design')
+
+    # take the input sequence and sanitize it
+    seq = sanitize_input(st.text_input("Input sequence:", value = st.session_state["dna_template"]))
+
+    # check the symbols in the sequence
+    if set(seq) - symbols:
+        st.warning('The sequence contains symbols not included in the [IUPAC alphabet](https://www.bioinformatics.org/sms/iupac.html).', icon="⚠️")
+    if 'U' in seq:
+        st.error('The DNA template contains U', icon=":material/personal_injury:")
+    
+    # create a proper biopython sequence
+    seq = Seq(seq)
+
+    
+    if not seq:
+        st.stop()
+    elif len(seq) < 40:
+        st.error('The sequence is too short', icon=":material/personal_injury:")
+        st.stop()
     
     ###
     # Melting Temperature for PCR settings
     ###
+
     mcol1, mcol2 = st.columns(2, vertical_alignment='center') 
     with mcol1:
-        with st.popover("Melting temperature parameters"):
+        with st.popover("**Melting temperature parameters**"):
             # load settings if you want to upload custom settings
             load_settings = st.checkbox("Upload previous energy parameter:",
                                         help='''If you have saved a json file with the energy parameters, you can upload it and use the same settings.''')
@@ -92,6 +294,14 @@ def primers_tab(seq):
                 with cols[6]: correction_met = st.selectbox('Method', [0, 1, 2, 3, 4, 6, 7], key='Method')
                 with cols[7]: help_correction = st.button("Show info", key='energy_correction_info')
 
+                tm_kwargs = {'Na': na, 
+                             'K': k, 
+                             'Tris': tris, 
+                             'Mg': mg, 
+                             'saltcorr': correction_met,
+                             'dNTPs': dntps, 
+                             'DMSO': dmso}
+
             if help_correction:
                 # add a button to show the help of the selected method
                 st.help(mt.salt_correction)
@@ -103,15 +313,26 @@ def primers_tab(seq):
                 st.divider()
                 # take into account the primer concentration
                 primer_conc = st.number_input('Primer conc. (nM)', key="Primer")
-                calculate_mt = partial(method, nn_table=NN_models[mt_model], Na=na, K=k, Tris=tris, Mg=mg, dNTPs=dntps, dnac1=primer_conc, dnac2=0, saltcorr=correction_met)
-            elif mt_type == list(tm_models)[0]:
-                calculate_mt = partial(method, valueset=mt_model, Na=na, K=k, Tris=tris, Mg=mg, dNTPs=dntps, saltcorr=correction_met)
+                method_kwargs = tm_kwargs.copy()
+                method_kwargs.pop('dNTPs')
+                method_kwargs.pop('DMSO')
+                calculate_mt = partial(method, nn_table=NN_models[mt_model], dnac1=primer_conc, dnac2=0, **method_kwargs)
+            
+            elif mt_type == list(tm_models)[1]:
+                method_kwargs = tm_kwargs.copy()
+                method_kwargs.pop('DMSO')
+                calculate_mt = partial(method, valueset=mt_model, **method_kwargs)
             else:
                 calculate_mt = method
             
             def mt_correct(seq):
                 # calculate the melting temperature and correct it with the primer correction
-                return mt.chem_correction(calculate_mt(seq), DMSO=dmso)
+                try:
+                    return mt.chem_correction(calculate_mt(seq), DMSO=dmso)
+                except ValueError:
+                    st.error('Error in the melting temperature calculation. Try to switch page and come back.',
+                             icon=":material/personal_injury:")
+                return 0
                 
             # save settings and allow download
             with open('energy_parameters.json', 'w') as settings:
@@ -145,102 +366,13 @@ def primers_tab(seq):
                                     orientation="horizontal",
                                     styles=second_menu_style)
     
-    if selected_operation == 'Automatic':
-        st.write('Coming soon')
-        st.stop()
+    if selected_operation == 'Manual':
+        primers_tab(seq, mt_correct, tm_kwargs)
+    elif selected_operation == 'Automatic':
+        auto_primer(seq, mt_correct, tm_kwargs)
 
-    # show the settings for the two primers: choose the number of bases and show the gc content and melting temperature
-    st.write('\n')
-    col1, col2 = st.columns(2, gap='large')
-    mts = [0, 0]
-    # settings for the coding primer
-    with col1:
-        with st.columns(5)[2]:
-            st.markdown('###### Forward')
-
-        c_bases = st.slider('Primer length:', min_value=1, max_value=50, value = 21, 
-                            key="coding_primer")
-        c_primer = seq[:c_bases]
-
-        subcol1, subcol2 = st.columns([11,1], vertical_alignment='center')
-        with subcol1:
-            write_format_text(c_primer)
-        with subcol2:
-            copy_to_clipboard(c_primer, "")
-
-        mts[0] = round(mt_correct(c_primer),2)
-        subcol1, subcol2 = st.columns(2)
-        with subcol1:
-            st.markdown(f"GC content: {round(gc_fraction(c_primer, ambiguous='ignore') * 100, 1)}%")
-        with subcol2:
-            st.markdown(f"**:green[Tm: {round(mts[0], 1)}°C]**")
-
-    # settings for the non-coding primer
-    with col2:
-        with st.columns(5)[2]:
-            st.markdown('###### Reverse')
-
-        nc_bases = st.slider('Primer length:', min_value=1, max_value=50, value = 21, 
-                             key="non_coding_primer")
-        nc_primer = seq[-nc_bases:].reverse_complement()
-        
-        subcol1, subcol2 = st.columns([11,1], vertical_alignment='center')
-        with subcol1:
-            write_format_text(nc_primer)
-        with subcol2:
-            copy_to_clipboard(nc_primer, "")
-
-        mts[1] = round(mt_correct(nc_primer),2)
-        subcol1, subcol2 = st.columns(2)
-        with subcol1:
-            st.markdown(f"GC content: {round(gc_fraction(nc_primer, ambiguous='ignore') * 100, 1)}%")
-        with subcol2:
-            st.markdown(f"**:green[Tm: {round(mts[1], 1)}°C]**")
-
-    # show the primers preview, check the self-dimerization of the primer and check the dimer between the primers and the sequence
-    with st.expander("Dimerization preview"):
-        st.markdown(f"""<div style="text-align: center;"><span style="color: #FF5733">{c_primer}</span>{seq[c_bases]}[...]{seq[-nc_bases-1:]}</div>""", unsafe_allow_html=True)
-        st.markdown(f"""<div style="text-align: center;">{seq[:c_bases+1].complement()}[...]{seq[-nc_bases]}<span style="color: #FF5733">{nc_primer[::-1]}</span></div>""", unsafe_allow_html=True)
-        st.divider()
-        col1, col2 = st.columns(2, gap='large')
-        with col1:
-            self_dimer1 = check_dimer(c_primer, c_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
-            write_format_text('Self-Dimer forward primer\n' + self_dimer1)
-        with col2:
-            self_dimer2 = check_dimer(nc_primer, nc_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
-            write_format_text('Self-Dimer reverse primer\n' + self_dimer2)
-        self_dimer12 = check_dimer(c_primer, nc_primer, basepair={'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'})
-        write_format_text('Dimer between primers\n' + self_dimer12)
-
-    # add a warning if the melting temperature of the primers is too different
-    anneal_color = 'green'
-    if abs(mts[0] - mts[1]) >= 5:
-        st.warning('The difference of Tm should be below 5°C', icon="⚠️")
-        anneal_color = 'red'
-                    
-    # take into account the two main method to calculate the PCR annealing temperature: IDT method and Phusion Buffer method
-    col1, col2 = st.columns(2, gap='large', vertical_alignment='bottom')
-    ann_methods = ['IDT method [2]', 'Phusion method [3]']
-    with col1:
-        annealing_model = st.selectbox("Calculate annealing:", ann_methods)
-        
-    # the IDT method takes into account the GC melting temperature of the whole DNA sequence 
-    if annealing_model == ann_methods[0]:
-        t_anneal = round(0.3 * min(mts) + 0.7 * mt.chem_correction(mt.Tm_GC(seq, valueset=7, Na=na, K=k, Tris=tris, Mg=mg, dNTPs=dntps, saltcorr=correction_met), DMSO=dmso) - 14.9, 2)
-    # the Phusion method takes into account the Melting temperature of the primers
-    else:
-        if len(c_primer) <= 20 or len(nc_primer) <= 20:
-            t_anneal = min(mts)
-        else:
-            t_anneal = min(mts) + 3
-        if t_anneal < 50:
-            st.warning('Is suggested a temperature of annealing higher than 50°C.', icon="⚠️")
-            anneal_color = 'red'
-    # write the annealing temperature in big
-    with col2:
-        st.markdown(f"### Anneal at: :{anneal_color}[{t_anneal}°C]")
-
-# def auto_primer(sequence, target_temp):
+    # add bibliography
+    reference(True)
 
 
 if __name__ == "__main__":
@@ -263,31 +395,6 @@ if __name__ == "__main__":
     if selected_operation == 'MD simulations':
         st.write('Coming soon')
         st.stop()
-
-    if 'streamlit_cwd' not in st.session_state:
-        st.session_state.streamlit_cwd = str(Path(__file__).resolve().parent.parent)
+    elif selected_operation == 'Primers':
+        primers_setup()
     
-    if "dna_template" not in st.session_state:
-        st.session_state["dna_template"] = ''
-    # st.header('Primer design')
-
-    # take the input sequence and sanitize it
-    seq = sanitize_input(st.text_input("Input sequence:", value = st.session_state["dna_template"]))
-    # check the symbols in the sequence
-    if set(seq) - symbols:
-        st.warning('The sequence contains symbols not included in the [IUPAC alphabet](https://www.bioinformatics.org/sms/iupac.html).', icon="⚠️")
-    if 'U' in seq:
-        st.error('The DNA template contains U', icon=":material/personal_injury:")
-    # create a porper biopython symbol
-    seq = Seq(seq)
-
-    
-    if not seq:
-        st.stop()
-    elif len(seq) < 40:
-        st.error('The sequence is too short', icon=":material/personal_injury:")
-        st.stop()
-    primers_tab(seq)
-
-    # add bibliography
-    reference(True)

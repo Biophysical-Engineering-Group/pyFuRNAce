@@ -150,9 +150,6 @@ if __name__ == "__main__":
     ### set the logo of the app
     load_logo()
     warnings.filterwarnings("ignore") # ignore warnings
-
-    if 'streamlit_cwd' not in st.session_state:
-        st.session_state.streamlit_cwd = str(Path(__file__).resolve().parent.parent)
     
     if "rna_origami_seq" not in st.session_state:
         st.session_state["rna_origami_seq"] = ''

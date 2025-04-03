@@ -206,6 +206,7 @@ if __name__ == "__main__":
 
 
     if st.session_state.rna_origami_seq:
+        st.divider()
         sequence = st.session_state.rna_origami_seq
         folds = st.session_state.rna_origami_folds
 
@@ -249,6 +250,7 @@ if __name__ == "__main__":
                                    on_click='ignore',
                                    )
 
+        st.divider()
         col1, col2 = st.columns(2)
         with col1:
             with st.columns(3)[1]:

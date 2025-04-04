@@ -27,15 +27,17 @@ if __name__ == "__main__":
     with cols[2]:
         st.write('OxView 3D colormap:')
     with cols[3]:
-        st.selectbox('OxView 3D colormap:', 
-                     ['Reds', None] + plt.colormaps(),
-                     key='oxview_colormap',
-                     label_visibility='collapsed', 
-                     help='Change the color of the OxView visualization.')
+        cmap = st.selectbox('OxView 3D colormap:', 
+                            ['Reds', None] + plt.colormaps(),
+                            key='colormap',
+                            label_visibility='collapsed', 
+                            help='Change the color of the OxView visualization.')
+        st.session_state.oxview_colormap = cmap
     with cols[5]:
-        st.toggle('Color gradient path', 
-                  key='gradient', 
-                  help='Toggle the gradient color scheme for the nucleotides')
+        grad = st.toggle('Color gradient path', 
+                          key='grad', 
+                          help='Toggle the gradient color scheme for the nucleotides')
+        st.session_state.gradient = grad
 
 
     ### option menu to manage the motifs in the origami
@@ -51,14 +53,14 @@ if __name__ == "__main__":
             # st.divider()
             # last version:
             # st.markdown("<hr style='margin-top:+0.5em;margin-bottom:+1.0em;' />", unsafe_allow_html=True)  
-        view_opt = des_func.origami_select_display()
-        return view_opt
 
     if st.session_state.motif_menu_sticky:
         with sticky_container(mode="top", border=False):
-            view_opt = motif_menu_expander()
+            motif_menu_expander()
+            view_opt = des_func.origami_select_display()
     else:
-        view_opt = motif_menu_expander()
+        motif_menu_expander()
+        view_opt = des_func.origami_select_display()
 
     ### add separator
     # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)

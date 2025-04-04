@@ -63,6 +63,54 @@ def forna_options(lenght):
     else:
         st.session_state.color_text = None
 
+def generate_sequence():
+    if not structure:
+        st.error('No structure input given')
+        return
+    if not sequence_constraint:
+        st.error('No sequence constraint input given')
+        return
+    
+    # Initialize the UI elements
+    progress_bar = st.empty()
+    output_status = st.empty()
+    # Initialize the progress bar
+    progress_bar.progress(0, "Initializing...")
+
+    def callback_forna(structure, sequence, step, stage_name, n_stage):
+        # Update the progress bar
+        progress_bar.progress(n_stage, text = stage_name)
+        output_status.markdown(format_text(f"Structure:\n{structure}"
+                                            f"\nSequence:\n{sequence}"
+                                            f"\nSpool:\n{step}"))
+
+    opti_sequence, zip_out = pf.generate_road(structure, 
+                                              sequence_constraint, 
+                                              pseudoknot_info, 
+                                              name=filename,
+                                              callback=callback_forna,
+                                              zip_directory=True)
+    
+    st.session_state.rna_origami_seq = opti_sequence
+    st.session_state.zip_path = zip_out
+    st.session_state.rna_origami_folds = pf.fold_p(opti_sequence)
+
+    # Clear the progress bar
+    progress_bar.progress(1.0, text = f"Generation Completed")
+    output_status.empty()
+
+    if ('origami' in st.session_state 
+            and st.session_state.origami
+            and len(st.session_state.origami.sequence) == len(st.session_state.rna_origami_seq)):
+        try:
+            st.session_state.origami.sequence = st.session_state.rna_origami_seq
+            if 'code' in st.session_state:
+                code_text = 'origami.sequence = "' + st.session_state.rna_origami_seq + '"'
+                st.session_state.code.append(code_text)
+            st.success("Sequence loaded to the origami design!")
+        except Exception as e:
+            st.error(f"Error while loading the sequence into the origami design: {e}")
+
 
 if __name__ == "__main__":
     # somehow st components cause `Thread 'MainThread': missing ScriptRunContext!` 
@@ -106,7 +154,6 @@ if __name__ == "__main__":
     if 'rna_origami_folds' not in st.session_state:
         st.session_state.rna_origami_folds = ()
     
-
     st.header('Generate', help='Generate the RNA sequence that matches the desired dot-bracket notation (and sequence constraints) for the nanostructure.')
     structure = st.text_input("RNA strucutre (dot-bracket notation)", value=st.session_state.generate_structure)
     sequence_constraint = st.text_input("Sequence constraints", value=st.session_state.generate_sequence)
@@ -141,8 +188,6 @@ if __name__ == "__main__":
         edited = partial_forna(structure = structure, 
                                 sequence = sequence_constraint,
                                 key='target_forna')
-        
-    generate = True
 
     if sequence_constraint and sequence_constraint[0] != 'G':
         col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
@@ -173,136 +218,112 @@ if __name__ == "__main__":
     with col1:
         filename =  st.text_input('Name of RNA origami', value='Origami')
     with col2: 
+        generate = False
         if st.button("Generate RNA sequence"):
-            generate = False
-    if not generate:
-        # Initialize the UI elements
-        progress_bar = st.empty()
-        output_status = st.empty()
-        # Initialize the progress bar
-        progress_bar.progress(0, "Initializing...")
+            generate = True
+    if generate:
+        generate_sequence()
 
-        def callback_forna(structure, sequence, step, stage_name, n_stage):
-            # Update the progress bar
-            progress_bar.progress(n_stage, text = stage_name)
-            output_status.markdown(format_text(f"Structure:\n{structure}"
-                                               f"\nSequence:\n{sequence}"
-                                               f"\nSpool:\n{step}"))
 
-        opti_sequence, zip_out = pf.generate_road(structure, 
-                                                  sequence_constraint, 
-                                                  pseudoknot_info, 
-                                                  name=filename,
-                                                  callback=callback_forna,
-                                                  zip_directory=True)
+    if not st.session_state.rna_origami_seq:
+        st.stop()
         
-        st.session_state.rna_origami_seq = opti_sequence
-        st.session_state.zip_path = zip_out
-        st.session_state.rna_origami_folds = pf.fold_p(opti_sequence)
+    st.divider()
+    sequence = st.session_state.rna_origami_seq
+    folds = st.session_state.rna_origami_folds
 
-        # Clear the progress bar
-        progress_bar.progress(1.0, text = f"Generation Completed")
-        output_status.empty()
+    diversity = round(folds[6], 1)
+    if diversity < 30:
+        diversity_text = f":green[low {diversity}]"
+    elif diversity < 50:
+        diversity_text = f":orange[medium {diversity}]"
+    else:
+        diversity_text = f":red[high {diversity}]"
 
+    cols = st.columns(4, vertical_alignment='bottom')
+    st.markdown("### Last Optimized sequence "
+                f"(ensemble diversity: {diversity_text})", 
+                help='The ensemble diversity is the average distance between the '
+                'structures in the ensemble (the set of all the possible structures '
+                'that can be formed by the sequence). A lower value means that the '
+                'structures are more similar to each other (and therefore more '
+                'similar to the Minimum Free Energy structure). A higher value '
+                'means that the structures are more diverse and there are less '
+                'chances to obtain the minimum free energy structure. '
+                )
+    
 
-    if st.session_state.rna_origami_seq:
-        st.divider()
-        sequence = st.session_state.rna_origami_seq
-        folds = st.session_state.rna_origami_folds
-
-        diversity = round(folds[6], 1)
-        if diversity < 30:
-            diversity_text = f":green[low {diversity}]"
-        elif diversity < 50:
-            diversity_text = f":orange[medium {diversity}]"
-        else:
-            diversity_text = f":red[high {diversity}]"
-
-        cols = st.columns(4, vertical_alignment='bottom')
-        st.markdown("### Last Optimized sequence "
-                    f"(ensemble diversity: {diversity_text})", 
-                    help='The ensemble diversity is the average distance between the '
-                    'structures in the ensemble (the set of all the possible structures '
-                    'that can be formed by the sequence). A lower value means that the '
-                    'structures are more similar to each other (and therefore more '
-                    'similar to the Minimum Free Energy structure). A higher value '
-                    'means that the structures are more diverse and there are less '
-                    'chances to obtain the minimum free energy structure. '
-                    )
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.columns(3)[1]:
+            st.markdown("#### MFE Structure", 
+                        help='The Minimum Free Energy (MFE) structure is the structure with '
+                        'the lowest free energy. It is the most stable structure that can be '
+                        'formed by the sequence. '
+                        )
+            
+        subcol1, subcol2 = st.columns(2)
+        with subcol1:
+            st.markdown(f'Energy: {round(folds[1], 2)} Kcal/mol')
+        with subcol2:
+            st.markdown(f'Frequency in the ensemble: {round(folds[2] * 100, 4)} %',
+                        help = 'The MFE frequency in the ensemble is the probability of '
+                        'obtaining the MFE structure among all the possible structures '
+                        'that can be formed by the sequence.'
+                        )
+        partial_forna(structure = folds[0],
+                        sequence = sequence,
+                        key='struct_mfe')
+    with col2:
+        with st.columns(3)[1]:
+            st.markdown("#### Centroid",
+                        help='The centroid structure is the structure that is the most similar to '
+                        'the average structure of the ensemble. It is the closest structure to '
+                        'represent the average of all the possible structures that can be '
+                        'formed by the sequence. '
+                        )
+        subcol1, subcol2 = st.columns(2)
+        with subcol1:
+            st.markdown(f'Energy: {round(folds[4], 2)} Kcal/mol')
+        with subcol2:
+            st.markdown(f'Frequency in the ensemble: {round(folds[5] * 100, 4)} %',
+                        help = 'The centroid frequency in the ensemble is the probability of '
+                        'obtaining the centroid structure among all the possible structures '
+                        'that can be formed by the sequence.'
+                        )
+        partial_forna(structure = folds[3],
+                        sequence = sequence,
+                        key='struct_centroid')
         
+    st.divider()
 
-        st.markdown(format_text(st.session_state.rna_origami_seq))
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.page_link("pages/3_Convert.py", 
-                         label=":orange[Prepare the DNA template]", 
-                         icon=":material/genetics:")
-        with col2:
-            copy_to_clipboard(folds[0], 'Structure')
-        with col3:
-            copy_to_clipboard(sequence, 'Sequence')
-        with col4:
-            with open(st.session_state.zip_path, "rb") as fp:
-                st.download_button("Download Optimization Files",
-                                   data=fp,
-                                   file_name = f"{filename}.zip",
-                                   mime = "application/zip",
-                                   on_click='ignore',
-                                   )
+    st.markdown(format_text(st.session_state.rna_origami_seq))
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.page_link("pages/3_Convert.py", 
+                        label=":orange[Convert the RNA to the DNA template]", 
+                        icon=":material/genetics:")
+    with col2:
+        copy_to_clipboard(folds[0], 'Structure')
+    with col3:
+        copy_to_clipboard(sequence, 'Sequence')
+    with col4:
+        with open(st.session_state.zip_path, "rb") as fp:
+            st.download_button("Download Optimization Files",
+                                data=fp,
+                                file_name = f"{filename}.zip",
+                                mime = "application/zip",
+                                on_click='ignore',
+                                )
 
-        st.divider()
-        col1, col2 = st.columns(2)
-        with col1:
-            with st.columns(3)[1]:
-                st.markdown("#### MFE Structure", 
-                            help='The Minimum Free Energy (MFE) structure is the structure with '
-                            'the lowest free energy. It is the most stable structure that can be '
-                            'formed by the sequence. '
-                            )
+    if ('origami' in st.session_state 
+            and st.session_state.origami
+            and str(st.session_state.origami.sequence) == st.session_state.rna_origami_seq):
+
+        st.session_state.prepare_ind = 1
+        st.page_link("pages/4_Prepare.py",
+                        label=":orange[Prepare MD simulations]", 
+                        icon=":material/sync_alt:")
+
+        save_origami(filename)
                 
-            subcol1, subcol2 = st.columns(2)
-            with subcol1:
-                st.markdown(f'Energy: {round(folds[1], 2)} Kcal/mol')
-            with subcol2:
-                st.markdown(f'Frequency in the ensemble: {round(folds[2] * 100, 4)} %',
-                         help = 'The MFE frequency in the ensemble is the probability of '
-                            'obtaining the MFE structure among all the possible structures '
-                            'that can be formed by the sequence.'
-                            )
-            partial_forna(structure = folds[0],
-                          sequence = sequence,
-                          key='struct_mfe')
-        with col2:
-            with st.columns(3)[1]:
-                st.markdown("#### Centroid",
-                            help='The centroid structure is the structure that is the most similar to '
-                            'the average structure of the ensemble. It is the closest structure to '
-                            'represent the average of all the possible structures that can be '
-                            'formed by the sequence. '
-                            )
-            subcol1, subcol2 = st.columns(2)
-            with subcol1:
-                st.markdown(f'Energy: {round(folds[4], 2)} Kcal/mol')
-            with subcol2:
-                st.markdown(f'Frequency in the ensemble: {round(folds[5] * 100, 4)} %',
-                         help = 'The centroid frequency in the ensemble is the probability of '
-                            'obtaining the centroid structure among all the possible structures '
-                            'that can be formed by the sequence.'
-                            )
-            partial_forna(structure = folds[3],
-                          sequence = sequence,
-                          key='struct_centroid')
-
-
-        if 'origami' in st.session_state and st.session_state.origami:
-            if st.button("**:green[Load sequence into origami]**"):
-                try:
-                    st.session_state.origami.sequence = st.session_state.rna_origami_seq
-                    if 'code' in st.session_state:
-                        st.session_state.code.append('origami.sequence = "' + st.session_state.rna_origami_seq + '"')
-                    st.success("Sequence Loaded to the Origami")
-                except Exception as e:
-                    st.error(f"Error: {e}")
-            if all(n in 'AUCG' for n in st.session_state.rna_origami_seq):
-                save_origami(filename)
-                    

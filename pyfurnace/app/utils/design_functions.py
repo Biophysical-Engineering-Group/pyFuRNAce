@@ -101,10 +101,20 @@ def origami_general_options(origami, expanded=True):
 
         col1, col2 = st.columns(2)
         with col1:
-            st.slider('Origami font size', min_value=2, max_value=50, value=14, key='origami_font_size')
+            font_size = st.slider('Origami font size', 
+                                  min_value=2, 
+                                  max_value=50, 
+                                  value=14, 
+                                  key='ori_font_size')
+            st.session_state.origami_font_size = font_size
         with col2:
-            st.slider('Oxview frame size (disable and renable the OxView to apply changes)',
-                      min_value=0, max_value=2000, value=500, key='oxview_frame_size')
+            frame_size = st.slider('Oxview frame size (disable and renable '
+                                   'the OxView to apply changes)',
+                                    min_value=0, 
+                                    max_value=2000, 
+                                    value=500, 
+                                    key='oxFrame_size')
+            st.session_state.oxview_frame_size = frame_size
 
 def simple_origami():
     with st.form(key='simple_origami_form'):
@@ -212,7 +222,15 @@ def initiate_session_state():
     if 'flip' not in st.session_state:
         st.session_state.flip = False
     if 'selected_motif' not in st.session_state:
-        st.session_state.selected_motif = ''
+        st.session_state.selected_motif = 'Connections'
+    if 'gradient' not in st.session_state:
+        st.session_state.gradient = False
+    if 'oxview_colormap' not in st.session_state:
+        st.session_state.oxview_colormap = 'Reds'
+    if 'origami_font_size' not in st.session_state:
+        st.session_state.origami_font_size = 14
+    if 'oxview_frame_size' not in st.session_state:
+        st.session_state.oxview_frame_size = 500
 
 def update_file_uploader():
     st.session_state.upload_key += 1
@@ -245,7 +263,7 @@ def make_motif_menu(origami):
     
     if selected_motif != st.session_state.selected_motif:
         st.session_state.selected_motif = selected_motif
-        st.rerun()
+        st.rerun(scope='fragment')
 
     motif_add = True
 
@@ -1022,7 +1040,7 @@ def build_origami_content(barriers=None):
         origami_lines = origami.barrier_repr(barriers=barriers, 
                                              return_list=True)
     else:
-        if st.session_state.to_road:
+        if st.session_state.get('to_road'):
             origami_str = origami.to_road()
 
         else:
@@ -1193,9 +1211,9 @@ def clicked_options(clicked):
             st.session_state.motif_index = motif_slice[1]
             st.rerun()
 
-        col1, col2 = st.columns([2, 1])
+        col1, col2, _ = st.columns([1, 1, 1], vertical_alignment='center')
         with col1:
-            st.markdown(f'Selected {nucl_text} :orange[{motif_class_name}]: :orange[line {motif_slice[0]}], :orange[motif {motif_slice[1]}], choose "Edit" in the menu to modify the motif.')
+            st.markdown(f'Selected {nucl_text} :orange[{motif_class_name}]: :orange[line {motif_slice[0]}], :orange[motif {motif_slice[1]}]')
         with col2:
             ### copy the motif
             copy_motif('selected', motif=motif, motif_slice=motif_slice)

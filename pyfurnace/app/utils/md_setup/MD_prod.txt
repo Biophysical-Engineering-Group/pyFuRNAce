@@ -24,9 +24,10 @@ dt = 0.003
 ensemble = nvt
 T = 37C
 salt_concentration = 1.0
-thermostat = john
+thermostat = brownian
 newtonian_steps = 103
 diff_coeff = 2.5
+external_forces = 0
 use_average_seq = 0 
 seq_dep_file=/u/lmonari/software/oxDNA/rna_sequence_dependent_parameters.txt
 

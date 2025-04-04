@@ -11,6 +11,7 @@ from pathlib import Path
 ### import the template functions
 from utils import load_logo, main_menu_style, second_menu_style, copy_to_clipboard
 from utils.template_functions import symbols, write_format_text, check_dimer, reference, sanitize_input
+from utils.design_functions import origami_build_view
 
 # https://www.bioinformatics.org/sms/iupac.html
 # dictionary of melting temperature methods with name as key and function as value
@@ -113,7 +114,6 @@ def calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs):
     with col2:
         st.markdown(f"### Anneal at: :{anneal_color}[{t_anneal}°C]")
 
-
 def primers_tab(seq, mt_correct, tm_kwargs):
     """ Calculate the melting temperature of the primers and check the dimer between the primers and the sequence"""
 
@@ -211,7 +211,6 @@ def auto_primer(seq, mt_correct, tm_kwargs):
         calculate_annealing(seq, final_mts, primers[0], primers[1], tm_kwargs)
         
 def primers_setup():
-
     if "dna_template" not in st.session_state:
         st.session_state["dna_template"] = ''
     # st.header('Primer design')
@@ -374,11 +373,127 @@ def primers_setup():
     # add bibliography
     reference(True)
 
+def md_setup():
+    if (not st.session_state.get('origami') or
+        not all(n in 'AUCG' for n in st.session_state.origami.sequence)):
+
+        st.error("The origami blueprint is empty or it doesn't contain a sequence",
+                 icon=":material/personal_injury:")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.page_link("pages/1_Design.py", 
+                         label="**:orange[Have a look to the blueprint]**", 
+                         icon=":material/draw:")
+        
+        with col2:
+            st.page_link("pages/2_Generate.py", 
+                         label="**:orange[Generate the sequence]**", 
+                         icon=":material/network_node:")
+        st.stop()
+    
+    # with st.expander('**Origami preview:**', expanded=True):
+    origami_build_view('Origami split view')
+    md_input()
+
+
+@st.fragment
+def md_input():
+    st.text_input('OxDNA executable path (e.g. "~/Documents/software/oxDNA")')
+
+    help_mc_rel = ("Use Monte Carlo relaxation to relax the origami before the MD "
+                  "simulation, using external forces to keep the basepairing.")
+    help_md_rel = ("Use Molecular Dynamics to relax the structure, using forces to"
+                   "maintain the basepairing")
+    help_md_equ = ("An extra Molecular Dynamics simulation to make sure the Origami"
+                   "is fully relaxed and not bias the starting configuration of the " 
+                   "production. **External forces for pseudoknots only** are used "
+                   "in this simulation, to make sure the pseudoknots are paired "
+                   "at the start of the production")
+    help_md_run = ("The final Molecular Dynamics simulation, to simulate the "
+                   "structure without any external force.")
+    
+    num_input = st.toggle("Use numerical input", key='num_input')
+    format_science = ".e"
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if num_input:
+            step_mc_rel = st.number_input('MC relaxation steps', 
+                                          min_value=0,
+                                          value=int(5e3),
+                                          help=help_mc_rel,
+                                          format="%0.0e"
+                                          )
+        else:
+            step_mc_rel = st.slider('MC relaxation steps', 
+                                    min_value=0,
+                                    value=int(5e3),
+                                    max_value=int(10e3),
+                                    step=int(1e3),
+                                    help=help_mc_rel,
+                                    format="%0.0e"
+                                    )
+    with col2:
+        if num_input:
+            step_md_rel = st.number_input('MD relaxation steps', 
+                                          min_value=0,
+                                          value=int(1e7),
+                                          format="%0.0e"
+                                          )
+        else:
+            step_md_rel = st.slider('MD relaxation steps', 
+                                    min_value=0,
+                                    value=int(1e7),
+                                    max_value=int(1e8),
+                                    step=int(1e6),
+                                    help=help_mc_rel,
+                                    format="%0.0e"
+                                    )
+    with col3:
+        if num_input:
+            step_md_equ = st.number_input('MD equilibration steps', 
+                                          min_value=0,
+                                          value=int(1e8),
+                                          help=help_md_equ,
+                                          format="%0.0e"
+                                          )
+        else:
+            step_md_equ = st.slider('MD equilibration steps', 
+                                    min_value=0,
+                                    value=int(1e8),
+                                    max_value=int(1e9),
+                                    step=int(1e7),
+                                    help=help_md_equ,
+                                    format="%0.0e"
+                                    )
+    with col4:
+        if num_input:
+            step_md_run = st.number_input('MD production steps', 
+                                          min_value=0,
+                                          value=int(1e9),
+                                          help=help_md_run,
+                                          format="%0.0e"
+                                          )
+        else:
+            step_md_run = st.slider('MD production steps', 
+                                    min_value=0,
+                                    value=int(1e9),
+                                    max_value=int(1e10),
+                                    step=int(1e8),
+                                    help=help_md_run,
+                                    format="%0.0e"
+                                    )
+    
+    return
 
 if __name__ == "__main__":
     ### set the logo of the app
     load_logo()
     warnings.filterwarnings("ignore") # ignore warnings
+
+    if "prepare_ind" not in st.session_state:
+        st.session_state.prepare_ind = 0
 
     # create the tabs with the functions
     st.header('Prepare', help='Design primers for your DNA template or prepare the Origami for OxDNA simulation.')
@@ -390,11 +505,17 @@ if __name__ == "__main__":
                                     icons=list(option_data.values()),
                                     menu_icon="cast", 
                                     orientation="horizontal",
+                                    default_index=st.session_state.prepare_ind,
                                     styles=main_menu_style)
     
     if selected_operation == 'MD simulations':
-        st.write('Coming soon')
-        st.stop()
+        if st.session_state.prepare_ind == 0:
+            st.session_state.prepare_ind = 1
+            st.rerun()
+        md_setup()
     elif selected_operation == 'Primers':
+        if st.session_state.prepare_ind == 1:
+            st.session_state.prepare_ind = 0
+            st.rerun()
         primers_setup()
     

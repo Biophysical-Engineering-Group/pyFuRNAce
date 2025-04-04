@@ -13,7 +13,7 @@ verlet_skin = 0.5
 ##############################
 ####    SIM PARAMETERS    ####
 ##############################
-interaction_type=RNA2
+interaction_type = RNA2
 steps = 5e3
 dt = 0.05
 T = 37C

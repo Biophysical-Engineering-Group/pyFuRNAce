@@ -2226,16 +2226,16 @@ class Motif(Callback):
 
         return self
 
-    def save_3d_model(self, 
-                  filename: str = 'motif', 
-                  config: bool = True,
-                  topology: bool = True,
-                  forces: bool = False, 
-                  pk_forces: bool = False, 
-                  return_text: bool = False, 
-                  sequence: str = None,
-                  pdb: bool = False, 
-                  **kwargs) -> Optional[Tuple[str, str]]:
+    def save_3d_model(self: Union["Motif", "Origami"],
+                      filename: str = 'motif', 
+                      config: bool = True,
+                      topology: bool = True,
+                      forces: bool = False, 
+                      pk_forces: bool = False, 
+                      return_text: bool = False, 
+                      sequence: str = None,
+                      pdb: bool = False, 
+                      **kwargs) -> Optional[Tuple[str, str]]:
         """
         Save the motif 3D structure in a file for structural 3D modeling.
         This function save the 3D oxDNA motif representation in conformation and 
@@ -2441,19 +2441,21 @@ class Motif(Callback):
                 f.write(f"{seq}\n")
                 f.write(f"{dotb[i]}\n")
 
-    def save_text(self, filename: str = "motif") -> None:
+    def save_text(self, filename_path: str = "motif") -> None:
         """
         Save the motif representation as a text file.
 
         Parameters
         ----------
-        filename : str, optional
+        filename_path : str, optional
             The filepath to save (without extension). Default is 'motif'.
         """
-        with open(f'{filename}.txt', 'w') as f:
-            f.write(f">{str(filename)}\n")
+        path = filename_path.split('.')[0]
+        name = path.split('/')[-1].split('\\')[-1]
+        with open(f'{path}.txt', 'w') as f:
+            f.write(f">{str(name)}\n")
             f.write(f"{self.sequence}\n")
-            f.write(f"{self.structure}\n")
+            f.write(f"{self.structure}\n\n")
             f.write(str(self))
 
     def shift(self, 

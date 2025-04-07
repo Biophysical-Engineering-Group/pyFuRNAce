@@ -16,22 +16,34 @@ class GeneralEditCommand(MotifCommand):
 
     @staticmethod
     def interface(key=''):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if key:
-                flip_vert = st.button("Flip vertically", key=f"{key}flip_vert")
-            else:
-                st.write('\n'); st.write('\n')
+        col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
+        
+        if key:
+            with col1:
+                subcol1, subcol2 = st.columns(2)
+                with subcol1:
+                    flip_vert = st.toggle("Flip vertically", 
+                                        value=True,
+                                        key=f"{key}flip_vert")
+                with subcol2:
+                    flip_hor = st.toggle("Flip horizontally", 
+                                        value=True,
+                                        key=f"{key}flip_hor")
+            with col2:
+                if flip_vert or flip_hor:
+                    flip = st.button("Flip", key=f"{key}flip")
+                    flip_vert &= flip
+                    flip_hor &= flip
+            with col3:
+                 rotate = st.button("Rotate 90° clockwise", key=f"{key}rotate")
+                 
+             
+        else:
+            with col1:
                 flip_vert = st.toggle("Flip vertically", key=f"{key}flip_vert")
-        with col2:
-            if key:
-                flip_hor = st.button("Flip horizontally", key=f"{key}flip_hor")
-            else:
-                st.write('\n'); st.write('\n')
+            with col2:
                 flip_hor = st.toggle("Flip horizontally", key=f"{key}flip_hor")
-        with col3:
-            if key:
-                rotate = st.button("Rotate 90° clockwise", key=f"{key}rotate")
-            else:
+            with col3:
                 rotate = st.number_input("Rotate 90° clockwise:", min_value=0, max_value=4, key=f"{key}rotate")
+
         return flip_vert, flip_hor, rotate

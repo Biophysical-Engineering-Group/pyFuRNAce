@@ -124,7 +124,7 @@ def save_origami(origami_name='Origami'):
     st.write('### Download RNA origami structure')
     col1, col2 = st.columns([1, 6])
     with col1:
-        file_type = st.selectbox('Select file type', ['py', 'txt', 'txt with info', 'PDB', 'oxDNA'], key = 'file_type')
+        file_type = st.selectbox('Select file type', ['py', 'txt', 'fasta', 'PDB', 'oxDNA'], key = 'file_type')
     with col2:
         ori_name = st.text_input('Name of RNA origami', value=origami_name, key = 'ori_name')
         if not ori_name:
@@ -133,8 +133,8 @@ def save_origami(origami_name='Origami'):
         if file_type == 'PDB':
             sequence = origami.sequence
             if any(nucl not in "AUCG&" for nucl in origami.sequence):
-                st.warning('The sequence contains non-standard nucleotides (only A, U, C, G, and & are allowed)'
-                           'The PDB will be filled with a random sequence!')
+                st.warning('The sequence contains non-standard nucleotides (only AUCG are allowed).')
+                st.warning('The PDB will be filled with a random sequence!')
                 sequence = origami.sequence.get_random_sequence(structure=origami.structure)
             with tempfile.TemporaryDirectory() as tmpdirname:
                 file_path = f"{tmpdirname}/origami"
@@ -187,17 +187,19 @@ def save_origami(origami_name='Origami'):
             if file_type == 'py' and 'code' in st.session_state:
                 # create a text data with the structure of the RNA origami in python code
                 text_data = '\n\n'.join(st.session_state.code)
-            elif 'txt' in file_type:
-                #create a text data with the structure of the RNA origami
-                if 'to_road' in st.session_state and st.session_state.to_road:
-                    origami_str = origami.to_road()
-                else:
-                    origami_str = str(origami)
-                info = ''
-                if file_type == 'txt with info':
-                    info = f"\nSequence:{origami.sequence}\nStructure:\n{origami.structure}\nPseudoknots info:\n{origami.pseudoknots}\n"
-                    file_type = 'txt'
-                text_data = f'>{ori_name}\n{info}\n{origami_str}\n\nFolding Barriers:\n{origami.barrier_repr()}'
+
+            elif file_type == 'txt':
+                # create a text data with the structure of the RNA origami
+                to_road = st.session_state.get('to_road')
+                text_data = origami.save_text('origami', 
+                                              to_road=to_road,
+                                              return_text=True,
+                                              )
+
+            elif file_type == 'fasta':
+                text_data = origami.save_fasta('origami', 
+                                              return_text=True,
+                                              )
                 
             st.download_button('Download', 
                                text_data, 

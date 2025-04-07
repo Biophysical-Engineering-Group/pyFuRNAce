@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 import streamlit as st
-import tempfile
 from streamlit_option_menu import option_menu
 from st_click_detector import click_detector
 from st_oxview import oxview_from_text
@@ -37,6 +36,8 @@ code_editor_buttons = [
                         ]
 
 funny_bootstrap_icons = ['robot', 'trash', 'umbrella', 'camera', 'cart', 'cpu', 'cup-straw', 'trophy', 'palette', 'cup-straw', 'camera-reels', 'puzzle', 'hourglass-split', 'mortarboard']
+
+direction_list = [name for name in pf.Direction.__dict__ if '_' not in name]
 
 def origami_general_options(origami, expanded=True):
     with st.expander('General settings', expanded=expanded):
@@ -641,6 +642,8 @@ def custom(current_custom_motif):
             st.rerun()
         return
     
+    GeneralEditCommand().execute(current_custom_motif)
+    
     st.session_state["custom_strands"] = [s.copy() for s in current_custom_motif]
     if not current_custom_motif:
         st.session_state["custom_strands"] = [pf.Strand('')]
@@ -819,8 +822,8 @@ def custom(current_custom_motif):
         start_y = st.number_input("Start y:", min_value=0, value=strand.start[1], key=f'start_y_custom')
     with col3:
         strand_direction_ind = [d for d in pf.Direction].index(strand.direction)
-        new_dir = st.selectbox('Start direction:', ['Up', 'Right', 'Down', 'Left'], index=strand_direction_ind, key=f'dir_custom')
-        new_dir_tuple = pf.Direction[new_dir.upper()]
+        new_dir = st.selectbox('Start direction:', direction_list, index=strand_direction_ind, key=f'dir_custom')
+        new_dir_tuple = pf.Direction[new_dir]
     with col4:
         seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(strand.directionality), key=f'seq_dir_custom')
     with col5:
@@ -1298,12 +1301,29 @@ def edit(x, y):
         st.rerun()
 
     select_line()
+    advaced_edit(motif, motif_slice)
 
+@st.fragment
+def advaced_edit(motif, motif_slice):
     motif_copy = motif.copy()
+    y, x = motif_slice
+
     ### try to change each strand
     with st. container():
         with st.popover('Advanced feature, modify the strands of the selected motif:',
                         use_container_width=True,):
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                x_shift = st.number_input("Motif horizontal shift:", value=0)
+            with col2:
+                y_shift = st.number_input("Motif vertical shift:", value=0)
+
+            shifted = False
+            if x_shift != 0 or y_shift != 0:
+                shifted = True
+                motif_copy.shift((x_shift, y_shift))
+
             for i, s in enumerate(motif_copy):
                 col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
                 with col1:
@@ -1312,9 +1332,9 @@ def edit(x, y):
                         start_y = st.number_input("Start y:", min_value=0, value=s.start[1], key=f'start_y_{x}_{y}_{i}')
                 with col3:
                     direction_list = [name for name in pf.Direction.__dict__ if '_' not in name]
-                    strand_direction_ind = [i for i, d in enumerate(pf.Direction) if d == s.direction][0]
+                    strand_direction_ind = [d for d in pf.Direction].index(s.direction)
                     new_dir = st.selectbox('Start direction:', direction_list, index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
-                    new_dir_tuple = pf.Direction[new_dir.upper()]
+                    new_dir_tuple = pf.Direction[new_dir]
                 with col4:
                     seq_dir = st.selectbox('Directionality:', ['35', '53'], index=['35', '53'].index(s.directionality), key=f'seq_dir_{x}_{y}_{i}')
                 with col5:
@@ -1346,14 +1366,16 @@ def edit(x, y):
                 st.write(':orange[Preview:]')
 
                 scrollable_text(motif_text_format(motif_copy))
-                if not st.session_state.modified_motif_text:
+                if not st.session_state.modified_motif_text and not shifted:
                     st.write(':green[Structure is updated]') 
                 else:
                     st.warning('Be careful before updating, there is a high risk of breaking the structure.')
                     update = st.button('Update strands')
                     if update:
+                        if shifted:
+                            st.session_state.modified_motif_text += f'\nmotif.shift(({x_shift}, {y_shift}))'
                         st.session_state.code.append(f'motif = origami[({motif_slice[0]}, {motif_slice[1]})] # select the motif at index, line: {motif_slice}' + st.session_state.modified_motif_text)
-                        origami[motif_slice] = motif_copy
+                        st.session_state.origami[motif_slice] = motif_copy
                         st.rerun()
             except pf.MotifStructureError as e:
                 st.error(e)

@@ -58,9 +58,8 @@ class DovetailCommand(MotifCommand):
         sign = 0
 
         ### create the interface
-        col1, col2 = st.columns([1, 5])
+        col1, col2 = st.columns([1, 5], vertical_alignment='bottom')
         with col1:
-            st.write('\n'); st.write('\n')
             specific_seq = st.toggle("Custom Sequence", key=f'seq_dt{key}')
         with col2:
             if specific_seq:   
@@ -70,13 +69,12 @@ class DovetailCommand(MotifCommand):
                 with col2:
                     sign = st.selectbox('Sign:', [-1, +1], key=f'txt_sign_dt{key}')
                 with col3:
-                    st.write('\n')
                     top_cross = st.toggle('Top cross', key=f'top_cross_dt{key}', value=top_cross)
                 with col4:
-                    st.write('\n')
                     bot_cross = st.toggle('Bottom cross', key=f'bot_cross_dt{key}', value=bot_cross)
             else:
-                subcol1, subcol2, subcol3, subcol4, subcol5, subcol6, subcol7, = st.columns(7)
+                subcol1, subcol2, subcol3, subcol4, subcol5, subcol6, subcol7, = st.columns(7, 
+                                                                                            vertical_alignment='bottom')
                 with subcol1:
                     seq_length = st.number_input('Length:', key=f'dt_length{key}', min_value=-100, value=len_default)
                 with subcol2:
@@ -86,21 +84,10 @@ class DovetailCommand(MotifCommand):
                 with subcol4:
                     wobble_insert = st.selectbox('Wobble insert:', ['middle', 'start', 'end'], key=f'dt_wobble_ins{key}', index=['middle', 'start', 'end'].index(wobble_insert))
                 with subcol5:
-                    st.write('\n')
                     strong_bases = st.toggle('Strong bases', key=f'strong_bases_dt{key}', value=strong_bases, help='Use strong bases for dovetails shoter than 4 nt')
                 with subcol6:
-                    st.write('\n')
                     top_cross = st.toggle('Top cross', key=f'top_cross_dt{key}', value=top_cross)
                 with subcol7:
-                    st.write('\n')
                     bot_cross = st.toggle('Bottom cross', key=f'bot_cross_dt{key}', value=bot_cross)
-
-        # _, col2, _, col4, _ = st.columns(5)
-        # with col2:
-        #     st.write('\n'); st.write('\n')
-        #     top_cross = not st.toggle('Remove top cross', key=f'top_cross_dt{key}', value=not top_cross)
-        # with col4:
-        #     st.write('\n'); st.write('\n')
-        #     bot_cross = not st.toggle('Remove bottom cross', key=f'bot_cross_dt{key}', value=not bot_cross)
 
         return sign, top_seq, seq_length, wobble_interval, wobble_tolerance, wobble_insert, top_cross, bot_cross, strong_bases

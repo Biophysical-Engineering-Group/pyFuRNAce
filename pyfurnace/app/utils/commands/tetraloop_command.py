@@ -31,16 +31,14 @@ class TetraLoopCommand(MotifCommand):
     def interface(self, key='', seq_default='UUCG'):
         seq = None
         open_left = False
-        col1, col2, col3 = st.columns([1, 1, 4])
+        col1, col2, col3 = st.columns([1, 1, 4], vertical_alignment='bottom')
         with col1:
-            st.write('\n'); st.write('\n')
             custom_seq = st.toggle("Custom Sequence", key=f'seq_tetra{key}')
         with col2:
-            st.write('\n'); st.write('\n')
             if key == 'mod':
                 open_left = st.button('Flip', key=f'open_left_tetra{key}')
             else:
-                open_left = st.toggle('Change side', value=st.session_state.current_line_occupied, key=f'open_left_tetra{key}')
+                open_left = st.toggle('Flip', value=st.session_state.current_line_occupied, key=f'open_left_tetra{key}')
         if custom_seq:
             with col3:
                 seq = st.text_input('Sequence:', value=seq_default, key=f'txt_seq_tetra{key}')

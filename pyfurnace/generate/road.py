@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import tempfile
+import zipfile
 import shutil
 import warnings
 
@@ -9,8 +10,18 @@ from ..design.core.symbols import *
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
 
-def generate_road(structure, sequence, pseudoknots, name='origami', callback=None, directory=None, zip_directory=False):
+def generate_road(structure, 
+                  sequence, 
+                  pseudoknots, 
+                  name='origami', 
+                  callback=None, 
+                  directory=None, 
+                  zip_directory=False,
+                  origami_code : str = None):
+    
     road_dir = __file__.replace('road.py', 'road_bin')
+    
+    files_to_include = []
         
     # Sanity check
     if '&' in sequence or '&' in structure:
@@ -82,10 +93,21 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
         directory = directory
 
     ### WORK IN THE DIRECTORY
+
+    # save the origami code
+    if origami_code is not None:
+        origami_code_path = os.path.join(directory, f'{name}.py')
+        with open(origami_code_path, 'w') as f:
+            f.write(origami_code)
+        # include it in the zip
+        files_to_include.append(origami_code_path)
         
     # create the target input file
-    with open(os.path.join(directory, 'target.txt'), 'w') as f:
+    target_path = os.path.join(directory, 'target.txt')
+    with open(target_path, 'w') as f:
         f.write(f"{name}\n{structure}\n{sequence}\n")
+    # include it in the zip
+    files_to_include.append(target_path)
 
     # read the revolvr file
     revolvr_local_path = os.path.join(road_dir, 'revolvr.pl')
@@ -102,20 +124,25 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
     out_revolvr = os.path.join(directory, 'revolvr.pl')
     with open(out_revolvr, 'w') as f:
         f.write(revolvr_text)
+    # include it in the zip
+    files_to_include.append(out_revolvr)
 
+    vienna_out_path = os.path.join(directory, 'viennarna_funcs.py')
     shutil.copyfile(os.path.join(road_dir, 'viennarna_funcs.py'),
-                    os.path.join(directory, 'viennarna_funcs.py')
+                    vienna_out_path
                     )
+    # include it in the zip
+    files_to_include.append(vienna_out_path)
     
     command = f'perl "{out_revolvr}" "{directory}"'
     process = subprocess.Popen(command,
-                                shell=True,
-                                cwd=directory,
-                                env=env,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT,
-                                text=True  #makes output strings
-                                )
+                               shell=True,
+                               cwd=directory,
+                               env=env,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT,
+                               text=True  #makes output strings
+                               )
 
     # Read output in real time
     last_seq = '' 
@@ -141,26 +168,39 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
                 last_struct = line
         
         if line and last_seq and last_struct and callback:
-            callback(last_struct, last_seq, line, stages[n_stage - 1], n_stage / len(stages))
+            callback(last_struct, 
+                     last_seq, 
+                     line, 
+                     stages[n_stage - 1], 
+                     n_stage / len(stages))
 
         prev_line = line
 
     # wait for process to finish
     process.wait()
+
+    # spool file
+    files_to_include.append(os.path.join(directory, f'{name}_spool.txt'))
     
     # read the results
+    design_path = os.path.join(directory, f'{name}_design.txt')
     with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
         lines = f.readlines()
         last_seq = lines[2].strip()
 
-    # create a temporary zip file with all the info
-    temp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
-    temp_zip.close()  # Close so shutil can write to it
+    # include it in the zip
+    files_to_include.append(design_path)
 
-    # Create a zip archive from the directory
-    shutil.make_archive(base_name=temp_zip.name.replace(".zip", ""), 
-                        format='zip', 
-                        root_dir=directory)
+    if zip_directory:
+        # create a temporary zip file
+        temp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
+        temp_zip.close()  # Close so we can write to it
+
+        # Create the zip and add selected files
+        with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file in files_to_include:
+                # Store relative to directory for cleaner archive structure
+                zipf.write(file, arcname=os.path.basename(file))
 
     if tempdir is not None:
         # Close the temporary directory
@@ -169,10 +209,5 @@ def generate_road(structure, sequence, pseudoknots, name='origami', callback=Non
     # Return the path to the zip file
     if zip_directory:
         return last_seq, temp_zip.name
+    
     return last_seq
-
-
-# out = subprocess.run("cd road_bin; perl RNAbuild.pl pattern.txt", shell=True, capture_output=True)
-# vrna_path = '/home/adminuser/.conda/bin/'
-# subprocess.run(f"cd road_bin; perl trace_pattern.pl pattern.txt > target.txt", shell=True)
-# subprocess.run(f"export PATH=$PATH:{vrna_path}; cd road_bin; perl batch_revolvr.pl 1", shell=True)

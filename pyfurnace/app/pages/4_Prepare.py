@@ -1,5 +1,5 @@
 import streamlit as st
-from pathlib import Path
+import os
 from functools import partial
 from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
@@ -7,10 +7,10 @@ from Bio.SeqUtils import gc_fraction
 from streamlit_option_menu import option_menu
 import json
 import warnings
-from pathlib import Path
 ### import the template functions
 from utils import load_logo, main_menu_style, second_menu_style, copy_to_clipboard
 from utils.template_functions import symbols, write_format_text, check_dimer, reference, sanitize_input
+from pyfurnace.prepare import oxdna_simulations
 from utils.design_functions import origami_build_view
 
 # https://www.bioinformatics.org/sms/iupac.html
@@ -151,7 +151,8 @@ def auto_primer(seq, mt_correct, tm_kwargs):
     target_temp = st.number_input('Temperature (°C)', value=65, min_value=0, max_value=100, step=1)
 
     if st.button("Design primers", key='auto_primer'):
-        st.write('Designing primers...')
+        status = st.empty()
+        status.info("Designing primers...", icon=":material/precision_manufacturing:")
 
         final_mts = []
         primers = []
@@ -186,6 +187,7 @@ def auto_primer(seq, mt_correct, tm_kwargs):
                     score -= 17 - prim_length
                 if 40 < round(gc_fraction(primer, ambiguous='ignore') * 100, 1) < 60:
                     score += 1
+                score -= abs(tm - target_temp) / 2
 
                 dimers = check_dimer(primer, 
                                      primer, 
@@ -208,6 +210,18 @@ def auto_primer(seq, mt_correct, tm_kwargs):
             final_mts.append(primers_info[0][1])
             primers.append(primers_info[0][2])
 
+            status.success(f"Primer designed!", icon=":material/precision_manufacturing:")
+
+        col1, col2 = st.columns(2, gap='large')
+        # settings for the coding primer
+        with col1:
+            with st.columns(5)[2]:
+                st.markdown('###### Forward')
+        with col2:
+            with st.columns(5)[2]:
+                st.markdown('###### Reverse')
+
+        # check the dimerization of the primers
         calculate_annealing(seq, final_mts, primers[0], primers[1], tm_kwargs)
         
 def primers_setup():
@@ -392,14 +406,18 @@ def md_setup():
                          icon=":material/network_node:")
         st.stop()
     
-    # with st.expander('**Origami preview:**', expanded=True):
-    origami_build_view('Origami split view')
+    with st.expander('**Origami preview:**', expanded=True):
+        origami_build_view('Origami split view')
     md_input()
-
 
 @st.fragment
 def md_input():
-    st.text_input('OxDNA executable path (e.g. "~/Documents/software/oxDNA")')
+    st.divider()
+    col1, col2 = st.columns(2)
+    with col1:
+        oxdna_dir = st.text_input('OxDNA directory (e.g. "~/Documents/software/oxDNA")')
+    with col2:
+        temp = st.number_input('Temperature (°C)', value=37, min_value=0, max_value=100, step=1)
 
     help_mc_rel = ("Use Monte Carlo relaxation to relax the origami before the MD "
                   "simulation, using external forces to keep the basepairing.")
@@ -414,7 +432,6 @@ def md_input():
                    "structure without any external force.")
     
     num_input = st.toggle("Use numerical input", key='num_input')
-    format_science = ".e"
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -423,7 +440,6 @@ def md_input():
                                           min_value=0,
                                           value=int(5e3),
                                           help=help_mc_rel,
-                                          format="%0.0e"
                                           )
         else:
             step_mc_rel = st.slider('MC relaxation steps', 
@@ -439,7 +455,7 @@ def md_input():
             step_md_rel = st.number_input('MD relaxation steps', 
                                           min_value=0,
                                           value=int(1e7),
-                                          format="%0.0e"
+                                          help=help_md_rel,
                                           )
         else:
             step_md_rel = st.slider('MD relaxation steps', 
@@ -447,7 +463,7 @@ def md_input():
                                     value=int(1e7),
                                     max_value=int(1e8),
                                     step=int(1e6),
-                                    help=help_mc_rel,
+                                    help=help_md_rel,
                                     format="%0.0e"
                                     )
     with col3:
@@ -456,7 +472,6 @@ def md_input():
                                           min_value=0,
                                           value=int(1e8),
                                           help=help_md_equ,
-                                          format="%0.0e"
                                           )
         else:
             step_md_equ = st.slider('MD equilibration steps', 
@@ -473,7 +488,6 @@ def md_input():
                                           min_value=0,
                                           value=int(1e9),
                                           help=help_md_run,
-                                          format="%0.0e"
                                           )
         else:
             step_md_run = st.slider('MD production steps', 
@@ -484,7 +498,37 @@ def md_input():
                                     help=help_md_run,
                                     format="%0.0e"
                                     )
-    
+            
+    if not oxdna_dir or not temp:
+        st.stop()
+
+    zip_path = oxdna_simulations(origami=st.session_state.origami,
+                                oxdna_directory=oxdna_dir,
+                                temperature=temp,
+                                mc_relax_steps=step_mc_rel,
+                                md_relax_steps=step_md_rel,
+                                md_equil_steps=step_md_equ,
+                                md_prod_steps=step_md_run
+                                )
+    # add a button to download the zip file
+    st.divider()
+    col1, col2 = st.columns(2, vertical_alignment='bottom')
+    with col1:
+        name = st.text_input('Name of the simulation:', value='origami_simulation')
+    with col2:
+        with open(zip_path, "rb") as file:
+            st.download_button(
+                label="Download MD simulation files",
+                data=file,
+                file_name=f"{name}.zip",
+                mime="application/zip",
+                help='''Download the MD simulation files. 
+                        The zip file contains the input files for the MD simulation.'''
+                )
+        
+    # delete the zip file
+    if os.path.exists(st.session_state.zip_path):
+        os.remove(zip_path)
     return
 
 if __name__ == "__main__":

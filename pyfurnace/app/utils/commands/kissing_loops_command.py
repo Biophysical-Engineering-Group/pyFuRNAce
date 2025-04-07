@@ -48,7 +48,7 @@ class KissingLoopsCommand(MotifCommand):
                                       )
             name = kl_name_map[kl_selction]
             kl_class = getattr(kissing_loops, name)
-            flip, top_seq, kl_energy, tolerance, pk_index = self.interface(change_side=st.session_state.current_line_occupied and 'Dimer' not in name)
+            flip, top_seq, kl_energy, tolerance, pk_index = self.interface(flip=st.session_state.current_line_occupied and 'Dimer' not in name)
             if top_seq:
                 motif = kl_class(open_left = flip, sequence = top_seq)
                 st.session_state.motif_buffer = f"motif = pf.{name}(open_left = {flip}, sequence = '{top_seq}')"
@@ -61,7 +61,7 @@ class KissingLoopsCommand(MotifCommand):
         # reset the warning filter
         warnings.filterwarnings("default")
 
-    def interface(self, key='', top_seq=None, kl_energy=-8.5, energy_tolerance=0.5, default_pk_index=None, change_side=False):
+    def interface(self, key='', top_seq=None, kl_energy=-8.5, energy_tolerance=0.5, default_pk_index=None, flip=False):
         def pk_index_interface():
             all_pk_indexes = ['0']
             last_ind = 0
@@ -76,17 +76,15 @@ class KissingLoopsCommand(MotifCommand):
             pk_index = st.selectbox('Pseudoknot id:', options=all_pk_indexes, index=index_for_list, key=f'pk_index_kl{key}')
             return pk_index
 
-        col1, col2, col3 = st.columns([1, 1, 5])
+        col1, col2, col3 = st.columns([1, 1, 5], vertical_alignment='bottom')
         open_left = False
         with col1:
-            st.write('\n'); st.write('\n')
             specific_seq = st.toggle("Custom Sequence", key=f'seq_int_kl{key}')
         with col2:
-            st.write('\n'); st.write('\n')
             if key == 'mod':
                 open_left = st.button('Flip', key=f'open_left_kl{key}')
             else:
-                open_left = st.toggle('Change side', value=change_side, key=f'open_left_kl{key}')
+                open_left = st.toggle('Flip', value=flip, key=f'open_left_kl{key}')
         with col3:
             if specific_seq:
                 subcol1, subcol2 = st.columns([5, 1])

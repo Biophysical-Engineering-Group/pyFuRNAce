@@ -18,29 +18,31 @@ verlet_skin = 0.5
 ####    SIM PARAMETERS    ####
 ##############################
 interaction_type = RNA2
-steps = 1e8
-dt = 0.003
+steps = STEPS
+dt = 0.002
 ensemble = nvt
-T = 37C
-salt_concentration = 1.0
-thermostat = brownian
+T = TEMPERATUREC
+salt_concentration=1.0
+thermostat = langevin
 newtonian_steps = 103
 diff_coeff = 2.5
+max_backbone_force = 10
+max_backbone_far = 10
 external_forces = 1
-external_forces_file = pk_forces.txt
+external_forces_file = forces.txt
 use_average_seq = 0 
-seq_dep_file=/u/lmonari/software/oxDNA/rna_sequence_dependent_parameters.txt
+seq_dep_file = OXDNA_DIRECTORY/rna_sequence_dependent_parameters.txt
 
 ##############################
 ####    INPUT / OUTPUT    ####
 ##############################
 topology = topology.top
-conf_file = last_conf_MD_relax.dat
-lastconf_file = last_conf_MD_equil.dat
-trajectory_file = trajectory_MD_equil.dat
-energy_file = energy_MD_equil.dat
+conf_file = last_conf_MC_relax.dat
+lastconf_file = last_conf_MD_relax.dat
+trajectory_file = trajectory_MD_relax.dat
+energy_file = energy_MD_relax.dat
 print_conf_interval = ${$(steps) / 1000}
-print_energy_every = ${$(steps) / 10000}
+print_energy_every = ${$(steps) / 2000}
 time_scale = linear
 reset_com_momentum = true
 refresh_vel = 1

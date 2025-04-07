@@ -14,9 +14,9 @@ verlet_skin = 0.5
 ####    SIM PARAMETERS    ####
 ##############################
 interaction_type = RNA2
-steps = 5e3
+steps = STEPS
 dt = 0.05
-T = 37C
+T = TEMPERATUREC
 salt_concentration = 1.0
 ensemble = nvt
 delta_translation = 0.22
@@ -27,15 +27,15 @@ max_backhone_force_far = 10
 external_forces = 1
 external_forces_file = forces.txt
 use_average_seq = 0
-seq_dep_file = /u/lmonari/software/oxDNA/rna_sequence_dependent_parameters.txt
+seq_dep_file = OXDNA_DIRECTORY/rna_sequence_dependent_parameters.txt
 
 ##############################
 ####    INPUT / OUTPUT    ####
 ##############################
 topology = topology.top
 conf_file = start.dat
-lastconf_file = last_conf_MC.dat
-trajectory_file = MC_traj.dat
+lastconf_file = last_conf_MC_relax.dat
+trajectory_file = trajectory_MC_relax.dat
 energy_file = energy_MC.dat
 print_conf_interval = ${$(steps) / 10}
 print_energy_every = ${$(steps) / 50}

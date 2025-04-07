@@ -46,9 +46,8 @@ class StemCommand(MotifCommand):
         seq_length = 0
 
         ### create the interface
-        col1, col2 = st.columns([1, 5])
+        col1, col2 = st.columns([1, 5], vertical_alignment='bottom')
         with col1:
-            st.write('\n'); st.write('\n')
             specific_seq = st.toggle("Custom Sequence", key=f'seq_stem{key}')
         with col2:
             if specific_seq:   

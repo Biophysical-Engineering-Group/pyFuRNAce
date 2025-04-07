@@ -1646,7 +1646,41 @@ class Origami(Callback):
     def save_3d_model(self, *args, **kwargs) -> Optional[Tuple[str, str]]:
         return self.motif.save_3d_model(*args, **kwargs)
 
-    def save_structure_text(self, filename_path: str, to_road: bool = False) -> None:
+    def save_fasta(self, 
+                   filename_path: str,
+                   return_text: bool = False) -> Optional[str]:
+        """
+        Save the sequence of the Origami to a FASTA file.
+
+        Parameters
+        ----------
+        filename_path : str
+            Path to the output file.
+        return_text : bool, default=False
+            If True, return the text instead of saving it to a file.
+
+        Returns
+        -------
+        Optional[str]
+            The FASTA text if return_text is True.
+        """
+        path = filename_path.split('.')[0]
+        name = path.split('/')[-1].split('\\')[-1]
+        text = (f">{name}\n"
+                f"{self.sequence}\n"
+                f"{self.structure}\n"
+                )
+        
+        if return_text:
+            return text
+        
+        with open(path + '.fasta', 'w') as f:
+            f.write(text)
+
+    def save_text(self, 
+                  filename_path: str, 
+                  to_road: bool = False, 
+                  return_text: bool = False) -> Optional[str]:
         """
         Save only the structure part of the Origami to a text file.
 
@@ -1656,17 +1690,30 @@ class Origami(Callback):
             Path to the output file.
         to_road : bool, default=False
             If True, convert to ROAD-compatible format.
+        return_text : bool, default=False
+            If True, return the text instead of saving it to a file.
+
+        Returns
+        -------
+        Optional[str]
+            The text if return_text is True.
         """
         path = filename_path.split('.')[0]
         name = path.split('/')[-1].split('\\')[-1]
+        text = (f">{name}\n"
+                f"Sequence:\n{self.sequence}\n"
+                f"Structure:\n{self.structure}\n"
+                f"Pseudoknots info:\n{self.pseudoknots}\n\n"
+                f"Blueprint:\n\n"
+                f"{self.to_road() if to_road else str(self)}\n\n"
+                f"Folding Barriers:\n\n"
+                f"{self.barrier_repr()}\n"
+                )
+        
+        if return_text:
+            return text
         with open(path + '.txt', 'w') as f:
-            f.write(f'>{name}\n')
-            f.write(str(self.sequence) + '\n')
-            f.write(self.structure + '\n\n')
-            if to_road:
-                f.write(self.to_road())
-            else:
-                f.write(str(self))
+            f.write(text)
 
     def to_road(self) -> str:
         """

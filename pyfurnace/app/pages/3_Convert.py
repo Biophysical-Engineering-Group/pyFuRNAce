@@ -87,8 +87,8 @@ def convert_tab(seq):
         st.session_state.prepare_ind = 0
         st.page_link("pages/4_Prepare.py", label=":orange[Prepare the primers for the DNA template]", icon=":material/sync_alt:")
 
-def align_tab(seq):
-    """ Align two sequences and highlight the aligned bases"""
+def search_tab(seq):
+    """ Search a subsequence and highlight the bases"""
     subseq_list = []
     i = 0
     # take a subsequence
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     # create the tabs with the functions
     st.write("\n") # add space between initial menu and motif menu
     option_data = {'Convert': "bi bi-arrow-repeat",
-                   'Align': "bi bi-align-center",
+                   'Search': "bi bi-align-center",
                    'Dimer': "bi bi-bar-chart-steps"}
 
     selected_operation = option_menu(None, 
@@ -203,8 +203,8 @@ if __name__ == "__main__":
         st.stop()
     elif selected_operation == "Convert":
         convert_tab(seq)
-    elif selected_operation == "Align":
-        align_tab(seq)
+    elif selected_operation == "Search":
+        search_tab(seq)
     elif selected_operation == "Dimer":
         dimer_tab(seq)
     

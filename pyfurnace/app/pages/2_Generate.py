@@ -1,11 +1,12 @@
 from functools import partial
 import streamlit as st
 from colour import Color
+import os
 import warnings
 ################################OWN####LIBRARIES#######################################
 from utils import check_import_pyfurnace, load_logo, save_origami, copy_to_clipboard
 check_import_pyfurnace()
-import pyfurnace as pf
+from pyfurnace.generate import generate_road, fold_p
 
 def format_text(text):
     return "```\n" + text + "\n```"
@@ -70,7 +71,7 @@ def generate_sequence():
     if not sequence_constraint:
         st.error('No sequence constraint input given')
         return
-    
+        
     # Initialize the UI elements
     progress_bar = st.empty()
     output_status = st.empty()
@@ -84,16 +85,24 @@ def generate_sequence():
                                             f"\nSequence:\n{sequence}"
                                             f"\nSpool:\n{step}"))
 
-    opti_sequence, zip_out = pf.generate_road(structure, 
-                                              sequence_constraint, 
-                                              pseudoknot_info, 
-                                              name=filename,
-                                              callback=callback_forna,
-                                              zip_directory=True)
+    ori_txt = '\n\n'.join(st.session_state.code)
+    opti_sequence, zip_out = generate_road(structure, 
+                                           sequence_constraint, 
+                                           pseudoknot_info, 
+                                           name=filename,
+                                           callback=callback_forna,
+                                           zip_directory=True,
+                                           origami_code=ori_txt,
+                                           )
     
     st.session_state.rna_origami_seq = opti_sequence
+    st.session_state.rna_origami_folds = fold_p(opti_sequence)
+    # if there was already a zip file, remove it
+    if 'zip_path' in st.session_state:
+        if os.path.exists(st.session_state.zip_path):
+            os.remove(st.session_state.zip_path)
+    # save the new zip file
     st.session_state.zip_path = zip_out
-    st.session_state.rna_origami_folds = pf.fold_p(opti_sequence)
 
     # Clear the progress bar
     progress_bar.progress(1.0, text = f"Generation Completed")

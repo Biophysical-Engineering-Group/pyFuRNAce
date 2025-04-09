@@ -1,18 +1,31 @@
 import warnings
 import random
-from typing import Literal
+from typing import Literal, Union, List, Optional, Set
 from .symbols import *
 from .callback import Callback
 
 
 class Sequence(Callback):
     """
-    Represents a nucleotide sequence with directionality.
+    Represents a nucleotide sequence with 5' to 3' or 3' to 5' directionality.
+
+    This class provides functionality for manipulating RNA sequences
+    with support for slicing, translation, complementarity, GC content,
+    and integration with structure-aware tools.
+
+    Parameters
+    ----------
+    sequence : str, optional
+        The nucleotide sequence.
+    directionality : {'53', '35'}, optional
+        Directionality of the sequence (default is '53').
+    **kwargs : dict
+        Additional arguments passed to the Callback base class.
 
     Attributes
     ----------
     directionality : str
-        The directionality of the sequence ('53' or '35').
+        Direction of the sequence ('53' or '35').
     """
 
     def __init__(self, 
@@ -37,6 +50,7 @@ class Sequence(Callback):
             If the directionality is not '53' or '35'.
         """
         super().__init__(**kwargs)
+
         if directionality not in ('53', '35'):
             raise ValueError(f"Sequence directionality not allowed. "
                              f"It must be either '53' or '35', "
@@ -46,16 +60,16 @@ class Sequence(Callback):
         self._check_line(sequence)
         self._sequence = str(sequence).upper().translate(only_nucl)
 
-    def __repr__(self):
-        return f"{self._directionality[0]} {self._sequence} {self._directionality[1]}"
-    
-    def __str__(self):
+    def __str__(self) -> str:
+        """ Return the string representation of the sequence."""
         return self._sequence
-        
-    def __len__(self):
-        return len(self._sequence)
-    
-    def __getitem__(self, idx):
+
+    def __repr__(self) -> str:
+        """ Return a string representation of the sequence object."""
+        return f"{self._directionality[0]} {self._sequence} {self._directionality[1]}"
+
+    def __getitem__(self, idx: Union[int, slice]) -> 'Sequence':
+        """ Return a subsequence of the sequence."""
         dir_slice = 1
         if isinstance(idx, slice):
             if idx.step is not None and idx.step < 0:
@@ -64,15 +78,15 @@ class Sequence(Callback):
         return Sequence(self._sequence[idx], 
                         directionality=self.directionality[::dir_slice],
                         callbacks=self._callbacks)
-    
-    def __bool__(self):
-        return bool(self._sequence)
 
-    def __setitem__(self, idx, val):
+    def __setitem__(self, 
+                    idx: Union[int, slice],
+                    val: Union[str, 'Sequence']) -> None:
+        """ Set a subsequence of the sequence."""
         self._check_line(val)
         if isinstance(idx, slice):
             seq_line = list(self._sequence)
-            seq_line[idx] = val
+            seq_line[idx] = val.upper()
             self._sequence = "".join(seq_line)
         else:
             if idx < 0:
@@ -80,33 +94,58 @@ class Sequence(Callback):
             self._sequence = str(self._sequence[: idx] + val + self._sequence[idx+1:])
         self._trigger_callbacks(new_sequence = self._sequence)
 
-    def __add__(self, other):
+    def __len__(self) -> int:
+        """ Return the length of the sequence."""
+        return len(self._sequence)
+
+    def __add__(self, other: Union[str, 'Sequence']) -> 'Sequence':
+        """ Concatenate two sequences or a sequence and a string"""
         self._check_addition(other)
         return Sequence(str(self)+ str(other), self.directionality)
-    
-    def __mul__(self, other):
-        if isinstance(other, int):
-            return Sequence(self._sequence * other, self.directionality)
-        raise ValueError(f'Can only multiply sequence by an integer, got {type(other)} instead')
-    
-    def __rmul__(self, other):
-        return self.__mul__(other)
-    
-    def __iadd__(self, other):
+
+    def __iadd__(self, other: Union[str, 'Sequence']) -> 'Sequence':
+        """ Concatenate a sequence or a string to the current sequence"""
         self._check_addition(other)
         self._sequence = self._sequence + str(other)
         self._trigger_callbacks(new_sequence = self._sequence)
         return self
 
-    def __radd__(self, other):
+    def __radd__(self, other: Union[str, 'Sequence']) -> 'Sequence':
+        """ Concatenate two sequences or a sequence and a string"""
         if other == 0:
             return self
-        elif isinstance(other, str):
-            return Sequence(other + str(self), self.directionality)
-        else:
-            return self.__add__(other)
-        
-    def __eq__(self, other):
+        return self.__add__(other)
+
+    def __mul__(self, other: int) -> 'Sequence':
+        """ Multiply the sequence by an integer."""
+        if isinstance(other, int):
+            return Sequence(self._sequence * other, self.directionality)
+        raise ValueError(f'Can only multiply sequence by an integer, '
+                         f'got {type(other)} instead')
+
+    def __rmul__(self, other: int) -> 'Sequence':
+        """ Multiply the sequence by an integer."""
+        return self.__mul__(other)
+
+    def __bool__(self) -> bool:
+        """ Check if the sequence is not empty."""
+        return bool(self._sequence)
+
+    def __contains__(self, other: Union[str, 'Sequence']) -> bool:
+        """Check if a subsequence is included in the sequence"""
+        if isinstance(other, (str, Sequence)):
+            str_seq = str(other)
+            if (isinstance(other, Sequence) 
+                    and other.directionality != self.directionality):
+                str_seq = str_seq[::-1]
+            return str_seq in str(self)
+        return False
+
+    def __iter__(self):
+        """ Return an iterator over the sequence."""
+        return iter(self._sequence)
+
+    def __eq__(self, other: Union[str, 'Sequence']) -> bool:
         """ Check that the two sequence have same string and directionality"""
         if isinstance(other, str):
             return str(self) == other
@@ -116,24 +155,10 @@ class Sequence(Callback):
             else:
                 return str(self) == str(other)
         return False
-    
+
     def __hash__(self):
-        return hash(str(self.__repr__()))
-    
-    def __contains__(self, other):
-        """Check if a subsequence is included in the sequence"""
-        if isinstance(other, (str, Sequence)):
-            str_seq = str(other)
-            if isinstance(other, Sequence) and other.directionality != self.directionality:
-                str_seq = str_seq[::-1]
-            return str_seq in str(self)
-        return False
-    
-    def __iter__(self):
-        return iter(self._sequence)
-    
-    def __hash__(self):
-        return hash(str(self))
+        """ Return a hash of the sequence."""
+        return hash(self.__repr__())
 
     ### 
     ### PROPERTIES
@@ -141,78 +166,150 @@ class Sequence(Callback):
  
     @property
     def directionality(self):
-        """ directionality of the sequence (either '53' or '35'): the directionality is set in the initialization of the sequence. """
+        """ directionality of the sequence (either '53' or '35') """
         return self._directionality
-    
+
     @directionality.setter
-    def directionality(self, new_directionality):
-        #check that the new directionality is either '53' or '35' which are the only allowed strings
+    def directionality(self, new_directionality: Literal['53', '35']) -> None:
+        """ Set the directionality of the sequence."""
         if new_directionality not in ('53', '35'):
-                raise ValueError(f"Sequence directionality not allowed. It must be either '53' or '35', got {new_directionality} instead.")
+                raise ValueError(f"Sequence directionality not allowed. "
+                                 f"It must be either '53' or '35', got " 
+                                 f"{new_directionality} instead.")
         self._directionality = new_directionality
         self._trigger_callbacks(new_sequence = self._sequence)
 
     ### 
-    ### CHECK METHODS
+    ### PRETECTED METHODS
     ###
 
-    def _check_line(self, line):
-        if not isinstance(line, (str, Sequence)):
-            raise ValueError(f"The sequence must be a string or a sequence object. Got {type(line)} instead.")
-        if isinstance(line, str) and line.translate(nucl_to_none).replace('&', ''):
-            warnings.warn(f"Warning: The string '{line}' contains nucleotides not allowed in ROAD that will be removed. The allowed nucleotides are: {nucleotides.union('&')}.", AmbiguosStructure, stacklevel=3)
-        if self.directionality[0] in line[1:] or self.directionality[1] in line[:-1]:
-            raise ValueError(f"The start/end symbols '{self.directionality}' are not at the end of the sequence: '{line}'") 
-        return True
-
-    def _check_addition(self, other):
+    def _check_addition(self, other: Union[str, 'Sequence']) -> bool:
+        """ Check that the sequence is valid and have same directionality"""
         if isinstance(other, str):
             self._check_line(other)
+
         elif not isinstance(other, Sequence):
             raise ValueError(f'{other} is not a valid type for addition')
+        
         elif self.directionality != other.directionality:
-            raise ValueError(f'Cannot add two sequences with different directionalitys')
+            raise ValueError(f'Cannot add two sequences with different directionality')
+        return True
+
+    def _check_line(self, line: Union[str, 'Sequence']) -> bool:
+        """ Check that the sequence is valid and contains only allowed nucleotides."""
+        if not isinstance(line, (str, Sequence)):
+            raise ValueError(f"The sequence must be a string or a sequence object. "
+                             f"Got {type(line)} instead.")
+        
+        if isinstance(line, str) and line.translate(nucl_to_none).replace('&', ''):
+            warnings.warn(f"Warning: The string '{line}' contains nucleotides not "
+                          f"allowed in ROAD that will be removed. The allowed "
+                          f"nucleotides are: {nucleotides.union('&')}.", 
+                          AmbiguosStructure, stacklevel=3)
+
+        if self.directionality[0] in line[1:] or self.directionality[1] in line[:-1]:
+            raise ValueError(f"The start/end symbols '{self.directionality}' "
+                             f"are not at the end of the sequence: '{line}'") 
         return True
 
     ### 
     ### METHODS
     ###
 
-    def translate(self, dictionary, inplace=False):
-        """ Translate the sequence using a dictionary
-        --------------------------------------------------------------------------------------
-        dictionary: dict
-            a dictionary that contains the translation of the sequence
+    def complement(self) -> 'Sequence':
         """
-        if not inplace:
-            return Sequence(self._sequence.translate(dictionary), directionality=self.directionality)
-        new_sequence = str(self._sequence.translate(dictionary))
-        self._check_line(new_sequence)
-        self._sequence = new_sequence
-        self._trigger_callbacks(new_sequence = self._sequence)
-        return self
+        Return the complement of the sequence.
 
-    def reverse(self, inplace=True):
-        """ Reverse the sequence: it changes the directionality of the sequence."""
-        if not inplace:
-            return Sequence(self._sequence, directionality=self._directionality[::-1], callback=self.callbacks)
-        self._directionality = self._directionality[::-1]
-        self._trigger_callbacks(new_sequence = self._sequence)
-        return self
+        Returns
+        -------
+        Sequence
+            Complementary sequence.
+        """
+        return Sequence(self._sequence.translate(nucl_to_pair), 
+                        self.directionality)
 
-    def complement(self):
-        """ Return the complement of the sequence: the sequence is not changed."""
-        return Sequence(self._sequence.translate(nucl_to_pair), self.directionality)
-    
-    def reverse_complement(self):
-        """ Return the reverse complement of the sequence: the sequence is not changed."""
-        return Sequence(self._sequence.translate(nucl_to_pair)[::-1], self.directionality)
+    def copy(self, **kwargs) -> 'Sequence':
+        """
+        Create a copy of the sequence.
 
-    def gc_content(self, extended_alphabet=False):
-        """Calculate the percentage of G, C, S and half K in the sequence.
-        --------------------------------------------------------------------------------------
-        Return: float
-            The percentage of G, C, or S in the sequence.
+        Returns
+        -------
+        Sequence
+            A new Sequence instance.
+        """     
+        return Sequence(str(self), self.directionality, **kwargs)
+
+    def distance(self, other: Union[str, 'Sequence']) -> int:
+        """
+        Compute the number of mismatched bases between this sequence and another.
+
+        Parameters
+        ----------
+        other : str or Sequence
+            Sequence to compare against.
+
+        Returns
+        -------
+        int
+            Number of incompatible positions.
+
+        Raises
+        ------
+        ValueError
+            If the input is invalid or lengths do not match.
+        """
+        self._check_line(other)
+
+        if len(self) != len(other):
+            raise ValueError("Sequences must have the same length.")
+        
+        distance = 0 # Initialize the distance
+        for ind, (nt1, nt2) in enumerate(zip(self, other)):
+            # the symbols are not compatible
+            if nt2 not in iupac_code[nt1] and nt1 not in iupac_code[nt2]:
+                distance += 1
+
+        return distance
+
+    def find_repeated_subsequence(self, min_length: int = 8) -> Set[str]:
+        """
+        Find all subsequences of minimum length that appear more than once.
+
+        Parameters
+        ----------
+        min_length : int, optional
+            Minimum length of subsequence (default is 8).
+
+        Returns
+        -------
+        set of str
+            Repeated subsequences.
+        """     
+        repeated_subsequences = set()
+        length = len(self)
+        for i in range(length):
+            for j in range(i+min_length, length):
+
+                subsequence = self[i:j]
+
+                if subsequence in self[j:]:
+                    repeated_subsequences.add(str(subsequence))
+
+        return repeated_subsequences
+
+    def gc_content(self, extended_alphabet: bool = False) -> float:
+        """
+        Calculate the GC content of the sequence.
+
+        Parameters
+        ----------
+        extended_alphabet : bool, optional
+            Whether to include ambiguous base codes (e.g., S, M, R) in the calculation.
+
+        Returns
+        -------
+        float
+            GC content percentage.
         """
         total_count = len(self)
         if not total_count:
@@ -220,15 +317,80 @@ class Sequence(Callback):
         seq = self._sequence
         gc_count = seq.count('G') + seq.count('C') 
         if extended_alphabet:
-            gc_count += seq.count('S') + sum(map(seq.count, ['M', 'R', 'Y', 'K'])) / 2 + sum(map(seq.count, ['D', 'H'])) / 3 + sum(map(seq.count, ['V', 'B'])) * 2 / 3 + sum(map(seq.count, ['N', 'X']))  / 4
+            gc_count += (seq.count('S') 
+                         + sum(map(seq.count, ['M', 'R', 'Y', 'K'])) / 2 
+                         + sum(map(seq.count, ['D', 'H'])) / 3 
+                         + sum(map(seq.count, ['V', 'B'])) * 2 / 3 
+                         + sum(map(seq.count, ['N', 'X']))  / 4
+                        )
         percentage = (gc_count / total_count) * 100
         return percentage
-    
-    def molecular_weight(self):
-        """Calculate the molecular weight of the sequence.
-        --------------------------------------------------------------------------------------
-        Return: float
-            The molecular weight of the sequence.
+
+    def get_random_sequence(self, structure: str = '') -> 'Sequence':
+        """
+        Generate a randomized sequence compatible with the IUPAC symbols and 
+        optionally a dot-bracket structure to be respected.
+
+        Parameters
+        ----------
+        structure : str, optional
+            Dot-bracket structure.
+
+        Returns
+        -------
+        str
+            A new randomized sequence.
+        """
+        # make a first random sequence
+        seq = [random.choice(list(iupac_code[nucleotide])) 
+                         for nucleotide in self._sequence]
+
+        # fully random sequence
+        if not structure:
+            return Sequence("".join(seq), self.directionality)
+        
+        # small sanity check of the structure
+        elif structure and len(structure) != len(self):
+            raise ValueError(f"The target dot-bracket must have the same length as "
+                             f"the sequence. Got {len(structure)}, "
+                             f"expected {len(self)}.")
+        
+        # build the pair map
+        pair_map = dot_bracket_to_pair_map(structure)
+
+        # paired the nucleotied that are paired in the target structure
+        for k, v in pair_map.items():
+
+            # unpaired nucleotide
+            if v is None:
+                continue
+
+            # the paired nucleotide has the symbol for wobble pairings
+            if self._sequence[v] == "K":
+                if seq[k] == "G": seq[v] = "U"
+                elif seq[k] == "U": seq[v] = "G"
+
+            # normal pairing
+            else: 
+                # the iupac code that pairs the nucleotides
+                pair_sym = seq[k].translate(nucl_to_pair) 
+                # the iupac code of the nucleotide at position v
+                sym_at_pos = iupac_code[self._sequence[v]]
+                # take the nucleotides that are allowed by both
+                possible_paired_nucleotides = sym_at_pos & iupac_code[pair_sym]
+                if possible_paired_nucleotides:
+                    seq[v] = random.choice(list(possible_paired_nucleotides))
+
+        return Sequence("".join(seq), self.directionality)
+
+    def molecular_weight(self) -> float:
+        """
+        Calculate the molecular weight of the sequence.
+
+        Returns
+        -------
+        float
+            Total molecular weight in Daltons.
         """
         molecular_weight_table = {
                                 'A': 347.2,
@@ -240,122 +402,133 @@ class Sequence(Callback):
             total_weight += molecular_weight_table.get(nucleotide, 0)
         return total_weight
 
-    def copy(self, **kwargs):
-        """ Return a copy of the sequence
-        --------------------------------------------------------------------------------------
-        Return: sequence
-            a copy of the current sequence
-        """        
-        return Sequence(str(self), self.directionality, **kwargs)
+    def pop(self, idx: int) -> str:
+        """
+        Remove and return a nucleotide at the given index.
 
-    def pop(self, idx):
-        """ Pop the element at index
-        --------------------------------------------------------------------------------------
-        idx: int
-            the index at which adding the character
-        val: str
-            the characters to add
-        """        
+        Parameters
+        ----------
+        idx : int
+            Index of nucleotide to remove.
+
+        Returns
+        -------
+        str
+            The removed character.
+        """    
         seq_line = list(self._sequence)
         popped_val = seq_line.pop(idx)
         self._sequence = "".join(seq_line)
         self._trigger_callbacks(new_sequence = self._sequence)
         return popped_val
-    
-    def replace(self, old, new):
-        """ Replace the old character with the new one
-        --------------------------------------------------------------------------------------
-        old: str
-            the character to replace
-        new: str
-            the character to add
-        """        
+
+    def replace(self, old: str, new: str) -> 'Sequence':
+        """
+        Replace all occurrences of `old` with `new` in the sequence.
+
+        Parameters
+        ----------
+        old : str
+            Character to replace.
+        new : str
+            Replacement character.
+
+        Returns
+        -------
+        Sequence
+            Updated sequence.
+        """      
         self._check_line(new)
         self._sequence = str(self._sequence.replace(old, new))
         self._trigger_callbacks(new_sequence = self._sequence)
         return self
-    
-    def upper(self):
-        """ Return the sequence in uppercase
-        --------------------------------------------------------------------------------------
-        Return: str
-            the sequence in uppercase
-        """        
-        return self._sequence.upper()
-    
-    def split(self, sep=None):
-        """ Split the sequence
-        --------------------------------------------------------------------------------------
-        sep: str
-            the separator to split the sequence
-        Return: list
-            the list of the splitted sequence
-        """        
-        return self._sequence.split(sep)
-    
-    def get_random_sequence(self, structure=None, pair_map=None):
-        if not structure and not pair_map:
-            return ''.join([random.choice(list(iupac_code[nucleotide])) for nucleotide in self._sequence])
-        elif structure and len(structure) != len(self):
-            raise ValueError(f"The target dot-bracket must have the same length as the sequence. Got {len(structure)}, expected {len(self)}.")
-        if not pair_map:
-            pair_map = dot_bracket_to_pair_map(structure)
-        # make a first random sequence
-        seq = [random.choice(list(iupac_code[nucleotide])) for nucleotide in self._sequence]
-        # paired the nucleotied that are paired in the target structure
-        for k, v in pair_map.items():
-            if v is None:
-                continue
-            # the paired nucleotide has the symbol for wobble pairings
-            if self._sequence[v] == "K":
-                if seq[k] == "G": seq[v] = "U"
-                elif seq[k] == "U": seq[v] = "G"
-            else: # normal pairing
-                pair_sym = seq[k].translate(nucl_to_pair) 
-                # take the nucleotides that are allowed by IUPAC code of the paired position and the pair symbols
-                possible_paired_nucleotides = (iupac_code[self._sequence[v]] & iupac_code[pair_sym]) 
-                if possible_paired_nucleotides:
-                    seq[v] = random.choice(list(possible_paired_nucleotides))
-        return "".join(seq)
-            
-    def find_repeated_subsequence(self, min_length=8):
-        """ Find the repeated subsequence in the sequence
-        --------------------------------------------------------------------------------------
-        min_length: int
-            the minimum length of the repeated subsequence
-        Return: list
-            the list of the repeated subsequences
-        """        
-        repeated_subsequences = set()
-        length = len(self)
-        for i in range(length):
-            for j in range(i+min_length, length):
-                subsequence = self[i:j]
-                if 'N' in subsequence: # skip the subsequence that contains N
-                    continue
-                if subsequence in self[j:]:
-                    repeated_subsequences.add(str(subsequence))
-        return list(repeated_subsequences)
-    
-    def distance(self, other):
-        """Calculate the distance between two sequences.
-        --------------------------------------------------------------------------------------
-        other: Sequence
-            The other sequence to calculate the distance with.
-        Return: int
-            The distance between the two sequences.
+
+    def reverse(self, inplace: bool = False) -> 'Sequence':
         """
-        if not isinstance(other, (Sequence, str)):
-            raise ValueError("Invalid type for 'other'. Expected Sequence or String object.")
-        if isinstance(other, str):
-            other = Sequence(other, self.directionality)
-        if len(self) != len(other):
-            raise ValueError("Sequences must have the same length.")
-        distance = 0 # Initialize the distance
-        for ind, (nt1, nt2) in enumerate(zip(self, other)):
-            # the symbols are not compatible
-            if nt2 not in iupac_code[nt1] and nt1 not in iupac_code[nt2]:
-                distance += 1
-                print(ind, nt1, nt2)
-        return distance
-    
+        Reverse the directionality of the sequence.
+
+        Parameters
+        ----------
+        inplace : bool, optional
+            If True, reverse in-place. Otherwise, return a new Sequence.
+
+        Returns
+        -------
+        Sequence
+            Reversed sequence.
+        """
+        if not inplace:
+            return Sequence(self._sequence, 
+                            directionality=self._directionality[::-1], 
+                            callback=self.callbacks)
+        
+        self._directionality = self._directionality[::-1]
+        self._trigger_callbacks(new_sequence = self._sequence)
+        return self
+
+    def reverse_complement(self) -> 'Sequence':
+        """
+        Return the reverse complement of the sequence.
+
+        Returns
+        -------
+        Sequence
+            Reverse-complemented sequence.
+        """
+        return Sequence(self._sequence.translate(nucl_to_pair)[::-1], 
+                        self.directionality)
+
+    def split(self, sep: Optional[str] = None) -> List['Sequence']:
+        """
+        Split the sequence by a separator.
+
+        Parameters
+        ----------
+        sep : str, optional
+            Separator to use (default is None, meaning split on whitespace).
+
+        Returns
+        -------
+        list of Sequence
+            List of subsequences.
+        """      
+        return [Sequence(s, self.directionality) for s in self._sequence.split(sep)]
+
+    def translate(self, dictionary: dict, inplace: bool = False) -> 'Sequence':
+        """
+        Translate the sequence using a mapping dictionary.
+
+        Parameters
+        ----------
+        dictionary : dict
+            Dictionary to translate each character.
+        inplace : bool, optional
+            If True, modify the current sequence. Otherwise, return a new instance.
+
+        Returns
+        -------
+        Sequence
+            Translated sequence.
+        """
+        dictionary = str.maketrans(dictionary)
+
+        if not inplace:
+            return Sequence(self._sequence.translate(dictionary), 
+                            directionality=self.directionality)
+        
+        new_sequence = str(self._sequence.translate(dictionary))
+        self._check_line(new_sequence)
+        self._sequence = new_sequence
+        self._trigger_callbacks(new_sequence = self._sequence)
+        return self
+
+    def upper(self) -> str:
+        """
+        Convert sequence to uppercase.
+
+        Returns
+        -------
+        str
+            Uppercase sequence string.
+        """     
+        return self._sequence.upper()

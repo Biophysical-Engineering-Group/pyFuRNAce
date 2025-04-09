@@ -148,7 +148,7 @@ def primers_tab(seq, mt_correct, tm_kwargs):
 def auto_primer(seq, mt_correct, tm_kwargs):
     """ Automatically design the primers for the sequence"""
     # check if the sequence is a DNA sequence
-    target_temp = st.number_input('Temperature (°C)', value=65, min_value=0, max_value=100, step=1)
+    target_temp = st.number_input('Target melting temperature (°C)', value=65, min_value=0, max_value=100, step=1)
 
     if st.button("Design primers", key='auto_primer'):
         status = st.empty()

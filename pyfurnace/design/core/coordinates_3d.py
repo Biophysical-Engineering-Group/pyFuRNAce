@@ -65,7 +65,9 @@ class ProteinCoords:
 
     @property
     def coords(self) -> np.ndarray:
-        """Get the 3D coordinates."""
+        """
+        Get the 3D coordinates.
+        """
         return self._coords
 
     @coords.setter
@@ -97,7 +99,9 @@ class ProteinCoords:
 
     @property
     def sequence(self) -> str:
-        """Get the protein sequence."""
+        """
+        Get the protein sequence.
+        """
         return self._sequence
 
     @sequence.setter
@@ -127,7 +131,7 @@ class ProteinCoords:
     ###
 
     def copy(self) -> 'ProteinCoords':
-        """Create a copy of the ProteinCoords instance."""
+        """ Create a copy of the ProteinCoords instance. """
         return ProteinCoords(self.sequence, np.copy(self.coords))
 
     def transform(self, T_matrix: np.ndarray) -> None:
@@ -219,7 +223,9 @@ class Coords:
 
     @property
     def array(self) -> np.ndarray:
-        """Return the coordinates array."""
+        """
+        Return the coordinates array.
+        """
         return self._array
 
     @array.setter
@@ -238,7 +244,9 @@ class Coords:
 
     @property
     def dummy_ends(self) -> Tuple[np.ndarray, np.ndarray]:
-        """Return the dummy ends."""
+        """
+        Return the dummy ends.
+        """
         return self._dummy_ends
 
     @dummy_ends.setter
@@ -258,7 +266,9 @@ class Coords:
 
     @property
     def proteins(self) -> List['ProteinCoords']:
-        """Return the list of proteins."""
+        """
+        Return the list of proteins.
+        """
         return self._proteins
 
     @proteins.setter
@@ -277,12 +287,16 @@ class Coords:
 
     @property
     def shape(self) -> Tuple[int, ...]:
-        """Return the shape of the coordinates array."""
+        """
+        Return the shape of the coordinates array.
+        """
         return self.array.shape
 
     @property
     def size(self) -> int:
-        """Return the size of the coordinates array."""
+        """
+        Return the size of the coordinates array.
+        """
         return self.array.size
 
     ###

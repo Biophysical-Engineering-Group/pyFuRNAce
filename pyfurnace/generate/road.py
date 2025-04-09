@@ -12,9 +12,11 @@ from .pk_utils import parse_pseudoknots
 
 def generate_road(structure, 
                   sequence, 
-                  pseudoknots, 
+                  pseudoknots = '', 
                   name='origami', 
+                  initial_sequence=None,
                   callback=None, 
+                  timeout=7200,
                   directory=None, 
                   zip_directory=False,
                   origami_code : str = None):
@@ -26,6 +28,10 @@ def generate_road(structure,
     # Sanity check
     if '&' in sequence or '&' in structure:
         raise ValueError("The ROAD algorithm does not support multistranded structures.")
+    
+    if len(sequence) != len(structure):
+        raise ValueError("The length of the sequence and structure must match."
+                         " Got {} and {}.".format(len(sequence), len(structure)))
     
     ### Fix the short stems with '{' ROAD symbols
     struct_list = list(structure)
@@ -106,6 +112,11 @@ def generate_road(structure,
     target_path = os.path.join(directory, 'target.txt')
     with open(target_path, 'w') as f:
         f.write(f"{name}\n{structure}\n{sequence}\n")
+        
+        if (initial_sequence is not None 
+                and len(initial_sequence) == len(structure)):
+            f.write(f"{initial_sequence}\n")
+
     # include it in the zip
     files_to_include.append(target_path)
 
@@ -119,6 +130,8 @@ def generate_road(structure,
                                         f'my $MinKL = {avg_pk_E + avg_pk_dE};')
     revolvr_text = revolvr_text.replace('my $MaxKL = -10.8;',
                                         f'my $MaxKL = {avg_pk_E - avg_pk_dE};')
+    revolvr_text = revolvr_text.replace('my $timeout_length = 7200;',
+                                        f'my $timeout_length = {int(timeout)};')
 
     # create the revolvr file with specific KL parameters
     out_revolvr = os.path.join(directory, 'revolvr.pl')
@@ -184,9 +197,14 @@ def generate_road(structure,
     
     # read the results
     design_path = os.path.join(directory, f'{name}_design.txt')
-    with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
-        lines = f.readlines()
-        last_seq = lines[2].strip()
+    if not os.path.exists(design_path):
+        last_seq = ""
+        warnings.warn(f"Design file {design_path} not found. Optimization failed. "
+                       "Please check the ROAD algorithm output.")
+    else:
+        with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
+            lines = f.readlines()
+            last_seq = lines[2].strip()
 
     # include it in the zip
     files_to_include.append(design_path)

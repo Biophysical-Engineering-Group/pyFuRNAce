@@ -3,6 +3,7 @@ import RNA
 from . import CONFS_PATH
 from ..core.symbols import *
 from ..core.coordinates_3d import Coords
+from ..core.sequence import Sequence
 from ..core.strand import Strand
 from .loops import Loop
 
@@ -81,7 +82,6 @@ class KissingLoop(Loop):
 
     def set_sequence(self, new_seq):
         """ Set the sequence of the strand """
-        new_seq = str(new_seq)
         self._create_strands(sequence = new_seq, pk_index = self._pk_index)
 
     def _check_pk_index(self, pk_index):
@@ -98,14 +98,19 @@ class KissingLoop(Loop):
         self._pk_index = self._check_pk_index(pk_index)
     
         seq_len = self._seq_len
+
         if sequence:
+
+            if not isinstance(sequence, Sequence):
+                sequence = Sequence(sequence, directionality='53')
+
             if seq_len and len(sequence) != seq_len:
                 raise ValueError(f"The sequence length doesn't match the length required for this kissing loop, which is {seq_len}.")
             if all([s in 'ACGU' for s in sequence]):
-                self._energy = round(RNA.fold(f"{sequence}&{sequence.translate(nucl_to_pair)[::-1]}")[1], 2)
+                self._energy = round(RNA.fold(f"{sequence}&{sequence.reverse_complement()}")[1], 2)
                 self._energy_tolerance = 0
         else:
-            sequence = 'N' * seq_len
+            sequence = Sequence('N' * seq_len, directionality='53')
         
         ### if the strands are already created, just update the sequence
         if hasattr(self, '_strands'):
@@ -115,7 +120,8 @@ class KissingLoop(Loop):
         ### create the strand
         strand = Strand(f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭", 
                         start=(seq_len + 2, 2),
-                        direction=(-1, 0))
+                        direction=(-1, 0),
+                        directionality=sequence.directionality)
         pk_info = {"id": [self._pk_index], 'ind_fwd': [(0, seq_len - 1)], 'E': [self._energy], 'dE': [self._energy_tolerance]}
         setattr(strand, 'pk_info', pk_info)
 
@@ -236,7 +242,7 @@ class KissingDimer(KissingLoop180):
 
         bottom_strand = super()._create_strands(sequence, return_strand=True, pk_index=bottom_pk_index)[0]
         seq = bottom_strand.sequence[2:-1]
-        rev_comp = seq.translate(nucl_to_pair)[::-1]
+        rev_comp = seq.reverse_complement()
     
         self._pk_index = new_pk_index # add the pk_index to override the pk_index of the bottom strand
 
@@ -273,7 +279,8 @@ class KissingDimer(KissingLoop180):
 
     def set_bot_sequence(self, new_seq):
         """ Set the sequence of the top strand"""
-        self.set_sequence(new_seq.translate(nucl_to_pair)[::-1])
+        new_seq = Sequence(new_seq, self[1].directionality)
+        self.set_sequence(new_seq.reverse_complement())
 
 
 class KissingDimer120(KissingLoop120):
@@ -301,7 +308,7 @@ class KissingDimer120(KissingLoop120):
 
         bottom_strand = super()._create_strands(sequence, return_strand=True, pk_index=bottom_pk_index)[0]
         seq = bottom_strand.sequence
-        rev_comp = seq.translate(nucl_to_pair)[::-1]
+        rev_comp = seq.reverse_complement()
     
         self._pk_index = new_pk_index # add the pk_index to override the pk_index of the bottom strand
 
@@ -341,7 +348,8 @@ class KissingDimer120(KissingLoop120):
 
     def set_bot_sequence(self, new_seq):
         """ Set the sequence of the top strand"""
-        self.set_sequence(new_seq.translate(nucl_to_pair)[::-1])
+        new_seq = Sequence(new_seq, self[1].directionality)
+        self.set_sequence(new_seq.reverse_complement())
 
 
 class BranchedDimer(BranchedKissingLoop):
@@ -371,8 +379,9 @@ class BranchedDimer(BranchedKissingLoop):
             bottom_pk_index = new_pk_index + "'"
 
         if not sequence:
-            sequence = sequence = 'N' * self._seq_len
-        rev_comp = sequence.translate(nucl_to_pair)[::-1]
+            sequence = Sequence('N' * self._seq_len, directionality='53')
+
+        rev_comp = sequence.reverse_complement()
         strands = super()._create_strands(rev_comp, return_strand=True, pk_index=bottom_pk_index)
         
         self._pk_index = new_pk_index # add the pk_index to override the pk_index of the bottom strand
@@ -409,4 +418,5 @@ class BranchedDimer(BranchedKissingLoop):
 
     def set_bot_sequence(self, new_seq):
         """ Set the sequence of the top strand"""
-        self.set_sequence(new_seq.translate(nucl_to_pair)[::-1])
+        new_seq = Sequence(new_seq, self[1].directionality)
+        self.set_sequence(new_seq.reverse_complement())

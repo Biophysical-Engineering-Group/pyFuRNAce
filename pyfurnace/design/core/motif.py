@@ -374,7 +374,7 @@ class Motif(Callback):
             return self.__add__(other)
 
     def __bool__(self) -> bool:
-        """True if the motif contains at least one valid strand, False otherwise."""
+        """ True if the motif contains at least one valid strand, False otherwise. """
         if not self._strands:
             return False
         for s in self._strands:
@@ -383,7 +383,7 @@ class Motif(Callback):
         return False
     
     def __contains__(self, other: Union['Strand', 'Sequence', str, 'BasePair']) -> bool:
-        """Check if the motif contains a strand, sequence, or base pair."""
+        """ Check if the motif contains a strand, sequence, or base pair. """
         if type(other) == Strand:
             return other in self._strands
         elif type(other) == Sequence:
@@ -395,7 +395,7 @@ class Motif(Callback):
         return False
 
     def __eq__(self, other: Any) -> bool:
-        """True if two motifs have equal strands and equal basepair """
+        """ True if two motifs have equal strands and equal basepair. """
         if not isinstance(other, Motif):
             return False
         
@@ -417,7 +417,9 @@ class Motif(Callback):
 
     @property
     def base_map(self) -> Dict[Tuple[int, int], int]:
-        """A dictionary with base position as key and strand index as value."""
+        """
+        A dictionary with base position as key and strand index as value. 
+        """
         if self._base_map:
             return self._base_map
         
@@ -429,7 +431,9 @@ class Motif(Callback):
 
     @property
     def basepair(self) -> BasePair:
-        """A dictionary with positions as key and the paired position as values."""
+        """
+        A dictionary with positions as key and the paired position as values.
+        """
         if self.autopairing and (not self._map 
                                  or not self._sequence 
                                  or not self._basepair):
@@ -443,7 +447,9 @@ class Motif(Callback):
     @basepair.setter
     def basepair(self, 
                  basepair_dict: Union[Dict[Position, Position], BasePair]) -> None:
-        """Set the basepair dictionary and turn autopairing off."""
+        """
+        Set the basepair dictionary and turn autopairing off.
+        """
         
         if not isinstance(basepair_dict, (dict, BasePair)):
             raise ValueError(f"{basepair_dict} must be a dictionary or a BasePair"
@@ -502,24 +508,32 @@ class Motif(Callback):
 
     @property
     def lock_coords(self) -> bool:
-        """Boolean indicating if the coordinates are locked in the same block."""
+        """
+        Boolean indicating if the coordinates are locked in the same block.
+        """
         return self._lock_coords
 
     @lock_coords.setter
     def lock_coords(self, lock_coords):
-        """Set wether the strands coordinates must be locked in the same block."""
+        """
+        Set wether the strands coordinates must be locked in the same block.
+        """
         self._lock_coords = bool(lock_coords)
     
     @property
     def max_pos(self) -> Tuple[int, int]:
-        """The maximum x, y coordinates occupied of the motif."""
+        """
+        The maximum x, y coordinates occupied of the motif.
+        """
         if not self._map:
             self.map # calculate the map
         return self._max_pos
 
     @property
     def map(self) -> Dict[Tuple[int, int], int]:
-        """A dictionary with occupied position as key and strand index as value."""
+        """
+        A dictionary with occupied position as key and strand index as value. 
+        """
         #if the map is already calculated return it
         if self._map:
             return self._map
@@ -560,29 +574,37 @@ class Motif(Callback):
 
     @property
     def min_pos(self) -> Tuple[int, int]:
-        """The minimum x, y coordinates occupied of the motif."""
+        """
+        The minimum x, y coordinates occupied of the motif.
+        """
         if not self._map:
             self.map # calculate the map
         return self._min_pos
 
     @property
     def num_char(self) -> int:
-        """The maximum length of the motif lines."""
+        """
+        The maximum length of the motif lines.
+        """
         if not self._map:
             self.map # calculate the map
         return self._max_pos[0] + 1
 
     @property
     def num_lines(self) -> int:
-        """The number of lines in the motif structure."""
+        """
+        The number of lines in the motif structure.
+        """
         if not self._map:
             self.map
         return self._max_pos[1] + 1
 
     @property
     def pair_map(self) -> Dict[int, Union[int, None]]:
-        """The dictionary of the paired indexes (alternative to the dot bracket 
-        notation). """
+        """
+        The dictionary of the paired indexes (alternative to the dot bracket 
+        notation). 
+        """
         if self._pair_map:
             return self._pair_map
         
@@ -604,7 +626,9 @@ class Motif(Callback):
 
     @property
     def sequence(self) -> str:
-        """Return the sequence of the motif."""
+        """
+        Return the sequence of the motif.
+        """
         if self._sequence:
             self._sequence 
         
@@ -659,7 +683,9 @@ class Motif(Callback):
 
     @property
     def sequence_index_map(self) -> Dict[Tuple[int, int], int]:
-        """A dictionary with base position as key and sequence index as value."""
+        """
+        A dictionary with base position as key and sequence index as value.
+        """
         if self._sequence_index_map:
             return self._sequence_index_map
         
@@ -682,12 +708,16 @@ class Motif(Callback):
 
     @property
     def strands(self) -> List['Strand']:
-        """The list of strands in the motif."""
+        """
+        The list of strands in the motif.
+        """
         return self._strands
 
     @property
     def structure(self) -> str:
-        """Return the dot bracket representation of the motif """
+        """
+        Return the dot bracket representation of the motif.
+        """
         ### if the dot bracket is already calculated return it
         if self._structure:
             return self._structure
@@ -1098,7 +1128,9 @@ class Motif(Callback):
         current_index = [0, 0]
 
         def recursive_build_origami(node, insert_at=None, flip=False):
-            """ Recursively build the origami from the tree representation. """
+            """
+            Recursively build the origami from the tree representation.
+            """
 
             nonlocal current_index
             # initialize the variables
@@ -1587,11 +1619,11 @@ class Motif(Callback):
                         continue 
 
                     # skip if the motifs are not joinable for sure
-                    if len(set((s1.prev_pos,
+                    if len(set((s1.prec_pos,
                                 s1.start,
                                 s1.end,
                                 s1.next_pos,
-                                s2.prev_pos,
+                                s2.prec_pos,
                                 s2.start,
                                 s2.end,
                                 s2.next_pos))) == 8:
@@ -1730,7 +1762,7 @@ class Motif(Callback):
         other : Motif
             The motif to be added.
         direction : tuple of int, optional
-            The direction in which the motifs should be checked for addition. 
+            The direction in which the motifs should be checked for addition.
             Default is (1, 0).
 
         Raises
@@ -2010,7 +2042,7 @@ class Motif(Callback):
         vertically : bool, default True
             If True, flip the strands vertically.
         strand_index : list, default None
-            The list of indices of the strands to flip. 
+            The list of indices of the strands to flip.
             If None, all the strands are flipped.
 
         Returns
@@ -2540,12 +2572,13 @@ class Motif(Callback):
     def sort(self, 
              key: Optional[Callable[['Strand'], Any]] = None,
              reverse: bool = False) -> 'Motif':
-        """Sort the strands in the motif. 
+        """
+        Sort the strands in the motif.
 
         Parameters
         ----------
         key : function, optional
-            The function to use to sort the strands. 
+            The function to use to sort the strands.
             If None, the strands are sorted by: 
                 - the strands with 5' end
                 - the strand with the lowest y start position
@@ -2566,7 +2599,7 @@ class Motif(Callback):
 
     def strip(self, skip_axis: Literal[None, 0, 1] = None) -> 'Motif':
         """
-        Remove the empty lines/columns in the motif structure. 
+        Remove the empty lines/columns in the motif structure.
 
         Parameters
         ----------

@@ -43,11 +43,6 @@ class Callback:
     def callbacks(self) -> List[Callable[..., None]]:
         """
         Get the list of registered callbacks.
-
-        Returns
-        -------
-        List[Callable[..., None]]
-            A list of registered callback functions.
         """
         return self._callbacks
 

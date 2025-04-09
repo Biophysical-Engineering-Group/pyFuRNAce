@@ -472,7 +472,9 @@ class Origami(Callback):
 
     @property
     def align(self) -> Literal['left', 'first', 'center']:
-        """ The alignment type of the rows of the origami. """
+        """
+        The alignment type of the rows of the origami.
+        """
         return self._align
     
     @align.setter
@@ -499,17 +501,21 @@ class Origami(Callback):
 
     @property
     def assembled(self):
-        """ The matrix of the origami with the motif shifted in the correct position 
+        """
+        The matrix of the origami with the motif shifted in the correct position 
         for the assembly. The assembled matrix contains rows with the vertical 
-        connection motifs. """
+        connection motifs.
+        """
         if not self._assembled:
             self._assemble()
         return self._assembled
 
     @property
     def base_map(self) -> dict:
-        """ A dictionary with the nucleotide position (x, y) as keys and the
-        matrix index (y, x) of the motif that contains it as values. """
+        """
+        A dictionary with the nucleotide position (x, y) as keys and the
+        matrix index (y, x) of the motif that contains it as values.
+        """
         if not self._base_map:
             self._base_map = {}
             origami_map = self.map
@@ -520,11 +526,13 @@ class Origami(Callback):
 
     @property
     def junctions(self) -> List[dict]:
-        """ The vertical junctions for each line of the Origami.
+        """
+        The vertical junctions for each line of the Origami.
         The junctions are a dictionary with directions as keys and positions of the 
         junctions as values.
         The motif junctions are extended, so we can just take the maximum position 
-        of the motifs for connections. """
+        of the motifs for connections.
+        """
 
         ### check if the junctions are already calculated
         if self._junctions:
@@ -570,8 +578,10 @@ class Origami(Callback):
 
     @property
     def map(self) -> dict:
-        """ A dictionary with the symbols position (x, y) as keys and the
-        matrix index (y, x) of the motif that contains it as values. """
+        """
+        A dictionary with the symbols position (x, y) as keys and the
+        matrix index (y, x) of the motif that contains it as values.
+        """
         if self._map is not None:
             return self._map
         
@@ -594,7 +604,9 @@ class Origami(Callback):
 
     @property
     def motif(self) -> Motif:
-        """ The assembled origami motif. """
+        """
+        The assembled origami motif.
+        """
         if isinstance(self._motif, Motif):
             return self._motif
         mot = None
@@ -615,8 +627,10 @@ class Origami(Callback):
 
     @property
     def motif_map(self) -> dict:
-        """ A dictionary with the symbols position (x, y) as keys and the
-        motif that contains it as values. """
+        """
+        A dictionary with the symbols position (x, y) as keys and the
+        motif that contains it as values.
+        """
         if not self._map:
             # the motif_map is calculated when the map is calculated
             self.map
@@ -624,34 +638,43 @@ class Origami(Callback):
 
     @property
     def num_char(self) -> List[int]:
-        """ The number of characters in each line of the origami. """
+        """
+        The number of characters in each line of the origami.
+        """
         if not self._matrix:
             return 0
         return [sum(m.num_char for m in line) for line in self._matrix]
 
     @property
     def num_lines(self) -> int:
-        """ The number of lines in the origami. """
+        """
+        The number of lines in the origami.
+        """
         if not self._matrix:
             return 0
         return len(self._matrix)
 
     @property
     def num_motifs(self) -> int:
-        """ The number of motifs in the origami. """
+        """
+        The number of motifs in the origami.
+        """
         return sum(1 for line in self._matrix for item in line if item is not None)
 
     @property
     def pair_map(self) -> dict:
-        """The dictionary of the paired indexes (alternative to the dot bracket 
-        notation). """
+        """
+        The dictionary of the paired indexes (alternative to the dot bracket 
+        notation).
+        """
         if not self._motif:
             self.motif
         return self.motif.pair_map
 
     @property
     def pseudoknots(self) -> List[dict]:
-        """ A list of dictionaries with the pseudoknot information.
+        """ 
+        A list of dictionaries with the pseudoknot information.
         Each dictionary contains the following keys:
             - id: a pseudoknot index to identify the pseudoknot
             - ind_fwd: a list of tuples (start, end) with the indices of the forward 
@@ -744,12 +767,16 @@ class Origami(Callback):
 
     @property
     def sequence(self) -> 'Sequence':
-        """ The sequence of the origami, as a Sequence. """
+        """
+        The sequence of the origami, as a Sequence.
+        """
         return self.motif.sequence
 
     @sequence.setter
     def sequence(self, new_seq):
-        """Set the sequence of the origami. """
+        """
+        Set the sequence of the origami.
+        """
 
         # remove the '&' symbol
         new_seq = new_seq.replace('&', '') 
@@ -825,15 +852,18 @@ class Origami(Callback):
 
     @property
     def sequence_index_map(self) -> dict:
-        """ A dictionary with the nucleotide position (x, y) as keys and the
-        index of the nucleotide in the sequence as values. """
+        """
+        A dictionary with the nucleotide position (x, y) as keys and the
+        index of the nucleotide in the sequence as values.
+        """
         if not self._motif:
             self.motif
         return self.motif.sequence_index_map
 
     @property
     def shift_map(self) -> dict:
-        """ A dictionary with the slice of the motif in the matrix as key (y, x) 
+        """
+        A dictionary with the slice of the motif in the matrix as key (y, x) 
         and positional shift of the motif as values (y, x). The shift is the 
         difference between the position of the motif in the matrix and the position
         of the motif in the assembled origami.
@@ -846,24 +876,32 @@ class Origami(Callback):
 
     @property
     def ss_assembly(self) -> bool:
-        """ Boolean indicating if the origami 3d structure
-        is assembled without locking the coordinates of the motifs. """
+        """
+        Boolean indicating if the origami 3d structure
+        is assembled without locking the coordinates of the motifs.
+        """
         return bool(self._ss_assembly)
 
     @ss_assembly.setter
     def ss_assembly(self, new_ss_assembly):
-        """ Set the ss_assembly attribute to True or False. """
+        """
+        Set the ss_assembly attribute to True or False.
+        """
         self._ss_assembly = bool(new_ss_assembly)
         self._updated_motif()
 
     @property
     def strands(self) -> List[Strand]:
-        """ The strands of the origami. """
+        """
+        The strands of the origami.
+        """
         return list(self.motif)
 
     @property
     def structure(self) -> str:
-        """ The dot-bracket structure of the origami. """
+        """
+        The dot-bracket structure of the origami.
+        """
         return self.motif.structure
 
     ### 

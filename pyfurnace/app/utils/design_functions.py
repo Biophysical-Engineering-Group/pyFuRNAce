@@ -160,8 +160,8 @@ def motif_text_format(motif):
         for s in motif:
             if not s.sequence: # skip strand without sequence
                 continue
-            if s[0] not in '35' and motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] == ' ':
-                motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '<' + s.directionality[0] + '>'
+            if s[0] not in '35' and motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] == ' ':
+                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = '<' + s.directionality[0] + '>'
             if s[-1] not in '35' and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' ':
                 motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '<' + s.directionality[1] + '>'
 
@@ -545,8 +545,8 @@ def custom_text_input(current_custom_motif):
         motif_list = [['']]
     # Add the  5 before the start of each motif.
     for s in current_custom_motif:
-        if s.directionality == '53' and motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] == ' ': # add 5' to the start of the strand
-            motif_list[s.prev_pos[1] + int(add_line)][s.prev_pos[0] + int(add_char)] = '5'
+        if s.directionality == '53' and motif_list[s.prec_pos[1] + int(add_line)][s.prec_pos[0] + int(add_char)] == ' ': # add 5' to the start of the strand
+            motif_list[s.prec_pos[1] + int(add_line)][s.prec_pos[0] + int(add_char)] = '5'
         elif s.directionality == '35' and motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] == ' ': # add 5' to the end of the strand
             motif_list[s.next_pos[1] + int(add_line)][s.next_pos[0] + int(add_char)] = '5'
 
@@ -1068,8 +1068,8 @@ def build_origami_content(barriers=None):
     for s in motif:  # Add the 5' and 3' symbols to the motif as 1 and 2
         if not s.sequence:
             continue
-        if s.sequence and s[0] not in '35' and motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] == ' ':
-            motif_list[s.prev_pos[1] + 1][s.prev_pos[0] + 1] = '1' if s.directionality == '53' else '2'
+        if s.sequence and s[0] not in '35' and motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] == ' ':
+            motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = '1' if s.directionality == '53' else '2'
         if s.sequence and s[-1] not in '35' and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' ':
             motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2' if s.directionality == '53' else '1'
     origami_list = [''.join(line) for line in motif_list]

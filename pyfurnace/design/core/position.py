@@ -13,51 +13,6 @@ class Position(tuple):
 
     _dimension = 2
 
-    @classmethod
-    def set_dimension(cls, dimension: Literal[2, 3]) -> None:
-        """
-        Sets the dimension of the position and direction classes.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension to set (must be 2 or 3).
-
-        Raises
-        ------
-        ValueError
-            If the dimension is not 2 or 3.
-        """
-        if dimension not in [2, 3]:
-            raise ValueError("Dimension must be 2 or 3.")
-        if dimension == 2:
-            Direction.RIGHT = Position((1, 0))
-            Direction.DOWN = Position((0, 1))
-            Direction.LEFT = Position((-1, 0))
-            Direction.UP = Position((0, -1))
-        else:
-            Direction.RIGHT = Position((1, 0, 0))
-            Direction.DOWN = Position((0, 1, 0))
-            Direction.LEFT = Position((-1, 0, 0))
-            Direction.UP = Position((0, -1, 0))
-            Direction.IN = Position((0, 0, 1))
-            Direction.OUT = Position((0, 0, -1))
-        cls._dimension = dimension
-
-    @classmethod
-    def zero(cls) -> 'Position':
-        """
-        Returns a zero position vector for the current dimension.
-
-        Returns
-        -------
-        Position
-            A zero vector of appropriate dimension.
-        """
-        if Position._dimension == 3:
-            return cls((0, 0, 0))
-        return cls((0, 0))
-
     def __repr__(self):
         """ Repr of the position tuple. """
         return 'Position' + super().__repr__()
@@ -109,6 +64,80 @@ class Position(tuple):
                              self[2] - other[2]))
         return Position((self[0] - other[0], 
                          self[1] - other[1]))
+    
+    ###
+    ### PROPERTIES
+    ###
+
+    @property
+    def x(self):
+        """ Returns the x-coordinate. """
+        return self[0]
+    
+    @property
+    def y(self):
+        """ Returns the y-coordinate. """
+        return self[1]
+    
+    @property
+    def z(self):
+        """ Returns the z-coordinate. """
+        if self._dimension == 3:
+            return self[2]
+        raise AttributeError("z-coordinate is not available in 2D.")
+
+    ###
+    ### CLASS METHODS
+    ###
+
+    @classmethod
+    def set_dimension(cls, dimension: Literal[2, 3]) -> None:
+        """
+        Sets the dimension of the position and direction classes.
+
+        Parameters
+        ----------
+        dimension : int
+            The dimension to set (must be 2 or 3).
+
+        Raises
+        ------
+        ValueError
+            If the dimension is not 2 or 3.
+        """
+        if dimension not in [2, 3]:
+            raise ValueError("Dimension must be 2 or 3.")
+        if dimension == 2:
+            Direction.RIGHT = Position((1, 0))
+            Direction.DOWN = Position((0, 1))
+            Direction.LEFT = Position((-1, 0))
+            Direction.UP = Position((0, -1))
+        else:
+            Direction.RIGHT = Position((1, 0, 0))
+            Direction.DOWN = Position((0, 1, 0))
+            Direction.LEFT = Position((-1, 0, 0))
+            Direction.UP = Position((0, -1, 0))
+            Direction.IN = Position((0, 0, 1))
+            Direction.OUT = Position((0, 0, -1))
+        cls._dimension = dimension
+
+    @classmethod
+    def zero(cls) -> 'Position':
+        """
+        Returns a zero position vector for the current dimension.
+
+        Returns
+        -------
+        Position
+            A zero vector of appropriate dimension.
+        """
+        if Position._dimension == 3:
+            return cls((0, 0, 0))
+        return cls((0, 0))
+
+    ###
+    ### METHODS
+    ###
     
     def swap_xy(self):
         """ Swap the x and y coordinates. """

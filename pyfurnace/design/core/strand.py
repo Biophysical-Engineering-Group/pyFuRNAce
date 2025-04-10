@@ -1,6 +1,7 @@
 import warnings
 import copy
 from typing import Optional, Union, Literal, List, Dict, Any
+from itertools import accumulate
 
 try:
     from oxDNA_analysis_tools.UTILS.RyeReader import get_confs, describe, strand_describe, inbox
@@ -580,22 +581,6 @@ class Strand(Callback):
                 else:
                     sym = '↓'
 
-            # convert the plane/change sybol (TO DO)
-            elif sym == "⊗":
-                direction = direction + Position((0, 0, 1))
-                # new_strand.append("⊗")
-                # pos_dict[pos] = "⊗"
-                # dir_dict[pos] = direction + Position(0, 0, 1)
-                # pos = pos + Position(0, 0, 1)
-                # sym = "⊗"
-            elif sym == "⊙":
-                direction = direction - Position((0, 0, 1))
-                # new_strand.append("⊙")
-                # pos_dict[pos] = "⊙"
-                # dir_dict[pos] = direction - Position(0, 0, 1)
-                # pos = pos - Position(0, 0, 1)
-                # sym = "⊙"
-
             # Append the new symbol to the strand list
             new_strand.append(sym)
 
@@ -652,6 +637,12 @@ class Strand(Callback):
                 direction = direction.swap_xy()
             elif sym in "╭╯/":
                 direction = direction.swap_change_sign_xy()
+            # EXPERIMENTAL
+            elif sym == "⊗":
+                direction = direction + Position((0, 0, 1))
+            elif sym == "⊙":
+                direction = direction - Position((0, 0, 1))
+
             dir_dict[pos] = direction
 
             # Update positions

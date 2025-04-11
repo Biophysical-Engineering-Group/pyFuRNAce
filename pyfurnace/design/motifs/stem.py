@@ -47,6 +47,8 @@ class Stem(Motif):
         else:
             ### create the strands
             strands = self._create_strands(sequence=sequence, length=length, return_strands=True, strong_bases=strong_bases)
+
+        kwargs["join"] = False
         # Initialize the motif
         super().__init__(strands=strands, **kwargs)
 

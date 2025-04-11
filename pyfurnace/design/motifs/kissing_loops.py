@@ -24,6 +24,7 @@ class KissingLoop(Loop):
             strands = kwargs.pop('strands')
         else:
             strands = self._create_strands(sequence=sequence, return_strand = True, pk_index=pk_index)
+
         # create motif with the strands making up the external kissing loop structure
         super().__init__(strands=strands, open_left=open_left, **kwargs)
         # insert the pk_index in the strand
@@ -380,6 +381,8 @@ class BranchedDimer(BranchedKissingLoop):
 
         if not sequence:
             sequence = Sequence('N' * self._seq_len, directionality='53')
+        elif not isinstance(sequence, Sequence):
+            sequence = Sequence(sequence, directionality='53')
 
         rev_comp = sequence.reverse_complement()
         strands = super()._create_strands(rev_comp, return_strand=True, pk_index=bottom_pk_index)

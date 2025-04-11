@@ -611,11 +611,17 @@ class Origami(Callback):
             return self._motif
         mot = None
         for line in self.assembled:
+
             # concatenate the motifs in the line
-            mot_line = Motif.concat(line, 
-                                    align=False, 
-                                    unlock_strands=self._ss_assembly, 
-                                    lock_coords=False)
+            if len(line) > 1:
+                mot_line = Motif.concat(line, 
+                                        align=False, 
+                                        unlock_strands=self._ss_assembly, 
+                                        lock_coords=False)
+                
+            else: # line made of connection motifs
+                mot_line = line[0]
+
             # add the line to the motif
             mot = Motif.concat([mot, mot_line], 
                                axis=0, align=False, 
@@ -710,7 +716,7 @@ class Origami(Callback):
             start_pos_ind = 0 
             if strand.directionality == '35':
                 start_pos_ind = -1
-            pos = list(strand.base_map.keys())[start_pos_ind]
+            pos = strand.base_positions[start_pos_ind]
 
             # get the index of the sequence in the strand
             offset_ind = self.sequence_index_map[(shift[0] + pos[0], 
@@ -807,7 +813,7 @@ class Origami(Callback):
             new_strand_seq = ''
 
             # iterate over the nucleotides in the strand
-            for ind, pos in enumerate(s.base_map):
+            for ind, pos in enumerate(s.base_positions):
                 
                 ### GET THE STRAND ID FOR THIS NUCLEOTIDE
 

@@ -61,6 +61,7 @@ class Dovetail(Stem):
         else:
             self._sign = +1 if length >= 0 else -1
 
+        kwargs['join'] = False
         super().__init__(length=length, sequence=sequence, wobble_interval=wobble_interval, wobble_tolerance=wobble_tolerance, wobble_insert=wobble_insert, **kwargs)
 
     ### 

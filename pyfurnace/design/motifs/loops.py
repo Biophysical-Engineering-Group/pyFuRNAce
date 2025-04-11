@@ -14,7 +14,8 @@ class Loop(Motif):
             strand = Strand('─' * seq_len + '╰│╭' + sequence, start=(seq_len, 2), direction=(-1, 0))
             # Add the strand to the list of strands
             kwargs['strands'] = kwargs.get('strands', []) + [strand]
-        kwargs.setdefault('join', False)
+        
+        kwargs['join'] = False
         super().__init__(**kwargs)
         if open_left:
             self.flip(horizontally=True, vertically=True)

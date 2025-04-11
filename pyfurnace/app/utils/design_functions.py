@@ -1358,8 +1358,12 @@ def advaced_edit(motif, motif_slice):
             current_structure = motif_copy.structure
             new_db = st.text_input('Add dot-bracket notation:', value=current_structure,  key=f'structure_{x}_{y}', help='Add the dot-bracket notation of the motif for each strand, separated by a "&". If the paired bases are more than one position apart, the pairing symbol "┊" is not shown.')
             if new_db != current_structure:
-                motif_copy.structure = new_db
-                st.session_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'
+                if not new_db:
+                    motif_copy.autopairing = True
+                    st.session_state.modified_motif_text += f'\nmotif.autopairing = True'
+                else:
+                    motif_copy.structure = new_db
+                    st.session_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'
             
             ### update the motif
             try:

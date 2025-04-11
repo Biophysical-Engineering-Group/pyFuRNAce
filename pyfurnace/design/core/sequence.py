@@ -114,7 +114,7 @@ class Sequence(Callback):
         """ Concatenate two sequences or a sequence and a string"""
         if other == 0:
             return self
-        return self.__add__(other)
+        return Sequence(str(other) + str(self), self.directionality)
 
     def __mul__(self, other: int) -> 'Sequence':
         """ Multiply the sequence by an integer."""

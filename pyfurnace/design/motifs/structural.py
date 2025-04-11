@@ -14,7 +14,7 @@ def LambdaTurn(**kwargs):
     strand2._coords = Coords.load_from_file(CONFS_PATH / "LambdaTurn_2.dat", 
                                             dummy_ends=(True, True),
                                             )
-    kwargs.setdefault('join', False)
+    kwargs['join'] = False
     return Motif([strand1, strand2], **kwargs) 
 
 def ThreeWayJunction(**kwargs):
@@ -31,7 +31,7 @@ def ThreeWayJunction(**kwargs):
     strand3._coords = Coords.load_from_file(CONFS_PATH / "ThreeWayJunction_3.dat", 
                                             dummy_ends=(True, True),
                                             )
-    kwargs.setdefault('join', False)
+    kwargs['join'] = False
     return Motif([strand1, strand2, strand3], **kwargs)
 
 # """
@@ -53,6 +53,6 @@ def Bend90(**kwargs):
     strand2._coords = Coords.load_from_file(CONFS_PATH / "Bend90_2.dat", 
                                             dummy_ends=(True, True),
                                             )
-    kwargs.setdefault('join', False)
+    kwargs['join'] = False
     return Motif([strand1, strand2], **kwargs)
                                

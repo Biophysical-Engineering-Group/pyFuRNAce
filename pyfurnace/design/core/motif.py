@@ -191,7 +191,7 @@ class Motif(Callback):
             self.basepair = BasePair(basepair, callback = self._updated_basepair)
 
         # set autopairing
-        self.autopairing = autopairing
+        self._autopairing = autopairing
 
     def __str__(self) -> str:
         if not self:
@@ -346,7 +346,7 @@ class Motif(Callback):
 
         # if other has autopairing off, set it off
         if not other_copy.autopairing:
-            self.autopairing = False
+            self._autopairing = False
             self._basepair.update(other_copy.basepair)
 
         # add the other strands to self
@@ -416,6 +416,23 @@ class Motif(Callback):
     ###
 
     @property
+    def autopairing(self) -> bool:
+        """
+        Indicates whether the motif automatically pairs bases.
+        """
+        return self._autopairing
+    
+    @autopairing.setter
+    def autopairing(self, autopairing: bool) -> None:
+        """
+        Set the autopairing property.
+        """
+        self._autopairing = bool(autopairing)
+        if autopairing:
+            self._basepair = BasePair()
+            self._calculate_basepair()
+
+    @property
     def base_map(self) -> Dict[Tuple[int, int], int]:
         """
         A dictionary with base position as key and strand index as value. 
@@ -425,7 +442,7 @@ class Motif(Callback):
         
         base_map = {}
         for i, s in enumerate(self._strands):
-            base_map.update({pos: i for pos in s.base_map})
+            base_map.update({pos: i for pos in s.base_positions})
         self._base_map = base_map
         return base_map
 
@@ -434,7 +451,7 @@ class Motif(Callback):
         """
         A dictionary with positions as key and the paired position as values.
         """
-        if self.autopairing and (not self._map 
+        if self._autopairing and (not self._map 
                                  or not self._sequence 
                                  or not self._basepair):
             # calculate the basepair dictionary
@@ -461,7 +478,7 @@ class Motif(Callback):
             raise ValueError("Error converting the basepair dictionary to"
                              f" a dictionary of Position objects: {e}")
         
-        self.autopairing = False
+        self._autopairing = False
         self._basepair = BasePair(basepair_dict, callback = self._updated_basepair)
         self._trigger_callbacks()
 
@@ -480,16 +497,16 @@ class Motif(Callback):
 
         ### collect the junctions
         for s in self:
-            if not s: # skip the empty strands
+            if not s.strand: # skip the empty strands
                 continue
 
             # skip if the the start is '5' or '3' and the strand is not just the symbol
-            if s.map[s.start] not in '35' or len(s.map) == 1:
+            if s[0] not in '35' or len(s.strand) == 1:
                 # invert the start direction to have the direction of the junction 
                 junctions_dict[(-s.direction[0], -s.direction[1])].append(s.start) 
 
             # skip if the the end is '5' or '3' and the strand is not just the symbol
-            if s.map[s.end] not in '35' or len(s.map) == 1: 
+            if s[-1] not in '35' or len(s.strand) == 1: 
                 junctions_dict[s.end_direction].append(s.end)
 
         ### order the junctions
@@ -544,7 +561,7 @@ class Motif(Callback):
         map_dict = {}
 
         for ind, strand in enumerate(self):
-            for pos in strand.map:
+            for pos in strand.positions:
                 map_dict[pos] = ind
 
                 if max_pos is None:
@@ -613,7 +630,7 @@ class Motif(Callback):
         for s in self:
             # adjust the strand direction
             search_dir = 1 if s.directionality == '53' else -1
-            for pos in list(s.base_map)[::search_dir]:
+            for pos in list(s.base_positions)[::search_dir]:
                 paired_pos = base_pair_dict.get(pos, default=None)
                 ind1 = self.sequence_index_map[pos]
 
@@ -697,11 +714,11 @@ class Motif(Callback):
             search_dir = 1 if s.directionality == '53' else -1
 
             # create the map from the positions to the indexes
-            for ind, pos in enumerate(list(s.base_map)[::search_dir]):
+            for ind, pos in enumerate(s.base_positions[::search_dir]):
                 pos_to_index[pos] = strand_offset + ind
 
             # store the break points of the strands
-            strand_offset += len(s.base_map)
+            strand_offset += len(s.base_positions)
         
         self._sequence_index_map = pos_to_index
         return pos_to_index
@@ -892,7 +909,7 @@ class Motif(Callback):
                     s.strands_block = None
 
         new_motif = cls(**kwargs)
-        new_motif.autopairing = autopairing
+        new_motif._autopairing = autopairing
         new_motif._basepair = basepair
         new_motif.replace_all_strands([strand for m in aligned for strand in m], 
                                       copy=False, 
@@ -992,7 +1009,7 @@ class Motif(Callback):
                     # add the Strand to the list
                     strand_list.append(strand)
                     # update the visited positions
-                    mapped_pos.update(set(strand.map.keys()))
+                    mapped_pos.update(set(strand.positions))
 
         ### TRACE THE STRANDS STARTING WITH 5
         for y, line in enumerate(motif_list):
@@ -1043,7 +1060,7 @@ class Motif(Callback):
                     # add the Strand to the list
                     strand_list.append(strand)
                     # update the visited positions
-                    mapped_pos.update(set(strand.map.keys()))
+                    mapped_pos.update(set(strand.positions))
 
         ### TRACE THE BASEPAIRS ###
         basepair = BasePair()
@@ -1721,7 +1738,7 @@ class Motif(Callback):
         basepair = BasePair(callback=self._updated_basepair)
 
         for pos1, ind1 in self.base_map.items():
-            base1 = self[ind1].base_map[pos1]
+            base1 = self[ind1].get_base_at_pos(pos1)
 
             if pos1 in basepair:
                 continue
@@ -1741,7 +1758,8 @@ class Motif(Callback):
                     continue
 
                 # check the bases can pair
-                base2 = self[self.base_map[pos2]].base_map[pos2]
+                strand = self[self.base_map[pos2]]
+                base2 = strand.get_base_at_pos(pos2)
                 if base2 in base_pairing[base1]:
                     basepair[Position(pos1)] = Position(pos2)
                     break
@@ -1859,7 +1877,7 @@ class Motif(Callback):
         self._max_pos = None
         self._min_pos = None
         self._junctions = {}
-        if self.autopairing:
+        if self._autopairing:
             self._basepair = BasePair()
             self._structure = None
         self._updated_basepair()
@@ -1933,7 +1951,7 @@ class Motif(Callback):
         """
         return Motif(Motif.copy_strands_preserve_blocks(self._strands), 
                     basepair=self._basepair, 
-                    autopairing=self.autopairing, 
+                    autopairing=self._autopairing, 
                     copy=False, join=False, 
                     lock_coords=self.lock_coords, 
                     **kwargs)
@@ -1991,6 +2009,7 @@ class Motif(Callback):
 
                         # get the strand at the position
                         strand_at_pos = self[self.map[pos]] 
+
                         # if the position is not at the minimum border
                         if pos[naxis] != 0: 
                             # add a strand from the position and going to the border
@@ -1999,7 +2018,7 @@ class Motif(Callback):
                                                    direction=pos_direction)
                             
                             # check that the extension doesn't overlap with other strands
-                            if not (set(extend_strand.map) & set(self.map)): 
+                            if not (set(extend_strand.positions) & set(self.map)): 
                                 strand_at_pos.join(extend_strand)
 
                 if pos_direction not in skip_directions:
@@ -2019,7 +2038,7 @@ class Motif(Callback):
                                                    direction=pos_direction)
                             
                             # check that the extension doesn't overlap with other strands
-                            if not (set(extend_strand.map) & set(self.map)): 
+                            if not (set(extend_strand.positions) & set(self.map)): 
                                 strand_at_pos.join(extend_strand)
 
         except MotifStructureError as e:
@@ -2153,7 +2172,7 @@ class Motif(Callback):
         # REMOVE THE PAIRS IN WHICH THE STRAND IS INVOLVED
         new_basepair = BasePair()
         for k, v in self._basepair.items():
-            if k in strand.map or v in strand.map:
+            if k in strand.positions or v in strand.positions:
                 continue
             new_basepair[Position(k)] = Position(v)
 
@@ -2248,7 +2267,7 @@ class Motif(Callback):
                 s.strand = s.strand.translate(rotate_90)   
 
             # rotate the basepair dictionary
-            if not self.autopairing and self._basepair:
+            if not self._autopairing and self._basepair:
                 new_bp = BasePair()
                 for k, v in self._basepair.items():
                     new_k = (num_lines - 1 - k[1], k[0])
@@ -2542,7 +2561,7 @@ class Motif(Callback):
 
             ### CREATE EXTENSION STRANDS FOR THE JUNCTIONS ###
             for pos in junc_vert:
-                if pos in s.map:
+                if pos in s.positions:
                     extend_strand.append(Strand('│' * abs(shift[1]), 
                                                 start=(pos[0] + shift[0], 
                                                        pos[1]), 
@@ -2550,7 +2569,7 @@ class Motif(Callback):
                                                            int(copysign(1, 
                                                                         shift[1])))))
             for pos in junc_hor:
-                if pos in s.map: 
+                if pos in s.positions: 
                     extend_strand.append(Strand('─' * abs(shift[0]), 
                                                 start=(pos[0], 
                                                        pos[1] + shift[1]),
@@ -2559,14 +2578,16 @@ class Motif(Callback):
                                                            0)))
             
             # for each strand shift the starting position
-            s.shift(shift)
+            s.shift(shift, check=False)
+
             #loop through the strands forming the extensions
             for s2 in extend_strand:
                 s.join(s2) # join the strand to the vertical extension
             
         # shift every basepair too
-        if not self.autopairing:
+        if not self._autopairing:
             self._basepair = self.basepair.shift(shift)
+            
         return self
 
     def sort(self, 

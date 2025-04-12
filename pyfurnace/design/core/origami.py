@@ -624,7 +624,7 @@ class Origami(Callback):
             # add the line to the motif
             mot = Motif.concat([mot, mot_line], 
                                axis=0, align=False, 
-                               lock_coords=True, 
+                               lock_coords=False, 
                                unlock_strands=self._ss_assembly)
         
         self._motif = mot

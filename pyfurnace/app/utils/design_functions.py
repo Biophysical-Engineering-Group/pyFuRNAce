@@ -264,7 +264,11 @@ def make_motif_menu(origami):
     
     if selected_motif != st.session_state.selected_motif:
         st.session_state.selected_motif = selected_motif
-        st.rerun(scope='fragment')
+        try:
+            st.rerun(scope='fragment')
+        except Exception as e:
+            print(f"Error in rerun: {e}")
+            st.rerun()
 
     motif_add = True
 

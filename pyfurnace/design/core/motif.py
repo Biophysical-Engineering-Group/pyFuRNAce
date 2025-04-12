@@ -171,8 +171,8 @@ class Motif(Callback):
             # IMPORTANT: look at the _coords to avoid locking strands 
             #            that don't have coordinates 
             # (therefore should not be locked)
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands ])
+                                                #  if not s._coords.is_empty()])
 
         ### BASEPAIR/DOT-BRACKET INITIALIZATION
         # prioritize the structure
@@ -201,7 +201,7 @@ class Motif(Callback):
 
         # draw each strand to the canvas
         for strand in self:
-            strand.draw_strand(canvas_repr, return_draw=False)
+            strand.draw(canvas_repr, return_draw=False)
 
         # add base pairing at position (if the base pairing position is free)
         for pos1, pos2 in self.basepair.items():
@@ -252,8 +252,8 @@ class Motif(Callback):
         self._updated_strands()
         self._strands = self.join_strands(self._strands)
         if self.lock_coords:
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands ])
+                                                #  if not s._coords.is_empty()])
 
     def __len__(self) -> int:
         """Get the number of strands."""
@@ -356,8 +356,8 @@ class Motif(Callback):
         # join the strands
         self._strands = self.join_strands(self._strands)
         if self.lock_coords:
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands ])
+                                                #  if not s._coords.is_empty()])
         for s in self:
             s.register_callback(self._updated_strands)
 
@@ -1508,7 +1508,7 @@ class Motif(Callback):
             else:
                 copied = strand.copy()
             strands_copy.append(copied)
-            new_strands_block.append(copied) # add the origami to the new strands block
+            new_strands_block.add(copied) # add the origami to the new strands block
         return strands_copy
 
     @staticmethod
@@ -1927,8 +1927,8 @@ class Motif(Callback):
         if join:
             self._strands = self.join_strands(self._strands)
         if self.lock_coords:
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands]) 
+                                                #  if not s._coords.is_empty()])
 
         return self
 
@@ -2149,8 +2149,8 @@ class Motif(Callback):
             self._strands = self.join_strands(self._strands)
 
         if self.lock_coords:
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands]) 
+                                                #  if not s._coords.is_empty()])
         return self
 
     def pop(self, index: int = -1) -> 'Strand':
@@ -2182,8 +2182,8 @@ class Motif(Callback):
         self._updated_basepair()
 
         if self.lock_coords:
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands]) 
+                                                #  if not s._coords.is_empty()])
         return strand
 
     def replace_all_strands(self, 
@@ -2229,8 +2229,8 @@ class Motif(Callback):
 
         self._strands = new_strands
         if self.lock_coords:
-            self._strands_block = StrandsBlock(*[s for s in self._strands 
-                                                 if not s._coords.is_empty()])
+            self._strands_block = StrandsBlock(*[s for s in self._strands])
+                                                #  if not s._coords.is_empty()])
         # this will also update the basepair dictionary
         self._updated_strands()
 

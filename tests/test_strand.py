@@ -107,6 +107,6 @@ def test_strand_copy(strand):
     assert id(copied_strand) != id(strand)
 
 def test_strand_draw(strand):
-    canvas = strand.draw_strand()
+    canvas = strand.draw()
     assert 'A' in canvas
     assert 'C' in canvas

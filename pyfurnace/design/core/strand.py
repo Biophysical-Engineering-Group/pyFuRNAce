@@ -1,6 +1,6 @@
 import warnings
 import copy
-from typing import Optional, Union, Literal, List, Dict, Any
+from typing import Optional, Union, Literal, List, Dict, Any, Set
 import numpy as np
 
 try:
@@ -261,10 +261,7 @@ class Strand(Callback):
         return False
 
     def __hash__(self):
-        string_repr = self._strand + str(self._start) + str(self._direction)
-        if self._sequence:
-            string_repr += str(self._sequence._directionality)
-        return hash(string_repr)
+        return id(self)
 
     ### 
     ### PROPERTIES
@@ -556,7 +553,7 @@ class Strand(Callback):
         
         # assign the new block to the strand
         self._strands_block = new_block
-        self._strands_block.append(self)
+        self._strands_block.add(self)
 
     ### 
     ### PROTECTED METHODS
@@ -601,7 +598,7 @@ class Strand(Callback):
 
         # traverse the strand building the 2D map
         for i, sym in enumerate(translated):
-            print(pos)
+
             # Convert the turns to the corresponding symbols
             if sym == '/':
                 if direction[0] == -1 or direction[1] == -1:
@@ -1140,25 +1137,20 @@ class Strand(Callback):
             return
         
         # join the strands block of the combined and first strand
-        StrandsBlock.join_blocks(joined.strands_block, 
-                                 strand1.strands_block, 
-                                 avoid_strand=strand1)
-        
-        # join the strands block of the second strand if it is different
-        if id(strand1.strands_block) != id(strand2.strands_block):
-            StrandsBlock.join_blocks(joined.strands_block, 
-                                     strand2.strands_block, 
-                                     avoid_strand=strand2)
+        joined.strands_block.update(strand1.strands_block,
+                                    strand2.strands_block,
+                                    avoid_strands={strand1, strand2}
+                                    )
         return joined
 
     ### 
     ### METHODS
     ###
 
-    def draw_strand(self, 
-                    canvas: list = None, 
-                    return_draw: bool = True, 
-                    plane: int = 0):
+    def draw(self, 
+             canvas: list = None, 
+             return_draw: bool = True, 
+             plane: int = 0):
         """
         Draw the strand in 2D space using a canvas.
         The canvas is a list of strings, where each string is a line of the canvas.
@@ -1516,12 +1508,11 @@ class Strand(Callback):
             self.strand = first.strand + second.strand
             self._coords = Coords.combine_coords(first, second)
 
-            if self.strands_block != other.strands_block:
-                StrandsBlock.join_blocks(self.strands_block, 
-                                         other.strands_block, 
-                                         avoid_strand=other)
-            else:
-                self.strands_block.remove(other)
+            if self.sequence:
+                self.strands_block.update(self.strands_block, 
+                                          other.strands_block, 
+                                          avoid_strands={other}
+                                          )
 
             # calculte the new pseudoknots information
             new_pk_info = first._combine_pk_info(second)
@@ -1738,68 +1729,7 @@ class StrandsBlock(set):
         """
         return StrandsBlock(*(array for array in super().__add__(other)))
 
-    # def __setitem__(self, key: int, value: 'Strand') -> None:
-    #     """
-    #     Set the item at a given index in the StrandsBlock.
-
-    #     Parameters
-    #     ----------
-    #     key : int
-    #         The index at which to set the item.
-    #     value : Strand
-    #         The Strand instance to set at the specified index.
-
-    #     Raises
-    #     ------
-    #     ValueError
-    #         If the value is not an instance of Strand.
-    #     """
-    #     if not isinstance(value, Strand):
-    #         raise ValueError("The item must be a Strand instance") 
-    #     super().__setitem__(key, Coords(value))
-    #     self[key].strands_block = self
-
-    @staticmethod
-    def join_blocks(s_block1: 'StrandsBlock', 
-                    s_block2: 'StrandsBlock', 
-                    avoid_strand: Optional['Strand'] = None) -> 'StrandsBlock':
-        """
-        Join two strands blocks together, optionally avoiding a specified strand.
-
-        Parameters
-        ----------
-        s_block1 : StrandsBlock
-            The first StrandsBlock to join.
-        s_block2 : StrandsBlock
-            The second StrandsBlock to join.
-        avoid_strand : Strand, optional
-            A strand to avoid during the joining process.
-
-        Returns
-        -------
-        StrandsBlock
-            A new StrandsBlock instance with the combined strands.
-
-        Raises
-        ------
-        ValueError
-            If any of the input arguments is not a StrandsBlock, or 
-            if avoid_strand is not a Strand.
-        """
-        if (not isinstance(s_block1, StrandsBlock) 
-                or not isinstance(s_block2, StrandsBlock)):
-            raise ValueError("The input arguments must be StrandsBlock instances")
-            
-        # check if the avoid_strand is a Strand instance
-        if avoid_strand is not None and not isinstance(avoid_strand, Strand):
-            raise ValueError("The avoid_strand must be a Strand instance")
-        
-        # avoid the strand to join
-        s_block1 = (strand for strand in s_block1 if id(strand) != id(avoid_strand))
-        s_block2 = (strand for strand in s_block2 if id(strand) != id(avoid_strand))
-        return StrandsBlock(*s_block1, *s_block2)
-
-    def append(self, item: 'Strand') -> None:
+    def add(self, item: 'Strand') -> None:
         """
         Append a Strand instance to the StrandsBlock.
 
@@ -1817,9 +1747,9 @@ class StrandsBlock(set):
             raise ValueError(f"The item must be a Strand instance, got {type(item)}")
         
         # append the strand to the block if it is not already in the block
-        if not any(item is strand for strand in self):
+        if not item._coords.is_empty():
             super().add(item)
-            item.strands_block = self
+            item._strands_block = self
 
     def remove(self, item: 'Strand') -> None:
         """
@@ -1838,11 +1768,8 @@ class StrandsBlock(set):
         if not isinstance(item, Strand):
             raise ValueError(f"The item must be a Strand instance, got {type(item)}")
         
-        else:
-            for i, strand in enumerate(self):
-                if strand is item:
-                    del self[i]
-                    strand.strands_block = None
+        super().remove(item)
+        item.strands_block = None
 
     def transform(self, T: Any) -> None:
         """
@@ -1861,3 +1788,42 @@ class StrandsBlock(set):
         """
         for strand in self:
             strand.transform(T)
+
+    def update(self, 
+               *others: List['StrandsBlock'],
+               avoid_strands: Optional[Set['Strand']] = None) -> None:
+        """
+        Update the strands block with the strands in the input iterable.
+        This method is similar to the add method, but it allows for
+        adding multiple strands at once. It also allows for avoiding
+        specific strands in the update process.
+        
+        Parameters
+        ----------
+        *other : StrandsBlock
+            The StrandsBlock instances to update with.
+        avoid_strands : set of Strand, default None
+            A set of strands to avoid in the update process.
+        
+        Raises
+        ValueError
+            If any of the input arguments is not a StrandsBlock, or 
+            if avoid_strand is not a Strand.
+        """
+        if not all(isinstance(s, StrandsBlock) for s in others):
+            raise ValueError("The input arguments must be StrandsBlock instances")
+            
+        # check if the avoid_strand is a Strand instance
+        if (avoid_strands is not None 
+                and any (not isinstance(s, Strand) for s in avoid_strands)):
+            raise ValueError("The avoid_strands must be a set of Strand instances")
+
+        if avoid_strands is None:
+            avoid_strands = set()
+
+        # add the strands to the block
+        for sb in others:
+            for s in sb:
+                if s not in avoid_strands:
+                    self.add(s)
+        # (self.add(s) for sb in others for s in sb if s not in avoid_strands)

@@ -34,8 +34,12 @@ class ProteinCoords:
         coords : np.ndarray, optional
             A NumPy array of shape (N, 3) representing the 3D coordinates.
         """
+        # Initialize the sequence as an empty string
         self._sequence: str = ''
+        # Initialize the coordinates as an empty NumPy array
         self._coords: np.ndarray = np.array(())
+
+        # Set the sequence and coordinates with their setters
         self.sequence = sequence
         self.coords = coords
 
@@ -132,7 +136,7 @@ class ProteinCoords:
 
     def copy(self) -> 'ProteinCoords':
         """ Create a copy of the ProteinCoords instance. """
-        return ProteinCoords(self.sequence, np.copy(self.coords))
+        return ProteinCoords(self.sequence, self.coords)
 
     def transform(self, T_matrix: np.ndarray) -> None:
         """
@@ -197,9 +201,14 @@ class Coords:
         """
         if proteins is None:
             proteins = []
+        # initialize the attributes
+        self._dummy_ends = ()
+        self._array = ()
+
+        # set the attributes
         self.dummy_ends = dummy_ends
         self.proteins = proteins
-        self.array = np.array(input_array)
+        self.array = input_array
 
     def __getitem__(self, key: int) -> np.ndarray:
         """Get item from array."""
@@ -384,25 +393,26 @@ class Coords:
         Coords
             Combined coordinate object with the transformed coordinates of the strands.
         """
-        seq1 = strand1.sequence
         coords1 = strand1.coords
-        seq2 = strand2.sequence
+        seq1 = strand1.sequence
         coords2 = strand2.coords
+        seq2 = strand2.sequence
 
         ### HEDGE CASES
         # there are no coordinates to combine 
-        if coords1.is_empty() and not seq1 and coords2.is_empty() and not seq2: 
+        if coords1.is_empty() and coords2.is_empty(): 
             return Coords([])
         # the first strand has no coordinates and no nucleotides
-        elif coords1.is_empty() and not seq1: 
+        elif coords1.is_empty(): 
             return coords2.copy()
         # the second strand has no coordinates and no nucleotides
-        elif coords2.is_empty() and not seq2: 
+        elif coords2.is_empty(): 
             return coords1.copy()
         
         ### TRANSFORM THE SECOND STRAND
         # transform them only if they are not in the same block os strands
-        if id(strand1.strands_block) != id(strand2.strands_block): 
+        if strand1.strands_block is not strand2.strands_block: 
+            
             # create the coordinates for the first strand
             if coords1.size == 0 and len(seq1): 
                 coords1 = Coords.compute_helix_from_nucl((0,0,0), # start position
@@ -410,6 +420,7 @@ class Coords:
                                                          (0,1,0), # normal vector
                                                          length=len(seq1),
                                                          directionality=seq1.directionality)
+                
             if coords2.size == 0 and len(seq2): # create the coordinates for the second strand
                 coords2 = Coords.compute_helix_from_nucl((0,0,0), # start position
                                                          (1,0,0), # base vector
@@ -478,15 +489,19 @@ class Coords:
 
         ### COMBINE THE COORDINATES, the coordinates could be empty if there are dummies 
         combined_dummy = (coords1.dummy_ends[0], coords2.dummy_ends[1])
+
         # both strands have no coordinates
         if coords1.size == 0 and coords2.size == 0: 
             combined = Coords([], dummy_ends=combined_dummy)
+
         # the first strand has no coordinates
         elif coords1.size == 0: 
             combined = Coords(coords2.array, dummy_ends=combined_dummy)
+
         # the second strand has no coordinates
         elif coords2.size == 0: 
             combined = Coords(coords1.array, dummy_ends=combined_dummy)
+
         else:
             combined = Coords(np.concatenate((coords1.array, coords2.array), axis=0), 
                                               dummy_ends=combined_dummy)
@@ -1033,8 +1048,8 @@ class Coords:
         Coords
             A new Coords object with the same attributes.
         """
-        return Coords(np.copy(self.array), 
-                      (np.copy(self._dummy_ends[0]), np.copy(self._dummy_ends[1])), 
+        return Coords(self.array, 
+                      (self._dummy_ends[0], self._dummy_ends[1]), 
                       [protein.copy() for protein in self._proteins])
 
     def is_empty(self) -> bool:

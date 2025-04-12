@@ -4,6 +4,8 @@ from typing import Literal
 class Position(tuple):
     """
     A class to represent a 2D or 3D position.
+    The operations are hard-coded to be 2D or 3D to 
+    maximize performance.
 
     Attributes
     ----------
@@ -107,18 +109,7 @@ class Position(tuple):
         """
         if dimension not in [2, 3]:
             raise ValueError("Dimension must be 2 or 3.")
-        if dimension == 2:
-            Direction.RIGHT = Position((1, 0))
-            Direction.DOWN = Position((0, 1))
-            Direction.LEFT = Position((-1, 0))
-            Direction.UP = Position((0, -1))
-        else:
-            Direction.RIGHT = Position((1, 0, 0))
-            Direction.DOWN = Position((0, 1, 0))
-            Direction.LEFT = Position((-1, 0, 0))
-            Direction.UP = Position((0, -1, 0))
-            Direction.IN = Position((0, 0, 1))
-            Direction.OUT = Position((0, 0, -1))
+        Direction._set_dimension(dimension)
         cls._dimension = dimension
 
     @classmethod
@@ -180,8 +171,32 @@ class Position(tuple):
 
 class DirectionMeta(type):
     """
-    Metaclass for the Direction class to allow iteration over its attributes.
+    Metaclass to make the Direction class an Enum. In particular, it will:
+        - allow iteration over the directions attribute 
+        - prevent setting or deleting directions
+        - get the names of the directions
+        - set the dimension of the directions
     """
+
+    def __getitem__(cls, key):
+        """
+        Get an item from the Direction class.
+
+        Returns
+        -------
+        Position
+            A direction position.
+        """
+        return cls.__dict__[key]
+
+    def __setattr__(cls, name, value):
+        """ Removes the ability to set attributes to make Direction immutable. """
+        raise AttributeError("Direction is immutable")
+
+    def __delattr__(cls, name):
+        """ Removes the ability to delete attributes to make Direction immutable. """
+        raise AttributeError("Direction is immutable")
+
     def __iter__(cls):
         """
         Iterates over the Direction class attributes.
@@ -194,20 +209,47 @@ class DirectionMeta(type):
         return (value for name, value in vars(cls).items() 
                 if not name.startswith("__"))
     
-    def __getitem__(cls, key):
+    def _set_dimension(cls, dimension: Literal[2, 3]) -> None:
         """
-        Get an item from the Direction class.
+        Sets the dimension of the direction class.
+
+        Parameters
+        ----------
+        dimension : int
+            The dimension to set (must be 2 or 3).
+        """
+        if dimension == 2:
+            type.__setattr__(cls, 'RIGHT', Position((1, 0)))
+            type.__setattr__(cls, 'DOWN', Position((0, 1)))
+            type.__setattr__(cls, 'LEFT', Position((-1, 0)))
+            type.__setattr__(cls, 'UP', Position((0, -1)))
+            if hasattr(cls, 'IN'):
+                type.__delattr__(cls, 'IN')
+            if hasattr(cls, 'OUT'):
+                type.__delattr__(cls, 'OUT')
+        else:
+            type.__setattr__(cls, 'RIGHT', Position((1, 0, 0)))
+            type.__setattr__(cls, 'DOWN', Position((0, 1, 0)))
+            type.__setattr__(cls, 'LEFT', Position((-1, 0, 0)))
+            type.__setattr__(cls, 'UP', Position((0, -1, 0)))
+            type.__setattr__(cls, 'IN', Position((0, 0, 1)))
+            type.__setattr__(cls, 'OUT', Position((0, 0, -1)))
+    
+    def names(cls):
+        """
+        Returns the names of the directions.
 
         Returns
         -------
-        Position
-            A direction position.
+        list
+            A list of direction names.
         """
-        return cls.__dict__[key]
+        return [name for name in cls.__dict__ if not name.startswith("__")]
+
 
 class Direction(metaclass=DirectionMeta):
     """
-    Class to store and retrieve the Direction information.
+    Enumerator to store and retrieve the Direction information.
 
     Attributes
     ----------

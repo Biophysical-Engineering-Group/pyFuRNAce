@@ -37,7 +37,7 @@ code_editor_buttons = [
 
 funny_bootstrap_icons = ['robot', 'trash', 'umbrella', 'camera', 'cart', 'cpu', 'cup-straw', 'trophy', 'palette', 'cup-straw', 'camera-reels', 'puzzle', 'hourglass-split', 'mortarboard']
 
-direction_list = [name for name in pf.Direction.__dict__ if '_' not in name]
+direction_list = pf.Direction.names()
 
 def origami_general_options(origami, expanded=True):
     with st.expander('General settings', expanded=expanded):
@@ -1331,7 +1331,6 @@ def advaced_edit(motif, motif_slice):
                 with col2:
                         start_y = st.number_input("Start y:", min_value=0, value=s.start[1], key=f'start_y_{x}_{y}_{i}')
                 with col3:
-                    direction_list = [name for name in pf.Direction.__dict__ if '_' not in name]
                     strand_direction_ind = [d for d in pf.Direction].index(s.direction)
                     new_dir = st.selectbox('Start direction:', direction_list, index=strand_direction_ind, key=f'dir_{x}_{y}_{i}')
                     new_dir_tuple = pf.Direction[new_dir]

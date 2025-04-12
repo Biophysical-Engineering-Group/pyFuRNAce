@@ -416,7 +416,6 @@ class Origami(Callback):
                             f'y index: {i}, x slice: {x_slice}.') from e
 
         ### update the motif
-        self._prepare_matrix() # this also prepare the motifs
         self._updated_motif()
 
     def __len__(self):
@@ -1130,7 +1129,7 @@ class Origami(Callback):
         return assembled_matrix
 
     def _prepare_matrix(self, copy: bool = False) -> None:
-        """ Remove the empty motifs, add the callbackss and extend the junctions 
+        """ Remove the empty motifs, add the callbacks and extend the junctions 
         (make sure all the bottom junctions reach the same y position).
         
         copy : bool, optional
@@ -1156,7 +1155,8 @@ class Origami(Callback):
                 # Copy, add the callback and save it
                 if copy:
                     m = m.copy()
-                m.register_callback(self._updated_motif)
+                if self._updated_motif not in m._callbacks:
+                    m.register_callback(self._updated_motif)
                 new_line.append(m)
 
             prepare_matrix.append(new_line)
@@ -1219,17 +1219,19 @@ class Origami(Callback):
         if isinstance(item, Motif):
             if not self._matrix:
                 self._matrix.append([])
+            if copy:
+                item = item.copy()
             self._matrix[-1].append(item)
 
         elif (isinstance(item, (list, tuple)) 
                 and all(isinstance(m, Motif) for m in item)):
-            
+            if copy:
+                item = [m.copy() for m in item]
             self._matrix.append(item)
         else:
             raise TypeError(f'Only motifs or lists of motifs can be added to the ' 
                             f'Origami, but the object {item} was added.')
         
-        self._prepare_matrix(copy=copy) # remove empty motifs and add callbacks
         self._updated_motif()
 
     def barrier_repr(self, kl_delay: int = 150, 
@@ -1325,7 +1327,6 @@ class Origami(Callback):
         if insert_idx is None:
             insert_idx = len(self._matrix)
         self._matrix.insert(insert_idx, new_line)
-        self._prepare_matrix()
         self._updated_motif()
 
     # inherit the documentation from the function
@@ -1620,8 +1621,6 @@ class Origami(Callback):
                              f'(row, col) or a list of two indices. '
                              f' Got {idx} instead.')
         
-        # remove empty motifs and add callbacks
-        self._prepare_matrix(copy=copy)
         self._updated_motif()
 
     def pop(self, 
@@ -1658,7 +1657,14 @@ class Origami(Callback):
             raise ValueError(f'Index must be a single index or a tuple of '
                              f'(row, col) or a list of two indices. '
                              f' Got {idx} instead.')
-        self._prepare_matrix()
+        
+        # remove the callbacks 
+        if isinstance(popped, list):
+            for m in popped:
+                m._clear_callbacks()
+        else:
+            popped._clear_callbacks()
+
         self._updated_motif()
         return popped
 
@@ -1680,9 +1686,10 @@ class Origami(Callback):
         """
         for line in self._matrix:
             if motif in line:
+                # remove the callback
+                motif._clear_callbacks()
                 line.remove(motif)
                 break
-        self._prepare_matrix()
         self._updated_motif()
 
     # inherit the documentation from the function

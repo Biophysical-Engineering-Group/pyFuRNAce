@@ -1,7 +1,7 @@
 import warnings
 import copy
 from typing import Optional, Union, Literal, List, Dict, Any
-from itertools import accumulate
+import numpy as np
 
 try:
     from oxDNA_analysis_tools.UTILS.RyeReader import get_confs, describe, strand_describe, inbox
@@ -28,6 +28,8 @@ class Strand(Callback):
         The directionality of the strand (default is '53').
     start : Position, optional
         The starting position of the strand in 2D space (default is Position.zero()).
+        If set to 'minimal', the start position is calculated as the minimal
+        start position required to draw the strand in 2D to avoid negative coordinates.
     direction : Direction, optional
         The initial direction of the strand in 2D space (default is Direction.RIGHT).
     coords : Coords, optional
@@ -78,8 +80,8 @@ class Strand(Callback):
     def __init__(self, 
                  strand: str = '', 
                  directionality: Literal['53', '35'] = '53', 
-                 start: Optional[Position] = Position.zero(), 
-                 direction: Direction = Direction.RIGHT, 
+                 start: Optional[Union[Position, tuple, Literal['minimal']]] = None,
+                 direction: Optional[Direction] = None, 
                  coords: Coords = None, 
                  strands_block: Optional['StrandsBlock'] = None, 
                  **kwargs) -> None:
@@ -94,7 +96,8 @@ class Strand(Callback):
             The directionality of the strand (default is '53').
         start : Position, default Position.zero()
             The starting position of the strand in 2D space.
-            If start is None, the strand will be placed at the minimal position
+            If start is set to 'minimal', the start position is calculated
+            as the minimal start position required to draw the strand in 2D
             to avoid negative coordinates.
         direction : Direction, default is Direction.RIGHT
             The initial direction of the strand in 2D space.
@@ -114,10 +117,15 @@ class Strand(Callback):
         self._update_sequence_insertion(strand, directionality)
 
         ### check the 2D direction 
-        self._direction = self._check_position(direction, True)
+        if direction is None:
+            self._direction = Direction.RIGHT
+        else:
+            self._direction = self._check_position(direction, True)
 
         ### check the start position
         if start is None:
+            self._start = Position.zero()
+        elif start == 'minimal':
             self._start = self.minimal_dimensions
         else:
             self._start = self._check_position(start)
@@ -251,6 +259,12 @@ class Strand(Callback):
             return False
         
         return False
+
+    def __hash__(self):
+        string_repr = self._strand + str(self._start) + str(self._direction)
+        if self._sequence:
+            string_repr += str(self._sequence._directionality)
+        return hash(string_repr)
 
     ### 
     ### PROPERTIES
@@ -587,7 +601,7 @@ class Strand(Callback):
 
         # traverse the strand building the 2D map
         for i, sym in enumerate(translated):
-
+            print(pos)
             # Convert the turns to the corresponding symbols
             if sym == '/':
                 if direction[0] == -1 or direction[1] == -1:
@@ -1374,8 +1388,14 @@ class Strand(Callback):
             The updated strand instance.
         """
         shift = self._check_position(shift_position)
+        self._start += shift
 
-        # apply the shift to the positions
+        # don't update the positions if the strand is not built
+        if self._positions is None:
+            self._trigger_callbacks()
+            return self
+
+        # apply the shift to all the positions
         positions = tuple(pos + shift for pos in self._positions)
         
         # check if the shift is valid
@@ -1385,7 +1405,6 @@ class Strand(Callback):
                              )
         
         # directly update the positional attributes
-        self._start += shift
         self._positions = positions
         self._base_positions = tuple(pos + shift for pos in self._base_positions)
         self._prec_pos = self._prec_pos + shift
@@ -1657,7 +1676,7 @@ class Strand(Callback):
         return new_stand
 
 
-class StrandsBlock(list):
+class StrandsBlock(set):
     """
     A container class that holds a collection of Strand instances.
 
@@ -1701,7 +1720,7 @@ class StrandsBlock(list):
             if not isinstance(s, Strand):
                 raise ValueError("The input arguments must be Strand instance")   
             else:
-                self.append(s)
+                self.add(s)
 
     def __add__(self, other: 'StrandsBlock') -> 'StrandsBlock':
         """
@@ -1719,26 +1738,26 @@ class StrandsBlock(list):
         """
         return StrandsBlock(*(array for array in super().__add__(other)))
 
-    def __setitem__(self, key: int, value: 'Strand') -> None:
-        """
-        Set the item at a given index in the StrandsBlock.
+    # def __setitem__(self, key: int, value: 'Strand') -> None:
+    #     """
+    #     Set the item at a given index in the StrandsBlock.
 
-        Parameters
-        ----------
-        key : int
-            The index at which to set the item.
-        value : Strand
-            The Strand instance to set at the specified index.
+    #     Parameters
+    #     ----------
+    #     key : int
+    #         The index at which to set the item.
+    #     value : Strand
+    #         The Strand instance to set at the specified index.
 
-        Raises
-        ------
-        ValueError
-            If the value is not an instance of Strand.
-        """
-        if not isinstance(value, Strand):
-            raise ValueError("The item must be a Strand instance") 
-        super().__setitem__(key, Coords(value))
-        self[key].strands_block = self
+    #     Raises
+    #     ------
+    #     ValueError
+    #         If the value is not an instance of Strand.
+    #     """
+    #     if not isinstance(value, Strand):
+    #         raise ValueError("The item must be a Strand instance") 
+    #     super().__setitem__(key, Coords(value))
+    #     self[key].strands_block = self
 
     @staticmethod
     def join_blocks(s_block1: 'StrandsBlock', 
@@ -1776,8 +1795,8 @@ class StrandsBlock(list):
             raise ValueError("The avoid_strand must be a Strand instance")
         
         # avoid the strand to join
-        s_block1 = [strand for strand in s_block1 if id(strand) != id(avoid_strand)]
-        s_block2 = [strand for strand in s_block2 if id(strand) != id(avoid_strand)]
+        s_block1 = (strand for strand in s_block1 if id(strand) != id(avoid_strand))
+        s_block2 = (strand for strand in s_block2 if id(strand) != id(avoid_strand))
         return StrandsBlock(*s_block1, *s_block2)
 
     def append(self, item: 'Strand') -> None:
@@ -1798,9 +1817,9 @@ class StrandsBlock(list):
             raise ValueError(f"The item must be a Strand instance, got {type(item)}")
         
         # append the strand to the block if it is not already in the block
-        if id(item) not in [id(strand) for strand in self]:
-            super().append(item)
-            self[-1].strands_block = self
+        if not any(item is strand for strand in self):
+            super().add(item)
+            item.strands_block = self
 
     def remove(self, item: 'Strand') -> None:
         """
@@ -1821,7 +1840,7 @@ class StrandsBlock(list):
         
         else:
             for i, strand in enumerate(self):
-                if id(strand) == id(item):
+                if strand is item:
                     del self[i]
                     strand.strands_block = None
 

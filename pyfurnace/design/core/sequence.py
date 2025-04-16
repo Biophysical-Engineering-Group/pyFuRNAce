@@ -29,7 +29,7 @@ class Sequence(Callback):
     """
 
     def __init__(self, 
-                 sequence: str = None, 
+                 sequence: str = "", 
                  directionality: Literal['53', '35'] = '53', 
                  **kwargs) -> None:
         """

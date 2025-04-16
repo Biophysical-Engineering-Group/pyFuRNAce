@@ -180,7 +180,7 @@ def dot_bracket_to_pair_map(dot_bracket):
 def pair_map_to_dot_bracket(pair_map, structure_length = None):
     """ Convert the pair map to a dot bracket notation"""
     if structure_length is None:
-        structure_length = max(j if j is not None else 0 for i in pair_map.items() for j in i) + 1
+        structure_length = max(pair_map.keys(), default=-1) + 1
 
     ### CREATE THE DOT BRACKET NOTATION ###
     done_pairs = set()

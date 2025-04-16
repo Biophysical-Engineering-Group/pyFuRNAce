@@ -1,5 +1,5 @@
 from typing import Literal
-
+import numpy as np
 
 class Position(tuple):
     """
@@ -15,13 +15,34 @@ class Position(tuple):
 
     _dimension = 2
 
+    def __new__(cls, position):
+        """
+        Create a new Position instance.
+
+        Parameters
+        ----------
+        position : tuple
+            A tuple representing the coordinates of the position.
+        
+        Returns
+        -------
+        Position
+            A new Position instance.
+        """
+        if cls._dimension == 3:
+            position = list(position)
+            diff = 3 - len(position)
+            if diff > 0:
+                position.extend([0] * diff)
+        return super().__new__(cls, position)
+
     def __repr__(self):
         """ Repr of the position tuple. """
         return 'Position' + super().__repr__()
     
     def __mul__(self, value):
         """ Multiply the position by a scalar or another position element-wise. """
-        if isinstance(value, int):
+        if isinstance(value, (int, np.int64)):
             if self._dimension == 3:
                 return Position((self[0] * value, 
                                  self[1] * value, 
@@ -36,14 +57,7 @@ class Position(tuple):
                          self[1] * value[1]))
 
     def __add__(self, other):
-        """ Add the position with a scalar or another position element-wise. """
-        if isinstance(other, int):
-            if self._dimension == 3:
-                return Position((self[0] + other, 
-                                 self[1] + other, 
-                                 self[2] + other))
-            return Position((self[0] + other, 
-                             self[1] + other))
+        """ Add the position to another position element-wise. """
         if self._dimension == 3:
             return Position((self[0] + other[0], 
                              self[1] + other[1], 
@@ -52,20 +66,22 @@ class Position(tuple):
                          self[1] + other[1]))
     
     def __sub__(self, other):
-        """ Subtract the position with a scalar or another position element-wise. """
-        if isinstance(other, int):
-            if self._dimension == 3:
-                return Position((self[0] - other, 
-                                 self[1] - other, 
-                                 self[2] - other))
-            return Position((self[0] - other, 
-                             self[1] - other))
+        """ Subtract the position to another position element-wise. """
         if self._dimension == 3:
             return Position((self[0] - other[0], 
                              self[1] - other[1], 
                              self[2] - other[2]))
         return Position((self[0] - other[0], 
                          self[1] - other[1]))
+    
+    def __neg__(self):
+        """ Return the opposite coordinate. """
+        if self._dimension == 3:
+            return Position((-self[0], 
+                             -self[1], 
+                             -self[2]))
+        return Position((-self[0], 
+                         -self[1]))
     
     ###
     ### PROPERTIES

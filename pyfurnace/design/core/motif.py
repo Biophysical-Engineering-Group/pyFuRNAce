@@ -1,7 +1,9 @@
 import warnings
+import copy
 from functools import wraps
 from inspect import signature
 from math import copysign
+from collections.abc import Iterable
 from typing import Any, List, Dict, Tuple, Union, Optional, Literal, Callable
 
 # OAT IMPORTS
@@ -37,10 +39,8 @@ class Motif(Callback):
 
     Parameters
     ----------
-    strands : list of Strand, optional
+    *strands : list of Strand, optional
         A list of `Strand` objects to initialize the motif.
-    *args : list of Strand
-        Additional strands to add to the motif.
     basepair : BasePair, dict, optional
         A dictionary defining base pair connections, with `Position` objects as keys 
         and values representing paired positions.
@@ -62,30 +62,39 @@ class Motif(Callback):
 
     Attributes
     ----------
-    strands : list of Strand
-        A list of strands composing the motif.
+    autopairing : bool
+        Indicates whether the motif automatically pairs bases.
     basepair : BasePair
         The base-pairing map of the motif.
         A double dictionary with `Position` objects as keys and values 
         representing paired positions in the 2D representation.
-    structure : str
-        The motif structure represented in dot-bracket notation.
-    sequence : str
-        The nucleotide sequence of the motif.
-    lock_coords : bool
-        Indicates whether the motif coordinates are part of the same coordinate system.
-    autopairing : bool
-        Indicates whether the motif automatically pairs bases.
     junctions : dict
-        A dictionary with 2D Direction as key and position of the open end as value.
-    map : dict
-        A mapping of 2D positions of the motif to strand indices.
-    base_map : dict
-        A mapping of 2D positions of the bases in the motif to strand indices.
-    sequence_index_map : dict
-        A mapping of base 2D position as key and strand index as value.
+        A dictionary with 2D Direction as key and Positions of the junctions as values.
+    lock_coords : bool
+        Indicates whether the strands coordinates are part of the same coordinate 
+        system.
+    max_pos : tuple of int
+        The maximum x, y coordinates occupied by the motif.
+    min_pos : tuple of int
+        The minimum x, y coordinates occupied by the motif. 
+    num_char : int
+        The maximum length of the motif lines.
+    num_lines : int
+        The number of lines in the motif structure.
     pair_map : dict
         A mapping of paired bases indices (alternative to dot-bracket notation).
+    positions : tuple of Position
+        A tuple of the positions of each character of each strand in 2D space.
+    seq_positions : tuple of Position
+        The positions of each nucleotide in the motif sequence (x,y coordinates).
+        Note: the sequence is always 5' to 3' in the motif.
+    sequence : Sequence
+        The nucleotide sequence of the motif. It's the concatenation of the sequence.
+        of each strand, with 5' to 3' directionality.
+    strands : list of Strand
+        A list of strands composing the motif.
+    structure : str
+        The motif structure represented in dot-bracket notation.
 
     Notes
     -----
@@ -95,8 +104,7 @@ class Motif(Callback):
     """
 
     def __init__(self, 
-                 strands: Optional[List[Strand]] = None, 
-                 *args:List[Strand], 
+                 *strands: List[Strand], 
                  basepair: Optional[Dict[Tuple[int, int], Tuple[int, int]]] = None,
                  structure: Optional[str] = None, 
                  autopairing: bool = True, 
@@ -109,10 +117,8 @@ class Motif(Callback):
 
         Parameters
         ----------
-        strands : list of Strand, optional
+        *strands : list of Strand
             List of strands to add to the motif.
-        *args : list of Strand
-            Additional strands to add to the motif.
         basepair : dict, optional
             The base-pairing map of the motif.
             A double dictionary with `Position` objects as keys and values 
@@ -133,38 +139,50 @@ class Motif(Callback):
         super().__init__(**kwargs)
 
         ### Initialize the attributes
+        self._positions = None
+        self._seq_positions = None
+        self._max_pos = None
+        self._min_pos = None
         self._junctions = {}
-        self._sequence = ''
-        self._map = {}
-        self._base_map = {}
-        self._sequence_index_map = {}
-        self._pair_map = {}
+        self._sequence = Sequence()
+        self._pair_map = BasePair()
         self._structure = None
         self._strands = []
         self.lock_coords = lock_coords
         self._strands_block = StrandsBlock() 
-
+        
         ### STRANDS INITIALIZATION
-        if strands is None:
-            strands = []
-        elif isinstance(strands, Strand):
-            strands = [strands]
-        all_strands = list(strands) + list(args)
-        if not all(isinstance(s, Strand) for s in all_strands):
+        if (len(strands) == 1 
+                and isinstance(strands[0], Iterable)
+                and not isinstance(strands[0], Strand)):
+            # if a single list of strands is passed, unpack it
+            strands = tuple(strands[0])
+
+        extra = kwargs.pop('strands', tuple())
+
+        if isinstance(extra, Strand):
+            strands += (extra, )
+        elif isinstance(extra, Iterable):
+            strands += tuple(extra)
+        else:
+            raise TypeError("`strands` keyword argument must be a Strand or an "
+                            "iterable of Strands.")
+
+        if not all(isinstance(s, Strand) for s in strands):
             raise ValueError("All the elements in the strands input must be of type"
-                             f" Strand. Got types {[type(s) for s in all_strands]}.")
+                             f" Strand. Got types {[type(s) for s in strands]}.")
 
         ### COPY/REGISTER STRANDS
         if copy:
-            all_strands = self.copy_strands_preserve_blocks(all_strands, self)
+            strands = self.copy_strands_preserve_blocks(strands, self)
         else:
-            for s in all_strands:
+            for s in strands:
                 s.register_callback(self._updated_strands)
 
         ### JOIN STRANDS
         if join:
-            all_strands = self.join_strands(strands = all_strands)
-        self._strands = all_strands # set the strands
+            strands = self.join_strands(strands = strands)
+        self._strands = list(strands) # set the strands
 
         ### LOCK COORDINATES
         if self.lock_coords:
@@ -201,7 +219,7 @@ class Motif(Callback):
 
         # draw each strand to the canvas
         for strand in self:
-            strand.draw(canvas_repr, return_draw=False)
+            strand.draw(canvas_repr, return_string=False)
 
         # add base pairing at position (if the base pairing position is free)
         for pos1, pos2 in self.basepair.items():
@@ -249,11 +267,10 @@ class Motif(Callback):
         strand.register_callback(self._updated_strands)
         self._strands[idx] = strand
         # indicate that the strands have been updated
-        self._updated_strands()
         self._strands = self.join_strands(self._strands)
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands ])
-                                                #  if not s._coords.is_empty()])
+        self._updated_strands()
 
     def __len__(self) -> int:
         """Get the number of strands."""
@@ -294,7 +311,8 @@ class Motif(Callback):
         other_copy = other.copy()
 
         # align the motifs horizontally
-        self.align([self_copy, other_copy])  
+        self.align(self_copy, other_copy)  
+        # get the x shifts to move the motifs
         x_shifts = self.get_sequential_shift([self_copy, other_copy], 
                                              position_based=False)
 
@@ -338,7 +356,7 @@ class Motif(Callback):
 
         if self:
             # align the motifs horizontally
-            self.align([self, other_copy])  
+            self.align(self, other_copy)  
             x_shifts = self.get_sequential_shift([self, other_copy], 
                                                  position_based=False)
             # move motif to the right of the first motif
@@ -357,7 +375,6 @@ class Motif(Callback):
         self._strands = self.join_strands(self._strands)
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands ])
-                                                #  if not s._coords.is_empty()])
         for s in self:
             s.register_callback(self._updated_strands)
 
@@ -382,7 +399,8 @@ class Motif(Callback):
                 return True
         return False
     
-    def __contains__(self, other: Union['Strand', 'Sequence', str, 'BasePair']) -> bool:
+    def __contains__(self, 
+                     other: Union['Strand', 'Sequence', str, 'BasePair']) -> bool:
         """ Check if the motif contains a strand, sequence, or base pair. """
         if type(other) == Strand:
             return other in self._strands
@@ -433,25 +451,11 @@ class Motif(Callback):
             self._calculate_basepair()
 
     @property
-    def base_map(self) -> Dict[Tuple[int, int], int]:
-        """
-        A dictionary with base position as key and strand index as value. 
-        """
-        if self._base_map:
-            return self._base_map
-        
-        base_map = {}
-        for i, s in enumerate(self._strands):
-            base_map.update({pos: i for pos in s.base_positions})
-        self._base_map = base_map
-        return base_map
-
-    @property
     def basepair(self) -> BasePair:
         """
         A dictionary with positions as key and the paired position as values.
         """
-        if self._autopairing and (not self._map 
+        if self._autopairing and (not self._positions
                                  or not self._sequence 
                                  or not self._basepair):
             # calculate the basepair dictionary
@@ -483,44 +487,14 @@ class Motif(Callback):
         self._trigger_callbacks()
 
     @property
-    def junctions(self) -> Dict[Tuple[int, int], List[Tuple[int, int]]]:
+    def junctions(self) -> Dict[Tuple[int, int], Tuple[Tuple[int, int]]]:
         """
         A dictionary with Direction as key (right: (1,0), bottom: (0,1), 
         left: (-1,0), top: (0,1)) and an ordered list of junction positon as value.
         """
         ### if the junctions are already calculated return them
-        if self._junctions:
-            return self._junctions
-        
-        ### initialize the junctions
-        junctions_dict = {direct: [] for direct in Direction}
-
-        ### collect the junctions
-        for s in self:
-            if not s.strand: # skip the empty strands
-                continue
-
-            # skip if the the start is '5' or '3' and the strand is not just the symbol
-            if s[0] not in '35' or len(s.strand) == 1:
-                # invert the start direction to have the direction of the junction 
-                junctions_dict[(-s.direction[0], -s.direction[1])].append(s.start) 
-
-            # skip if the the end is '5' or '3' and the strand is not just the symbol
-            if s[-1] not in '35' or len(s.strand) == 1: 
-                junctions_dict[s.end_direction].append(s.end)
-
-        ### order the junctions
-        for key, val in junctions_dict.items():
-
-            # order the bottom/top junctions
-            if key in ((0,1), (0,-1)):
-                val.sort(key=lambda a : a[0]) # order the junctions from left to right
-            
-            # order the left/right junctions
-            elif key in ((-1,0), (1,0)):
-                val.sort(key=lambda a : a[1]) # order the junctions from top to bottom
-
-        self._junctions = junctions_dict
+        if not self._positions:
+            self._calculate_positions()
         return self._junctions
 
     @property
@@ -542,60 +516,17 @@ class Motif(Callback):
         """
         The maximum x, y coordinates occupied of the motif.
         """
-        if not self._map:
-            self.map # calculate the map
+        if not self._positions:
+            self._calculate_positions()
         return self._max_pos
-
-    @property
-    def map(self) -> Dict[Tuple[int, int], int]:
-        """
-        A dictionary with occupied position as key and strand index as value. 
-        """
-        #if the map is already calculated return it
-        if self._map:
-            return self._map
-
-        ### initialize the variables
-        max_pos = None
-        min_pos = None
-        map_dict = {}
-
-        for ind, strand in enumerate(self):
-            for pos in strand.positions:
-                map_dict[pos] = ind
-
-                if max_pos is None:
-                    max_pos = list(pos)
-                    min_pos = list(pos)
-
-                ### update the maximum and minimum position
-                if pos[0] > max_pos[0]:
-                    max_pos[0] = pos[0]
-                elif pos[0] < min_pos[0]:
-                    min_pos[0] = pos[0]
-
-                if pos[1] > max_pos[1]:
-                    max_pos[1] = pos[1]
-                elif pos[1] < min_pos[1]:
-                    min_pos[1] = pos[1]
-
-        self._map = map_dict
-        if max_pos is None:
-            self._max_pos = (-1,-1)
-            self._min_pos = (0,0)
-        else:
-            self._max_pos = tuple(max_pos)
-            self._min_pos = tuple(min_pos)
-
-        return map_dict
 
     @property
     def min_pos(self) -> Tuple[int, int]:
         """
         The minimum x, y coordinates occupied of the motif.
         """
-        if not self._map:
-            self.map # calculate the map
+        if not self._positions:
+            self._calculate_positions()
         return self._min_pos
 
     @property
@@ -603,8 +534,8 @@ class Motif(Callback):
         """
         The maximum length of the motif lines.
         """
-        if not self._map:
-            self.map # calculate the map
+        if not self._positions:
+            self._calculate_positions()
         return self._max_pos[0] + 1
 
     @property
@@ -612,8 +543,8 @@ class Motif(Callback):
         """
         The number of lines in the motif structure.
         """
-        if not self._map:
-            self.map
+        if not self._positions:
+            self._calculate_positions()
         return self._max_pos[1] + 1
 
     @property
@@ -622,24 +553,24 @@ class Motif(Callback):
         The dictionary of the paired indexes (alternative to the dot bracket 
         notation). 
         """
-        if self._pair_map:
+        if self._positions and self._pair_map:
             return self._pair_map
-        
-        base_pair_dict = self.basepair
-        ind_pair_map = {}
-        for s in self:
-            # adjust the strand direction
-            search_dir = 1 if s.directionality == '53' else -1
-            for pos in list(s.base_positions)[::search_dir]:
-                paired_pos = base_pair_dict.get(pos, default=None)
-                ind1 = self.sequence_index_map[pos]
 
-                # unpaired position have None as value
-                ind2 = self.sequence_index_map.get(paired_pos, None)
-                ind_pair_map[ind1] = ind2
-
-        self._pair_map = BasePair(ind_pair_map)
+        pos_to_ind = {pos: ind for ind, pos in enumerate(self.seq_positions)}
+        self._pair_map = BasePair({ind: pos_to_ind.get(self.basepair.get(pos))
+                                            for pos, ind in pos_to_ind.items()})     
+         
         return self._pair_map
+    
+    @property
+    def positions(self) -> Tuple[Position]:
+        """ 
+        A tuple of the positions of each character of each strand in 2D space
+        (x,y coordinates).
+        """
+        if not self._positions:
+            self._calculate_positions()
+        return self._positions
 
     @property
     def sequence(self) -> str:
@@ -699,29 +630,14 @@ class Motif(Callback):
             s.sequence = seq_list.pop(0)
 
     @property
-    def sequence_index_map(self) -> Dict[Tuple[int, int], int]:
+    def seq_positions(self) -> Tuple[Position]:
+        """ 
+        The positions of each nucleotide in the motif sequence (x,y coordinates).
+        The sequence has always the directionality 5' to 3' 
         """
-        A dictionary with base position as key and sequence index as value.
-        """
-        if self._sequence_index_map:
-            return self._sequence_index_map
-        
-        pos_to_index = {} # convert the positions to indexes
-        strand_offset = 0
-
-        for s in self:
-            # check the direction of the strand
-            search_dir = 1 if s.directionality == '53' else -1
-
-            # create the map from the positions to the indexes
-            for ind, pos in enumerate(s.base_positions[::search_dir]):
-                pos_to_index[pos] = strand_offset + ind
-
-            # store the break points of the strands
-            strand_offset += len(s.base_positions)
-        
-        self._sequence_index_map = pos_to_index
-        return pos_to_index
+        if not self._positions:
+            self._calculate_positions()
+        return self._seq_positions
 
     @property
     def strands(self) -> List['Strand']:
@@ -740,21 +656,14 @@ class Motif(Callback):
             return self._structure
 
         # calculate the break points of the strands
-        break_points = []
-        last_ind = 0
-        for i, s in enumerate(self):
-            # skip the strands without sequence
-            if not s.sequence: 
-                continue
-            last_ind += len(s.sequence)
-            # store the break points of the strands
-            break_points.append(last_ind) 
+        break_points = [i for i, sym in enumerate(self.sequence) if sym == '&']
 
         ### CREATE THE DOT BRACKET NOTATION ###
-        dotbracket = pair_map_to_dot_bracket(self.pair_map, last_ind) 
+        dotbracket = pair_map_to_dot_bracket(self.pair_map, 
+                                             len(self.sequence.replace('&', ''))) 
 
         ### ADD THE BREAK POINTS ###
-        for i, bp in enumerate(break_points[:-1]):
+        for i, bp in enumerate(break_points):
             dotbracket = dotbracket[:bp + i] + '&' + dotbracket[bp + i:]
         self._structure = dotbracket
 
@@ -775,27 +684,26 @@ class Motif(Callback):
         # get the dictionary of paired indexes without the separation symbol
         pair_map = dot_bracket_to_pair_map(structure.replace('&', '')) 
         # get the list of base positions in simple order
-        base_positions = list(self.base_map.keys()) 
 
          # iterate over the base positions
-        for index, pos in enumerate(base_positions):
+        for index, pos in enumerate(self.seq_positions):
             paired = pair_map[index]
             # the index of the base position is paired to something
             if paired is not None: 
-                basepair_dict[Position(pos)] = Position(base_positions[paired])
+                basepair_dict[Position(pos)] = Position(self.seq_positions[paired])
 
         # set the basepair dictionary
         self.basepair = basepair_dict
+        self._pair_map = pair_map
         self._structure = structure
 
     ### 
-    ### CLASS METHODS (construct an object without using __init__())
+    ### CLASS METHODS
     ###
 
     @classmethod
     def concat(cls, 
-               motifs: List["Motif"], 
-               *args: List["Motif"],
+               *motifs: List["Motif"], 
                axis: Literal[0, 1] = 1, 
                extend: bool = False, 
                copy: bool = True, 
@@ -803,16 +711,15 @@ class Motif(Callback):
                position_based: bool = False, 
                align_junctions: Optional[List[Tuple[int, int]]] = None, 
                unlock_strands: bool = False, 
+               return_shifts: bool = False,
                **kwargs) -> "Motif":
         """
         Concatenate multiple motifs along a specified axis.
 
         Parameters
         ----------
-        motifs : list of Motif
+        *motifs : list of Motif
             List of motifs to concatenate.
-        *args : list of Motif
-            Additional motifs to concatenate.
         axis : int, default 1
             The numpy axis along which motifs are aligned.
             1 for horizontal alignment, 0 for vertical alignment.
@@ -829,6 +736,11 @@ class Motif(Callback):
         unlock_strands : bool, default False
             Whether to unlock all strands, so they are not part 
             of the same Strand block (different coordinate systems).
+        return_shifts : bool, default False
+            Whether to return the shift values for each motif to be aligned
+            and concatenated. If True, a list of tuples with the shifts is returned,
+            along with the concatenated motif (useful for Origami alignment).
+
         **kwargs : dict
             Additional arguments to pass to the Motif constructor. 
 
@@ -836,19 +748,45 @@ class Motif(Callback):
         -------
         Motif
             The concatenated Motif object.
+        List[Tuple[int, int]], optional
+            The list of shifts applied to each motif during alignment.
+            Only returned if return_shifts is True.
         """
-        if isinstance(motifs, Motif):
-            motifs = [motifs]
+        if (len(motifs) == 1 
+                and isinstance(motifs[0], Iterable)
+                and not isinstance(motifs[0], Motif)):
+            # if a single list of motifs is passed, unpack it
+            motifs = tuple(motifs[0])
+
+        extra = tuple(kwargs.pop('motifs', tuple()))
+        if isinstance(extra, Motif):
+            motifs += (extra,)
+        elif isinstance(extra, Iterable):
+            motifs += tuple(extra)
+        
+        # check if all the elements in the motifs input are of type Motif
+        if not all(isinstance(m, Motif) for m in motifs):
+            raise ValueError("All the elements in the motifs input must be of type"
+                             f" Motif. Got types {[type(m) for m in motifs]}.")
 
         # make a motif list and remove the empty motifs
-        motifs = [m for m in motifs + list(args) if m]
+        motifs = [m for m in motifs if m]
 
         if copy:
             motifs = [m.copy() for m in motifs]
 
+        if return_shifts:
+            # create a list of shifts for each motif
+            shifts = [Position.zero()] * len(motifs)
+
         if align:
-            aligned = Motif.align(motifs, axis=axis, 
-                                  align_junctions=align_junctions)
+            aligned = Motif.align(*motifs, 
+                                  axis=axis, 
+                                  align_junctions=align_junctions,
+                                  return_shifts=return_shifts)
+            if return_shifts:
+                aligned, shifts = aligned
+
         else :
             aligned = motifs
 
@@ -857,7 +795,11 @@ class Motif(Callback):
         y_pos = int(not axis)
 
         if extend:
-            aligned = [m.extend_junctions(skip_axis=y_pos) for m in aligned] 
+            # Extend the junctions
+            max_extend = max([m.max_pos[axis] for m in aligned], default=0)
+            extend_until = [None, None]
+            extend_until[axis] = max_extend
+            aligned = [m.extend_junctions(until=extend_until) for m in aligned] 
 
         # prepare the motif shifting them two by two
         for ind, m1 in enumerate(aligned[:-1]):
@@ -870,8 +812,8 @@ class Motif(Callback):
             
             # calculate the shift based on the junctions
             else:
-                m1_junct = m1.junctions[(x_pos,y_pos)]
-                m2_junct = m2.junctions[(-x_pos,-y_pos)]
+                m1_junct = m1.junctions[Position((x_pos,y_pos))]
+                m2_junct = m2.junctions[Position((-x_pos,-y_pos))]
 
                 if m1_junct and m2_junct:
                     ind1, ind2 = 0, 0
@@ -889,9 +831,15 @@ class Motif(Callback):
                         max_pos_m1 = -1
 
             # Calculate the shift for the axis
-            shift_pos = max_pos_m1 - min_pos_m2 + 1
+            shift_pos = Position((x_pos * (max_pos_m1 - min_pos_m2 + 1),
+                                  y_pos * (max_pos_m1 - min_pos_m2 + 1)))
+
             # Apply the shift
-            m2.shift((shift_pos * axis, shift_pos * int(not axis))) 
+            m2.shift(shift_pos)
+            
+            # update the shifts
+            if return_shifts:
+                shifts[ind+1] = shifts[ind+1] + shift_pos
 
         ### BASEPAIRS HANDLING
         basepair = BasePair()
@@ -907,13 +855,19 @@ class Motif(Callback):
             for m in aligned:
                 for s in m:
                     s.strands_block = None
-
+        
+        # create a object of the class
         new_motif = cls(**kwargs)
         new_motif._autopairing = autopairing
         new_motif._basepair = basepair
         new_motif.replace_all_strands([strand for m in aligned for strand in m], 
                                       copy=False, 
                                       join=True)
+
+        # used in Origami assembly
+        if return_shifts:
+            return new_motif, shifts
+        
         return new_motif
 
     @classmethod
@@ -1118,8 +1072,8 @@ class Motif(Callback):
             sequence = 'N' * len(structure)
 
         if isinstance(structure, str) and len(structure) != len(sequence):
-            raise ValueError(f"The sequence length must be equal to the structure length."
-                             f" Got {len(sequence)} for {len(structure)}")
+            raise ValueError(f"The sequence length must be equal to the structure "
+                             f"length. Got {len(sequence)} for {len(structure)}")
 
         # input dot-bracket notation
         if type(structure) == str:
@@ -1349,21 +1303,21 @@ class Motif(Callback):
     ###
 
     @staticmethod
-    def align(motifs: List['Motif'], 
-              *args: List['Motif'],
+    def align(*motifs: List['Motif'], 
               axis: Literal[0, 1] = 1, 
               extend: bool = False,
               align_junctions: Optional[List[Tuple[int, int]]] = None, 
-              align_to: Literal["first", "last", "center"] = "first") -> List['Motif']:
+              align_to: Literal["first", "last", "center"] = "first",
+              return_shifts: bool = False,
+              **kwargs
+              ) -> List['Motif'] | Tuple[List['Motif'], List[Tuple[int, int]]]:
         """
         Align motifs along a given axis by shifting them (without concatenating).
 
         Parameters
         ----------
-        motifs : List[Motif]
+        *motifs : List[Motif]
             List of motifs to align.
-        *args : List[Motif]
-            Additional motifs to align.
         axis : int, default 1
             The numpy axis along which motifs are aligned 
             (1 for horizontal, 0 for vertical).
@@ -1373,22 +1327,35 @@ class Motif(Callback):
             List of tuples specifying which junctions to align.
         align_to : str, default "first"
             Specifies how to align the motifs. Options: "first", "last", "center".
+            "first" aligns the first junction of the first motif with the first junction
+            of the second motif. "last" aligns the last junction of the first motif
+            with the last junction of the second motif. "center" aligns the center
+            of the first motif with the center of the second motif.
+        return_shifts : bool, default False
+            If True, returns the shifts applied to each motif during alignment,
+            along with the aligned motifs (useful for Origami alignment).
+            If False, only the aligned motifs are returned.
+        **kwargs : dict 
+            Parse if calling the motifs list explicitly.
 
         Returns
         -------
         List[Motif]
             The list of aligned motifs.
+        List[Tuple[int, int]], optional
+            The list of shifts applied to each motif during alignment.
+            Only returned if return_shifts is True.
         """
 
         ### get the alignment direction
         if axis in (1, 0):
-            direction = (axis, int(not axis))
+            direction = Position((axis, int(not axis)))
         else:
             raise ValueError(f"{axis} is not a valid value for the axis parameter."
                              " The axis parameter must be 0 or 1")
         
         # the direction to shift is the opposite of the direction of the axis
-        shift_direction = (int(not axis), axis)
+        shift_direction = Position((int(not axis), axis))
 
         ### check alignment type
         if align_to not in ("first", "last", "center"):
@@ -1397,18 +1364,33 @@ class Motif(Callback):
                              ' "first", "last" or "center"')
 
         ### check if the motifs are of the right type
-        if issubclass(type(motifs), Motif):
-            motifs = [motifs]
-        # remove the empty motifs
-        motifs = [m for m in motifs + list(args) if m]
+        if (len(motifs) == 1 
+                and isinstance(motifs[0], Iterable)
+                and not isinstance(motifs[0], Motif)):
+            # an iterable of motifs is passed
+            motifs = tuple(motifs[0])
 
-        ### aling all the motifs
+        extra = tuple(kwargs.pop('motifs', tuple()))
+        if isinstance(extra, Motif):
+            motifs += (extra,)
+        elif isinstance(extra, Iterable):
+            motifs += tuple(extra)
+        
+        # check if all the motifs are of type Motif
+        if not all(isinstance(m, Motif) for m in motifs):
+            raise ValueError("All the motifs must be of type Motif.")
+
+        # if shifts are requested, save them
+        if return_shifts:
+            shifts = [Position((0, 0)) for _ in motifs]
+
+        ### align all the motifs
         ind1 = 0
         ind2 = 1
         n_motifs = len(motifs)
         # start with the assumption that all the motifs are connected
         connected_motifs = [True] * n_motifs 
-
+        
         while ind2 < n_motifs: # stop when the second motif is the last one
             m1 = motifs[ind1]
             m2 = motifs[ind2]
@@ -1418,7 +1400,7 @@ class Motif(Callback):
                 junct_ind1, junct_ind2 = align_junctions[ind1]
 
             else:
-                # aling the first junction of the first motif 
+                # align the first junction of the first motif 
                 # with the first junction of the second motif
                 junct_ind1, junct_ind2 = 0, 0 # by default align the first junction
 
@@ -1426,7 +1408,7 @@ class Motif(Callback):
                     junct_ind1, junct_ind2 = -1, -1
 
             junctions1 = m1.junctions[direction]
-            junctions2 = m2.junctions[(-axis, -int(not axis))]
+            junctions2 = m2.junctions[-direction]
 
             ### calculate the shift of the two motifs 
             # and shift the motif with the lower junction
@@ -1437,7 +1419,8 @@ class Motif(Callback):
 
             elif (junctions1 
                     and junctions2 
-                    and junctions1[junct_ind1] and junctions2[junct_ind2]):
+                    and junct_ind1 < len(junctions1)
+                    and junct_ind2 < len(junctions2)):
                 # if junctions are detected, calculate the shift based on the junctions
                 shift = junctions1[junct_ind1][axis] - junctions2[junct_ind2][axis]
 
@@ -1445,26 +1428,38 @@ class Motif(Callback):
                 connected_motifs[ind1] = False # mark the first motif as not connected
                 shift = 0
 
+            shift_pos = shift_direction * shift
+            
             if shift > 0:
                 # shift only the newly appended motif
-                m2.shift((shift * shift_direction[0],  # x shift
-                          shift * shift_direction[1]), # y shift
-                         extend=extend)
+                m2.shift(shift_pos, extend=extend)
+                
+                # update the shifts
+                if return_shifts:
+                    shifts[ind2] = shifts[ind2] + shift_pos
 
             elif shift < 0:
+                shift_pos = -shift_pos
                 # shift the left motif and all the previous one if they are connected
                 for j in range(ind1, -1, -1):
                     if not connected_motifs[j]:
                         break
-                    if motifs[j]:
-                        motifs[j].shift((-shift * shift_direction[0],  # x shift
-                                         -shift * shift_direction[1]), # y shift
-                                        extend=extend)
+                        
+                    motifs[j].shift(shift_pos, extend=extend)
+                        
+                    # update the shifts
+                    if return_shifts:
+                        shifts[j] = shifts[j] + shift_pos
 
             # update the indices
             ind1 += 1
             ind2 += 1
 
+        if return_shifts:
+            # if the shifts are requested, return them
+            return motifs, shifts
+        
+        # if the shifts are not requested, return the motifs
         return motifs
 
     @staticmethod
@@ -1503,7 +1498,7 @@ class Motif(Callback):
             # collect the new strands block
             new_strands_block = new_motifs_dict[id(strand.strands_block)] 
             # copy the strand and add the callback
-            if motif:
+            if motif is not None:
                 copied = strand.copy(callback = motif._updated_strands)
             else:
                 copied = strand.copy()
@@ -1578,12 +1573,13 @@ class Motif(Callback):
             else:
                 m1_junct = m1.junctions
                 m2_junct = m2.junctions
-
+                
                 # if the junctions are detected, calculate the shift 
                 # based on the junctions
-                if m1_junct[(x_pos,y_pos)] and m2_junct[(-x_pos,-y_pos)]:
-                    max_pos_m1 = max((pos[y_pos] for pos in m1_junct[(x_pos,y_pos)]))
-                    min_pos_m2 = min((pos[y_pos] for pos in m2_junct[(-x_pos,-y_pos)]))
+                junc_dir = Position((x_pos, y_pos))
+                if m1_junct[junc_dir] and m2_junct[-junc_dir]:
+                    max_pos_m1 = max((pos[y_pos] for pos in m1_junct[junc_dir]))
+                    min_pos_m2 = min((pos[y_pos] for pos in m2_junct[-junc_dir]))
                 
                 else: # no junctions, just concatenate the motifs
                     max_pos_m1 = m1.max_pos[y_pos]
@@ -1610,8 +1606,8 @@ class Motif(Callback):
         List[Strand]
             The list of joined strands.
         """
-        joined_strands = set()
-        strands = [s for s in strands if s] # remove the empty strands
+        # remove the empty strands
+        strands = [s for s in strands if s] 
         
         # ordering strand is:
         # - the strands with 5' end
@@ -1620,6 +1616,11 @@ class Motif(Callback):
         strands = sorted(strands, 
                          key=lambda s: (-int('5' in s.strand), *s.start[::-1]))
     
+        # Comments for coders: I tried different ways to join the strands, 
+        # especially building a graph of joinable strands then using Depth First Search
+        # to join the adjacent strands; but this version of the code is faster
+
+        joined_strands = set()
         for ind1, s1 in enumerate(strands[:-1]):
             # if the strand is empty, or is already joined skip it
             if ind1 in joined_strands: 
@@ -1736,10 +1737,12 @@ class Motif(Callback):
         the `_basepair` attribute as a Basepair object.
         """
         basepair = BasePair(callback=self._updated_basepair)
+        pos_to_ind = {pos: ind for ind, pos in enumerate(self.seq_positions)}
+        sequence = str(self.sequence).replace('&', '')
 
-        for pos1, ind1 in self.base_map.items():
-            base1 = self[ind1].get_base_at_pos(pos1)
-
+        for pos1, ind1 in pos_to_ind.items():
+            base1 = sequence[ind1]
+            # skip already paired pos
             if pos1 in basepair:
                 continue
 
@@ -1749,26 +1752,88 @@ class Motif(Callback):
                 pos2 = pos1 + d * 2 
                 
                 # skip the positions already paired or not in the base map
-                if pos2 in basepair or pos2 not in self.base_map:
+                if pos2 in basepair or pos2 not in pos_to_ind:
                     continue
 
                 # if the basepair position is already taken, skip
                 bp_pos = pos1 + d
-                if bp_pos in self.map:
+                if bp_pos in self._positions:
                     continue
 
                 # check the bases can pair
-                strand = self[self.base_map[pos2]]
-                base2 = strand.get_base_at_pos(pos2)
+                base2 = sequence[pos_to_ind[pos2]]
                 if base2 in base_pairing[base1]:
                     basepair[Position(pos1)] = Position(pos2)
                     break
 
         self._basepair = basepair
 
+    def _calculate_positions(self) -> None:
+        """ 
+        Calculate the 2D properties of the strand.
+        This function calculates the properties:
+            - positions
+            - seq_positions
+            - max_pos
+            - min_pos
+            - junctions
+        """
+        ### initialize the variables
+        positions = ()
+        seq_positions = ()
+        max_pos = [0, 0]
+        min_pos = [float('inf'), float('inf')]
+        ### initialize the junctions
+        junctions_dict = {direct: [] for direct in Direction}
+
+        for ind, s in enumerate(self):
+            if not s:
+                continue
+            positions += s.positions
+
+            seq_dir = 1 if s.directionality == '53' else -1
+            seq_positions += s._seq_positions[::seq_dir]
+
+            # update MAX/MIN positions
+            if s._max_pos[0] > max_pos[0]:
+                max_pos[0] = s._max_pos[0]
+            if s._max_pos[1] > max_pos[1]:
+                max_pos[1] = s._max_pos[1]
+            if s._min_pos[0] < min_pos[0]:
+                min_pos[0] = s._min_pos[0]
+            if s._min_pos[1] < min_pos[1]:
+                min_pos[1] = s._min_pos[1]
+
+            # skip if the the start is '5' or '3' and the strand is not just the symbol
+            if s[0] not in '35':
+                # invert the start direction to have the direction of the junction 
+                junctions_dict[- s.direction].append(s.start) 
+                
+            # skip if the the end is '5' or '3' and the strand is not just the symbol
+            if s[-1] not in '35': 
+                junctions_dict[s.end_direction].append(s.end)
+
+        ### order the junctions
+        for key, val in junctions_dict.items():
+            # order the bottom/top junctions
+            if key in (Direction.DOWN, Direction.UP):
+                val.sort() # order the junctions in growing x and y
+            # order the left/right junctions
+            elif key in (Direction.LEFT, Direction.RIGHT):
+                val.sort(key=lambda pos : pos.swap_xy()) # order in growing y and x
+            
+        #### convert the junctions to tuple
+        self._junctions = {key: tuple(val) for key, val in junctions_dict.items()}
+
+        # save the other positional properties
+        self._positions = positions
+        self._seq_positions = seq_positions
+        self._max_pos = Position(max_pos)
+        self._min_pos = Position((c if c != float('inf') else 0 for c in min_pos))
+
     def _check_addition(self, 
                         other: "Motif", 
-                        direction: Union[Position, Tuple[int, int]] = Direction.RIGHT
+                        direction: Union[Position, Tuple[int, int]] = None
                         ) -> None:
         """
         Check whether two motifs can be added together in a given direction.
@@ -1781,7 +1846,7 @@ class Motif(Callback):
             The motif to be added.
         direction : tuple of int, optional
             The direction in which the motifs should be checked for addition.
-            Default is (1, 0).
+            Default is Direction(1, 0) (right).
 
         Raises
         ------
@@ -1797,7 +1862,9 @@ class Motif(Callback):
         if not isinstance(other, Motif):
             raise ValueError(f'{other} is not a valid type for addition')
     
-        if not isinstance(direction, (Direction, Position)):
+        if direction is None:
+            direction = Direction.RIGHT
+        elif not isinstance(direction, (Direction, Position)):
             direction = Position(direction)
 
         # take the junctions of the left and right side of the motifs
@@ -1811,24 +1878,7 @@ class Motif(Callback):
                 f"The motifs cannot be added in the direction {direction}, "
                 "the junctions are missing. Junctions" 
                 f" motif1: {junction1}, Junctions motif2: {junction2}. If you want" 
-                " to concatenate the motifs, use pf.Motif.concat() method.")
-        
-        elif len(junction1) != len(junction2):
-            raise MotifStructureError(
-                f"The number of connecting strands is different"
-                f" in the direction {direction}." 
-                f" Junctions motif1: {junction1}, Junctions motif2: {junction2}")
-        
-        ### Too much check, not necessary
-        # for i in range(len(junction1)-1):
-        #     # calculate the y difference between strands junctions, it must match
-        #     if abs(junction1[i][1] - junction1[i+1][1]) != abs(junction2[i][1] - junction2[i+1][1]):
-        #         raise MotifStructureError(f"The junctions have a different y distance;"
-        #                                     f" junctions1: {junction1}, junctions2: {junction2}")  
-        #     # # calculate the x difference between strands junctions, it must match
-        #     if abs(junction1[i][0] - junction1[i+1][0]) != abs(junction2[i][0] - junction2[i+1][0]):
-        #         raise MotifStructureError(f"The junctions have a different x distance; junctions1: "
-        #                                     f"{junction1}, junctions2: {junction2}")
+                " to concatenate the motifs, use pf.Motif.concat() method.") 
 
     def _updated_basepair(self, **kwargs) -> None:
         """
@@ -1870,13 +1920,7 @@ class Motif(Callback):
         - Base-pair structures
         """
         self._sequence = ''
-        self._map = {}
-        self._base_map = {}
-        self._sequence_index_map = {}
-        self._pair_map = {}
-        self._max_pos = None
-        self._min_pos = None
-        self._junctions = {}
+        self._positions = None
         if self._autopairing:
             self._basepair = BasePair()
             self._structure = None
@@ -1922,17 +1966,16 @@ class Motif(Callback):
 
         strand.register_callback(self._updated_strands)
         self._strands.append(strand)
-        self._updated_strands()
 
         if join:
             self._strands = self.join_strands(self._strands)
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands]) 
-                                                #  if not s._coords.is_empty()])
 
+        self._updated_strands()
         return self
 
-    def copy(self, **kwargs) -> 'Motif':
+    def copy(self, callback=None, **kwargs) -> 'Motif':
         """
         Return a copy of the motif.
 
@@ -1941,20 +1984,85 @@ class Motif(Callback):
 
         Parameters
         ----------
-        **kwargs
-            Additional parameters to modify the copied motif.
+        callback : callable, default None
+            A callback function to be registered in the copied motif.
+        **kwargs : dict
+            If the keyword 'deepcopy' with a list of attributes names is passed,
+            the attributes will deepcopyed instead referenced.
+            Same for the keyword 'copy' with a list of attributes names.
 
         Returns
         -------
-        Motif
-            A new motif object that is an independent copy of the original.
+        Motif or subclass
+            A new instance of the motif or its subclass, with the same properties
+            and attributes as the original.
         """
-        return Motif(Motif.copy_strands_preserve_blocks(self._strands), 
-                    basepair=self._basepair, 
-                    autopairing=self._autopairing, 
-                    copy=False, join=False, 
-                    lock_coords=self.lock_coords, 
-                    **kwargs)
+        new_motif = type(self).__new__(type(self))
+
+        # attributes that are calculated fresh or immutable that
+        # can be just reassigned
+        basic_properties = {'_autopairing',
+                            '_lock_coords', 
+                            '_structure', 
+                            '_positions',
+                            '_seq_positions',
+                            '_max_pos',
+                            '_min_pos',
+                            '_sequence',
+                            }
+        for prop in basic_properties:
+            setattr(new_motif, prop, getattr(self, prop))
+        
+        # attributes that have to be teatred differently
+        avoid_to_copy = {'_basepair', 
+                         '_junctions',
+                         '_pair_map', 
+                         '_strands_block',
+                         '_strands',
+                         '_callbacks',
+                         }
+
+        new_motif._strands = self.copy_strands_preserve_blocks(self._strands,
+                                                               new_motif)
+        if self._lock_coords and new_motif._strands:
+            new_motif._strands_block = new_motif[0].strands_block
+        new_motif._junctions = {k: tuple(v) for k, v in self._junctions.items()}
+        new_motif._basepair = self._basepair.copy()
+        new_motif._pair_map = self._pair_map.copy()
+        new_motif._callbacks = [callback] if callback else []
+
+        ### The other attributes should be freshly calculated
+        # or immutable, so just reassign them
+        for attr in self.__dict__:
+            # deepcopy the attribute if it is in the deepcopy list
+            if attr in kwargs.get('deepcopy', ()):
+                setattr(new_motif, attr, copy.deepcopy(getattr(self, attr)))
+                continue
+
+            # copy the attribute if it is in the copy list
+            elif attr in kwargs.get('copy', ()):
+                setattr(new_motif, attr, getattr(self, attr).copy())
+                continue
+
+            # check if the attribute is to avoid or already copied
+            if attr in avoid_to_copy or attr in basic_properties:
+                continue
+            
+            # reference the attribute 
+            setattr(new_motif, attr, getattr(self, attr))
+
+        return new_motif
+
+    # def copy(self, callback=None):
+    #     # return a copy of the Motif or subclass
+    #     new = copy.copy(self)
+    #     new._clear_callbacks()
+    #     new._strands = self.copy_strands_preserve_blocks(self._strands)
+    #     new._junctions = {k: tuple(v) for k, v in self._junctions.items()}
+    #     new._basepair = self._basepair.copy()
+    #     if callback:
+    #         new.register_callback(callback)
+    #     return new
 
     def extend_junctions(self, 
                          skip_axis: Literal[None, 0, 1] = None, 
@@ -1997,34 +2105,39 @@ class Motif(Callback):
             raise ValueError(f"{skip_axis} is not a valid value for the axis."
                              " You can skip the axis 0 or 1")
         
+        # make a dictionary from positions to index
+        index_map = {p: ind for ind, s in enumerate(self) for p in s.positions}
+
         try:
             for axis, sym in ((1, '─'), (0, '│')): # consider the two axis
                 naxis = int(not axis)
-                neg_direction = (- axis, - naxis)
-                pos_direction = (axis, naxis) 
+                neg_direction = Position((- axis, - naxis))
+                pos_direction = Position((axis, naxis)) 
 
                 if neg_direction not in skip_directions:
                     # consider all the junction positions in the negative direction
                     for pos in juncts[neg_direction]: 
 
-                        # get the strand at the position
-                        strand_at_pos = self[self.map[pos]] 
-
                         # if the position is not at the minimum border
                         if pos[naxis] != 0: 
                             # add a strand from the position and going to the border
                             extend_strand = Strand(sym * pos[naxis], 
-                                                   start=(pos[0] * naxis, pos[1] * axis), 
+                                                   start=(pos[0] * naxis, 
+                                                   pos[1] * axis),
                                                    direction=pos_direction)
                             
-                            # check that the extension doesn't overlap with other strands
-                            if not (set(extend_strand.positions) & set(self.map)): 
+                            # check that the extension doesn't overlap 
+                            # with other strands
+                            if not (set(extend_strand.positions) 
+                                            & set(index_map)): 
+                                # get the strand at the position
+                                strand_at_pos = self[index_map[pos]] 
                                 strand_at_pos.join(extend_strand)
 
                 if pos_direction not in skip_directions:
                     for pos in juncts[pos_direction]:
 
-                        strand_at_pos = self[self.map[pos]] 
+                        strand_at_pos = self[index_map[pos]] 
                         max_pos = self.max_pos[naxis]
 
                         # set the maximum position to the until parameter
@@ -2034,11 +2147,14 @@ class Motif(Callback):
                         if pos[naxis] < max_pos: 
                             # add a strand from the position and going to the border,
                             extend_strand = Strand(sym * (max_pos - pos[naxis]), 
-                                                   start=(pos[0] + 1 * axis, pos[1] + 1 * naxis), 
+                                                   start=(pos[0] + 1 * axis, 
+                                                          pos[1] + 1 * naxis), 
                                                    direction=pos_direction)
                             
-                            # check that the extension doesn't overlap with other strands
-                            if not (set(extend_strand.positions) & set(self.map)): 
+                            # check that the extension doesn't overlap 
+                            # with other strands
+                            if not (set(extend_strand.positions) 
+                                            & set(index_map)): 
                                 strand_at_pos.join(extend_strand)
 
         except MotifStructureError as e:
@@ -2106,6 +2222,32 @@ class Motif(Callback):
     @wraps(fold_bar) # inherit the documentation from the function
     def folding_barriers(self, kl_delay: int = 150) -> Tuple[str, int]:
         return fold_bar(self.structure, kl_delay)
+    
+    def get_strand_index_map(self) -> Dict[Tuple[int, int], int]:
+        """
+        Get a dictionary of positions as keys and the index of the
+        strand in the motif as values.
+
+        Returns
+        -------
+        Dict[Tuple[int, int], int]
+            A dictionary mapping positions to strand indexes
+        """
+        return {pos: ind for ind, strand in enumerate(self)
+                            for pos in strand.positions}
+    
+    def get_position_map(self) -> Dict[Tuple[int, int], str]:
+        """
+        Get a dictionary of positions as keys and the corresponding
+        characters as values.
+
+        Returns
+        -------
+        Dict[Tuple[int, int], str]
+            A dictionary mapping positions to characters.
+        """
+        return {pos: sym for strand in self 
+                            for pos, sym in zip(strand.positions, strand.strand)}
 
     def insert(self, 
                index: int, strand: 'Strand', 
@@ -2143,14 +2285,14 @@ class Motif(Callback):
 
         strand.register_callback(self._updated_strands)
         self._strands.insert(index, strand)
-        self._updated_strands()
 
         if join:
             self._strands = self.join_strands(self._strands)
 
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands]) 
-                                                #  if not s._coords.is_empty()])
+
+        self._updated_strands()
         return self
 
     def pop(self, index: int = -1) -> 'Strand':
@@ -2183,7 +2325,7 @@ class Motif(Callback):
 
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands]) 
-                                                #  if not s._coords.is_empty()])
+
         return strand
 
     def replace_all_strands(self, 
@@ -2230,7 +2372,7 @@ class Motif(Callback):
         self._strands = new_strands
         if self.lock_coords:
             self._strands_block = StrandsBlock(*[s for s in self._strands])
-                                                #  if not s._coords.is_empty()])
+
         # this will also update the basepair dictionary
         self._updated_strands()
 
@@ -2308,7 +2450,7 @@ class Motif(Callback):
             If True, saves force constraints specifically for pseudoknots.
         return_text : bool, default=False
             If True, returns the generated oxDNA configuration and topology as strings
-            instead of writing to files.
+            instead of writing to files (used for real-time visualization).
         sequence : str, optional
             If provided, uses the given sequence to generate the topology.
         pdb : bool, optional, default=False
@@ -2389,7 +2531,8 @@ class Motif(Callback):
                 print('Problem with proteins', s, e)
 
         if sequence:
-            topology_text = '\n'.join([f'{seq} type=RNA circular=false' for seq in sequence.split('&')]) + '\n'
+            topology_text = '\n'.join([f'{seq} type=RNA circular=false' 
+                                            for seq in sequence.split('&')]) + '\n'
             
         topology_text = f'{n_nucleotides} {n_strands} 5->3\n' + topology_text
 
@@ -2520,7 +2663,8 @@ class Motif(Callback):
         shift_vect : Tuple[int, int]
             The (x, y) shift values.
         extend : bool, default False
-            Whether to extend junctions when shifting.
+            Whether to extend junctions when shifting
+            (in the direction opposite to the shifting direction).
 
         Returns
         -------
@@ -2533,12 +2677,7 @@ class Motif(Callback):
             If shifting moves strands to negative positions.
         """
         Strand._check_position(input_pos_dir = shift_vect)
-
-        try:
-            shift = Position(shift_vect)
-        except Exception as e:
-            raise ValueError(f"Error converting the direction to a Position object: {e}")
-        
+        shift = Position(shift_vect)
         min_pos = self.min_pos
         # check if the shift will bring the strands to negative positions
         if min_pos[0] + shift[0] < 0 or min_pos[1] + shift[1] < 0:
@@ -2552,9 +2691,11 @@ class Motif(Callback):
         junc_vert, junc_hor = [], []
         if extend:
             if shift[1]:
-                junc_vert = self.junctions[(0, -int(copysign(1, shift[1])))]
+                junc_vert = self.junctions[Position((0, 
+                                                     -int(copysign(1, shift[1]))))]
             if shift[0]:
-                junc_hor = self.junctions[(-int(copysign(1, shift[0])), 0)] 
+                junc_hor = self.junctions[Position((-int(copysign(1, shift[0])),
+                                                    0))] 
                 
         for s in self:
             extend_strand = []
@@ -2587,7 +2728,6 @@ class Motif(Callback):
         # shift every basepair too
         if not self._autopairing:
             self._basepair = self.basepair.shift(shift)
-            
         return self
 
     def sort(self, 
@@ -2635,11 +2775,7 @@ class Motif(Callback):
         
         """
         min_pos = self.min_pos
-        shift = (-min_pos[0], -min_pos[1])
-        if skip_axis == 0:
-            shift = (-min_pos[0], 0)
-        elif skip_axis == 1:
-            shift = (0, -min_pos[1])
+        shift = (-min_pos[0] * int(skip_axis != 1), 
+                 -min_pos[1] * int(skip_axis != 0))
         self.shift(shift)
-
         return self

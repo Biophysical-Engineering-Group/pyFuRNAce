@@ -153,7 +153,7 @@ def save_origami(origami_name='Origami'):
         
         elif file_type == 'oxDNA':
             with tempfile.TemporaryDirectory() as tmpdirname:
-                file_path = f"{tmpdirname}/origami"
+                file_path = f"{tmpdirname}/{ori_name}"
                 origami.save_3d_model(file_path, forces=True)
                 with open(f"{file_path}.dat", 'r') as f:
                     conf_text = f.read()
@@ -191,13 +191,13 @@ def save_origami(origami_name='Origami'):
             elif file_type == 'txt':
                 # create a text data with the structure of the RNA origami
                 to_road = st.session_state.get('to_road')
-                text_data = origami.save_text('origami', 
+                text_data = origami.save_text('ori_name', 
                                               to_road=to_road,
                                               return_text=True,
                                               )
 
             elif file_type == 'fasta':
-                text_data = origami.save_fasta('origami', 
+                text_data = origami.save_fasta('ori_name', 
                                               return_text=True,
                                               )
                 

@@ -138,7 +138,6 @@ The connection between helices (Dovetails) are obtained roughly with this lookup
             helix_kl = st.number_input('Kissing loop columns:', min_value=1, value=1, help='number of KL repeats in the helix')
         with col2:
             main_stem = st.number_input('Spacing between crossovers (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
-            main_stem = [main_stem] * helix_kl
 
         submitted = st.form_submit_button("Submit")
         if submitted:
@@ -515,12 +514,14 @@ def generate_custom_motif_text(strand, x_size=50, y_size=10):
     ### update the content
     content = f"<div style='font-family: monospace; font-size: {st.session_state['origami_font_size'] + 8}px;'>"
     current_motif = st.session_state.motif
+    m_pos_to_sym = current_motif.get_position_map()
+    s_pos_to_sym = strand.get_position_map()
     for y in range(y_size):
         for x in range(x_size):
-            if (x, y) in strand.map:
-                content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: #D00000;">{strand.map[(x, y)]}</a>'
-            elif (x, y) in current_motif.map: # strand not currently selected
-                symbol = current_motif[current_motif.map[(x, y)]].map[(x, y)]
+            if (x, y) in s_pos_to_sym:
+                content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: #D00000;">{s_pos_to_sym[(x, y)]}</a>'
+            elif (x, y) in m_pos_to_sym: # strand not currently selected
+                symbol = m_pos_to_sym[(x, y)]
                 content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: #00856A; opacity: 0.5;">{symbol}</a>'
             else:
                 content += f'<a href="javascript:void(0);" id="{x},{y}" style="color: grey; opacity: 0.5;">•</a>'
@@ -607,8 +608,7 @@ def upload_3d_interface(strand, strand_num, current_custom_motif):
         pdb_format = file_3d.name.endswith('.pdb')
         strand.coords = pf.Coords.load_from_text(file_3d.getvalue().decode('utf-8'), 
                                                 dummy_ends=(dummy_start, dummy_end), 
-                                                pdb_format=pdb_format,
-                                                return_coords=True)
+                                                pdb_format=pdb_format)
         update_strand(strand, strand_num, current_custom_motif, coords=True)
 
 def update_strand(strand, strand_num, current_custom_motif, coords=None):
@@ -756,8 +756,8 @@ def custom(current_custom_motif):
         else:
             ### if the clicked position is the start, remove it and update the start
             if pos == strand.start:
-                strand._start = list(strand.map.keys())[0]
-                strand._direction = list(strand._direction_map.values())[0]
+                strand._start = strand.positions[0]
+                strand._direction = strand.directions[0]
                 strand.strand = strand.strand[1:]
 
             ### check the direction and in case add the new position
@@ -872,18 +872,18 @@ def update_code(code_text):
     # Define the local environment in which the user's code will be executed
     local_context = {'origami': st.session_state.origami}
     # Attempt to execute the code safely
-    try:
-        exec(code_text, {'__builtins__': __builtins__, 'pf': pf}, local_context)
-        st.session_state.origami = local_context['origami']  # Retrieve the modified origami variable
-        st.success("Nanostructure updated successfully!")
+    # try:
+    exec(code_text, {'__builtins__': __builtins__, 'pf': pf}, local_context)
+    st.session_state.origami = local_context['origami']  # Retrieve the modified origami variable
+    st.success("Nanostructure updated successfully!")
 
-        # select the end of the origami
-        st.session_state.line_index = len(st.session_state.origami) - 1
-        st.session_state.motif_index = len(st.session_state.origami[-1])
+    # select the end of the origami
+    st.session_state.line_index = len(st.session_state.origami) - 1
+    st.session_state.motif_index = len(st.session_state.origami[-1])
 
-    except Exception as e:
-        st.error(f"Error in executing the code: {e}")
-        return False
+    # except Exception as e:
+    #     st.error(f"Error in executing the code: {e}")
+    #     return False
     st.session_state.code = code_text.split('\n\n')
     st.rerun()
 
@@ -1017,9 +1017,9 @@ def display3d():
             motif = origami[m_slice[0]][m_slice[1]]
             motif_shift = origami.shift_map[m_slice]
             index_colors = [0] * len(origami.sequence.replace('&', ''))
-            for pos in motif.base_map:
+            for pos in motif.seq_positions:
                 shifted = tuple([pos[0] + motif_shift[0], pos[1] + motif_shift[1]])
-                index_colors[origami.sequence_index_map[shifted]] = 1
+                index_colors[origami.seq_positions.index(shifted)] = 1
 
     if index_colors:
         for s in origami.strands:
@@ -1057,6 +1057,8 @@ def build_origami_content(barriers=None):
         
     # create color gradient
     if st.session_state.gradient:
+        # create a dictionary from positions to index
+        pos_to_index = {pos: ind for ind, pos in enumerate(origami.seq_position)}
         tot_len = 0
         for s in origami.strands:
             tot_len += len(s.sequence)
@@ -1121,7 +1123,7 @@ def build_origami_content(barriers=None):
             elif ori_pos in origami.map:  # a motif symbol
                 motif_slice = origami.map[ori_pos]
                 if st.session_state.gradient: 
-                    index = st.session_state.origami.sequence_index_map.get(ori_pos)
+                    index = pos_to_index.get(ori_pos)
                     if index is not None:
                         color = c_map[index]
 
@@ -1209,8 +1211,9 @@ def clicked_options(clicked):
 
         nucl_text = ''
         # Indicate the nucleotide index:
-        if pos in st.session_state.origami.base_map:
-            nucl_text += f':orange[nucleotide index {st.session_state.origami.sequence_index_map[pos]}] in'
+        if pos in st.session_state.origami.seq_positions:
+            ind = st.session_state.origami.seq_positions.index(pos)
+            nucl_text += f':orange[nucleotide index {ind}] in'
 
         ### highlight the selected motif
         if st.session_state.line_index != motif_slice[0] or st.session_state.motif_index != motif_slice[1]:
@@ -1236,8 +1239,8 @@ def display_structure_sequence():
         try:
             motif = origami[motif_slice]
             shifts_x, shift_y = origami.shift_map[motif_slice]
-            for pos in motif.base_map:
-                indexes.append(list(origami.base_map.keys()).index((pos[0] + shifts_x, pos[1] + shift_y)))
+            for pos in motif.seq_positions:
+                indexes.append(origami.seq_positions.index((pos[0] + shifts_x, pos[1] + shift_y)))
         except IndexError:
             pass
             # problem with updating the keys or the motif is not present

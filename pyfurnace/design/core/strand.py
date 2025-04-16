@@ -59,9 +59,8 @@ class Strand(Callback):
         The positions of each strand character in 2D space (x,y coordinates).
     directions : Tuple[Direction]
         The directions of each strand character in 2D space (x,y coordinates).
-    base_positions : Tuple[Position]
-        The positions of each nucleotide base of the strand in 2D space
-        (x,y coordinates).
+    seq_positions : Tuple[Position]
+        The positions of each nucleotide in the strand sequence (x,y coordinates).
     end : Position
         The last position of the strand in 2D space.
     end_direction : Direction
@@ -72,8 +71,6 @@ class Strand(Callback):
         The next position of the strand in 2D space.
     pk_info : Optional[Dict]
         The pseudoknot information of the strand (if any).
-        Note: This attribute is not defined in the constructor and should be set
-        separately if needed.
     """
 
 
@@ -110,6 +107,15 @@ class Strand(Callback):
         """
         # register the callback
         super().__init__(**kwargs) 
+        self.pk_info = None
+        self._coords = Coords()
+        self._positions = None
+        self._directions = None
+        self._seq_positions = None
+        self._prec_pos = None
+        self._next_pos = None
+        self._max_pos = None
+        self._min_pos = None
         
         strand = self._check_line(strand)
 
@@ -132,9 +138,8 @@ class Strand(Callback):
 
         ### set 2D properties
         self._reset_positions()
-        if coords is None:
-            self._coords = Coords()
-        else:
+
+        if coords is not None:
             self.coords = coords
 
         # set the strand block to lock the 3D coordinates
@@ -183,9 +188,7 @@ class Strand(Callback):
                             coords=coords)
         
         # combine the pseudoknots information and add them
-        new_pk_info = self._combine_pk_info(other)
-        if new_pk_info:
-            new_strand.pk_info = new_pk_info
+        new_strand.pk_info = self._combine_pk_info(other)
 
         return new_strand
     
@@ -199,9 +202,7 @@ class Strand(Callback):
         self._coords = Coords.combine_coords(self, other)
 
         # combine the pseudoknots information and add them
-        new_pk_info = self._combine_pk_info(other)
-        if new_pk_info:
-            self.pk_info = new_pk_info
+        self.pk_info = self._combine_pk_info(other)
 
         # notify the upper class that the strand has changed
         self._trigger_callbacks()
@@ -266,6 +267,24 @@ class Strand(Callback):
     ### 
     ### PROPERTIES
     ###
+
+    @property
+    def max_pos(self) -> Position:
+        """ 
+        The maximum x, y coordinates of the strand in 2D space. 
+        """
+        if not self._positions:
+            self._calculate_positions()
+        return self._max_pos
+    
+    @property
+    def min_pos(self) -> Position:
+        """ 
+        The minimum x, y coordinates of the strand in 2D space. 
+        """
+        if not self._positions:
+            self._calculate_positions()
+        return self._min_pos
 
     @property
     def strand(self) -> str:
@@ -397,14 +416,13 @@ class Strand(Callback):
         return self._directions
     
     @property
-    def base_positions(self) -> Tuple[Position]:
+    def seq_positions(self) -> Tuple[Position]:
         """ 
-        A tuple of the positions of each nucleotide base of the strand in 2D space
-        (x,y coordinates).
+        The positions of each nucleotide in the strand sequence (x,y coordinates).
         """
         if not self._positions:
             self._calculate_positions()
-        return self._base_positions
+        return self._seq_positions
 
     @property
     def end(self) -> Position:
@@ -491,7 +509,7 @@ class Strand(Callback):
         If the coordinates are not set, they are calculated for a strand in
         a perfect helix with the same length of the strand.
         """
-        if not self._coords.is_empty():
+        if not self._sequence or not self._coords.is_empty():
             return self._coords
         coords = Coords.compute_helix_from_nucl(
                             (0,0,0), # start position
@@ -514,11 +532,9 @@ class Strand(Callback):
             self._coords = Coords()
 
         # sanity check
-        if (new_coords.size > 0 
-                and new_coords.shape 
-                and new_coords.shape[0] != len(self.sequence)):
+        if (len(new_coords) != len(self.sequence)):
             raise MotifStructureError(f"The number of oxDNA coordinates "
-                                      f"({new_coords.shape[0]}) is different "
+                                      f"({len(new_coords)}) is different "
                                       f"from the number of nucleotides "
                                       f"({len(self.sequence)})")
         
@@ -561,7 +577,7 @@ class Strand(Callback):
 
     def _calculate_positions(self) -> None:
         """ 
-        Trace the strand in 2D space and create the 2D projections of the strand.
+        Trace the strand in 2D space and create the 2D properties of the strand.
         It cleans the symbols, replacing them with the corresponding nice ASCII 
         representation. It also checks for structural errors in the strand
         drawing.
@@ -570,6 +586,8 @@ class Strand(Callback):
             - _positions
             - _directions
             - _next_pos
+            - _max_pos
+            - _min_pos
             
         Raises
         ------
@@ -579,12 +597,14 @@ class Strand(Callback):
         """
         ### initialize all the variables
         pos = self.start
+        max_pos = list(pos)
+        min_pos = list(pos)
         direction = self.direction
         self._prec_pos = pos - direction
         positions = []
         # pos_set = set() # to check weird crossings
         directions = []
-        base_positions = []
+        seq_positions = []
         # Use list for efficient string concatenation
         new_strand = [] 
         # first conversion of the symbols that are easy to interpret
@@ -619,7 +639,7 @@ class Strand(Callback):
                     sym = '↓'
             elif sym in nucleotides:
                 # add the base positions
-                base_positions.append(pos)
+                seq_positions.append(pos)
 
             # Append the new symbol to the strand list
             new_strand.append(sym)
@@ -634,7 +654,6 @@ class Strand(Callback):
 
             
             # Check symbols and directions errors
-
             elif (direction[0] 
                     and any((sym == "│", 
                              direction[0] == 1 and sym in "╰╭", 
@@ -661,7 +680,7 @@ class Strand(Callback):
                                                               )
                                           )
             
-            ### DON'T CHECK CROSSINGS THAT WORKS
+            ### DON'T NAME THE CROSSINGS IF THEY WORKS
             # # allowed crossing, signal it
             # elif pos in pos_set and sym not in "┼":
             #     warnings.warn(f"The strand is doing a crossing not allowed, "
@@ -674,6 +693,15 @@ class Strand(Callback):
 
             # Add symbol to the 2D map
             positions.append(pos)
+
+            if pos[0] > max_pos[0]:
+                max_pos[0] = pos[0]
+            if pos[1] > max_pos[1]:
+                max_pos[1] = pos[1]
+            if pos[0] < min_pos[0]:
+                min_pos[0] = pos[0]
+            if pos[1] < min_pos[1]:
+                min_pos[1] = pos[1]
 
             # Update directions
             if sym in "╰╮\\":
@@ -689,7 +717,7 @@ class Strand(Callback):
             directions.append(direction)
 
             # Update positions
-            pos += direction
+            pos = pos + direction
 
         # Update the strand symbols
         new_strand = ''.join(new_strand)
@@ -699,8 +727,10 @@ class Strand(Callback):
         # Update the 2D properties
         self._positions = tuple(positions)
         self._directions = tuple(directions)
-        self._base_positions = tuple(base_positions)
+        self._seq_positions = tuple(seq_positions)
         self._next_pos = pos
+        self._max_pos = Position(max_pos)
+        self._min_pos = Position(min_pos)
 
     @staticmethod
     def _check_position(input_pos_dir, direction: bool =False) -> Position:
@@ -724,8 +754,8 @@ class Strand(Callback):
             return input_pos_dir 
         
         if (not isinstance(input_pos_dir, (tuple, list)) 
-                or not isinstance(input_pos_dir[0], int) 
-                or not isinstance(input_pos_dir[1], int)):
+                or not isinstance(input_pos_dir[0], (int, np.int64))
+                or not isinstance(input_pos_dir[1], (int, np.int64))):
             raise ValueError(f'The 2D coordinates must be a tuple/list of (x,y) '
                              f'integer values. Got {input_pos_dir} instead.')
         
@@ -733,7 +763,7 @@ class Strand(Callback):
             raise ValueError(f'2D direction not allowed. The allowed values are:\n'
                              f'RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).\n'
                              f'Got {input_pos_dir} instead.')
-        
+
         return Position(input_pos_dir)
 
     def _check_line(self, 
@@ -857,7 +887,7 @@ class Strand(Callback):
                 and self.directionality != other.directionality):
             raise MotifStructureError(f'Cannot add two strands with different '
                                       f'directionality. \n'
-                                      f'\tFirst strand: {self._strand}. \n'
+                                      f'\tFirst strand: {self._strand} \n'
                                       f'\tFirst strand directionality: '
                                       f'{self.directionality}\n'
                                       f'\tSecond strand {other._strand}\n'
@@ -906,7 +936,7 @@ class Strand(Callback):
                     current_sequence = "" 
 
         # reset the oxDNA coordinates if the sequence is not the same
-        if not hasattr(self, '_sequence') or len(new_sequence) != len(self._sequence):
+        if len(new_sequence) != len(self._coords):
             self._coords = Coords(()) 
 
         # pick the directionality
@@ -943,7 +973,7 @@ class Strand(Callback):
 
         new_seq_str = new_sequence._sequence
         # reset the coordinates if the sequence changed length
-        if len(new_seq_str) != len(self._sequence):
+        if len(new_seq_str) != len(self._coords):
             self._coords = Coords(()) # reset the oxDNA coordinates
 
         # assign the new sequence
@@ -977,7 +1007,7 @@ class Strand(Callback):
         """
         # Main positional parameters
         self._positions = None
-        self._base_positions = None
+        self._seq_positions = None
         self._directions = None
 
     def _combine_pk_info(self, other: 'Strand') -> Optional[Dict]:
@@ -1002,13 +1032,13 @@ class Strand(Callback):
             The combined pseudoknot information if available, otherwise None.
         """
         # check if the strands have pseudoknot information
-        if not hasattr(self, 'pk_info') and not hasattr(other, 'pk_info'):
+        if not self.pk_info and not other.pk_info:
             return None
         
         new_pk_info = {"id": [], 'ind_fwd': [], 'E': [], 'dE': []}
-        if hasattr(self, 'pk_info'):
+        if self.pk_info:
             new_pk_info = copy.deepcopy(self.pk_info)
-        if hasattr(other, 'pk_info'):
+        if other.pk_info:
             offset = len(self.sequence)
             new_pk_info['id'] += other.pk_info['id']
             new_pk_info['ind_fwd'] += [(x[0] + offset, x[1] + offset) 
@@ -1117,16 +1147,16 @@ class Strand(Callback):
             if strand1._positions and strand2._positions:
                 joined._positions = first._positions + second._positions
                 joined._directions = first._directions + second._directions
-                joined._base_positions = first._base_positions + second._base_positions
+                joined._seq_positions = first._seq_positions + second._seq_positions
                 joined._prec_pos = first._prec_pos
                 joined._next_pos = second._next_pos
+                joined._max_pos = Position((max(first._max_pos[0], second._max_pos[0]),
+                                           max(first._max_pos[1], second._max_pos[1])))
+                joined._min_pos = Position((min(first._min_pos[0], second._min_pos[0]),
+                                           min(first._min_pos[1], second._min_pos[1])))
             
             # update the pseudoknots information
-            new_pk_info = first._combine_pk_info(second)
-        
-            # update the pseudoknots information
-            if new_pk_info:
-                joined.pk_info = new_pk_info
+            joined.pk_info = first._combine_pk_info(second)
 
         # revert back the strand if it was inverted
         if s2_inverted:
@@ -1149,8 +1179,8 @@ class Strand(Callback):
 
     def draw(self, 
              canvas: list = None, 
-             return_draw: bool = True, 
-             plane: int = 0):
+             return_string: bool = True, 
+             plane: int = 0) -> Optional[str]:
         """
         Draw the strand in 2D space using a canvas.
         The canvas is a list of strings, where each string is a line of the canvas.
@@ -1160,7 +1190,7 @@ class Strand(Callback):
         ----------
         canvas : list, default None
             The canvas to draw the strand on. If None, a new canvas is created.
-        return_draw : bool, default True
+        return_string : bool, default True
             If True, return the drawn canvas as a string (for printing).
         plane : int, default 0
             The plane to draw the strand on (experimental). If 0, the strand 
@@ -1168,8 +1198,8 @@ class Strand(Callback):
 
         Returns
         -------
-        str
-            The drawn canvas as a string if return_draw is True, otherwise None.
+        str or None
+            The drawn canvas as a string if return_string is True, otherwise None.
 
         Raises
         -------
@@ -1223,7 +1253,7 @@ class Strand(Callback):
                                  + sym 
                                  + canvas[pos[1]][pos[0] + 1:])
         
-        if return_draw: 
+        if return_string: 
             return '\n'.join(canvas)
     
     def flip(self, 
@@ -1286,13 +1316,8 @@ class Strand(Callback):
         str
             The base at the specified position.
         """
-        if not isinstance(pos, (tuple, list)):
-            raise TypeError(f'The position must be a tuple or list of (x,y) '
-                             f'integer values. Got {type(pos)} instead.')
-        
-        pos = Position(pos)
-        
-        return str(self._sequence[self._base_positions.index(pos)])
+        pos = self._check_position(pos)
+        return str(self._sequence[self._seq_positions.index(pos)])
 
     def get_char_at_pos(self, pos: Union[Position, Tuple[int, int]]) -> str:
         """
@@ -1308,13 +1333,20 @@ class Strand(Callback):
         str
             The character at the specified position.
         """
-        if not isinstance(pos, (tuple, list)):
-            raise TypeError(f'The position must be a tuple or list of (x,y) '
-                             f'integer values. Got {type(pos)} instead.')
-        
-        pos = Position(pos)
-        
+        pos = self._check_position(pos)
         return self.strand[self._positions.index(pos)]
+    
+    def get_position_map(self) -> Dict[Tuple[int, int], str]:
+        """
+        Get a dictionary of positions as keys and the corresponding
+        characters as values.
+
+        Returns
+        -------
+        Dict[Tuple[int, int], str]
+            A dictionary mapping positions to characters.
+        """
+        return {pos: char for pos, char in zip(self.positions, self.strand)}
 
     def invert(self) -> 'Strand':
         """
@@ -1327,22 +1359,38 @@ class Strand(Callback):
         Strand
             The updated strand instance.
         """
-        end = self.end
-        self._direction = self.end_direction * -1
-        self._start = end
-        self._sequence._directionality = self._sequence._directionality[::-1]
-        self._coords.reverse_in_place()
-        self._update_sequence_insertion(self._strand[::-1])
-        self._reset_positions()
         # don't trigger the callbacks, the strand is the same for the Motif
         seq_len = len(self.sequence)
 
+        # update the start positions and direction
+        end = self.end
+        self._direction = - self.end_direction
+        self._start = end
+
+        # update the strand and sequence
+        self._strand = self._strand[::-1]
+        self._sequence._directionality = self._sequence._directionality[::-1]
+        self._sequence._sequence = self._sequence._sequence[::-1]
+        self._seq_slice = [slice(seq_len - sl.stop, seq_len - sl.start)
+                                for sl in self._seq_slice[::-1]]
+        
+        # invert the positions if already built
+        if self._positions:
+            self._positions = self._positions[::-1]
+            self._directions = tuple(-d for d in self._directions[::-1])
+            self._seq_positions = self._seq_positions[::-1]
+            self._prec_pos, self._next_pos = self._next_pos, self._prec_pos
+            # max pos and min pos don't change
+
         # adjust the pseudoknots information
-        if hasattr(self, 'pk_info'):
+        if self.pk_info:
             new_ind_fwd = []
             for start, end in self.pk_info['ind_fwd']:
                 new_ind_fwd.append((seq_len - end, seq_len - start))
             self.pk_info['ind_fwd'] = new_ind_fwd
+
+        # update the 3D coordinates
+        self._coords.reverse_in_place()
                 
         return self
     
@@ -1398,9 +1446,11 @@ class Strand(Callback):
         
         # directly update the positional attributes
         self._positions = positions
-        self._base_positions = tuple(pos + shift for pos in self._base_positions)
-        self._prec_pos = self._prec_pos + shift
-        self._next_pos = self._next_pos + shift
+        self._seq_positions = tuple(pos + shift for pos in self._seq_positions)
+        self._prec_pos += shift
+        self._next_pos += shift
+        self._max_pos += shift
+        self._min_pos += shift
 
         self._trigger_callbacks()
         return self
@@ -1442,7 +1492,8 @@ class Strand(Callback):
         return popped_val
 
 
-    def join(self, other: 'Strand') -> Optional['Strand']:
+    def join(self, other: 'Strand', 
+             trigger_callbacks: bool = True) -> Optional['Strand']:
         """
         Join this strand with another strand, aligning their start and end positions and direction.
         This behaves like the @staticmethod join_strands, but it modifies the current strand
@@ -1452,6 +1503,8 @@ class Strand(Callback):
         ----------
         other : Strand
             The other strand to join.
+        trigger_callbacks : bool, default True
+            If True, trigger the callbacks after joining the strands.
 
         Returns
         -------
@@ -1498,28 +1551,38 @@ class Strand(Callback):
             if join_order == 1:
                 first, second = self, other
             else:
-                self._start = other.start
-                self._direction = other.direction
-                if not self._sequence:
-                    self._sequence = other.sequence
                 first, second = other, self
 
-            # this calls the reset of all the positions
-            self.strand = first.strand + second.strand
+            if not self._sequence:
+                self._sequence._directionality = other._sequence.directionality
+
+            self._start = first._start
+            self._direction = first._direction
+
             self._coords = Coords.combine_coords(first, second)
+
+            # this calls the reset of all the positions
+            self._update_sequence_insertion(first.strand + second.strand)
 
             if self.sequence:
                 self.strands_block.update(self.strands_block, 
                                           other.strands_block, 
                                           avoid_strands={other}
                                           )
+            
+            if first._positions and second._positions:
+                self._positions = first._positions + second._positions
+                self._directions = first._directions + second._directions
+                self._seq_positions = first._seq_positions + second._seq_positions
+                self._prec_pos = first._prec_pos
+                self._next_pos = second._next_pos
+                self._max_pos = Position((max(first._max_pos[0], second._max_pos[0]),
+                                         max(first._max_pos[1], second._max_pos[1])))
+                self._min_pos = Position((min(first._min_pos[0], second._min_pos[0]),
+                                         min(first._min_pos[1], second._min_pos[1])))
 
             # calculte the new pseudoknots information
-            new_pk_info = first._combine_pk_info(second)
-
-            # update the pseudoknots information
-            if new_pk_info:
-                self.pk_info = new_pk_info
+            self.pk_info = first._combine_pk_info(second)
         
         # revert the strand to the original position
         if s2_inverted: 
@@ -1528,6 +1591,9 @@ class Strand(Callback):
         if join_order is None:
             return
 
+        # trigger the callbacks if needed
+        if trigger_callbacks:
+            self._trigger_callbacks()
         return self
         
     def transform(self, transformation_matrix: Any) -> None:
@@ -1557,7 +1623,7 @@ class Strand(Callback):
             The base name for the output files.
         return_text : bool, default=False
             If True, returns the configuration and topology text instead 
-            of saving to file.
+            of saving to file (used for real-time visualization).
         pdb : bool, default=False
             If True, exports the structure as a PDB file (requires 
             `oxDNA_analysis_tools`).
@@ -1634,37 +1700,107 @@ class Strand(Callback):
             oxDNA_PDB(conf, system, filename, **kwargs)
 
 
-    def copy(self, **kwargs) -> 'Strand':
+    # def copy(self, **kwargs) -> 'Strand':
+    #     """
+    #     Create a copy of the current strand, including coordinates and attributes.
+
+    #     Parameters
+    #     ----------
+    #     **kwargs : dict
+    #         Optional keyword arguments passed to the Strand constructor.
+
+    #     Returns
+    #     -------
+    #     Strand
+    #         A deep copy of the strand.
+    #     """
+    #     new_stand = Strand(self.strand, 
+    #                        self.directionality, 
+    #                        start=self.start, 
+    #                        direction=self.direction, 
+    #                        coords=self.coords.copy(), 
+    #                        **kwargs)
+        
+    #     # copy the pk_info if available (and eventually other immutable attributes)
+    #     for attr in self.__dict__.keys():
+    #         if attr not in new_stand.__dict__.keys():
+    #             setattr(new_stand, attr, copy.deepcopy(getattr(self, attr)))
+    #         # don't copy the list because this copies the callbacks
+    #         # copy the dictionaries, so it copies the maps
+    #         elif type(getattr(self, attr)) in (int, float, str, bool, tuple):
+    #             setattr(new_stand, attr, copy.copy(getattr(self, attr)))
+
+    #     return new_stand
+    
+    def copy(self, callback=None) -> 'Strand':
         """
         Create a copy of the current strand, including coordinates and attributes.
 
         Parameters
         ----------
-        **kwargs : dict
-            Optional keyword arguments passed to the Strand constructor.
+        callback : callable, default None
+            A callback function to be registered in the copied strand.
 
         Returns
         -------
         Strand
             A deep copy of the strand.
         """
-        new_stand = Strand(self.strand, 
-                           self.directionality, 
-                           start=self.start, 
-                           direction=self.direction, 
-                           coords=self.coords.copy(), 
-                           **kwargs)
+        ### Initialize a new strand object
+        new_strand = Strand.__new__(Strand)
         
-        # copy the pk_info if available (and eventually other immutable attributes)
-        for attr in self.__dict__.keys():
-            if attr not in new_stand.__dict__.keys():
-                setattr(new_stand, attr, copy.deepcopy(getattr(self, attr)))
-            # don't copy the list because this copies the callbacks
-            # copy the dictionaries, so it copies the maps
-            elif type(getattr(self, attr)) in (int, float, str, bool, tuple):
-                setattr(new_stand, attr, copy.copy(getattr(self, attr)))
+        # attributes that are calculated fresh or immutable that
+        # can be just reassigned
+        attr_to_copy = {'_strand',  # strand properties
+                        '_seq_slice',
+                        '_start', # 2D positions
+                        '_direction', 
+                        '_positions', 
+                        '_directions',
+                        '_seq_positions',
+                        '_prec_pos',
+                        '_next_pos',
+                        '_max_pos',
+                        '_min_pos',
+                        }
+        for attr in attr_to_copy:
+            setattr(new_strand, attr, getattr(self, attr))
 
-        return new_stand
+        # sequence attributes
+        new_seq = self._sequence.copy(callback=new_strand._updated_sequence)
+        new_strand._sequence = new_seq
+
+        new_strand._coords = self._coords.copy()
+        new_strand._strands_block = StrandsBlock(self)
+
+        ### callbacks
+        new_strand._callbacks = [callback] if callback else []
+
+        ### pk_info
+        new_strand.pk_info = copy.deepcopy(self.pk_info)
+        
+        return new_strand
+    
+    # def copy(self, callback=None) -> 'Strand':
+    #     """
+    #     Create a copy of the current strand, including coordinates and attributes.
+
+    #     Parameters
+    #     ----------
+    #     callback : callable, default None
+    #         A callback function to be registered in the copied strand.
+
+    #     Returns
+    #     -------
+    #     Strand
+    #         A deep copy of the strand.
+    #     """
+    #     strand_copy = copy.copy(self)
+    #     strand_copy._clear_callbacks()
+    #     strand_copy.pk_info = copy.deepcopy(self.pk_info)
+    #     if callback:
+    #         strand_copy.register_callback(callback)
+    #     return strand_copy
 
 
 class StrandsBlock(set):

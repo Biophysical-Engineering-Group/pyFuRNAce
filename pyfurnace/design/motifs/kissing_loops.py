@@ -132,14 +132,6 @@ class KissingLoop(Loop):
         # replace the strands
         self.replace_all_strands([strand], copy=False, join=False)
 
-    def copy(self, **kwargs):
-        # return a copy of the KissingLoop or subclass
-        return  type(self)(strands = self.copy_strands_preserve_blocks(self._strands), 
-                           pk_index= self._pk_index, energy=self._energy, energy_tolerace=self._energy_tolerance,
-                            #  Motif parameters
-                            basepair = self._basepair, autopairing = self.autopairing,
-                            **kwargs)
-
 class KissingLoop120(KissingLoop):
     """ Structure from PDB: 1BJ2"""
 

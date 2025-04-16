@@ -190,12 +190,3 @@ class Stem(Motif):
             return strands
         
         self.replace_all_strands(strands, copy=False, join=False)
-
-    def copy(self, **kwargs):
-        return Stem(    # Stem parameters
-                    sequence=self[0].sequence, wobble_interval = self.wobble_interval, wobble_tolerance=self.wobble_tolerance, wobble_insert = self._wobble_insert, 
-                        # Copied Stem parameters
-                    strands = self.copy_strands_preserve_blocks(self._strands),
-                        #  Motif parameters
-                    basepair = self._basepair, autopairing = self.autopairing,
-                    **kwargs)

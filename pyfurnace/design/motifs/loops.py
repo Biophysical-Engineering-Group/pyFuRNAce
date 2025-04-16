@@ -56,13 +56,5 @@ class TetraLoop(Loop):
         if len(new_sequence) != 4:
             raise ValueError("The sequence length doesn't match the length required for a tetraloop, which is 4.")
         self[0].sequence = new_sequence
-
-    def copy(self, **kwargs):
-        """ Return a copy of the motif. """
-        return TetraLoop(strands = self.copy_strands_preserve_blocks(self._strands), 
-                            #  Motif parameters
-                        basepair = self._basepair, 
-                        autopairing = self.autopairing,
-                        **kwargs)
                     
 

@@ -137,7 +137,9 @@ class Dovetail(Stem):
             ### Top strands
             top_strand.strand = '──' + top_strand.strand + '╯' * top_cross + '─' * (not top_cross)
             top_strand1 = top_strand
-            top_strand2 = Strand('╰' * top_cross + '─' * (not top_cross), start=(top_strand1.end[0] + 1, 0), direction=(int(not top_cross), int(top_cross)))
+            top_strand2 = Strand('╰' * top_cross + '─' * (not top_cross), 
+                                 start=(top_strand1.end[0] + 1, 0), 
+                                 direction=(int(not top_cross), int(top_cross)))
 
             ### Bottom strands
             bot_strand1 = Strand('╮' * bot_cross + '─' * (not bot_cross), start=(0, 2), direction=(-int(not bot_cross), - int(bot_cross)))
@@ -238,15 +240,3 @@ class Dovetail(Stem):
             return top_strand1, top_strand2, bot_strand1, bot_strand2
 
         self.replace_all_strands([top_strand1, top_strand2, bot_strand1, bot_strand2], copy=False, join=True)
-
-
-    def copy(self, **kwargs):
-        return Dovetail(  # Stem parameters
-                        sequence=self[0].sequence if self[0].sequence else self[1].sequence, wobble_interval = self.wobble_interval, wobble_insert = self._wobble_insert, 
-                            # DT parameters
-                        top_cross = self.top_cross, bot_cross = self.bot_cross, sign = int(self.length >= 0) - int(self.length <= 0), 
-                            # Copied DT parameters
-                        strands = self.copy_strands_preserve_blocks(self._strands),
-                        #  Motif parameters
-                        basepair = self._basepair, autopairing = self.autopairing,
-                        **kwargs)

@@ -1,3 +1,4 @@
+from pathlib import Path
 from functools import wraps
 from typing import List, Tuple, Union, Literal, Callable, Optional
 from .symbols import *
@@ -45,16 +46,16 @@ class Origami(Callback):
         List of individual strands in the Origami.
     junctions : list of dict
         Connection junctions (left, right, top, bottom) for each row.
-    base_map : dict
-        Map from nucleotide symbol positions (x, y) to matrix slice (y, x).
+    seq_positions : Tuple[Positions]
+        The positions of each nucleotide in the origami sequence (x,y coordinates).
+        This is the same as calling origami.motif.seq_positions.
+        Note: the sequence is always 5' to 3'.
     map : dict
         Map from symbol positions (x, y) to motif matrix slice (y, x).
     shift_map : dict
         Map from motif matrix slices (y, x) to spatial shifts (x, y) of 
         the motifs to shift them from their original position to the
         assembled position.
-    motif_map : dict
-        Map from nucleotide symbol positions (x, y) to the corresponding Motif.
     sequence_index_map : dict
         Map from nucleodited symbol positions (x, y) to sequence index.
     pseudoknots : list of dict
@@ -109,7 +110,6 @@ class Origami(Callback):
         self._junctions = None
         self._motif = None
         self._map = None
-        self._base_map = None
         self._shift_map = None
         self._assembled = None
         self._ss_assembly = bool(ss_assembly)
@@ -122,13 +122,14 @@ class Origami(Callback):
         ### CHECK THE MATRXI
         # the matrix is a proper 2D list
         if (isinstance(matrix, (list, tuple)) 
-                and all(isinstance(row, (list, tuple)) for row in matrix)):
+                and all(isinstance(row, (list, tuple)) for row in matrix)
+                and all(isinstance(m, Motif) for row in matrix for m in row)):
             pass
 
         # the matrix is a list of motif
         elif (isinstance(matrix, (list, tuple)) 
                 and any(isinstance(row, Motif) for row in matrix)):
-            matrix = [matrix] # make it a 2D list
+            matrix = [matrix] # make it a 1D list
 
         # the matrix is a motif
         elif isinstance(matrix, Motif):
@@ -153,9 +154,17 @@ class Origami(Callback):
                                  f' motifs or motifs, but it contains {type(args)}.')
 
         ### add the matrix to the object
-        self._matrix = matrix
-        # prepare the motifs
-        self._prepare_matrix(copy=copy) 
+        if copy:
+            # make a copy of the matrix
+            self._matrix = [[m.copy() for m in row] for row in matrix]
+        else:
+            self._matrix = matrix
+
+        # registest the callbacks
+        for row in self._matrix:
+            for m in row:
+                if self._updated_motif not in m._callbacks:
+                    m.register_callback(self._updated_motif)
 
         ### set the alignment type
         if align not in ('left', 'first', 'center'):
@@ -510,20 +519,6 @@ class Origami(Callback):
         return self._assembled
 
     @property
-    def base_map(self) -> dict:
-        """
-        A dictionary with the nucleotide position (x, y) as keys and the
-        matrix index (y, x) of the motif that contains it as values.
-        """
-        if not self._base_map:
-            self._base_map = {}
-            origami_map = self.map
-            origami_motif_base_map = self.motif.base_map
-            for pos in origami_motif_base_map.keys():
-                self._base_map[pos] = origami_map[pos]
-        return self._base_map
-
-    @property
     def junctions(self) -> List[dict]:
         """
         The vertical junctions for each line of the Origami.
@@ -534,46 +529,47 @@ class Origami(Callback):
         """
 
         ### check if the junctions are already calculated
-        if self._junctions:
-            return self._junctions
+        if self._assembled:
+            self._assemble()
+        return self._junctions
         
-        junctions_list = [] # initialize the list
+        # junctions_list = [] # initialize the list
 
-        ### Calculate the junctions for each line
-        for line in self._matrix:
-            x_shift = 0
+        # ### Calculate the junctions for each line
+        # for line in self._matrix:
+        #     x_shift = 0
 
-            # initialize the dictionary
-            line_junc_dict = {direct: [] for direct in Direction}
+        #     # initialize the dictionary
+        #     line_junc_dict = {direct: [] for direct in Direction}
             
-            # iterate through the motifs in the line
-            for ind, m in enumerate(line):
+        #     # iterate through the motifs in the line
+        #     for ind, m in enumerate(line):
 
-                ### NOT USED
-                # # add the left junctions of the first motif
-                # if ind == 0: 
-                #     line_junc_dict[Direction.LEFT] = m.junctions[Direction.LEFT]
+        #         ### NOT USED
+        #         # # add the left junctions of the first motif
+        #         # if ind == 0: 
+        #         #     line_junc_dict[Direction.LEFT] = m.junctions[Direction.LEFT]
 
-                shift = Position((x_shift, 0))
-                ### add the top and bottom junctions
-                line_junc_dict[Direction.UP] += [shift + p 
-                                                 for p in m.junctions[Direction.UP]]
-                line_junc_dict[Direction.DOWN] += [shift + p 
-                                                  for p in m.junctions[Direction.DOWN]]
+        #         shift = Position((x_shift, 0))
+        #         ### add the top and bottom junctions
+        #         line_junc_dict[Direction.UP] += [shift + p 
+        #                                          for p in m.junctions[Direction.UP]]
+        #         line_junc_dict[Direction.DOWN] += [shift + p 
+        #                                           for p in m.junctions[Direction.DOWN]]
 
-                # just add numchar becasue the junctions are extended
-                x_shift += m.num_char 
+        #         # just add numchar becasue the junctions are extended
+        #         x_shift += m.num_char 
 
-            ### NOT USED
-            # # if it's the last motif, add the right junctions
-            # line_junc_dict[(1, 0)] += [x_shift + p for p in m.junctions[(1, 0)]]
+        #     ### NOT USED
+        #     # # if it's the last motif, add the right junctions
+        #     # line_junc_dict[(1, 0)] += [x_shift + p for p in m.junctions[(1, 0)]]
 
-            # add the junctions to the list
-            junctions_list.append(line_junc_dict)
+        #     # add the junctions to the list
+        #     junctions_list.append(line_junc_dict)
 
-        # save the junctions
-        self._junctions = junctions_list
-        return junctions_list
+        # # save the junctions
+        # self._junctions = junctions_list
+        # return junctions_list
 
     @property
     def map(self) -> dict:
@@ -581,24 +577,8 @@ class Origami(Callback):
         A dictionary with the symbols position (x, y) as keys and the
         matrix index (y, x) of the motif that contains it as values.
         """
-        if self._map is not None:
-            return self._map
-        
-        ### build the map and the motif map
-        assembled = self.assembled
-        self._map = {}
-        self._motif_map = {}
-        for y, line in enumerate(assembled):
-            # skip the connection motifs
-            if y % 2 == 1:
-                continue
-
-            for x, m in enumerate(line):
-                for pos in m.map:
-                    # y//2 because for each line there is a connection motif
-                    self._map[pos] = (y//2, x)
-                    self._motif_map[pos] = m
-
+        if self._motif is None:
+            self._assemble()
         return self._map
 
     @property
@@ -606,40 +586,9 @@ class Origami(Callback):
         """
         The assembled origami motif.
         """
-        if isinstance(self._motif, Motif):
-            return self._motif
-        mot = None
-        for line in self.assembled:
-
-            # concatenate the motifs in the line
-            if len(line) > 1:
-                mot_line = Motif.concat(line, 
-                                        align=False, 
-                                        unlock_strands=self._ss_assembly, 
-                                        lock_coords=False)
-                
-            else: # line made of connection motifs
-                mot_line = line[0]
-
-            # add the line to the motif
-            mot = Motif.concat([mot, mot_line], 
-                               axis=0, align=False, 
-                               lock_coords=False, 
-                               unlock_strands=self._ss_assembly)
-        
-        self._motif = mot
+        if not self._motif:
+            self._assemble()
         return self._motif
-
-    @property
-    def motif_map(self) -> dict:
-        """
-        A dictionary with the symbols position (x, y) as keys and the
-        motif that contains it as values.
-        """
-        if not self._map:
-            # the motif_map is calculated when the map is calculated
-            self.map
-        return self._motif_map
 
     @property
     def num_char(self) -> List[int]:
@@ -695,6 +644,7 @@ class Origami(Callback):
         # A dictionary to store the pseudoknot information, with the pk_index as key
         # and the pk information dict as value
         pk_dict = dict()
+        pos_to_ind = {pos: ind for ind, pos in enumerate(self.motif.seq_positions)}
         
         def add_pk(strand, pk_index, info_nr, shift, forward=True):
             """ Add the pseudoknot information to the pk_dict. """
@@ -715,11 +665,11 @@ class Origami(Callback):
             start_pos_ind = 0 
             if strand.directionality == '35':
                 start_pos_ind = -1
-            pos = strand.base_positions[start_pos_ind]
+            pos = strand.seq_positions[start_pos_ind]
 
             # get the index of the sequence in the strand
-            offset_ind = self.sequence_index_map[(shift[0] + pos[0], 
-                                                  shift[1] + pos[1])]
+            offset_ind = pos_to_ind[(shift[0] + pos[0], 
+                                    shift[1] + pos[1])]
             
             # get the start and end positions of the pseudoknot
             pk_start, pk_end = pk_info['ind_fwd'][info_nr]
@@ -744,7 +694,7 @@ class Origami(Callback):
             shift = self.shift_map[(i, j)]
 
             # get pseudoknot IDs from the strands
-            pk_strands = [s for s in m if hasattr(s, 'pk_info')]
+            pk_strands = [s for s in m if s.pk_info]
             pk_indexes = [pk_id for s in pk_strands for pk_id in s.pk_info['id']]
 
             ### Adjust the pk_index for unique pseudoknots
@@ -798,8 +748,8 @@ class Origami(Callback):
         offset = 0 
 
         # read the maps once to avoid triggering the callback and origami assembly
+        pos_to_slice = self.map
         origami_motif = self.motif
-        motif_map = self.map
         motif_shifts = self.shift_map
 
         # iterate over the strands in the origami motif
@@ -812,12 +762,12 @@ class Origami(Callback):
             new_strand_seq = ''
 
             # iterate over the nucleotides in the strand
-            for ind, pos in enumerate(s.base_positions):
+            for ind, pos in enumerate(s.seq_positions):
                 
                 ### GET THE STRAND ID FOR THIS NUCLEOTIDE
 
                 # get the y, x cooridnates of the motif in the matrix
-                motif_yx = motif_map[pos]
+                motif_yx = self[pos_to_slice[pos]]
                 # get the x, y shift of the motif in the origami positions
                 shift_yx = motif_shifts[motif_yx]
                 # remove the shifts from the position of the base
@@ -856,14 +806,12 @@ class Origami(Callback):
             offset += len(s.sequence)
 
     @property
-    def sequence_index_map(self) -> dict:
+    def seq_positions(self) -> Tuple[Position]:
+        """ 
+        The positions of each nucleotide in the motif sequence (x,y coordinates).
+        The sequence has always the directionality 5' to 3' 
         """
-        A dictionary with the nucleotide position (x, y) as keys and the
-        index of the nucleotide in the sequence as values.
-        """
-        if not self._motif:
-            self.motif
-        return self.motif.sequence_index_map
+        return self.motif.seq_positions
 
     @property
     def shift_map(self) -> dict:
@@ -917,7 +865,7 @@ class Origami(Callback):
     def _calculate_connections(junctions1: dict,
                                junctions2: dict,
                                x_shift: Union[tuple[int, int], Position]=(0, 0), 
-                               start_y: int=0) -> Tuple[Motif, int]:
+                               start_y: int=0) -> Tuple[Motif, Position]:
         """
         Creates the connection between the rows of the origami.
 
@@ -934,7 +882,7 @@ class Origami(Callback):
 
         Returns
         -------
-        Tuple[Motif, int]
+        Tuple[Motif, Position]
             The connection motifs and height of the vertical connections
         """
         ### take the junctions of the two lines
@@ -1020,7 +968,7 @@ class Origami(Callback):
                                   direction=Direction.DOWN))
 
         # Extra +1 to the max_crossing to add the symbol "^" or "↑"
-        connection_height = max_crossing + 1 + 1 
+        connection_height = Position((0, max_crossing + 1 + 1))
         return Motif(strands, join=False), connection_height
 
     ### 
@@ -1028,153 +976,88 @@ class Origami(Callback):
     ###
 
     def _assemble(self) -> List[List[Motif]]:
-        """ Arrange the motifs and rows connections in a matrix
-        where the motifs are all shifted to the right position.
+        """ 
+        Assemble the origami by shifting the motifs in the correct position,
+        concatenating the motifs in the lines, and creating the connection motifs.
         """
-        self._prepare_matrix()
+        ### Screen the matrix to remove the empty motifs
+        self._matrix = [[m for m in line if m] for line in self._matrix]
 
-        ### CHECK THE ALIGNMENT
-        junctions = self.junctions
+        ### initialize the variables
+        motif_lines = []
+        shifts = [[Position.zero() for _ in line] for line in self._matrix]
+        align_shifts = [Position.zero() for _ in range(self.num_lines)]
 
-        # Case 1: No alignment
-        if self._align == 'left':
-            align_shift = [0] * len(self._matrix)
-
-        ### Case 2: align the first junctions
-        elif self._align == "first":
-            # initialize all the shift to 0
-            align_shift = [0] * len(self._matrix)
-
-            # calculate the alignment to the first junction x position
-            for ind1, line_juncs in enumerate(junctions[:-1]):
-
-                # take the first x position of the bottom junction
-                bot_junct = line_juncs[Direction.DOWN][0][0] 
-
-                # take the first x position of the top junction of the next line
-                next_line_juncs = junctions[ind1 + 1]
-                top_junct = next_line_juncs[Direction.UP][0][0] 
-
-                # calculate the shift to align the first junctions
-                shift = align_shift[ind1] + bot_junct - top_junct 
-
-                # the bottom line is shifted to the right, all good
-                if shift > 0: 
-                    align_shift[ind1 + 1] += shift
-                    continue
-                
-                # the bottom line is shifted to the left
-                for ind2 in range(ind1 + 1): 
-                    # shift all top lines 
-                    align_shift[ind2] -= shift 
-        
-        ### Case 3: the center of the rows
-        elif self.align == "center":
+        ### Center the rows, can precompute the shift
+        if self.align == "center":
             # take the maximum center position of the motifs in all lines
-            max_center = max([num_char // 2 for num_char in self.num_char])
+            max_center = max([num_char // 2 for num_char in self.num_char], default=0)
             # shift to the right to align the center of the motifs
-            align_shift = [max_center - num_char // 2 for num_char in self.num_char]
-
-        ### PUTS THE MOTIFS IN PLACE
-
-        # initialize the variables
-        vert_shift = 0 # y shift
-        assembled_matrix = []
-        self._shift_map = {}
+            align_shifts = [Position((max_center - num_char // 2, 0))
+                                for num_char in self.num_char]    
 
         for ind, line in enumerate(self._matrix):
-            # the the x shift of the motifs in the line
-            horiz_shift = Motif.get_sequential_shift(line, position_based=False)
-
-            new_line = []
-            max_y = 0
-            for j, m in enumerate(line):
-                # update the maximum y position of the motifs
-                if m.num_lines > max_y:
-                    max_y = m.num_lines
-
-                # shift the motif
-                shift = (align_shift[ind] + horiz_shift[j], vert_shift)
-                m = m.copy().shift(shift)
-
-                # register the shift in the shift map
-                self._shift_map[(ind, j)] = shift
-
-                # add the shifted motif to the line
-                new_line.append(m)
             
-            # add the line to the assembled matrix
-            assembled_matrix.append(new_line)
+            # create the line
+            mot_line, vh_shifts = Motif.concat(line, 
+                                              copy=True,
+                                              align=True,
+                                              extend=True,
+                                              return_shifts=True,
+                                              unlock_strands=self._ss_assembly, 
+                                              lock_coords=False,
+                                              ) 
+            
+            mot_line.shift(align_shifts[ind])
 
-            # update the vertical shift
-            vert_shift += max_y
+            shifts[ind] = [h + vh_shifts[i] + align_shifts[ind] 
+                                for i, h in enumerate(shifts[ind])]
+            
+            motif_lines.append(mot_line)
 
-            # create the connections between the motifs
-            if ind < len(self._matrix) - 1:
-               # the shift of the junctions due to the alignment
-               junct_shift = (align_shift[ind], align_shift[ind+1]) 
-               # create the connection motifs
-               m_connect, height = self._calculate_connections(junctions[ind], 
-                                                               junctions[ind + 1], 
-                                                               x_shift = junct_shift, 
-                                                               start_y = vert_shift)
-               
-               # add the connection motif to the assembled matrix
-               assembled_matrix.append([m_connect])
-               # update the vertical shift
-               vert_shift += height
-
-        ### save the assembled matrix
-        self._assembled = assembled_matrix
-        return assembled_matrix
-
-    def _prepare_matrix(self, copy: bool = False) -> None:
-        """ Remove the empty motifs, add the callbacks and extend the junctions 
-        (make sure all the bottom junctions reach the same y position).
+        # shift the motif horizontally to align the first junction
+        if self._align == 'first':
+            _, h_shifts = Motif.align(motif_lines,
+                                      axis=0, 
+                                      return_shifts=True,
+                                      )
+            shifts = [[h + h_shifts[i] for h in line]
+                        for i, line in enumerate(shifts)]
+            
+        ### calculate the junctions
+        ind1 = 0
+        while ind1 < len(motif_lines) - 1:
+            j1 = motif_lines[ind1].junctions
+            j2 = motif_lines[ind1 + 1].junctions
+            # create the connection motifs
+            m_connect, _ = self._calculate_connections(j1, j2)
+            # intercalate the connections into the motif lines
+            motif_lines.insert(ind1 + 1, m_connect)
+            ind1 += 2
+            
+        # assemble the origami, piece by piece
+        mot = Motif()
+        for ind, line in enumerate(motif_lines):
+            # add the line to the motif
+            mot, v_shifts = Motif.concat(mot, line, 
+                                         axis=0, 
+                                         align=False, 
+                                         lock_coords=False,
+                                         position_based=True, 
+                                         return_shifts=True,
+                                         unlock_strands=self._ss_assembly)
+            if ind > 0 and ind % 2 == 0:
+                # add the vertical shift to the horizontal shift
+                shifts[ind // 2] = [h + v_shifts[1] for h in shifts[ind // 2]]
         
-        copy : bool, optional
-            If True, the motifs are copied before being added to the origami.
-        """
-
-        ### clean the empty motifs
-        prepare_matrix = []
-        for y, line in enumerate(self._matrix):
-            new_line = []
-
-            for x, m in enumerate(line):
-                # check if the motif is empty
-                if not m:
-                    continue
-                    
-                # check the type
-                if not isinstance(m, Motif):  
-                    raise ValueError(f'Only Motif or subclass of Motif can be added to'
-                                     f' the Origami, but the object type {type(m)} '
-                                     f'was added at position x: {x}, y: {y}.')
-                
-                # Copy, add the callback and save it
-                if copy:
-                    m = m.copy()
-                if self._updated_motif not in m._callbacks:
-                    m.register_callback(self._updated_motif)
-                new_line.append(m)
-
-            prepare_matrix.append(new_line)
-
-        for ind, line in enumerate(prepare_matrix):
-            # Align the motifs
-            aligned = Motif.align(line)
-
-            # Extend the junctions
-            max_y = max([m.max_pos[1] for m in aligned], default=0)
-            for m in aligned:
-                m.extend_junctions(until= (None, max_y))
-            
-            # Add the aligned motifs to the matrix
-            prepare_matrix[ind] = aligned
-
-        # save the updated matrix
-        self._matrix = prepare_matrix
+        self._motif = mot
+        self._assembled = motif_lines
+        self._shift_map = {(i, j): shift for i, line in enumerate(shifts) 
+                                         for j, shift in enumerate(line)}
+                                         
+        self._map = {(pos + shifts[i][j]): (i, j) for i, line in enumerate(self._matrix)
+                                                  for j, m in enumerate(line)
+                                                  for pos in m.positions}
 
     def _updated_motif(self, **kwargs) -> None:
         """
@@ -1188,7 +1071,6 @@ class Origami(Callback):
         self._motif = None
         self._junctions = None
         self._map = None
-        self._base_map = None
         self._shift_map = None
         self._assembled = None
         self._pseudoknots = None
@@ -1221,12 +1103,23 @@ class Origami(Callback):
                 self._matrix.append([])
             if copy:
                 item = item.copy()
+            
+            # update the callbacks:
+            if self._updated_motif not in item._callbacks:
+                item.register_callback(self._updated_motif)
+
             self._matrix[-1].append(item)
 
         elif (isinstance(item, (list, tuple)) 
                 and all(isinstance(m, Motif) for m in item)):
             if copy:
                 item = [m.copy() for m in item]
+
+            # update the callbacks:
+            for m in item:
+                if self._updated_motif not in m._callbacks:
+                    m.register_callback(self._updated_motif)
+
             self._matrix.append(item)
         else:
             raise TypeError(f'Only motifs or lists of motifs can be added to the ' 
@@ -1258,39 +1151,11 @@ class Origami(Callback):
         origami_lines = str(self).split('\n')
         if barriers is None:
             barriers = motif.folding_barriers(kl_delay=kl_delay)[0]
-        for i, (x, y) in enumerate(motif.base_map):
+        for i, (x, y) in enumerate(motif.seq_positions):
             origami_lines[y] = origami_lines[y][:x] + barriers[i] + origami_lines[y][x+1:]
         if return_list:
             return origami_lines
         return '\n'.join(origami_lines)
-
-    def change_strand_at_position(self,
-                                  position: Tuple[int, int],
-                                  new_strand: 'Strand',
-                                  ) -> None:
-        """
-        Change the strand at the given position to a new one.
-
-        Parameters
-        ----------
-        position : tuple of int
-            Global structure coordinates.
-        new_strand : str
-            New strand string (symbols).
-        start : tuple of int, optional
-            New start coordinates for the strand.
-        direction : tuple of int, optional
-            New direction vector for the strand.
-        """
-        motif = self.get_motif_at_position(position)
-        strand = self.select_strand_at_position(position)
-        strand_ind = motif.strands.index(strand)
-        # remove the strand from the motif
-        motif.pop(strand_ind)
-        # add the new strand to the motif
-        motif.insert(strand_ind, new_strand)
-        # update the motif
-        self._updated_motif()
 
     def copy(self) -> 'Origami':
         """
@@ -1421,11 +1286,12 @@ class Origami(Callback):
             raise ValueError(f'The sequence index must be an integer lower than '
                              f'the length of the sequence ({len(self.sequence)}), '
                              f'but {index} (type: {type(index)}) was given.')
-        ind_pos = None
-        for pos, ind in self.sequence_index_map.items():
-            if ind == index:
-                ind_pos = pos
-        return self.map[ind_pos]
+        
+        # map the sequence index to the slice
+        ind_to_slice = {ind: self._map[seq_pos]
+                        for ind, seq_pos in enumerate(self.motif.seq_positions)}
+
+        return ind_to_slice.get(index)
 
     def get_strand_at_position(self, position: Tuple[int, int]) -> Strand:
         """
@@ -1503,6 +1369,10 @@ class Origami(Callback):
         min_bar = start_barrier
         best_middle = 0
 
+        # map the sequence index to the slice
+        ind_to_slice = {ind: self.map[seq_pos]
+                        for ind, seq_pos in enumerate(origami.motif.seq_positions)}
+
         # rotate the dot-bracket structure
         for db, (start, end) in zip(db, stacks):
             if db in '()' and (end - start) > 4:
@@ -1520,8 +1390,8 @@ class Origami(Callback):
 
             # create a copy of the origami, get the slice and the motif
             ori_copy = origami.copy()
-            start_slice = origami.get_slice_at_seq_index(best_middle)
-            m = origami.get_motif_at_seq_index(best_middle)
+            start_slice = ind_to_slice[best_middle]
+            m = origami[start_slice]
 
             ### IMPORTANT REMARK:
             ### THIS ASSUMENTS THE MOTIF HAS A LENGTH PROPERTY
@@ -1596,8 +1466,19 @@ class Origami(Callback):
         ### check the item variable
         if isinstance(item, (list, tuple)) and all(isinstance(m, Motif) for m in item):
             dimension = 2
+            if copy:
+                item = [m.copy() for m in item]
+            # update the callbacks:
+            for m in item:
+                if self._updated_motif not in m._callbacks:
+                    m.register_callback(self._updated_motif)
         elif isinstance(item, Motif):
             dimension = 1
+            if copy:
+                item = item.copy()
+            # update the callbacks:
+            if self._updated_motif not in item._callbacks:
+                item.register_callback(self._updated_motif)
         else:
             raise ValueError(f'Only motifs or lists of motifs can be added to the '
                              f'Origami, but the object type {type(item)} was added.')
@@ -1715,8 +1596,8 @@ class Origami(Callback):
         Optional[str]
             The FASTA text if return_text is True.
         """
-        path = filename_path.split('.')[0]
-        name = path.split('/')[-1].split('\\')[-1]
+        path = Path(filename_path).with_suffix('.fasta')
+        name = path.stem
         text = (f">{name}\n"
                 f"{self.sequence}\n"
                 f"{self.structure}\n"
@@ -1749,8 +1630,8 @@ class Origami(Callback):
         Optional[str]
             The text if return_text is True.
         """
-        path = filename_path.split('.')[0]
-        name = path.split('/')[-1].split('\\')[-1]
+        path = Path(filename_path).with_suffix('.txt')
+        name = path.stem
         text = (f">{name}\n"
                 f"Sequence:\n{self.sequence}\n"
                 f"Structure:\n{self.structure}\n"

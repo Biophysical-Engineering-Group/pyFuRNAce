@@ -85,7 +85,7 @@ def convert_tab(seq):
         ### Save the DNA template in the session state and add a link to the primer page
         st.session_state["dna_template"] = str(dna_template)
         st.session_state.prepare_ind = 0
-        st.page_link("pages/4_Prepare.py", label=":orange[Prepare the primers for the DNA template]", icon=":material/sync_alt:")
+        st.page_link("pages/4_Prepare.py", label=":orange[Prepare the PCR primers]", icon=":material/sync_alt:")
 
 def search_tab(seq):
     """ Search a subsequence and highlight the bases"""

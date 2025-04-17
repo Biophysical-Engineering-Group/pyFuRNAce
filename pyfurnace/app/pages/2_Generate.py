@@ -350,7 +350,7 @@ if __name__ == "__main__":
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.page_link("pages/3_Convert.py", 
-                        label=":orange[Convert the RNA to the DNA template]", 
+                        label=":orange[Convert RNA to DNA]", 
                         icon=":material/genetics:")
     with col2:
         copy_to_clipboard(folds[0], 'Structure')

@@ -1271,7 +1271,7 @@ def display_structure_sequence():
         remove_syms = str.maketrans('', '', "{}'\"")
         pseudoknot_text = pseudoknot_text.translate(remove_syms)
 
-        st.markdown(f'**Structure length: :green[{str(len(origami.structure.replace('&', '')))}]**')
+        st.markdown(f'**Structure length: :green[{str(len(origami.structure.replace("&", "")))}]**')
         scrollable_text(f"""
             >Origami</br>{''.join(sequence_list)}</br>{''.join(structure_list)}</br></br>Pseudoknots info:</br>{pseudoknot_text}""")
 

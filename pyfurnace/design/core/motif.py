@@ -2671,11 +2671,12 @@ class Motif(Callback):
         min_pos = self.min_pos
         # check if the shift will bring the strands to negative positions
         if min_pos[0] + shift[0] < 0 or min_pos[1] + shift[1] < 0:
-            raise ValueError(f"The motif cannot be shifed. The strands cannot be drawn"
-                             f" at negative positons. Attempt to draw the motif at "
-                             f"position {min_pos[0] + shift_vect[0], 
-                                         min_pos[1] + shift_vect[1]}"
-                            )
+            raise MotifStructureError(
+                        f"The motif cannot be shifed. The strands cannot be drawn"
+                        f" at negative positons. Attempt to draw the motif at "
+                        f"position ({min_pos[0] + shift_vect[0]}, "
+                        f"{min_pos[1] + shift_vect[1]})")
+                        
         
         # take the junctions in the opposite direction of the shift
         junc_vert, junc_hor = [], []

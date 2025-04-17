@@ -569,6 +569,16 @@ class Origami(Callback):
         if self._assembled is None:
             self._assemble()
         return self._pos_shift_map
+    
+    @property
+    def positions(self) -> List[Position]:
+        """
+        The positions of the characters in the origami. Is the same as
+        calling the assembled.motif.positions.
+        """
+        if self._assembled is None:
+            self._assemble()
+        return self.assembled.positions
 
     @property
     def pseudoknots(self) -> List[dict]:

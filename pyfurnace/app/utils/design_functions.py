@@ -465,7 +465,7 @@ def add_motif(origami):
         # flip the motif if the top direction is 3' to 5' (unless it's a custom motif)
         if st.session_state.flip and motif.__class__.__name__ not in ('Motif', 'start_end_stem'):
             if motif.__class__.__name__ == 'Dovetail': # invert the top and bottom cross for dovetails
-                motif.top_cross, motif.bot_cross = motif.bot_cross, motif.top_cross
+                motif.up_cross, motif.down_cross = motif.down_cross, motif.up_cross
             motif.flip(False, True)
         scrollable_text(motif_text_format(motif))
 
@@ -490,7 +490,7 @@ def add_motif(origami):
                 flip_text = ''
                 if st.session_state.flip and motif.__class__.__name__ != 'Motif': 
                     if motif.__class__.__name__ == 'Dovetail': # invert the top and bottom cross for dovetails
-                        flip_text += f'\nmotif.top_cross, motif.bot_cross = motif.bot_cross, motif.top_cross'
+                        flip_text += f'\nmotif.up_cross, motif.down_cross = motif.down_cross, motif.up_cross'
                     flip_text += f'\nmotif.flip(False, True) # flip the motif vertically'
                 st.session_state.code.append(st.session_state.motif_buffer + f'{flip_text}\norigami.insert(({st.session_state.line_index}, {st.session_state.motif_index}), motif) # Add motif')
                 st.session_state.motif_buffer = '' ### clear the buffer

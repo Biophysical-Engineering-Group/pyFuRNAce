@@ -28,7 +28,7 @@ DAE_T_35 = np.array([[-0.82936221, -0.04732235, -0.55670361, -0.98603719],
 
 class Dovetail(Stem):
     
-    def __init__(self, length: int = 0 , sequence: str = '', top_cross = True, bot_cross = True, sign: int = 1, wobble_interval: int = 5, wobble_tolerance: int = 2, wobble_insert : str = "middle", **kwargs):
+    def __init__(self, length: int = 0 , sequence: str = '', up_cross = True, down_cross = True, sign: int = 1, wobble_interval: int = 5, wobble_tolerance: int = 2, wobble_insert : str = "middle", **kwargs):
         """
         Attributes of class DoveTail.
         The class DoveTail inherts all attributes from the parentclass Motif.
@@ -51,8 +51,8 @@ class Dovetail(Stem):
             raise ValueError("The length parameter must be an integer.")
         
         # initialize the attributes
-        self._top_cross = bool(top_cross)
-        self._bot_cross = bool(bot_cross)
+        self._up_cross = bool(up_cross)
+        self._down_cross = bool(down_cross)
         if sequence:
             if sign < 0:
                 self._sign = -1
@@ -69,25 +69,25 @@ class Dovetail(Stem):
     ###
 
     @property
-    def top_cross(self):
+    def up_cross(self):
         """Returns boolian describing wether the dovetail has a top crossing"""
-        return self._top_cross
+        return self._up_cross
     
-    @top_cross.setter
-    def top_cross(self, new_bool):
+    @up_cross.setter
+    def up_cross(self, new_bool):
         """ Set boolian describing wether the dovetail has a top crossing"""
-        self._top_cross = bool(new_bool)
+        self._up_cross = bool(new_bool)
         self.length = self._length
 
     @property
-    def bot_cross(self):
+    def down_cross(self):
         """Returns boolian describing wether the dovetail has a bottom crossing"""
-        return self._bot_cross
+        return self._down_cross
     
-    @bot_cross.setter
-    def bot_cross(self, new_bool):
+    @down_cross.setter
+    def down_cross(self, new_bool):
         """Set boolian describing wether the dovetail has a bottom crossing"""
-        self._bot_cross = bool(new_bool)
+        self._down_cross = bool(new_bool)
         self.length = self._length
 
     def set_top_sequence(self, new_seq, sign = 0):
@@ -125,26 +125,26 @@ class Dovetail(Stem):
             seq_len = abs(length)
             self._sign = +1 if pos else -1
 
-        top_cross = self._top_cross
-        bot_cross = self._bot_cross
+        up_cross = self._up_cross
+        down_cross = self._down_cross
 
-        kwargs.setdefault('strong_bases', top_cross and bot_cross)
+        kwargs.setdefault('strong_bases', up_cross and down_cross)
         ### Create the top and bottom strands (according to wobble_insert and wobble_interval)
         top_strand, bot_strand = super()._create_strands(sequence=sequence, length=length, compute_coords=False, return_strands=True, **kwargs)
 
         ### Positive dovetail
         if pos:
             ### Top strands
-            top_strand.strand = '──' + top_strand.strand + '╯' * top_cross + '─' * (not top_cross)
+            top_strand.strand = '──' + top_strand.strand + '╯' * up_cross + '─' * (not up_cross)
             top_strand1 = top_strand
-            top_strand2 = Strand('╰' * top_cross + '─' * (not top_cross), 
+            top_strand2 = Strand('╰' * up_cross + '─' * (not up_cross), 
                                  start=(top_strand1.end[0] + 1, 0), 
-                                 direction=(int(not top_cross), int(top_cross)))
+                                 direction=(int(not up_cross), int(up_cross)))
 
             ### Bottom strands
-            bot_strand1 = Strand('╮' * bot_cross + '─' * (not bot_cross), start=(0, 2), direction=(-int(not bot_cross), - int(bot_cross)))
+            bot_strand1 = Strand('╮' * down_cross + '─' * (not down_cross), start=(0, 2), direction=(-int(not down_cross), - int(down_cross)))
             # adjust the stem start position, strand and direction
-            bot_strand.strand = '──' + bot_strand.strand + '╭' * bot_cross + '─' * (not bot_cross)
+            bot_strand.strand = '──' + bot_strand.strand + '╭' * down_cross + '─' * (not down_cross)
             bot_strand.start = (bot_strand.start[0] + 4, 2)
             bot_strand.direction = (-1, 0)
             bot_strand2 = bot_strand
@@ -152,19 +152,19 @@ class Dovetail(Stem):
         ### Negative dovetail
         else:
             ### Top strands
-            top_strand1 = Strand('╯' * top_cross + '─' * (not top_cross), start=(0, 0), direction=(1, 0))
+            top_strand1 = Strand('╯' * up_cross + '─' * (not up_cross), start=(0, 0), direction=(1, 0))
             # adjust the stem start position, strand and direction
-            top_strand.strand = '╰' * top_cross + '─' * (not top_cross) + top_strand.strand + '──'
+            top_strand.strand = '╰' * up_cross + '─' * (not up_cross) + top_strand.strand + '──'
             top_strand.start = (1, 0)
-            top_strand.direction = (int(not top_cross), int(top_cross))
+            top_strand.direction = (int(not up_cross), int(up_cross))
             top_strand2 = top_strand
 
             ### Bottom strands
-            bot_strand.strand = '╮' * bot_cross + '─' * (not bot_cross) + bot_strand.strand + '──'
+            bot_strand.strand = '╮' * down_cross + '─' * (not down_cross) + bot_strand.strand + '──'
             bot_strand.start = (bot_strand.start[0] + 3, 2)
-            bot_strand.direction = (- int(not bot_cross), - int(bot_cross))
+            bot_strand.direction = (- int(not down_cross), - int(down_cross))
             bot_strand1 = bot_strand
-            bot_strand2 = Strand('─' * (not bot_cross) + '╭' * bot_cross, start=(bot_strand1.start[0] + 1, 2), direction=(-1, 0))
+            bot_strand2 = Strand('─' * (not down_cross) + '╭' * down_cross, start=(bot_strand1.start[0] + 1, 2), direction=(-1, 0))
 
         ### set up the coordinates
         coords = Coords.compute_helix_from_nucl((0,0,0), # start position
@@ -190,44 +190,44 @@ class Dovetail(Stem):
         if pos: ### the dovetail is positive
             # top strand 1
             top_coord1 = Coords(coords[1: seq_len + 1])
-            if top_cross:
+            if up_cross:
                 top_coord1.dummy_ends = (coords[0],  # necessary dummy for 0 DT
                                          np.array(Coords.apply_transformation(DAE_T_53, coords[seq_len][0], coords[seq_len][1], coords[seq_len][2], local=True)))
             # top strand 2
             top_coord2 = Coords(np.array(()))
-            if top_cross:
+            if up_cross:
                 top_coord2.dummy_ends = (np.array(Coords.apply_transformation(DAE_T_35, coords[seq_len + 1][0], coords[seq_len + 1][1], coords[seq_len + 1][2], local=True)),
                                          coords[seq_len + 1])
             # bot strand 1
             bot_coord1 = Coords(np.array(()))
-            if bot_cross:
+            if down_cross:
                 bot_coord1.dummy_ends = (np.array(Coords.apply_transformation(DAE_T_35, coords[-1][0], coords[-1][1], coords[-1][2], local=True)),
                                          coords[-1])
             # bot strand 2
             bot_coord2 = Coords(coords[seq_len + 3: seq_len * 2 + 3])
-            if bot_cross:
+            if down_cross:
                 bot_coord2.dummy_ends = (coords[seq_len + 2], # necessary dummy for 0 DT
                                          np.array(Coords.apply_transformation(DAE_T_53, coords[-2][0], coords[-2][1], coords[-2][2], local=True)))
         else: ### the dovetail is negative
             # top strand 1
             top_coord1 = Coords(np.array(()))
-            if top_cross:
+            if up_cross:
                 top_coord1.dummy_ends = (coords[0],
                                          np.array(Coords.apply_transformation(DAE_T_53, coords[0][0], coords[0][1], coords[0][2], local=True)))
             # top strand 2
             top_coord2 = Coords(coords[1: seq_len + 1])
-            if top_cross:
+            if up_cross:
                 top_coord2.dummy_ends = (np.array(Coords.apply_transformation(DAE_T_35, coords[1][0], coords[1][1], coords[1][2], local=True)),
                                          coords[seq_len + 1]) # coords[seq_len + 1], useful for Origami ss_assembly
             # bot strand 1
             bot_coord1 = Coords(coords[seq_len + 3: -1])
-            if bot_cross:
+            if down_cross:
                 bot_coord1.dummy_ends = (np.array(Coords.apply_transformation(DAE_T_35, coords[seq_len + 3][0], coords[seq_len + 3][1], coords[seq_len + 3][2], local=True)),
                                          coords[-1]) #coords[-1], useful for Origami ss_assembly
                 
             # bot strand 2
             bot_coord2 = Coords(np.array(()))
-            if bot_cross:
+            if down_cross:
                 bot_coord2.dummy_ends = (np.array(coords[seq_len + 2]),
                                          np.array(Coords.apply_transformation(DAE_T_53, coords[seq_len + 2][0], coords[seq_len + 2][1], coords[seq_len + 2][2], local=True)))
 
@@ -237,6 +237,8 @@ class Dovetail(Stem):
         bot_strand1._coords = bot_coord1
 
         if return_strands:
-            return top_strand1, top_strand2, bot_strand1, bot_strand2
+            return self.join_strands([top_strand1, top_strand2, bot_strand1, bot_strand2])
 
-        self.replace_all_strands([top_strand1, top_strand2, bot_strand1, bot_strand2], copy=False, join=True)
+        self.replace_all_strands([top_strand1, top_strand2, bot_strand1, bot_strand2], 
+                                 copy=False, 
+                                 join=True)

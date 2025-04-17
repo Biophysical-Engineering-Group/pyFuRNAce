@@ -143,12 +143,12 @@ def simple_origami(dt_list: list, helix_kl: int = 1, main_stem: list = None, lef
     # remove the top cross from the dovetails of the first helix
     for motif in origami[0]:
         if type(motif) == Dovetail:
-            motif.top_cross = False
+            motif.up_cross = False
 
     # remove the bottom cross from the dovetails of the last helix
     for motif in origami[-1]:
         if type(motif) == Dovetail:
-            motif.bot_cross = False
+            motif.down_cross = False
 
     # return the origami structure
     return origami

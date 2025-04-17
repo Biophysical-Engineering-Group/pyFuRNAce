@@ -494,7 +494,7 @@ class Motif(Callback):
         left: (-1,0), top: (0,1)) and an ordered list of junction positon as value.
         """
         ### if the junctions are already calculated return them
-        if not self._positions:
+        if self._positions is None:
             self._calculate_positions()
         return self._junctions
 
@@ -2053,17 +2053,6 @@ class Motif(Callback):
             setattr(new_motif, attr, getattr(self, attr))
 
         return new_motif
-
-    # def copy(self, callback=None):
-    #     # return a copy of the Motif or subclass
-    #     new = copy.copy(self)
-    #     new._clear_callbacks()
-    #     new._strands = self.copy_strands_preserve_blocks(self._strands)
-    #     new._junctions = {k: tuple(v) for k, v in self._junctions.items()}
-    #     new._basepair = self._basepair.copy()
-    #     if callback:
-    #         new.register_callback(callback)
-    #     return new
 
     def extend_junctions(self, 
                          skip_axis: Literal[None, 0, 1] = None, 

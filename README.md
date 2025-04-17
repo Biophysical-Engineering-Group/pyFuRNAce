@@ -21,31 +21,36 @@
 
 ## 📦 Installation
 
-Note: pyFuRNAce requires Python 3.10 or later.
+### Pyfurnace 
 
-### Note: Local Installation always includes the GUI
+Note: pyFuRNAce requires Python 3.10 or later, and the local installation always includes the GUI via Streamlit.
 
-
-Note: The pyFuRNAce installation doesn't include the oxDNA analysis tools (OAT). The OAT package is used to convert 3D structures in oxDNA format (natively supported in pyFuRNAce) from/to PDB files and write oxDNA force files. 
-To support PDB conversion and oxDNA force file generation, here is the command to install both packages:
-
-#### Instal from PyPI 
+#### Install from PyPI 
 Install the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):
 
 ```bash
 pip install pyfurnace
-# install oxDNA analysis tools for pdb conversion
-pip install git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
 ```
 
 #### Install from GitHub
 Install the latest development version of pyFuRNAce (and OAT) directly from the GitHub repository:
 
 ```bash
-pip install "git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git#egg=pyfurnace[oat]"
-# install oxDNA analysis tools for pdb conversion
-pip install git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
+pip install "git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git"
 ```
+
+### Extra Dependencies
+
+**Note**: The **pyFuRNAce installation does not include the oxDNA analysis tools (OAT)**. 
+
+The OAT package is used to convert 3D structures from/to PDB files and write oxDNA force files. 
+To install the OAT package, you can use the following command (the **git** command is required, you can install it via anaconda with `conda install git`):
+
+```bash
+pip install "git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
+```
+
+To run sequence generation, a `Perl` interpreter is required by the Revolvr script from ROAD. It is usually installed by default on most systems. If not, you can install it via Anaconda with `conda install bioconda-legacy::perl`.
 
 ## 🖥️ Running the Web Application
 
@@ -61,7 +66,6 @@ The WebApp is built using Streamlit and can be run locally or on a server. You c
 [pyfurnace.streamlit.app](https://pyfurnace.streamlit.app).
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pyfurnace.streamlit.app/)
-
 
 ## 🎛 Modules
 

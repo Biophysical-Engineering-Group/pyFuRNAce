@@ -9,6 +9,7 @@ description = "An integrated design engine for RNA origami"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = {text = "GNU General Public License v3 (GPLv3)"}
+license-files = ["LICEN[CS]E*"]
 authors = [
     {name = "Luca Monari", email = "l.monari@zmbh.uni-heidelberg.de"} 
 ]

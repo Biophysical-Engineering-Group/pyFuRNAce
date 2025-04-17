@@ -1,4 +1,4 @@
-![Alt Text](https://github.com/Lucandia/pyFuRNAce/blob/main/pyfurnace/app/static/logo_text.png?raw=true)
+![Alt Text](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/logo_text.png?raw=true)
 
 **pyFuRNAce** is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.
 

@@ -1,12 +1,18 @@
 import random
 import warnings
-from typing import Tuple
+from typing import Optional, Tuple, Dict, List, Union, Iterable
 from .basepair import BasePair
+
+# This file contains general useful functions and constants for the pyfurnace package.
+# It includes functions for manipulating RNA strands and sequences, RNA structures 
+# (including dot-bracket notation, pair map and tree), and a function for calculating
+# folding barriers of canonical co-transcriptional RNA Origami.
 
 ###
 ### USEFUL SETS AND DICTIONARIES
 ###
 
+# A set of all accepted nucleotides
 nucleotides = {"A", 
                "U", 
                "C", 
@@ -27,6 +33,8 @@ nucleotides = {"A",
                }
 
 # https://www.bioinformatics.org/sms/iupac.html
+# A dictionary with the IUPAC codes for nucleotides as keys 
+# and the corresponding nucleotides as values
 iupac_code = {"A": {"A"}, 
               "U": {"U"}, 
               "C": {"C"}, 
@@ -46,6 +54,8 @@ iupac_code = {"A": {"A"},
               "&": {"&"}, # separator
               }
 
+# A dictionary with the IUPAC codes for nucleotides as keys
+# and the IUPAC codes that can pair with them as values
 base_pairing = {"A": {"B", "D", "H", "K", "N", "U", "W", "Y"},
                 "U": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "V", "W"},
                 "C": {"B", "D", "G", "K", "N", "R", "S", "V"},
@@ -65,41 +75,113 @@ base_pairing = {"A": {"B", "D", "H", "K", "N", "U", "W", "Y"},
                 "&": {"&"} # separator
                 }
 
+# A dictionary of all possible base pairs in the dot-bracket notation
 db_pairs = {"(": ")", "[": "]", "{": "}", "<": ">", "A": "a", "B": "b", "C": "c", "D": "d", "E": "e", "F": "f", "G": "g", "H": "h", "I": "i", "J": "j", "K": "k", "L": "l", "M": "m", "N": "n", "O": "o", "P": "p", "Q": "q", "R": "r", "S": "s", "T": "t", "U": "u", "V": "v", "W": "w", "X": "x", "Y": "y", "Z": "z"}
+
+# A dictionary of all possible pseudoknot pairs in the dot-bracket notation
 all_pk_symbols =     ('[', ']', '{', '}', '<', '>', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
-road_symbols =  nucleotides | {"." "(", ")"} | set(all_pk_symbols) | {
-                "─", "│", "╭", "╮", "╰", "╯", "^", "*", "┼", "┊", '~', '◦',  # ROAD special symbols
-                '↑', '↓', "⊗", "⊙", "▄", "█", # Pyfurnace special symbols
+
+# A set of all accepted symbols
+accept_symbol =  nucleotides | {"." "(", ")"} | set(all_pk_symbols) | {
+                # ROAD special symbols
+                "─", "│", "╭", "╮", "╰", "╯", "^", "*", "┼", "┊", '~', '◦',  
+                # Pyfurnace special symbols
+                '↑', '↓', "⊗", "⊙", "▂", "▄", "█", 
+                # Normal symbols
                 "-", "|", "+", ":", "=", "!", " ", "/", "\\", "3", "5", "&"} 
+
+# Base pair symbols
 bp_symbols = {"┊", "=", ":", "!", "*"}
-# turns = {"╭", "╮", "╰", "╯", "/", "\\"} 
 
 ###
-### USEFUL STRING TRANSLATIONS
+### STRING TRANSLATORS
 ###
 
-def complement(sequence):
-    return sequence.translate(nucl_to_pair)
-
-def reverse_complement(sequence):
-    return sequence.translate(nucl_to_pair)[::-1]
-
+# Convert all pseudoknot symbols to dots
 pseudo_to_dot = str.maketrans(''.join(all_pk_symbols), "." * len(all_pk_symbols))
+
+# Convert each dot-bracket symbol to its corresponding pair
 pair_db_sym = str.maketrans(''.join(db_pairs.keys()) + ''.join(db_pairs.values()), 
                             ''.join(db_pairs.values()) + ''.join(db_pairs.keys()))
+
+# Remove all nucleotides from a string
 nucl_to_none = str.maketrans("", "", "".join(nucleotides))
-symb_to_none = str.maketrans("", "", "".join(road_symbols))
+
+# Remove all accepted symbols from a string
+symb_to_none = str.maketrans("", "", "".join(accept_symbol))
+
+# Convert all nucleotides to their corresponding pair 
+# (it supports IUPAC codes)
 nucl_to_pair = str.maketrans("AUCGWMRYKSDHVBNX", "UAGCWKYRKSHDBVNX")
-bracket_to_none = str.maketrans("", "", "{[(.)]}")
-# only_turns = str.maketrans("", "", "".join(road_symbols-turns))
-only_nucl = str.maketrans("", "", "".join(road_symbols-nucleotides))
+
+# Remove all symbols from a string, except nucleotides
+only_nucl = str.maketrans("", "", "".join(accept_symbol-nucleotides))
+
+# Convert the strand turning symbols to their corresponding horizontal flip
 horiz_flip = str.maketrans("╭╮╰╯/\\", "╮╭╯╰\\/")
+
+# Convert the strand turning symbols to their corresponding vertical flip
 verti_flip = str.maketrans("╭╮╰╯/\\", "╰╯╭╮\\/")
+
+# Convert the strand turning symbols to their corresponding 90 degree rotation
 rotate_90 = str.maketrans("╭╮╰╯│|─-", "╮╯╭╰──││")
+
+# Convert normal symbols to their corresponding ROAD symbols
 symb_to_road = str.maketrans("-|+=:*!", "─│┼┊┊┊┊")
 
-def pair_nucleotide(nucleotide, iupac_symbol='N'):
-    """ Return the nucleotides that can pair with the given nucleotide"""
+###
+### SEQUENCE FUNCTIONS
+###
+
+def complement(sequence: str) -> str:
+    """
+    Return the complement of an RNA sequence using IUPAC base-pairing rules.
+
+    Parameters
+    ----------
+    sequence : str
+        RNA sequence composed of standard and extended IUPAC nucleotide symbols.
+
+    Returns
+    -------
+    str
+        Complementary sequence with each base replaced by its pair.
+    """
+    return sequence.translate(nucl_to_pair)
+
+def reverse_complement(sequence: str) -> str:
+    """
+    Return the reverse complement of an RNA sequence.
+
+    Parameters
+    ----------
+    sequence : str
+        RNA sequence to reverse and complement.
+
+    Returns
+    -------
+    str
+        The reverse-complemented sequence.
+    """
+    return sequence.translate(nucl_to_pair)[::-1]
+
+def pair_nucleotide(nucleotide: str, iupac_symbol: str = 'N') -> str:
+    """
+    Return a nucleotide that can pair with the given nucleotide, optionally 
+    constrained by an IUPAC symbol.
+
+    Parameters
+    ----------
+    nucleotide : str
+        The base to find a pair for.
+    iupac_symbol : str, optional
+        Constraint based on allowed base-pairing (IUPAC code).
+
+    Returns
+    -------
+    str
+        A valid pairing nucleotide, or the complement of the input base.
+    """
     if iupac_symbol in 'AUCG':
         return iupac_symbol
     if iupac_symbol == 'K':
@@ -109,38 +191,92 @@ def pair_nucleotide(nucleotide, iupac_symbol='N'):
             return 'G'
     return nucleotide.translate(nucl_to_pair)
 
-def mutate_nucleotide(sequence, sequence_constraints, nucl_ind, pair_map):
-    """ Take a nucleotide, and return a possible mutation and the corresponding pair"""
+def mutate_nucleotide(sequence: str,
+                      sequence_constraints: str,
+                      nucl_ind: int,
+                      pair_map: Dict[int, Optional[int]]
+                      ) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Mutate a nucleotide in the sequence and update its paired counterpart accordingly.
+
+    Parameters
+    ----------
+    sequence : str
+        Original RNA sequence.
+    sequence_constraints : str
+        A string of IUPAC codes representing base constraints for each position.
+    nucl_ind : int
+        Index of the nucleotide to mutate.
+    pair_map : dict of int to int or None
+        A mapping of indices representing base pairs.
+
+    Returns
+    -------
+    tuple of (str or None, str or None)
+        A tuple with the new nucleotide and its paired base if applicable.
+    """
     new_set = iupac_code[sequence_constraints[nucl_ind]] - {sequence[nucl_ind]}
     if not new_set:
         return None, None
     new_nucl = random.choice(list(new_set))
-    paired_nucl = pair_map[nucl_ind] # get the index of the paired nucleotide
-    if paired_nucl is not None: # if the nucleotide is paired, get the paired nucleotide
+
+    # get the index of the paired nucleotide
+    paired_nucl = pair_map[nucl_ind] 
+
+    # if the nucleotide is paired, get the paired nucleotide
+    if paired_nucl is not None: 
         # get the possible nucleotides that can pair with the new nucleotide
         paired_nucl = pair_nucleotide(new_nucl, sequence_constraints[paired_nucl])
     return new_nucl, paired_nucl
 
-def gc_content(seq, extended_alphabet=True):
-    """Calculate the percentage of G, C, S and half K in the sequence.
-    --------------------------------------------------------------------------------------
-    Return: float
-        The percentage of G, C, or S in the sequence.
+def gc_content(seq: str, extended_alphabet: bool = True) -> float:
+    """
+    Calculate GC content (optionally including ambiguous nucleotides).
+
+    Parameters
+    ----------
+    seq : str
+        The RNA sequence.
+    extended_alphabet : bool, optional
+        Whether to include ambiguous IUPAC symbols (e.g., S, K) as partial GC.
+
+    Returns
+    -------
+    float
+        Proportion of GC content in the sequence.
     """
     total_count = len(seq)
     if not total_count:
         return 0
     gc_count = seq.count('G') + seq.count('C') 
     if extended_alphabet:
-        gc_count += seq.count('S') + sum(map(seq.count, ['M', 'R', 'Y', 'K', 'N', 'X'])) / 2 + sum(map(seq.count, ['D', 'H'])) / 3 + sum(map(seq.count, ['V', 'B'])) * 2 / 3 
+        gc_count += (seq.count('S') 
+                     + sum(map(seq.count, ['M', 'R', 'Y', 'K', 'N', 'X'])) / 2 
+                     + sum(map(seq.count, ['D', 'H'])) / 3 
+                     + sum(map(seq.count, ['V', 'B'])) * 2 / 3 )
     percentage = (gc_count / total_count)
     return percentage
 
 ###
-### DOT BRACKET FUNCTIONS
+### STRUCTURE FUNCTIONS
 ###
 
-def rotate_dot_bracket(dot_bracket, shift_left):
+def rotate_dot_bracket(dot_bracket: str, shift_left: int) -> str:
+    """
+    Rotate a dot-bracket structure leftward by a given number of positions.
+
+    Parameters
+    ----------
+    dot_bracket : str
+        RNA secondary structure in dot-bracket notation.
+    shift_left : int
+        Number of positions to rotate to the left.
+
+    Returns
+    -------
+    str
+        Rotated dot-bracket structure.
+    """
     n = len(dot_bracket)
     
     # Step 1: Get the pair map
@@ -156,8 +292,21 @@ def rotate_dot_bracket(dot_bracket, shift_left):
     
     return pair_map_to_dot_bracket(new_pair_map, n)
     
-def dot_bracket_to_pair_map(dot_bracket):
-    """ Convert the dot bracket notation to a double dictionary with the paired indexes"""
+def dot_bracket_to_pair_map(dot_bracket: str) -> BasePair:
+    """
+    Convert dot-bracket notation into a pair map.
+
+    Parameters
+    ----------
+    dot_bracket : str
+        Secondary structure in dot-bracket notation.
+
+    Returns
+    -------
+    BasePair
+        A bidirectional dictionary mapping nucleotide indices to their paired 
+        partner (or None).
+    """
     pair_map = BasePair()
     stacks = [[] for _ in range(len(db_pairs))]
     for i, sym in enumerate(dot_bracket):
@@ -171,14 +320,31 @@ def dot_bracket_to_pair_map(dot_bracket):
                 pair_map[j] = i
         else: # unpaired nucleotide: No pair
             pair_map[i] = None
+
     # If there are still elements that are not in the dictionary, add them as unpaired
     for i in range(len(dot_bracket)):
         if i not in pair_map:
             pair_map[i] = None
+
     return pair_map
 
-def pair_map_to_dot_bracket(pair_map, structure_length = None):
-    """ Convert the pair map to a dot bracket notation"""
+def pair_map_to_dot_bracket(pair_map: Dict[int, Optional[int]],
+                            structure_length: Optional[int] = None) -> str:
+    """
+    Convert a base pair map into dot-bracket notation.
+
+    Parameters
+    ----------
+    pair_map : dict
+        Mapping from nucleotide index to paired index or None.
+    structure_length : int, optional
+        Total length of the structure. If None, computed from the map.
+
+    Returns
+    -------
+    str
+        Dot-bracket notation representing the structure.
+    """
     if structure_length is None:
         structure_length = max(pair_map.keys(), default=-1) + 1
 
@@ -224,32 +390,69 @@ def pair_map_to_dot_bracket(pair_map, structure_length = None):
         bracket_count += 1
 
         if bracket_count >= 30:
-            warnings.warn(f"Warning: Too many bracket types needed in to write the structure. Stopping at 30, 'Z' to 'z'.", stacklevel=3)
+            warnings.warn(f"Warning: Too many bracket types needed in to write the "
+                          f"structure. Stopping at 30, 'Z' to 'z'.", stacklevel=3)
             break
 
     return ''.join(dotbracket)
 
-def dot_bracket_to_stacks(dot_bracket, only_opening=False):
+def dot_bracket_to_stacks(dot_bracket: str,
+                          only_opening: bool = False
+                          ) -> Tuple[str, List[Tuple[int, int]]]:
+    """
+    Identify contiguous structural elements (stacks) in a dot-bracket string.
+
+    Parameters
+    ----------
+    dot_bracket : str
+        RNA structure in dot-bracket format.
+    only_opening : bool, optional
+        Whether to return only stacks that start with an opening symbol.
+
+    Returns
+    -------
+    tuple of str and list of tuple
+        - A reduced dot-bracket string marking distinct stacks.
+        - A list of (start_index, end_index) tuples for each stack.
+    """
     pair_map = dot_bracket_to_pair_map(dot_bracket)
-    stacks = [] # a list of tuples containing starting index and the length of the stack
-    reduced_dot_bracket = [] # a list of the reduced dot bracket symbols, that will be returned as a string
+    # a list of tuples containing starting index and the length of the stack
+    stacks = [] 
+    # a list of the reduced dot bracket symbols, that will be returned as a string
+    reduced_dot_bracket = [] 
 
     stack_start = 0
     current_pair_sym = dot_bracket[0]
     last_stack_pair = pair_map[0] + 1 if pair_map[0] else None
-    ### NOT NECESSARY # open_pair_sym = '.' + ''.join(db_pairs.keys())
-    for i, symbol in enumerate(dot_bracket + '_'):
-        ### NOT NECESSARY 
-            # # ignore the symbols that are not '.' or not opening pairs, they should be already taken into accound
-            # if symbol in open_pair_sym:
-            #     continue
 
-        stack_pair = pair_map.get(i) # get the paired index of the current symbol
-        # if symbol change, or the pairing is not consecutive, add the last stack to the list
-        if symbol != current_pair_sym or stack_pair is not None and stack_pair != last_stack_pair - 1:
+    ### NOT NECESSARY 
+    # open_pair_sym = '.' + ''.join(db_pairs.keys())
+
+    for i, symbol in enumerate(dot_bracket + '_'):
+
+        ### NOT NECESSARY 
+        # # ignore the symbols that are not '.' or not opening pairs, 
+        # # they should be already taken into accound
+        # if symbol in open_pair_sym:
+        #     continue
+
+        # get the paired index of the current symbol
+        stack_pair = pair_map.get(i) 
+
+        # if symbol change, or the pairing is not consecutive, 
+        # add the last stack to the list
+
+        if (symbol != current_pair_sym 
+                or stack_pair is not None 
+                and stack_pair != last_stack_pair - 1):
+            
             add_last_stack = True # add the last stack to the list by default
-            if only_opening: # if only the opening stacks are needed, check if the last stack is an opening stack or unpaired
-                add_last_stack = current_pair_sym in db_pairs.keys() or current_pair_sym == '.'
+            # if only the opening stacks are needed, 
+            # check if the last stack is an opening stack or unpaired
+
+            if only_opening: 
+                add_last_stack = (current_pair_sym in db_pairs.keys() 
+                                  or current_pair_sym == '.')
 
             if add_last_stack:
                 reduced_dot_bracket.append(current_pair_sym)
@@ -258,165 +461,140 @@ def dot_bracket_to_stacks(dot_bracket, only_opening=False):
 
         last_stack_pair = stack_pair
         current_pair_sym = symbol
+
     return ''.join(reduced_dot_bracket), stacks
 
-def folding_barriers(structure: str,
-                     kl_delay: int = 150) -> Tuple[str, int]:
-    """
-    Compute the folding barriers for a given RNA secondary structure.
-    This function is based on ROAD: https://www.nature.com/articles/s41557-021-00679-1
-    This function analyzes the dot-bracket representation of the RNA secondary structure 
-    to determine folding barriers based on base pair topology and kinetic delay.
-
-    Parameters
-    ----------
-    structure : str
-        The dot-bracket notation representing the secondary structure of the RNA. 
-        If folding barriers is called from a Motif or Origami, the structure is already
-        provided by the object in the dot-bracket format.
-    kl_delay : int, optional, default=150
-        The number of nucleotides (nts) of delay before kissing loops (KLs) snap closed.
-        A typical realistic value is around 350 (~1 second), while a more conservative 
-        setting is 150 by default.
-
-    Returns
-    -------
-    Tuple[str, int]
-        A tuple containing:
-        - A string representing the barrier map where:
-        '─' = no barrier (0 penalty),
-        '▂' = opening pair weak barrier (1 penalty),
-        '▄' = cloding pair weak barrier (1 penalty),
-        '█' = strong barrier (2 penalty).
-        - An integer score indicating the total penalty based on barrier strengths.
-
-    Notes
-    -----
-    The function assigns barrier strengths based on the topology of base pairs 
-    and kinetic constraints, ensuring proper folding predictions.
-    """
-    structure = structure.replace('&', '')
-    ss_len = len(structure)
-    s_map = dot_bracket_to_pair_map(structure)
-    barriers = [''] * len(structure)
-
-    # don't count the nucleotides in the 3' terminal position
-    terminal_3_bonus = 16
-
-    current_barr_count = 0
-    for ind in range(ss_len):
-        # get the bracket at the position
-        bra = structure[ind]
-        # if bra == '&':
-        #     barriers[ind] = '&'
-        #     continue
-
-        # set the default barrier to 'N'
-        barriers[ind] = '─'
-
-        if ind > ss_len - terminal_3_bonus:
-            if s_map[ind] is not None:
-                barriers[s_map[ind]] = '─'
-            continue
-
-        ### unpaired nts are not barriers and reset the current barrier count
-        if bra == '.':
-            barriers[ind] = '─'
-            current_barr_count = 0
-
-        ### opening pairs may be barriers or not, 
-        # indicate them with 'w', reset the barrier count
-        elif bra == '(':
-            barriers[ind] = '▂'
-            current_barr_count = 0
-
-        ### closing pairs may be barriers or not, 
-        # depending on the topology count
-        elif bra == ')':
-            # if the opening pair is not blocked, 
-            # we close and reset the current barrier count
-            if barriers[s_map[ind]] == '▂':
-                barriers[ind] = '─'
-                barriers[s_map[ind]] = '─'
-                current_barr_count = 0
-
-            # if the closing pair is already blocked, then 
-            # we mark the barrier reached and start counting
-            elif barriers[s_map[ind]] == '█':
-                # if the current barrier count is greater than 5, wa mark it with 'S'
-                if current_barr_count > 5:
-                    barriers[ind] = '█'
-                    barriers[s_map[ind]] = '▄'
-                # if the current barrier count is less than 5, we mark it with 'W'
-                else:
-                    barriers[ind] = '▄'
-                    barriers[s_map[ind]] = '▄'
-                current_barr_count += 1
-
-        # if the index is bigger than the kl_delay, 
-        # we check if the internal KLs are closed
-        if ind > kl_delay:
-            
-            # we check if the KLs are closed, 
-            # if yes, we mark them with 'N'
-            close_sym = structure[ind - kl_delay]
-            if close_sym not in '(.)' and close_sym in db_pairs.values():
-                barriers[ind - kl_delay] == '─'
-                barriers[s_map[ind - kl_delay]] == '─'
-
-                # for each nt in the delay, we check if there are any barriers, 
-                # if yes, we mark them with 'S'
-                for k in range(s_map[ind - kl_delay], ind-kl_delay):
-                    if barriers[k] == '▂':
-                        barriers[k] = '█'
-
-    penalty = {'█': 2, '▄': 1, '▂': 1, '─': 0}#, '&': 0}
-    repl = [penalty[i] for i in barriers]
-    score = sum(repl)
-    return ''.join(barriers), score
 
 class Node():
-    def __init__(self, index = None, label = "5'", parent=None, seq=None, **kwargs):
+    """
+    A tree node representing a region of an RNA secondary structure.
+
+    Attributes
+    ----------
+    index : int or None
+        Position of the nucleotide in the sequence.
+    label : str
+        Structure symbol (e.g., '(', ')', '.', '&').
+    paired_index : int or None
+        Index of the nucleotide this node pairs with, if any.
+    parent : Node or None
+        Parent node in the tree.
+    seq : str or None
+        Sequence constraint at this node.
+    children : list of Node
+        Child nodes representing nested structures.
+    """
+
+    def __init__(self,
+                 index: Optional[int] = None,
+                 label: str = "5'",
+                 parent: Optional['Node'] = None,
+                 seq: Optional[str] = None,
+                 **kwargs) -> None:
+        """
+        Initialize a Node object.
+        Parameters
+        ----------
+        index : int or None
+            Index of the nucleotide in the sequence.
+        label : str
+            Structure symbol (e.g., '(', ')', '.', '&').
+        parent : Node or None
+            Parent node in the tree.
+        seq : str or None
+            Sequence constraint at this node.
+        kwargs : dict
+            Additional attributes to set on the node.
+        """
+        # Initialize the node with the given parameters
         self.index = index
         self.label = label
         self.paired_index = None
         self.parent = parent
         self.seq = seq
-        self.children = []
+        self.children: List[Node] = []
         if parent is not None:
             parent.children.append(self)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def __repr__(self, level=0):
-        paired_str = f' -> {self.paired_index}' if self.paired_index is not None else ''
+        """ 
+        Return a string representation of the node and its children.
+        """
+        paired_str = ''
+        if self.paired_index is not None:
+            paired_str = f' -> {self.paired_index}'
+
         if level == 0:
             ret = f"{self.label}\n"
         else:
-            ret = f"╰{'──' * level} {self.label} - {self.seq} - {self.index} {paired_str} \n" 
+            ret = (f"╰{'──' * level} {self.label} - {self.seq} "
+                   f"- {self.index} {paired_str} \n" )
         for child in self.children:
             ret += child.__repr__(level + 1)
         return ret
 
     def __str__(self):
+        """
+        Return a string representation of the node.
+        """
         return self.__repr__()
 
-    def search(self, target_index, target_label=None):
+    def search(self,
+               target_index: Optional[int],
+               target_label: Optional[str] = None) -> Optional['Node']:
+        """
+        Recursively search for a node with a matching index and label.
+
+        Parameters
+        ----------
+        target_index : int or None
+            Index to match.
+        target_label : str or None
+            Optional label to also match.
+
+        Returns
+        -------
+        Node or None
+            The first matching node found, or None if not found.
+        """
         # Check if the current node matches the target criteria
-        if target_index == self.index and (target_label is None or target_label == self.label):
+        if (target_index == self.index 
+                and (target_label is None 
+                     or target_label == self.label)):
             return self
-        elif self.index is None and self.parent is None and abs(target_index) == float('inf'):
+        elif (self.index is None 
+                and self.parent is None 
+                and abs(target_index) == float('inf')):
             return self # special case for the root node
 
         # Recursively search in child nodes
         for child in self.children:
-            result = child.search(target_index=target_index, target_label=target_label)
+            result = child.search(target_index=target_index, 
+                                  target_label=target_label)
             if result:
                 return result  # Return the node if found
     
         return None  # Return None if not found
 
-def dot_bracket_to_tree(dot_bracket, sequence=None):
+def dot_bracket_to_tree(dot_bracket: str,
+                        sequence: Optional[str] = None) -> Node:
+    """
+    Convert a dot-bracket RNA structure into a hierarchical tree of nodes.
+
+    Parameters
+    ----------
+    dot_bracket : str
+        RNA structure in dot-bracket format. Pseudoknots are ignored.
+    sequence : str, optional
+        Sequence constraints associated with each index.
+
+    Returns
+    -------
+    Node
+        Root node of the tree representing the full structure.
+    """
     # Remove pseudoknots from the dot bracket
     dot_bracket = dot_bracket.translate(pseudo_to_dot)
     root = Node()
@@ -429,7 +607,8 @@ def dot_bracket_to_tree(dot_bracket, sequence=None):
         if label == "(": # add a new node, move to the new node
             new_node = Node(i, label, current_node, seq = seq_const)
             current_node = new_node
-        elif label == ")": # add the paired index to the parent, move to the parent node
+        # add the paired index to the parent, move to the parent node
+        elif label == ")": 
             current_node.paired_index = i
             current_node = current_node.parent
         elif label == ".": # add a children to the current node, do not move
@@ -438,7 +617,28 @@ def dot_bracket_to_tree(dot_bracket, sequence=None):
              new_node = Node(None, label, current_node)
     return root
 
-def tree_to_dot_bracket(node, dot_bracket=None, seq_constraints=False):
+def tree_to_dot_bracket(node: Node,
+                        dot_bracket: Optional[List[str]] = None,
+                        seq_constraints: Union[bool, List[str]] = False
+                        ) -> Union[str, Tuple[str, str]]:
+    """
+    Convert a tree of Nodes into a dot-bracket structure and optional sequence 
+    constraints.
+
+    Parameters
+    ----------
+    node : Node
+        Root node of the RNA structure tree.
+    dot_bracket : list of str, optional
+        Accumulator for the dot-bracket string.
+    seq_constraints : bool or list of str
+        If True, collect sequence constraints using the `seq` attribute.
+
+    Returns
+    -------
+    str or tuple of (str, str)
+        Dot-bracket string, and sequence constraints if requested.
+    """
 
     if isinstance(seq_constraints, bool) and seq_constraints:
         # initialize the sequence constraints only if it's a bool
@@ -479,11 +679,64 @@ def tree_to_dot_bracket(node, dot_bracket=None, seq_constraints=False):
         
         return ''.join(dot_bracket)
 
-def hamming_distance(s1, s2, ignore_ind=(), **kwargs):
-    return sum((1 for i, (x, y) in enumerate(zip(s1, s2)) if x != y and i not in ignore_ind))
+###
+### DISTANCE FUNCTIONS
+###
 
-def base_pair_difference(s1, s2, pair_map1=None, pair_map2=None, ignore_ind=(), accept_unpaired_ind=(), **kwargs):
-    """ Accpet unpaired indexes is a list of indexes that are allowed to be unpaired in the second structure."""
+def hamming_distance(s1: str, 
+                     s2: str, 
+                     ignore_ind: Iterable[int] = (),
+                     **kwargs) -> int:
+    """
+    Compute the Hamming distance between two strings, ignoring specified indices.
+
+    Parameters
+    ----------
+    s1 : str
+        First sequence or structure.
+    s2 : str
+        Second sequence or structure.
+    ignore_ind : iterable of int, optional
+        Indices to exclude from comparison.
+
+    Returns
+    -------
+    int
+        Number of differing characters at unignored positions.
+    """
+    return sum((1 for i, (x, y) in enumerate(zip(s1, s2)) 
+                    if x != y and i not in ignore_ind))
+
+def base_pair_difference(s1: str,
+                         s2: str,
+                         pair_map1: Optional[Dict[int, Optional[int]]] = None,
+                         pair_map2: Optional[Dict[int, Optional[int]]] = None,
+                         ignore_ind: Iterable[int] = (),
+                         accept_unpaired_ind: Iterable[int] = (),
+                         **kwargs) -> List[int]:
+    """
+    Find indices where base pairing differs between two structures.
+
+    Parameters
+    ----------
+    s1 : str
+        First structure (dot-bracket notation).
+    s2 : str
+        Second structure.
+    pair_map1 : dict, optional
+        Precomputed pair map for s1.
+    pair_map2 : dict, optional
+        Precomputed pair map for s2.
+    ignore_ind : iterable of int, optional
+        Indices to ignore in the comparison.
+    accept_unpaired_ind : iterable of int, optional
+        Indices allowed to be unpaired in s2 without penalty.
+
+    Returns
+    -------
+    list of int
+        Indices of base pairs that differ.
+    """
     if pair_map1 is None:
         pair_map1 = dot_bracket_to_pair_map(s1)
     if pair_map2 is None:
@@ -494,228 +747,207 @@ def base_pair_difference(s1, s2, pair_map1=None, pair_map2=None, ignore_ind=(), 
         if i in ignore_ind or main_pair_map[i] is None:
             return False
         elif accept_unpaired and i in accept_unpaired_ind:
-            return pair_map2[i] is not None and pair_map1[i] != pair_map2[i]  # Only count if paired in both but different
+            # Only count if paired in both but different
+            return pair_map2[i] is not None and pair_map1[i] != pair_map2[i]  
         return pair_map1[i] != pair_map2[i]
 
     # pairs in s1 that are not in s2
-    diff_set = [i for i in pair_map1 if check_ind(pair_map1, i, True)]  # Pairs in s1 not matching in s2
+    diff_set = [i for i in pair_map1 if check_ind(pair_map1, i, True)]  
     # pairs in s2 that are not in s1
-    diff_set.extend(i for i in pair_map2 if check_ind(pair_map2, i))  # Pairs in s2 not matching in s1
+    diff_set.extend(i for i in pair_map2 if check_ind(pair_map2, i))  
     
     return diff_set
 
-def base_pair_distance(s1, s2, pair_map1=None, pair_map2=None, ignore_ind=(), accept_unpaired_ind=(), **kwargs):
-    """ Accpet unpaired indexes is a list of indexes that are allowed to be unpaired in the second structure."""
-    return len(base_pair_difference(s1, s2, pair_map1, pair_map2, ignore_ind, accept_unpaired_ind, **kwargs))
+def base_pair_distance(s1: str,
+                       s2: str,
+                       pair_map1: Optional[Dict[int, Optional[int]]] = None,
+                       pair_map2: Optional[Dict[int, Optional[int]]] = None,
+                       ignore_ind: Iterable[int] = (),
+                       accept_unpaired_ind: Iterable[int] = (),
+                       **kwargs) -> int:
+    """
+    Compute the number of base pair differences between two structures.
 
-def differently_paired_distance(s1, s2, pair_map1=None, pair_map2=None, ignore_ind=(), accept_unpaired_ind=(), **kwargs):
-    """ Accpet unpaired indexes is a list of indexes that are allowed to be unpaired in the second structure."""
-    if pair_map1 is None:
-        pair_map1 = dot_bracket_to_pair_map(s1)
-    if pair_map2 is None:
-        pair_map2 = dot_bracket_to_pair_map(s2) 
-    # check each symbol, if they have the same pair or different pairs
-    diff_pair_dist = 0
-    for i in range(len(s1)):
-        if i in ignore_ind:
-            continue
-        paired1 = pair_map1[i]
-        paired2 = pair_map2[i]
+    Parameters
+    ----------
+    s1 : str
+        First dot-bracket structure.
+    s2 : str
+        Second dot-bracket structure.
+    pair_map1 : dict, optional
+        Pair map for s1.
+    pair_map2 : dict, optional
+        Pair map for s2.
+    ignore_ind : iterable of int, optional
+        Indices to ignore.
+    accept_unpaired_ind : iterable of int, optional
+        Positions where being unpaired in s2 is allowed.
 
-        if paired1 is not None and paired2 is None:
-            if i not in accept_unpaired_ind:
-                diff_pair_dist += 1
-        elif paired1 != paired2:
-            diff_pair_dist += 1
-
-    return diff_pair_dist
+    Returns
+    -------
+    int
+        Total number of mismatched base pairs.
+    """
+    return len(base_pair_difference(s1, 
+                                    s2, 
+                                    pair_map1, 
+                                    pair_map2, 
+                                    ignore_ind, 
+                                    accept_unpaired_ind, 
+                                    **kwargs))
 
 ###
-### SEQUENCE CONSTRAINT FUNCTIONS
+### FOLDING BARRIERS
 ###
 
-def check_sequence_constraints(sequence_constraints, pair_map):
-    """ Check if the sequence constraints agree with the pair map and update the sequence constraints"""
-    new_seq_const = list(sequence_constraints)
-    for i, j in pair_map.items():
-        if j is None:
+def folding_barriers(structure: str,
+                     kl_delay: int = 150) -> Tuple[str, int]:
+    """
+    Compute the folding barriers for a given RNA secondary structure.
+    This function is based on 
+    ROAD: https://www.nature.com/articles/s41557-021-00679-1
+    This function analyzes the dot-bracket representation of the RNA secondary 
+    structure to determine folding barriers based on base pair topology and 
+    kinetic delay.
+
+    Parameters
+    ----------
+    structure : str
+        The dot-bracket notation representing the secondary structure of the RNA. 
+        If folding barriers is called from a Motif or Origami, the structure is 
+        already provided by the object in the dot-bracket format.
+    kl_delay : int, optional, default=150
+        The number of nucleotides (nts) of delay before kissing loops (KLs) snap 
+        closed. A typical realistic value is around 350 (~1 second), while a 
+        more conservative  setting is 150 by default.
+
+    Returns
+    -------
+    Tuple[str, int]
+        A tuple containing:
+        - A string representing the barrier map where:
+        '─' = no barrier (0 penalty),
+        '▂' = opening pair weak barrier (1 penalty),
+        '▄' = cloding pair weak barrier (1 penalty),
+        '█' = strong barrier (2 penalty).
+        - An integer score indicating the total penalty based on barrier strengths.
+
+    Notes
+    -----
+    The function assigns barrier strengths based on the topology of base pairs 
+    and kinetic constraints, ensuring proper folding predictions.
+    """
+    structure = structure.replace('&', '')
+    ss_len = len(structure)
+    s_map = dot_bracket_to_pair_map(structure)
+    barriers = [''] * len(structure)
+
+    # don't count the nucleotides in the 3' terminal position
+    terminal_3_bonus = 16
+
+    current_barr_count = 0
+    for ind in range(ss_len):
+        # get the bracket at the position
+        bra = structure[ind]
+        # if bra == '&':
+        #     barriers[ind] = '&'
+        #     continue
+
+        # set the default barrier to '─', no barrier
+        barriers[ind] = '─'
+
+        if ind > ss_len - terminal_3_bonus:
+            if s_map[ind] is not None:
+                barriers[s_map[ind]] = '─'
             continue
-        iupac_i = iupac_code[sequence_constraints[i]]
-        iupac_j = iupac_code[sequence_constraints[j]]
-        # give the priority to the set with the least number of elements, the other index is the slave index
-        priority_set = iupac_i
-        slave_set, slave_ind = iupac_j, j
-        if len(iupac_i) > len(iupac_j):
-            priority_set = iupac_j
-            slave_set, slave_ind = iupac_i, i
-        paired_set = {nucl.translate(nucl_to_pair) for nucl in priority_set}
-        # add wobble pairing
-        if sequence_constraints[i] == 'K' or sequence_constraints[j] == 'K':
-            paired_set.update('U' if nucl == 'G' else 'G' for nucl in priority_set)
-        elif sequence_constraints[i] == 'U' and sequence_constraints[j] == 'G':
-            paired_set.add('G'); paired_set.add('U')
-        elif sequence_constraints[i] == 'G' and sequence_constraints[j] == 'U':
-            paired_set.add('G'); paired_set.add('U')
-        slave_intersection = paired_set.intersection(slave_set)
-        if not slave_intersection:
-            raise ValueError(f"Pairing constraint violated at index {i} and {j}:  nucleotide {i} ({sequence_constraints[i]}) is supposed to pair nucleotide {j} ({sequence_constraints[j]}) but the sequence constraints do not allow it.")
-        new_iupac = next(key for key, value in iupac_code.items() if value == slave_intersection)
-        new_seq_const[slave_ind] = new_iupac
-    return ''.join(new_seq_const)
+
+        ### unpaired nts are not barriers and reset the current barrier count
+        if bra == '.':
+            barriers[ind] = '─'
+            current_barr_count = 0
+
+        ### opening pairs may be barriers or not, 
+        # indicate them with '▂', reset the barrier count
+        elif bra == '(':
+            barriers[ind] = '▂'
+            current_barr_count = 0
+
+        ### closing pairs may be barriers or not, 
+        # depending on the topology count
+        elif bra == ')':
+            # if the opening pair is not blocked, 
+            # we close and reset the current barrier count
+            if barriers[s_map[ind]] == '▂':
+                barriers[ind] = '─'
+                barriers[s_map[ind]] = '─'
+                current_barr_count = 0
+
+            # if the closing pair is already blocked, then 
+            # we mark the barrier reached and start counting
+            elif barriers[s_map[ind]] == '█':
+                # if the current barrier count is greater than 5, wa mark it with '█'
+                if current_barr_count > 5:
+                    barriers[ind] = '█'
+                    barriers[s_map[ind]] = '▄'
+                # if the current barrier count is less than 5, we mark it with '▄'
+                else:
+                    barriers[ind] = '▄'
+                    barriers[s_map[ind]] = '▄'
+                current_barr_count += 1
+
+        # if the index is bigger than the kl_delay, 
+        # we check if the internal KLs are closed
+        if ind > kl_delay:
+            
+            # we check if the KLs are closed, 
+            # if yes, we mark them with 'N'
+            close_sym = structure[ind - kl_delay]
+            if close_sym not in '(.)' and close_sym in db_pairs.values():
+                barriers[ind - kl_delay] == '─'
+                barriers[s_map[ind - kl_delay]] == '─'
+
+                # for each nt in the delay, we check if there are any barriers, 
+                # if yes, we mark them with '█'
+                for k in range(s_map[ind - kl_delay], ind-kl_delay):
+                    if barriers[k] == '▂':
+                        barriers[k] = '█'
+
+    penalty = {'█': 2, '▄': 1, '▂': 1, '─': 0}#, '&': 0}
+    repl = [penalty[i] for i in barriers]
+    score = sum(repl)
+    return ''.join(barriers), score
 
 ###
 ### CUSTOM EXCEPTIONS
 ###
 
+
 class MotifStructureError(Exception):
+    """
+    Exception raised when a motif's secondary structure is invalid or inconsistent.
+
+    This error typically indicates issues such as:
+    - Overlapping or conflicting strands
+    - Joining strands with different directionalities
+    - Logical inconsistencies in structural motifs
+    """
     pass
 
+
 class AmbiguosStructure(Warning):
-    def __init__(self, message):
-        self.message = message
+    """
+    Warning raised when a structure is ambiguous or potentially problematic.
 
-    def __str__(self):
+    This can occur in cases where:
+    - The strand routing is not clear
+
+    Parameters
+    ----------
+    message : str
+        Description of the ambiguity or issue.
+    """
+    def __init__(self, message: str) -> None:
+        self.message: str = message
+
+    def __str__(self) -> str:
         return repr(self.message)
-
-def visualize_tree(structure):
-    from igraph import Graph, EdgeSeq
-    import plotly.graph_objects as go
-    def make_annotations(pos, text, font_size=10, font_color='rgb(250,250,250)'):
-        L = len(pos)
-        if len(text) != L:
-            raise ValueError('The lists pos and text must have the same length')
-        annotations = []
-        for k in range(L):
-            annotations.append(
-                dict(
-                    text=text[k],  # Use text[k] instead of labels[k]
-                    x=pos[k][0], y=2 * M - position[k][1],
-                    xref='x1', yref='y1',
-                    font=dict(color=font_color, size=font_size),
-                    showarrow=False
-                )
-            )
-        return annotations
-
-    # Define your RNA structure
-    if type(structure) == str:
-        root = dot_bracket_to_tree(structure)
-    elif type(structure) == Node:
-        root = structure
-    else:
-        raise ValueError("The structure should be a string or a Node object.")
-
-    # Helper function to recursively add nodes and edges to the igraph graph
-    def add_nodes_edges(igraph_graph, node, parent_index=None):
-        current_index = igraph_graph.vcount()  # Get the current index for the new node
-        igraph_graph.add_vertex(name=f"{node.label}-{node.index}")
-
-        # If the node has a parent, create an edge to the parent
-        if parent_index is not None:
-            igraph_graph.add_edge(parent_index, current_index)
-
-        # Recursively add children nodes
-        for child in node.children:
-            add_nodes_edges(igraph_graph, child, current_index)
-
-    # Create an igraph Graph
-    G = Graph(directed=True)
-    add_nodes_edges(G, root)
-
-    # Layout using igraph's reingold-tilford algorithm for tree layout
-    lay = G.layout("rt")
-
-    # Extract coordinates for Plotly
-    nr_vertices = G.vcount()
-    position = {k: lay[k] for k in range(nr_vertices)}
-    Y = [lay[k][1] for k in range(nr_vertices)]
-    M = max(Y)
-
-    # Get edges and adjust positions
-    es = EdgeSeq(G)
-    E = [e.tuple for e in G.es]
-
-    L = len(position)
-    Xn = [position[k][0] for k in range(L)]
-    Yn = [2 * M - position[k][1] for k in range(L)]
-    Xe = []
-    Ye = []
-    for edge in E:
-        Xe += [position[edge[0]][0], position[edge[1]][0], None]
-        Ye += [2 * M - position[edge[0]][1], 2 * M - position[edge[1]][1], None]
-
-    # Helper function to traverse the tree and collect labels, separating leaf nodes
-    def get_labels_and_leaf_status(node, labels=None, is_leaf=None):
-        if labels is None:
-            labels = []
-        if is_leaf is None:
-            is_leaf = []
-
-        label_str  = f"{node.label} - {node.index}"
-        if node.paired_index is not None:
-            label_str += f" - ({node.paired_index})"
-        if node.seq:
-            label_str += f" - {node.seq}"
-
-        # Determine if the node is a leaf (no children)
-        labels.append(label_str)
-        # labels.append("")
-        is_leaf.append(len(node.children) == 0)  # True for leaf, False for non-leaf
-
-        # Recursively collect labels and leaf status from children
-        for child in node.children:
-            get_labels_and_leaf_status(child, labels, is_leaf)
-
-        return labels, is_leaf
-
-    # Generate labels and leaf status for coloring
-    v_label, leaf_status = get_labels_and_leaf_status(root)
-
-    # Separate node colors based on leaf status
-    node_colors = ['#696969' if is_leaf else '#00856A' for is_leaf in leaf_status]
-    # node_colors = ['#696969' if is_leaf else '#696969' for is_leaf in leaf_status]
-
-    # Plot using Plotly
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=Xe,
-        y=Ye,
-        mode='lines',
-        line=dict(color='rgb(69,69,69)', width=1),
-        # hoverinfo='none'
-    ))
-    fig.add_trace(go.Scatter(
-        x=Xn,
-        y=Yn,
-        mode='markers',
-        name='RNA Structure',
-        marker=dict(
-            symbol='circle-dot',
-            size=15,
-            color=node_colors,  # Apply color based on leaf status
-            line=dict(color='rgb(50,50,50)', width=1)
-        ),
-        text=v_label,
-        hoverinfo='text',
-        opacity=1
-    ))
-    fig.update_layout(title="RNA Secondary Structure Tree", showlegend=False)
-
-    axis = dict(showline=False,  # hide axis line, grid, ticklabels, and title
-                zeroline=False,
-                showgrid=False,
-                showticklabels=False,
-                )
-
-    fig.update_layout(
-        title='Tree with Reingold-Tilford Layout',
-        annotations=make_annotations(position, v_label),
-        font_size=12,
-        showlegend=False,
-        xaxis=axis,
-        yaxis=axis,
-        margin=dict(l=40, r=40, b=85, t=100),
-        hovermode='closest',
-        plot_bgcolor='rgb(255,255,255)'
-    )
-    fig.show()

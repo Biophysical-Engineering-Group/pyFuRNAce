@@ -124,12 +124,12 @@ def simple_origami(dt_list: list, helix_kl: int = 1, main_stem: list = None, lef
                     half_l_stem = (stem_len - abs(dt)) // 2
                     half_r_stem = stem_len - abs(dt) - half_l_stem
                     helix += [Stem(half_l_stem)
-                                .shift((1,0)).extend_junctions(), 
+                                .shift((1,0), extend=True), 
                               start_end_stem(), 
                               Stem(half_r_stem), Dovetail(dt)]
                 else:
                     helix += [Stem(main_stem[helix_in][kl_index] - abs(dt))
-                                .shift((6,0)).extend_junctions(), 
+                                .shift((6,0), extend=True),
                               Dovetail(dt)]
             # add a kissing normal loop repeat
             else:

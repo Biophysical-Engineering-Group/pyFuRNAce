@@ -73,7 +73,17 @@ class KissingLoopsCommand(MotifCommand):
                 index_for_list = all_pk_indexes.index(default_pk_index)
             else:
                 index_for_list = len(all_pk_indexes) - 1
-            pk_index = st.selectbox('Pseudoknot id:', options=all_pk_indexes, index=index_for_list, key=f'pk_index_kl{key}')
+            pk_index = st.selectbox('Pseudoknot id:', 
+                                    options=all_pk_indexes, 
+                                    index=index_for_list, 
+                                    key=f'pk_index_kl{key}',
+                                    help="Select the pseudoknot id for the kissing loop motif. "
+                                    "The id is used to identify the pseudoknot in the sequence."
+                                    " Pseudoknots with the same id will have the same sequence."
+                                    " Pseudoknots with the same id, but with a quote \"'\""
+                                    " will have a complementary sequence. Pseudoknots with id 0"
+                                    " will not pair with any other pseudoknot."
+                                    )
             return pk_index
 
         col1, col2, col3 = st.columns([1, 1, 5], vertical_alignment='bottom')

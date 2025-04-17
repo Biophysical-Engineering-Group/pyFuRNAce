@@ -184,7 +184,7 @@ def test_motif_concat(m_two_strands):
     """Test concatenating motifs."""
     motif1 = m_two_strands.copy()
     motif2 = m_two_strands.copy()
-    concatenated = Motif.concat([motif1, motif2], axis=1, copy=True)
+    concatenated = Motif.concat(motifs=[motif1, motif2], axis=1, copy=True)
     combined = motif1 + motif2
     assert combined == concatenated
 

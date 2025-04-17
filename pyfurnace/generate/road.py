@@ -5,21 +5,78 @@ import tempfile
 import zipfile
 import shutil
 import warnings
+from typing import Callable, Optional, Tuple, Union
 
+### Local imports
 from ..design.core.symbols import *
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
 
-def generate_road(structure, 
-                  sequence, 
-                  pseudoknots = '', 
-                  name='origami', 
-                  initial_sequence=None,
-                  callback=None, 
-                  timeout=7200,
-                  directory=None, 
-                  zip_directory=False,
-                  origami_code : str = None):
+def generate_road(structure: str,
+                  sequence: str,
+                  pseudoknots: Union[str, dict] = '',
+                  name: str = 'origami',
+                  initial_sequence: Optional[str] = None,
+                  callback: Optional[Callable[[str, str, str, str, float], 
+                                              None]] = None,
+                  timeout: int = 7200,
+                  directory: Optional[str] = None,
+                  zip_directory: bool = False,
+                  origami_code: Optional[str] = None
+                  ) -> Union[str, Tuple[str, str]]:
+    """
+    Generate an RNA origami design using the ROAD Revolvr algorithm.
+
+    This function orchestrates the structure processing, pseudoknot embedding,
+    and Perl-based design process for RNA origami, with optional support for 
+    real-time updates and zipped output.
+
+    Parameters
+    ----------
+    structure : str
+        RNA secondary structure in dot-bracket notation.
+    sequence : str
+        Initial sequence to use for the design (must match structure length).
+    pseudoknots : str or dict, optional
+        Pseudoknot definitions in ROAD-compatible format (string or parsed dict).
+    name : str, optional
+        Base name for the design file (default is 'origami').
+    initial_sequence : str, optional
+        Optional initial sequence to pre-fill as the starting point of the 
+        optimization.
+    callback : callable, optional
+        A function called during ROAD execution with progress updates:
+        `callback(structure, sequence, line, stage_name, stage_progress)`
+    timeout : int, optional
+        Timeout in seconds for the ROAD optimization 
+        (default is 7200 seconds = 2 hours).
+    directory : str, optional
+        Directory where files should be written. If None, a temporary directory 
+        is used.
+    zip_directory : bool, optional
+        Whether to generate a `.zip` file with all intermediate and result files.
+    origami_code : str, optional
+        Source code (e.g., Python) representing the origami design, to be saved 
+        and zipped.
+
+    Returns
+    -------
+    str or tuple
+        If `zip_directory` is False: returns the designed RNA sequence as a string.
+        If `zip_directory` is True: returns a tuple 
+        `(designed_sequence, path_to_zip_file)`.
+
+    Raises
+    ------
+    ValueError
+        If the structure and sequence lengths do not match, or if multistrand 
+        '&' is used.
+    
+    Warnings
+    --------
+    - If the working directory doesn't exist, it is created.
+    - If the final design file is missing, a warning is issued.
+    """
     
     road_dir = __file__.replace('road.py', 'road_bin')
     
@@ -27,7 +84,8 @@ def generate_road(structure,
         
     # Sanity check
     if '&' in sequence or '&' in structure:
-        raise ValueError("The ROAD algorithm does not support multistranded structures.")
+        raise ValueError("The ROAD Revolvr algorithm does not support "
+                         f"multistranded structures.")
     
     if len(sequence) != len(structure):
         raise ValueError("The length of the sequence and structure must match."
@@ -54,6 +112,8 @@ def generate_road(structure,
     external_pk_count = 0
     avg_pk_E = 0
     avg_pk_dE = 0
+
+    # Calculate the average energy and dE of the pseudoknots
     for pk_info in pk_dict.values():
         used = False
         avg_pk_E += pk_info['E']
@@ -83,7 +143,7 @@ def generate_road(structure,
     python_path = sys.executable # Get path to the current Python interpreter
     python_dir = os.path.dirname(python_path)
 
-    # Prepend it to PATH
+    # Prepend it to PATH, to make sure the correct Python is used
     env = os.environ.copy()
     env["PATH"] = python_dir + os.pathsep + os.environ["PATH"]
 

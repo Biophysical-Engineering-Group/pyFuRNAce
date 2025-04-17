@@ -1,31 +1,37 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-### import the design functions
+
+### My modules
 from utils import check_import_pyfurnace, load_logo, save_origami
 check_import_pyfurnace()
 import utils.design_functions as des_func
 from utils.st_fixed_container import sticky_container
 
-### set the logo of the app
 
 if __name__ == "__main__":
     load_logo()
     ### initiate the session state
     des_func.initiate_session_state()
-    st.header('Design', help='Design your RNA nanostructure and download it as textfile/python script.')
+    st.header('Design', 
+              help='Design your RNA nanostructure and '
+                    'download it as textfile/python script.')
 
     ### make the general options for the RNA origami
     des_func.origami_general_options(st.session_state.origami, 
                                      expanded=False)
 
-    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3], vertical_alignment='center') 
+    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3], 
+                      vertical_alignment='center') 
     with cols[0]:    
         with st.popover("Make a simple origami",
                         use_container_width=False,
-                        help='Start by creating a simple origami rather than starting from scratch'):
+                        help='Start by creating a simple origami rather than '
+                            'starting from scratch'):
             des_func.simple_origami()
+
     with cols[2]:
         st.write('OxView 3D colormap:')
+
     with cols[3]:
         cmap = st.selectbox('OxView 3D colormap:', 
                             ['Reds', None] + plt.colormaps(),
@@ -40,19 +46,9 @@ if __name__ == "__main__":
         st.session_state.gradient = grad
 
 
-    ### option menu to manage the motifs in the origami
-    # st.write("#### Add Motifs to the Origami:")
-    # with st.popover(":green[Add Motifs to the Origami:]",
-    #                 use_container_width=True,):
-    #     make_motif_menu(origami)
     def motif_menu_expander():
         with st.expander("**Add motifs to the origami:**", expanded=True):
             des_func.make_motif_menu(st.session_state.origami)
-            # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)
-            # st.markdown("<hr style='margin-top:+0em;border:none;margin-bottom:-1em;color:#FFFFFFw;background-color:#FFFFFF;' />", unsafe_allow_html=True)      
-            # st.divider()
-            # last version:
-            # st.markdown("<hr style='margin-top:+0.5em;margin-bottom:+1.0em;' />", unsafe_allow_html=True)  
 
     if st.session_state.motif_menu_sticky:
         with sticky_container(mode="top", border=False):
@@ -62,13 +58,6 @@ if __name__ == "__main__":
         motif_menu_expander()
         view_opt = des_func.origami_select_display()
 
-    ### add separator
-    # st.markdown("""<hr style="height:1px;border:none;color:#DDDDDD;background-color:#DDDDDD;" /> """, unsafe_allow_html=True)
- 
-    ### display the RNA origami structure
-    # st.write('#### Structure of your RNA origami')
-    # st.divider()
-
     ### select the render mode
     if not st.session_state.origami:
         st.success('The origami is empty, add a motif!')
@@ -76,8 +65,11 @@ if __name__ == "__main__":
     else:
         des_func.origami_build_view(view_opt)
 
-    ### display the dot-bracket notation and sequence constraints and link to the Generate page
+    ### display the dot-bracket notation and sequence constraints 
+    # and link to the Generate page
+
     des_func.display_structure_sequence()
+
     ### Download the RNA origami structure
     save_origami()
 

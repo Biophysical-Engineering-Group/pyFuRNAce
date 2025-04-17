@@ -448,7 +448,13 @@ def add_motif(origami):
         ### generate the motif code
         st.session_state.motif_buffer = "strands = []\n"
         for s in st.session_state["custom_strands"]:
-            st.session_state.motif_buffer += f"strands.append(pf.Strand('{s}', directionality='{s.directionality}', start={s.start}, direction={s.direction}, coords=pf.Coords({s.coords.array.tolist()}, dummy_ends=({s.coords.dummy_ends[0].tolist()}, {s.coords.dummy_ends[1].tolist()}))))\n"
+            st.session_state.motif_buffer += (f"strands.append(pf.Strand('{s}', "
+                                              f"directionality='{s.directionality}', "
+                                              f"start={tuple(s.start)}, "
+                                              f"direction={tuple(s.direction)}, "
+                                              f"coords=pf.Coords({s.coords.array.tolist()}, "
+                                              f"dummy_ends=({s.coords.dummy_ends[0].tolist()}, "
+                                              f"{s.coords.dummy_ends[1].tolist()}))))\n")
         st.session_state.motif_buffer += f"motif = pf.Motif(strands, structure = '{motif.structure}')"
 
     ### Show the preview of the motif
@@ -800,8 +806,8 @@ def custom(current_custom_motif):
             st.error(str(e))
 
     # ### Check the shortcut keys
-    # if strand.map:
-    #     next_dir = list(strand.direction_map.values())[-1]
+    # if strand.positions:
+    #     next_dir = list(strand.directions)[-1]
     # else:
     #     next_dir = (1, 0)
     # st.markdown("Click on a button to activate the shortcuts!")
@@ -999,9 +1005,10 @@ def origami_build_view(selected_display):
                           "This function is designed for canonical RNA Origami structures, it"
                           "may not work for other complex structures."):
                     # calculate the simplfied dot bracket
-                    code_lines = st.session_state.code
-                    code_lines += ['\norigami = origami.improve_folding_pathway(kl_delay=150)\n']
-                    update_code('\n'.join(code_lines))
+                    with st.spinner("Optimizing the folding pathway..."):
+                        code_lines = st.session_state.code
+                        code_lines += ['\norigami = origami.improve_folding_pathway(kl_delay=150)\n']
+                        update_code('\n'.join(code_lines))
                     
 def display3d():
     origami = st.session_state.origami
@@ -1015,7 +1022,7 @@ def display3d():
         index_colors = ()
         if m_slice[0] < len(origami) and m_slice[1] < len(origami[m_slice[0]]):
             motif = origami[m_slice[0]][m_slice[1]]
-            motif_shift = origami.shift_map[m_slice]
+            motif_shift = origami.pos_shift_map[m_slice]
             index_colors = [0] * len(origami.sequence.replace('&', ''))
             for pos in motif.seq_positions:
                 shifted = tuple([pos[0] + motif_shift[0], pos[1] + motif_shift[1]])
@@ -1041,7 +1048,7 @@ def build_origami_content(barriers=None):
     normal_color = '#333333' # 80% black
 
     origami = st.session_state.origami
-    motif = origami.motif
+    motif = origami.assembled
 
     if barriers:
         origami_lines = origami.barrier_repr(barriers=barriers, 
@@ -1088,13 +1095,22 @@ def build_origami_content(barriers=None):
     for y, line in enumerate(origami_list):
         line_color = normal_color
         motif_slice = None
-        current_line_nr = [origami.map[(x-1, y-1)] for x, _ in enumerate(line) if (x-1, y-1) in origami.map]
+        current_line_nr = [origami.pos_index_map[(x-1, y-1)] 
+                                for x, _ in enumerate(line) 
+                                    if (x-1, y-1) in origami.pos_index_map]
+        
         next_line = origami_list[y+1] if  (y + 1) < origami_list_len else []
-        next_line_nr = [origami.map[(x-1, y)] for x, _ in enumerate(next_line) if (x-1, y) in origami.map] # check the next line index
+        
+        # check the next line index
+        next_line_nr = [origami.pos_index_map[(x-1, y)] 
+                                for x, _ in enumerate(next_line) 
+                                        if (x-1, y) in origami.pos_index_map] 
+
         if current_line_nr: 
             current_line_nr = current_line_nr[0][0]  # get the first line number
         if next_line_nr:
             next_line_nr = next_line_nr[0][0]
+
         if line_nr != current_line_nr and isinstance(current_line_nr, int):  # is a new origami line
             if current_line_nr == st.session_state.line_index:
                 line_color = highlight_color
@@ -1120,8 +1136,8 @@ def build_origami_content(barriers=None):
                 content += f'<span style="color: {highlight_color}; line-height:1;">3</span>'
             elif char in pf.bp_symbols:
                 content += f'<span style="color: {color}; line-height:1;">{char}</span>'  # do not highlight the base pair in red
-            elif ori_pos in origami.map:  # a motif symbol
-                motif_slice = origami.map[ori_pos]
+            elif ori_pos in origami.pos_index_map:  # a motif symbol
+                motif_slice = origami.pos_index_map[ori_pos]
                 if st.session_state.gradient: 
                     index = pos_to_index.get(ori_pos)
                     if index is not None:
@@ -1238,7 +1254,7 @@ def display_structure_sequence():
         indexes = []
         try:
             motif = origami[motif_slice]
-            shifts_x, shift_y = origami.shift_map[motif_slice]
+            shifts_x, shift_y = origami.pos_shift_map[motif_slice]
             for pos in motif.seq_positions:
                 indexes.append(origami.seq_positions.index((pos[0] + shifts_x, pos[1] + shift_y)))
         except IndexError:

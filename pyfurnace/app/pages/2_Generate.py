@@ -3,8 +3,12 @@ import streamlit as st
 from colour import Color
 import os
 import warnings
-################################OWN####LIBRARIES#######################################
-from utils import check_import_pyfurnace, load_logo, save_origami, copy_to_clipboard
+
+### My modules
+from utils import (check_import_pyfurnace, 
+                   load_logo, 
+                   save_origami, 
+                   copy_to_clipboard)
 check_import_pyfurnace()
 from pyfurnace.generate import generate_road, fold_p
 
@@ -15,51 +19,85 @@ def forna_options(lenght):
     ### checkboxes for the options
     col1, col2, col3 = st.columns(3, vertical_alignment='bottom')
     with col1:
-        st.session_state.zoomable = st.checkbox("Zoomable", value=True, help = """Enable zooming in and out the structure""")
+        st.session_state.zoomable = st.checkbox("Zoomable", 
+                                                value=True, 
+                help = """Enable zooming in and out the structure""")
     with col2:
-        st.session_state.animation = st.checkbox("Interact", value=False, help = """Enable interaction with the structure""")
+        st.session_state.animation = st.checkbox("Interact", 
+                                                 value=False, 
+                help = """Enable interaction with the structure""")
     with col3:
-        st.session_state.node_label = st.checkbox("Label", value=True, help = """Show the nucleotide label""")
+        st.session_state.node_label = st.checkbox("Label", 
+                                                  value=True, 
+                help = """Show the nucleotide label""")
     
     ### second row of options
     col1, col2, col3 = st.columns(3, vertical_alignment='center')
     with col1:
         ### color scheme options
-        scheme_options = ["sequence", "structure", "positions", "color range", "custom"]
-        st.session_state.color_scheme = st.selectbox("Color scheme", scheme_options, index=1)
+        scheme_options = ["sequence", 
+                          "structure", 
+                          "positions", 
+                          "color range", 
+                          "custom"]
+        st.session_state.color_scheme = st.selectbox("Color scheme", 
+                                                     scheme_options, 
+                                                     index=1)
+
     with col2:
-        st.session_state.height = st.slider("Frame height", 10, 800, 300, help = """Set the height of the frame""")
+        st.session_state.height = st.slider("Frame height", 
+                                            min_value=10, 
+                                            max_value=800, 
+                                            value=300, 
+                help = """Set the height of the frame""")
+
     with col3:
-        st.session_state.label_interval = st.slider("Label every", 0,  max(lenght, 10), min(lenght, 10), help = """Show the nucleotide number every n nucleotides""")
+        st.session_state.label_interval = st.slider("Label every", 
+                                                    min_value=0, 
+                                                    max_value=max(lenght, 10), 
+                                                    value=min(lenght, 10), 
+                help = """Show the nucleotide number every n nucleotides""")
 
     st.session_state.color_text = ''
     st.session_state.colors = {}
+
     ### color scheme based on the sequence
     if st.session_state.color_scheme == "color range":
         st.session_state.color_scheme = "custom"
+
         with col2: # start color
             first = st.color_picker("Start color", "#ff0000")
+
         with col3: # end color
             last = st.color_picker("End color", "#00ff00")
+
         # create the colors range
         first = Color(first)
         last = Color(last)
+
         color_range = [first] + list(first.range_to(last, lenght))
+
         # save the colors in the session state and create the colors string
         for i, c in enumerate(color_range):
             st.session_state.colors[i] = c.hex
             st.session_state.color_text += str(i) + ":" + c.hex + " "
+
     ### custom colors for each nucleotide
     elif st.session_state.color_scheme == "custom":
+
         with col2: # select nucleotide index
             index = st.number_input("Select nucleotide index", 1, lenght, 1)
+
         with col3: # select color
             color = st.color_picker("Select a color", "#ffffff")
+
         # save the color in the session state
         st.session_state.colors[index] = color
+
         # create the colors string
         for i, c in st.session_state.colors.items():
             st.session_state.color_text += str(i) + ":" + c + " "
+
     ### display the custom colors
     else:
         st.session_state.color_text = None
@@ -68,6 +106,7 @@ def generate_sequence():
     if not structure:
         st.error('No structure input given')
         return
+    
     if not sequence_constraint:
         st.error('No sequence constraint input given')
         return
@@ -75,6 +114,7 @@ def generate_sequence():
     # Initialize the UI elements
     progress_bar = st.empty()
     output_status = st.empty()
+    
     # Initialize the progress bar
     progress_bar.progress(0, "Initializing...")
 
@@ -111,14 +151,14 @@ def generate_sequence():
     if ('origami' in st.session_state 
             and st.session_state.origami
             and len(st.session_state.origami.sequence) == len(st.session_state.rna_origami_seq)):
-        try:
-            st.session_state.origami.sequence = st.session_state.rna_origami_seq
-            if 'code' in st.session_state:
-                code_text = 'origami.sequence = "' + st.session_state.rna_origami_seq + '"'
-                st.session_state.code.append(code_text)
-            st.success("Sequence loaded to the origami design!")
-        except Exception as e:
-            st.error(f"Error while loading the sequence into the origami design: {e}")
+        # try:
+        st.session_state.origami.sequence = st.session_state.rna_origami_seq
+        if 'code' in st.session_state:
+            code_text = 'origami.sequence = "' + st.session_state.rna_origami_seq + '"'
+            st.session_state.code.append(code_text)
+        st.success("Sequence loaded to the origami design!")
+        # except Exception as e:
+        #     st.error(f"Error while loading the sequence into the origami design: {e}")
 
 
 if __name__ == "__main__":

@@ -212,6 +212,7 @@ class Motif(Callback):
         self._autopairing = autopairing
 
     def __str__(self) -> str:
+        """Return the blueprint of the motif."""
         if not self:
             return ''
         # create the canvas
@@ -986,13 +987,13 @@ class Motif(Callback):
                         top_sym = motif_list[y - 1][x].capitalize()
 
                     direction = None
-                    if right_sym in road_symbols and motif_list[y][x+1] not in ' 3':
+                    if right_sym in accept_symbol and motif_list[y][x+1] not in ' 3':
                         direction = (1, 0)
-                    elif bot_sym in road_symbols and bot_sym not in ' 3':
+                    elif bot_sym in accept_symbol and bot_sym not in ' 3':
                         direction = (0, 1)
-                    elif left_sym in road_symbols and left_sym not in ' 3':
+                    elif left_sym in accept_symbol and left_sym not in ' 3':
                         direction = (-1, 0)
-                    elif top_sym in road_symbols and top_sym not in ' 3':
+                    elif top_sym in accept_symbol and top_sym not in ' 3':
                         direction = (0, -1)
 
                     if direction is None:
@@ -1178,7 +1179,7 @@ class Motif(Callback):
                         origami.insert(insert_connect, fake_connect_down)
                         origami._assemble()
                         # get the shift of the fake connector
-                        shift_x = origami.shift_map[tuple(insert_connect)][0]
+                        shift_x = origami.pos_shift_map[tuple(insert_connect)][0]
                         # replace the fake connect with the real one
                         origami[insert_connect] = connect_down
                         connect_up.shift((shift_x, 0))
@@ -1220,7 +1221,7 @@ class Motif(Callback):
         # call the recursive function
         recursive_build_origami(node)
         # get the motif from the origami object
-        motif = origami.motif
+        motif = origami.assembled
 
         ### ADD THE PSEUDOKNOTS ###
         seq_offset = 0
@@ -1705,7 +1706,7 @@ class Motif(Callback):
         # Terminal symbols
         if sym == '3':
             return sym
-        elif sym == ' ' or sym not in road_symbols:
+        elif sym == ' ' or sym not in accept_symbol:
             return ""
             
         # Direction turns

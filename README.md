@@ -111,19 +111,19 @@ print(origami.sequence)
 
 #### -> Output:
 ```
-╭CGNKNKNNN──SS──NNKNNNAA┼─NNNNNN╯╭─ANNKNNN──SS──NKNKNNNUU╮
+                        ╭───────╮
+╭CGNNNKNNN──SS──NKNNNNAA┼─NNNNNN╯╭─ANNKNNN──SS──NNNKNNNUU╮
 │  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
-╰UUNKNKNNN──SS╮╭NNKNNNA─╯╭NNNNNN─┼AANNKNNN──SS╮╭NKNKNNNGC╯
+╰UUNNNKNNN──SS╮╭NKNNNNA─╯╭NNNNNN─┼AANNKNNN──SS╮╭NNNKNNNGC╯
               ││         ╰───────╯            ││
           ╭───╯│                         ╭────╯│
           │╭───╯                         │╭────╯
           ↓↓                             ↓↓
-╭CGNNKNNKN╯╰SS──NKNNNKNNNN─3 5─NNKNNNKNNN╯╰SS──NNKNNNNUU╮
+╭CGNKNKNNN╯╰SS──NKNNNKNNNN─3 5─NNNKNNNKNN╯╰SS──NKNNKNNUU╮
 │  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
-╰UUNNKNNKN──SS──NKNNNKNNNN─────NNKNNNKNNN──SS──NNKNNNNGC╯
-
+╰UUNKNKNNN──SS──NKNNNKNNNN─────NNNKNNNKNN──SS──NKNNKNNGC╯
 ((((((((((((((((((..[[[[[[.))))))))(((((((....)))))))(((((((((....)))))))))))))))))))(((((((((((((((((((....)))))))(((((((((....)))))))))((((((..]]]]]].))))))))))))))))))
-NNKNNNKNNNSSNNNKNNAANNNNNNANNKNNNSSNKNKNNNUUCGNNNKNKNSSNNKNNNNUUCGNNNNKNNSSNNNKNNNKNNNNNNKNNNKNSSNKNNKNNUUCGNNKNNKNSSNNNKNKNUUCGNKNKNNNSSNNKNNNAANNNNNNANNNKNNSSNKNNNKNNNN
+NNNKNNNKNNSSNNNKNNAANNNNNNANNKNNNSSNNNKNNNUUCGNNNKNNNSSNKNNKNNUUCGNNKNNKNSSNNKNNNKNNNNNNNKNNNKNSSNNNKNKNUUCGNKNKNNNSSNNNKNNNUUCGNNNKNNNSSNKNNNNAANNNNNNANNNNKNSSNKNNNKNNNN
 ```
 
 

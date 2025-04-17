@@ -1065,7 +1065,7 @@ def build_origami_content(barriers=None):
     # create color gradient
     if st.session_state.gradient:
         # create a dictionary from positions to index
-        pos_to_index = {pos: ind for ind, pos in enumerate(origami.seq_position)}
+        pos_to_index = {pos: ind for ind, pos in enumerate(motif.seq_positions)}
         tot_len = 0
         for s in origami.strands:
             tot_len += len(s.sequence)

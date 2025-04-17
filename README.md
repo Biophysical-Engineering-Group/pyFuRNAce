@@ -2,9 +2,11 @@
 
 **pyFuRNAce** is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.
 
-**Website:** [pyfurnace.de](http://pyfurnace.de)\
-**Documentation & Source:** _Coming Soon_\
-**PyPI:** _Coming Soon_
+<!-- **Documentation & Source:** _Coming Soon_\ -->
+**WebApp:** [pyfurnace.de](http://pyfurnace.de)\
+**GitHub:** [Biophysical-Engineering-Group/pyFuRNAce](https://github.com/Biophysical-Engineering-Group/pyFuRNAce)\
+**PyPI:** [pyfurnace](https://pypi.org/project/pyfurnace/)\
+**Script API examples:** [Code Examples](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/examples)
 
 ---
 
@@ -126,15 +128,9 @@ print(origami.sequence)
 NNNKNNNKNNSSNNNKNNAANNNNNNANNKNNNSSNNNKNNNUUCGNNNKNNNSSNKNNKNNUUCGNNKNNKNSSNNKNNNKNNNNNNNKNNNKNSSNNNKNKNUUCGNKNKNNNSSNNNKNNNUUCGNNNKNNNSSNKNNNNAANNNNNNANNNNKNSSNKNNNKNNNN
 ```
 
+### 📚 Examples
 
-### Example: generate a simple DAE RNA origami with 3 helices (120° angle)
-```python
-ori = pf.simple_origami(helices=[120], use_angles=True)
-```
-
-## 📚 Examples
-
-Explore tutorials and example notebooks in the /examples directory (or website when available).
+Explore tutorials and example notebooks in the examples directory.
 
 ## 📜 License
 

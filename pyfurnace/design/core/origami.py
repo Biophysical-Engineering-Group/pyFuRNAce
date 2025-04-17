@@ -1018,7 +1018,7 @@ class Origami(Callback):
     ### METHODS
     ###
 
-    def append(self, item: Union[Motif, List[Motif]], copy: bool = False) -> None:
+    def append(self, item: Union[Motif, List[Motif]], copy: bool = True) -> None:
         """
         Append a Motif or a list of Motifs to the end of the matrix.
         If the item is a single Motif, it is appended to the last line of the matrix.
@@ -1028,7 +1028,7 @@ class Origami(Callback):
         ----------
         item : Motif or list of Motif
             The motif(s) to append.
-        copy : bool, default=False
+        copy : bool, default=True
             Whether to copy motifs before appending.
 
         Raises
@@ -1107,8 +1107,8 @@ class Origami(Callback):
         Origami
             A new instance identical to the current one.
         """
-        new = Origami.__new__(self.__class__)
-        new._matrix = [[m.copy(callback=self._updated_motif) 
+        new = Origami.__new__(Origami)
+        new._matrix = [[m.copy(callback=new._updated_motif) 
                                     for m in line] 
                                         for line in self._matrix]
         new._align = self._align
@@ -1360,7 +1360,7 @@ class Origami(Callback):
 
     def insert(self, idx: Union[int, slice, Tuple[int, int]],
                item: Union[Motif, List[Motif]],
-               copy: bool = False) -> None:
+               copy: bool = True) -> None:
         """
         Insert a Motif or list of Motifs at a specific position.
 
@@ -1370,7 +1370,7 @@ class Origami(Callback):
             The index or coordinate at which to insert the item(s).
         item : Motif or list of Motif
             The motif(s) to insert.
-        copy : bool, default=False
+        copy : bool, default=True
             Whether to copy motifs before inserting.
 
         Raises

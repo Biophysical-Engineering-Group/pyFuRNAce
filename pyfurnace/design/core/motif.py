@@ -1179,7 +1179,7 @@ class Motif(Callback):
                         origami.insert(insert_connect, fake_connect_down)
                         origami._assemble()
                         # get the shift of the fake connector
-                        shift_x = origami.pos_shift_map[tuple(insert_connect)][0]
+                        shift_x = origami.index_shift_map[tuple(insert_connect)][0]
                         # replace the fake connect with the real one
                         origami[insert_connect] = connect_down
                         connect_up.shift((shift_x, 0))

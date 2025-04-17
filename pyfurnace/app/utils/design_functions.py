@@ -1022,7 +1022,7 @@ def display3d():
         index_colors = ()
         if m_slice[0] < len(origami) and m_slice[1] < len(origami[m_slice[0]]):
             motif = origami[m_slice[0]][m_slice[1]]
-            motif_shift = origami.pos_shift_map[m_slice]
+            motif_shift = origami.index_shift_map[m_slice]
             index_colors = [0] * len(origami.sequence.replace('&', ''))
             for pos in motif.seq_positions:
                 shifted = tuple([pos[0] + motif_shift[0], pos[1] + motif_shift[1]])
@@ -1252,14 +1252,12 @@ def display_structure_sequence():
         sequence_list = [char for char in origami.sequence]
         motif_slice = (st.session_state.line_index, st.session_state.motif_index)
         indexes = []
-        try:
+        if motif_slice in origami.index_shift_map:
             motif = origami[motif_slice]
-            shifts_x, shift_y = origami.pos_shift_map[motif_slice]
+            shifts_x, shift_y = origami.index_shift_map[motif_slice]
             for pos in motif.seq_positions:
                 indexes.append(origami.seq_positions.index((pos[0] + shifts_x, pos[1] + shift_y)))
-        except IndexError:
-            pass
-            # problem with updating the keys or the motif is not present
+
         for i in indexes:
             structure_list[i] = '<span style="color: #D52919; line-height:1;">' + structure_list[i] + "</span>"
             sequence_list[i] = '<span style="color: #D52919; line-height:1;">' + sequence_list[i] + "</span>"

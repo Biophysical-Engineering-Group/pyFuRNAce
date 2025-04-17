@@ -53,8 +53,8 @@ class Origami(Callback):
     pos_index_map : Dict[Position, Tuple[int, int]]
         Map from character position (x, y) in the assembled motif to the
         corresponding index in the original matrix (y, x).
-    pos_shift_map : Dict[Position, Tuple[int, int]]
-        Map from motif matrix slices (y, x) to spatial shifts (x, y).
+    index_shift_map : Dict[Position, Tuple[int, int]]
+        Map from motif matrix indexes (y, x) to spatial shifts (x, y).
     pseudoknots : List[dict]
         Parsed pseudoknot metadata including indices and energetics.
     sequence : Sequence
@@ -106,7 +106,7 @@ class Origami(Callback):
 
         # initialize the protected atrributes
         self._pos_index_map = dict()
-        self._pos_shift_map = dict()
+        self._index_shift_map = dict()
         self._assembled = None
         self._ss_assembly = bool(ss_assembly)
         self._pseudoknots = None
@@ -559,7 +559,7 @@ class Origami(Callback):
         return self._pos_index_map
 
     @property
-    def pos_shift_map(self) -> dict:
+    def index_shift_map(self) -> dict:
         """
         A dictionary with the slice of the motif in the matrix as key (y, x) 
         and positional shift of the motif as values (y, x). The shift is the 
@@ -568,7 +568,7 @@ class Origami(Callback):
         """
         if self._assembled is None:
             self._assemble()
-        return self._pos_shift_map
+        return self._index_shift_map
     
     @property
     def positions(self) -> List[Position]:
@@ -646,7 +646,7 @@ class Origami(Callback):
         ### Iterate through the strands of the motifs with pseudoknot information
         for i, j in pk_motifs:
             m = self._matrix[i][j]
-            shift = self.pos_shift_map[(i, j)]
+            shift = self.index_shift_map[(i, j)]
 
             # get pseudoknot IDs from the strands
             pk_strands = [s for s in m if s.pk_info]
@@ -705,7 +705,7 @@ class Origami(Callback):
         # read the maps once to avoid triggering the callback and origami assembly
         pos_to_slice = self.pos_index_map
         origami_motif = self.assembled
-        motif_shifts = self.pos_shift_map
+        motif_shifts = self.index_shift_map
 
         # iterate over the strands in the origami motif
         for s in origami_motif:
@@ -987,12 +987,12 @@ class Origami(Callback):
                                          position_based=True, 
                                          return_shifts=True,
                                          unlock_strands=self._ss_assembly)
-            if ind > 0 and ind % 2 == 0:
+            if len(v_shifts) > 1 and ind % 2 == 0:
                 # add the vertical shift to the horizontal shift
                 shifts[ind // 2] = [h + v_shifts[1] for h in shifts[ind // 2]]
         
         self._assembled = mot
-        self._pos_shift_map = {(i, j): shift 
+        self._index_shift_map = {(i, j): shift 
                                     for i, line in enumerate(shifts) 
                                         for j, shift in enumerate(line)}
                                          
@@ -1115,7 +1115,7 @@ class Origami(Callback):
         new._ss_assembly = self._ss_assembly
         new._assembled = self._assembled.copy() if self._assembled else None
         new._pos_index_map = {k: val for k, val in self._pos_index_map.items()}
-        new._pos_shift_map = {k: val for k, val in self._pos_shift_map.items()}
+        new._index_shift_map = {k: val for k, val in self._index_shift_map.items()}
         new._pseudoknots = copy.deepcopy(self._pseudoknots)
 
         return new

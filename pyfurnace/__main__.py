@@ -25,7 +25,7 @@ def main():
     env = os.environ.copy()
     env["PATH"] = python_dir + os.pathsep + os.environ["PATH"]
 
-    subprocess.run(f'streamlit run {app_path} {config_str}', 
+    subprocess.run(f'streamlit run "{app_path}" {config_str}', 
                    shell=True, 
                    env=env)
 

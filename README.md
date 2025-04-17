@@ -25,20 +25,26 @@ Note: pyFuRNAce requires Python 3.10 or later.
 
 ### Note: Local Installation always includes the GUI
 
-### Instal from PyPI 
-Note: The PyPi version doesn't include the oxDNA analysis tools (OAT). The OAT package is used to convert 3D structures in oxDNA format (natively supported in pyFuRNAce) from/to PDB files and write oxDNA force files. That's why they have to be installed separately.
+
+Note: The pyFuRNAce installation doesn't include the oxDNA analysis tools (OAT). The OAT package is used to convert 3D structures in oxDNA format (natively supported in pyFuRNAce) from/to PDB files and write oxDNA force files. 
+To support PDB conversion and oxDNA force file generation, here is the command to install both packages:
+
+#### Instal from PyPI 
+Install the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):
 
 ```bash
 pip install pyfurnace
 # install oxDNA analysis tools for pdb conversion
-pip install pip install git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
+pip install git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
 ```
 
-### Install from GitHub
-To install the latest version of pyFuRNAce, clone the repository and install all the required dependencies:
+#### Install from GitHub
+Install the latest development version of pyFuRNAce (and OAT) directly from the GitHub repository:
 
 ```bash
 pip install "git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git#egg=pyfurnace[oat]"
+# install oxDNA analysis tools for pdb conversion
+pip install git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
 ```
 
 ## 🖥️ Running the Web Application

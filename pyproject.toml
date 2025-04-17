@@ -38,9 +38,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-oat = [
-    "oxDNA_analysis_tools @ git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
-]
+
 dev = [
     "black",
     "flake8",

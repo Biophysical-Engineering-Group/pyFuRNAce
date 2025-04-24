@@ -6,7 +6,9 @@
 **WebApp:** [pyfurnace.de](http://pyfurnace.de)\
 **GitHub:** [Biophysical-Engineering-Group/pyFuRNAce](https://github.com/Biophysical-Engineering-Group/pyFuRNAce)\
 **PyPI:** [pyfurnace](https://pypi.org/project/pyfurnace/)\
-**Script API examples:** [Code Examples](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/examples)
+**Script API examples:** [Code Examples](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/tree/main/examples)
+
+![Alt Text](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/walkthrough_1min.gif?raw=true)
 
 ---
 
@@ -141,7 +143,7 @@ Code is licensed under the GNU General Public License v3.0 ([GPL-3.0](https://ww
 ## 🧠 Citation
 
 If you use pyFuRNAce in your research, please cite:
-Monari L., Braun I., Poppleton E., Göpfrich K. (2025). PyFuRNAce: An integrated design engine for RNA origami. (In preparation)
+Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami. (2025) [doi:10.1101/2025.04.17.647389](https://doi.org/10.1101/2025.04.17.647389).
 
 ## 🙏 Acknowledgements
 

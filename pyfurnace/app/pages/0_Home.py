@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import load_logo
+from utils import load_logo, app_path
 
 if __name__ == '__main__':
     load_logo() 
@@ -35,3 +35,12 @@ if __name__ == '__main__':
 
     st.markdown("- Design primers for your DNA template or prepare the Origami for "
                 "OxDNA simulation.")
+    
+    st.write("### Check out the 1-min walkthrough video:")
+    st.video(str(app_path / "static" / "walkthrough_1min.mp4"), 
+             format="video/mp4", 
+             start_time=0, 
+             subtitles=None, 
+             loop=True, 
+             autoplay=True, 
+             muted=True)

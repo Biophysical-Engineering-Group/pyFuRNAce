@@ -125,7 +125,7 @@ def simple_origami():
                                 help= f"""
 The program calculates the best connections bewteen the helices to fit the given angles.
 The connection between helices (Dovetails) are obtained roughly with this lookup table (angle --> dt):
-{pf.angles_dt_dict}
+{pf.ANGLES_DT_DICT}
 """)
 
         if not dt_text:
@@ -135,19 +135,19 @@ The connection between helices (Dovetails) are obtained roughly with this lookup
         main_stem_default = 11 * ((max([abs(dt) for dt in dt_list], default=0) + 17) // 11 + 1)
         col1, col2 = st.columns(2, vertical_alignment='bottom')
         with col1:
-            helix_kl = st.number_input('Kissing loop columns:', min_value=1, value=1, help='number of KL repeats in the helix')
+            kl_columns = st.number_input('Kissing loop columns:', min_value=1, value=1, help='number of KL repeats in the helix')
         with col2:
             main_stem = st.number_input('Spacing between crossovers (bp):', min_value=22, value=main_stem_default, step=11, help='The length of the consecutive stems in the helix')
 
         submitted = st.form_submit_button("Submit")
         if submitted:
             st.session_state.origami = pf.simple_origami(dt_list=angle_list, 
-                                                         helix_kl=helix_kl, 
+                                                         kl_columns=kl_columns, 
                                                          main_stem=main_stem, 
                                                          add_terminal_helix=True, 
                                                          align=st.session_state.origami.align, 
                                                          use_angles=True)
-            st.session_state.code.append(f'origami = pf.simple_origami(dt_list={angle_list}, helix_kl={helix_kl}, main_stem={main_stem}, add_terminal_helix=True, align="{st.session_state.origami.align}", use_angles=True) # Create a simple origami')
+            st.session_state.code.append(f'origami = pf.simple_origami(dt_list={angle_list}, kl_columns={kl_columns}, main_stem={main_stem}, add_terminal_helix=True, align="{st.session_state.origami.align}", use_angles=True) # Create a simple origami')
             # select the end of the origami
             st.session_state.line_index = len(st.session_state.origami) - 1
             st.session_state.motif_index = len(st.session_state.origami[-1])
@@ -1265,7 +1265,8 @@ def display_structure_sequence():
             # sequence_list[i] = f":orange[{sequence_list[i]}]"
 
         ### Pseudoknots info
-        pseudoknot_text = '; '.join([str(pk_dict) for pk_dict in origami.pseudoknots]) + ';'
+        pseudoknot_text = '; '.join([f'id: {k}, ' + str(val) 
+                                        for k, val in origami.pseudoknots.items()]) + ';'
         remove_syms = str.maketrans('', '', "{}'\"")
         pseudoknot_text = pseudoknot_text.translate(remove_syms)
 

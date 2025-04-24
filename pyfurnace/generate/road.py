@@ -63,8 +63,8 @@ def generate_road(structure: str,
     -------
     str or tuple
         If `zip_directory` is False: returns the designed RNA sequence as a string.
-        If `zip_directory` is True: returns a tuple 
-        `(designed_sequence, path_to_zip_file)`.
+        If `zip_directory` is True: returns 
+        the tuple `(designed_sequence, path_to_zip_file)`.
 
     Raises
     ------
@@ -113,19 +113,36 @@ def generate_road(structure: str,
     avg_pk_E = 0
     avg_pk_dE = 0
 
+    # sort the pseudoknots by their index
+    pk_dict = {k: v for k, v in sorted(pk_dict.items(), 
+                                       key=lambda item: 
+                                            min(inds[0]
+                                                for inds in item[1]['ind_fwd'] + 
+                                                            item[1]['ind_rev']))}
     # Calculate the average energy and dE of the pseudoknots
     for pk_info in pk_dict.values():
         used = False
         avg_pk_E += pk_info['E']
         avg_pk_dE += abs(pk_info['dE'])
         pk_sym = list(road_pk_notation)[external_pk_count]
-        for (start, end) in pk_info['ind_fwd']:
+
+        # Find the pk with the lowest index, between fwd and rev
+        min_fwd = min([inds[0] for inds in pk_info['ind_fwd']], default=float('inf'))
+        min_rev = min([inds[0] for inds in pk_info['ind_rev']], default=float('inf'))
+        if min_fwd < min_rev:
+            first_pk = pk_info['ind_fwd']
+            second_pk = pk_info['ind_rev']
+        else:
+            first_pk = pk_info['ind_rev']
+            second_pk = pk_info['ind_fwd']
+
+        for (start, end) in first_pk:
             if struct_list[start] not in '.()':
                 continue
             for i in range(start, end + 1):
                 struct_list[i] = pk_sym
             used = True
-        for (start, end) in pk_info['ind_rev']:
+        for (start, end) in second_pk:
             if struct_list[start] not in '.()':
                 continue
             for j in range(start, end + 1):
@@ -269,23 +286,32 @@ def generate_road(structure: str,
     # include it in the zip
     files_to_include.append(design_path)
 
+    success = True
     if zip_directory:
         # create a temporary zip file
         temp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
         temp_zip.close()  # Close so we can write to it
 
         # Create the zip and add selected files
-        with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for file in files_to_include:
-                # Store relative to directory for cleaner archive structure
-                zipf.write(file, arcname=os.path.basename(file))
-
+        try:
+            with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for file in files_to_include:
+                    # Store relative to directory for cleaner archive structure
+                    zipf.write(file, arcname=os.path.basename(file))
+        except Exception as e:
+            success = False
+            warnings.warn(f"Failed to create zip file: {e}")
+        
     if tempdir is not None:
         # Close the temporary directory
         tempdir.cleanup()
     
     # Return the path to the zip file
     if zip_directory:
+        if not success:
+            # Clean up the zip file if it was not created successfully
+            os.remove(temp_zip.name)
+            return last_seq
         return last_seq, temp_zip.name
     
     return last_seq

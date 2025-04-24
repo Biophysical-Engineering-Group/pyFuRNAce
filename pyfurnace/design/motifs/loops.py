@@ -6,7 +6,29 @@ from ..core.motif import Motif
 
 
 class Loop(Motif):
-    def __init__(self, open_left = False, sequence: str = "", **kwargs):
+
+    def __init__(self, open_left: bool = False, sequence: str = "", **kwargs) -> None:
+        """
+        Initialize a loop motif, optionally with a given sequence and orientation.
+
+        If a sequence is provided, a single strand is created for it, flanked by 
+        loop symbols.
+
+        Parameters
+        ----------
+        open_left : bool, optional
+            Whether to flip the loop horizontally and vertically to open to the 
+            left (default is False).
+        sequence : str, optional
+            Nucleotide sequence to insert into the loop. If provided, a strand will 
+            be created (default is "").
+        **kwargs : dict, optional
+            Additional keyword arguments passed to the `Motif` superclass.
+
+        Returns
+        -------
+        None
+        """
         # create motif of Cap without basepairs by turing autobasepairing of
         if sequence:
             seq_len = len(sequence)
@@ -22,8 +44,33 @@ class Loop(Motif):
 
 
 class TetraLoop(Loop):
-    
-    def __init__(self, open_left = False, sequence = "UUCG", **kwargs):
+
+    def __init__(self, open_left: bool = False, sequence: str = "UUCG", **kwargs) -> None:
+        """
+        Initialize a tetraloop motif with a specific 4-nucleotide sequence.
+
+        The tetraloop is represented as a single strand folded with a predefined shape.
+        Optionally, the loop can be opened to the left.
+
+        Parameters
+        ----------
+        open_left : bool, optional
+            Whether to flip the loop to open to the left (default is False).
+        sequence : str, optional
+            4-nucleotide sequence to assign to the tetraloop (default is "UUCG").
+        **kwargs : dict, optional
+            Additional keyword arguments passed to the `Loop` superclass. You can override
+            default strand(s) using `strands`.
+
+        Raises
+        ------
+        ValueError
+            If the provided sequence is not exactly 4 nucleotides long.
+
+        Returns
+        -------
+        None
+        """
         """
         Attributes of the class Cap_UUCG, which is a daugther class of the class Motif.
         -----------------------------------------------------------------------------------
@@ -49,9 +96,23 @@ class TetraLoop(Loop):
 
         super().__init__(strands=strands, open_left=open_left, **kwargs)
 
-    def set_sequence(self, new_sequence):
+    def set_sequence(self, new_sequence: str) -> None:
         """
-        Set the sequence of the tetraloop
+        Set a new 4-nucleotide sequence for the tetraloop.
+
+        Parameters
+        ----------
+        new_sequence : str
+            New tetraloop sequence. Must be exactly 4 nucleotides.
+
+        Raises
+        ------
+        ValueError
+            If the provided sequence is not exactly 4 nucleotides long.
+
+        Returns
+        -------
+        None
         """
         if len(new_sequence) != 4:
             raise ValueError("The sequence length doesn't match the length required for a tetraloop, which is 4.")

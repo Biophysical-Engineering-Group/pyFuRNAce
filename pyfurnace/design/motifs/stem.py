@@ -1,28 +1,57 @@
+from typing import Optional, List, Union, Literal
 import random
 from ..core.symbols import *
 from ..core.sequence import Sequence
 from ..core.coordinates_3d import Coords
 from ..core.strand import Strand
 from ..core.motif import Motif
+from typing import Optional, List, Union
 
 
 class Stem(Motif):
     
-    def __init__(self, length: int = 0, sequence: str = "", wobble_interval: int = 4, wobble_tolerance: int = 2, wobble_insert : str = "middle", strong_bases=True, **kwargs):
+    def __init__(self,
+                 length: int = 0,
+                 sequence: Union[str, Sequence] = "",
+                 wobble_interval: int = 5,
+                 wobble_tolerance: int = 2,
+                 wobble_insert: Literal["middle", "start", "end"] = "middle",
+                 strong_bases: bool = True,
+                 **kwargs
+                 ) -> None:
         """
-        Attributes of class Stem.
-        The class Stem inherts all attributes from the parentclass Motif.
-        -------------------------------------------------------------------------
-        length: int
-            the number of nucleotides in the Stem
-        seq: str
-            sequence of top strand of the Stem
-        wobble_interval: int
-            Number of nucleotides between wobble base pairing (wobbles cannot be consecutive, or at the end/start of a sequence), default is 7
-        wobble_tolerance: int
-            tolerance to randomize the wobble base pairing frequency
-        wobble_insert: str
-            position where the wobble base pairing is inserted (middle, start, end)
+        Initialize a Stem motif, representing a double-stranded helical region.
+
+        Parameters
+        ----------
+        length : int, default 0
+            Number of base pairs in the stem. Ignored if `sequence` is provided.
+        sequence : str or Sequence, default ""
+            Nucleotide sequence for the top strand. If provided, wobble settings 
+            are ignored (default is "").
+        wobble_interval : int, default 5
+            Number of bases between wobble base pair insertions.
+        wobble_tolerance : int, default 2
+            Random variation range for wobble base pair placement 
+            (0 to `wobble_tolerance`).
+        wobble_insert : ["middle", "start", "end"], default "middle"
+            Strategy for wobble insertion: "middle", "start", or "end", 
+            default is "middle".
+        strong_bases : bool, default True
+            If True, use strong bases (G or C) for short stems shorter than 4 bases.
+        **kwargs : dict, optional
+            Additional arguments passed to the Motif superclass.
+
+        Raises
+        ------
+        TypeError
+            If parameter types are invalid.
+        ValueError
+            If `wobble_insert` is not one of {"middle", "start", "end"}.
+
+        Returns
+        -------
+        None
         """
         ### set default values
         if wobble_insert not in ["middle", "start", "end"]:
@@ -118,10 +147,38 @@ class Stem(Motif):
         self.set_top_sequence(sequence=new_seq.translate(nucl_to_pair)[::-1])
 
     def set_strong_bases(self, strong_bases):
-        """ Set the strong bases of the stem """
+        """ Set wether to use strong bases for short stems """
         self._create_strands(length=self._length, strong_bases=strong_bases)
 
-    def _create_strands(self, sequence: str=None, length: int=0, return_strands=False, compute_coords=True, strong_bases=True):
+    def _create_strands(self,
+                        sequence: Optional[str] = None,
+                        length: int = 0,
+                        return_strands: bool = False,
+                        compute_coords: bool = True,
+                        strong_bases: bool = True
+                        ) -> Optional[List[Strand]]:
+        """
+        Internal method to create the top and bottom strands for the stem motif.
+
+        Parameters
+        ----------
+        sequence : str, optional
+            Nucleotide sequence for the top strand. If provided, it takes priority 
+            over `length`.
+        length : int, default 0
+            Length of the stem in nucleotides, used if `sequence` is not provided.
+        return_strands : bool, default False
+            If True, return the generated strands instead of assigning them.
+        compute_coords : bool, default True
+            Whether to compute 3D coordinates for the strands.
+        strong_bases : bool, default True
+            Whether to enforce strong base pairs for very short sequences.
+
+        Returns
+        -------
+        list of Strand or None
+            The generated strands if `return_strands` is True, otherwise None.
+        """
         ### Create the top and bottom 3D coordinates of the stem
         seq_len = len(sequence) if sequence else abs(length)
 

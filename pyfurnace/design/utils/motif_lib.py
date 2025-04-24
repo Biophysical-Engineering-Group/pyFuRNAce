@@ -9,13 +9,6 @@ class Utils(Motif):
         if rotate:
             self.rotate(rotate)
 
-    def copy(self, **kwargs):
-        return Utils(Motif.copy_strands_preserve_blocks(self._strands), 
-                     basepair=self._basepair, 
-                     autopairing=self.autopairing, 
-                     copy=False, join=False, 
-                     lock_coords=self.lock_coords, **kwargs)
-
 def start_end_stem(top_left='3', top_right='5', bot_left='-', bot_right='-', **kwargs):
     accepted_values = ['3', '5', '─', '-', '', None]
     

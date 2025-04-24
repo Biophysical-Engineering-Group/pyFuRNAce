@@ -55,8 +55,8 @@ class Origami(Callback):
         corresponding index in the original matrix (y, x).
     index_shift_map : Dict[Position, Tuple[int, int]]
         Map from motif matrix indexes (y, x) to spatial shifts (x, y).
-    pseudoknots : List[dict]
-        Parsed pseudoknot metadata including indices and energetics.
+    pseudoknots : dict
+        Pseudoknot metadata including indices and energies.
     sequence : Sequence
         Full nucleotide sequence of the Origami.
     seq_positions : Tuple[Position]
@@ -581,11 +581,11 @@ class Origami(Callback):
         return self.assembled.positions
 
     @property
-    def pseudoknots(self) -> List[dict]:
+    def pseudoknots(self) -> dict:
         """ 
-        A list of dictionaries with the pseudoknot information.
-        Each dictionary contains the following keys:
-            - id: a pseudoknot index to identify the pseudoknot
+        A dictionary with the pseudoknot information.
+        The dictionary has pseudoknot IDs as keys and the pseudoknot information as values.
+        The pseudoknot information is a dictionary with the following keys:
             - ind_fwd: a list of tuples (start, end) with the indices of the forward
                        sequences of the pseudoknot
             - ind_rev: a list of tuples (start, end) with the indices of the reverse
@@ -608,8 +608,7 @@ class Origami(Callback):
 
             # add the pseudoknot information to the pk_dict
             pk_dict.setdefault(pk_index, 
-                               {"id": pk_index, 
-                                'ind_fwd': [], 
+                               {'ind_fwd': [], 
                                 'ind_rev': [], 
                                 'E': [], 
                                 'dE': []})
@@ -671,8 +670,8 @@ class Origami(Callback):
         for pk in pk_dict.values():
             pk['E'] = sum(pk['E']) / len(pk['E'])
             pk['dE'] = sum(pk['dE']) / len(pk['dE'])
-        # convert the pk_dict to a list for simplicity
-        self._pseudoknots = tuple(pk_dict.values())
+
+        self._pseudoknots = pk_dict
         return self._pseudoknots
 
     @property

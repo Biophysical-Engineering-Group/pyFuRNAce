@@ -7,10 +7,36 @@ from .loops import Loop
 
 # Shared functionality for all Aptamers
 class Aptamer(Motif):
+    """
+    Base class for all aptamers, inheriting from the Motif class.
+    This class is used to create aptamers with specific sequences and coordinates.
+    At the moment, it does not add any additional functionality to the Motif class, 
+    but it can be used to create a common interface for all aptamers or for screening
+    motifs in an origami.
+    """
     pass
 
 # Create the Aptamer class also inheriting from the selected base class
 def create_aptamer(*args, inherit_from: classmethod = None, **kwargs):
+    """
+    Create an Aptamer object, optionally inheriting from a specified base class.
+
+    Parameters
+    ----------
+    args : list
+        Positional arguments to be passed to the Aptamer constructor.
+    inherit_from : classmethod, optional
+        A class from which the Aptamer class should inherit. If not provided, 
+        the Aptamer class will be used as is.
+    kwargs : dict
+        Keyword arguments to be passed to the Aptamer constructor.
+    
+    Returns
+    -------
+    Aptamer
+        An instance of the Aptamer class, optionally inheriting from the specified
+          inherit_from class.
+    """
     aptamer = Aptamer(*args, **kwargs)
     if inherit_from:
         aptamer = type("Aptamer", (Aptamer, inherit_from), {})(*args, **kwargs)

@@ -36,7 +36,14 @@ if __name__ == '__main__':
     st.markdown("- Design primers for your DNA template or prepare the Origami for "
                 "OxDNA simulation.")
     
-    st.write("### Check out the 1-min walkthrough video:")
+    st.markdown("**Note**: for bug reports, feature requests or any other questions, "
+                "please reach out to us via the " 
+                "[GitHub Issues](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/issues)"
+                " or the "
+                "[GitHub Discussions](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/discussions)."
+                )
+    
+    st.write("#### Check out the 1-min walkthrough video:")
     st.video(str(app_path / "static" / "walkthrough_1min.mp4"), 
              format="video/mp4", 
              start_time=0, 

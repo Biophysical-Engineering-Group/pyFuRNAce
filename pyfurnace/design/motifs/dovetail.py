@@ -1,3 +1,4 @@
+from typing import Optional
 import numpy as np
 from ..core.symbols import *
 from ..core.coordinates_3d import Coords
@@ -27,35 +28,50 @@ DAE_T_35 = np.array([[-0.82936221, -0.04732235, -0.55670361, -0.98603719],
                      [ 0.        ,  0.        ,  0.        ,  1.        ],])
 
 class Dovetail(Stem):
-    
-    def __init__(self, length: int = 0 , sequence: str = '', up_cross = True, down_cross = True, sign: int = 1, wobble_interval: int = 5, wobble_tolerance: int = 2, 
-                 wobble_insert : str = "middle", strong_bases=None, **kwargs):
+    def __init__(self,
+                 length: int = 0,
+                 sequence: str = '',
+                 up_cross: bool = True,
+                 down_cross: bool = True,
+                 sign: int = 1,
+                 wobble_interval: int = 5,
+                 wobble_tolerance: int = 2,
+                 wobble_insert: str = "middle",
+                 strong_bases: Optional[bool] = None,
+                 **kwargs
+                 ) -> None:
         """
-        Attributes of class DoveTail.
-        The class DoveTail inherts all attributes from the parentclass Motif.
-        -----------------------------------------------------------------------------------------
-        length: int
-            integer with a sign, 
-            the integer stands for the length of nuclotides making up the Stem,
-            the sign gives the direction of the dove tail (from left to right or right to left)
-        sequence: str
-            nucleotide sequence in core of dovetail
-        top_dt: bool
-            indicates if the top connection of the dovetail should be added
-        bot_dt: bool
-            indicates if the bottom connection of the dovetail should be added
-        sign: int
-            indicates the direction of the dovetail, +1 for positive and -1 for negative
-        wobble_interval: int
-            Number of nucleotides between wobble base pairing (wobbles cannot be consecutive, or at the end/start of a sequence), default is 7
-        wobble_tolerance: int
-            tolerance to randomize the wobble base pairing frequency
-        wobble_insert: str
-            position where the wobble base pairing is inserted (middle, start, end)
-        strong_bases: bool
-            indicates if the wobble base pairing should be strong or weak
-            if None, the value is set to True if the top and bottom connection of the dovetail are added.
-        
+        Initialize a Dovetail motif, which is a helical stem with configurable 
+        entry/exit junctions.
+
+        Parameters
+        ----------
+        length : int, default=0
+            Number of nucleotides in the stem. Sign determines dovetail direction
+        sequence : str, default=''
+            Sequence of the stem. Overrides length if provided.
+        up_cross : bool, default=True
+            Whether to include a top crossover motif.
+        down_cross : bool, default=True
+            Whether to include a bottom crossover motif.
+        sign : int, default=1
+            Direction of dovetail: +1 (right), -1 (left).
+        wobble_interval : int, default=5
+            Interval between wobble base pairs (default is 5).
+        wobble_tolerance : int, default=2
+            Random deviation for wobble interval (default is 2).
+        wobble_insert : str, default="middle"
+            Position of wobble insertion: "middle", "start", or "end".
+        strong_bases : bool, optional
+            If True, use strong base pairing; if None strong bases are set only if 
+            `up_cross` and `down_cross` are both True.
+        **kwargs : dict
+            Additional keyword arguments passed to `Stem`.
+
+        Raises
+        ------
+        ValueError
+            If `length` is not an integer.
         """
         if not isinstance(length, int):
             raise ValueError("The length parameter must be an integer.")
@@ -130,8 +146,31 @@ class Dovetail(Stem):
     ### Protected METHODS
     ###
 
-    def _create_strands(self, sequence: str=None, length: int=0, return_strands=False, **kwargs):
-        """Create the strands of the dovetail"""
+    def _create_strands(self,
+                        sequence: Optional[str] = None,
+                        length: int = 0,
+                        return_strands: bool = False,
+                        **kwargs
+                        ) -> Optional[List[Strand]]:
+        """
+        Internal method to generate top and bottom strands with dovetail crossover features.
+
+        Parameters
+        ----------
+        sequence : str, optional
+            Sequence to assign to the top strand. If None, generated based on length.
+        length : int, optional
+            Length of the stem (used if `sequence` is None).
+        return_strands : bool, optional
+            If True, return the strands instead of assigning them (default is False).
+        **kwargs : dict
+            Additional arguments for strand creation (e.g., `strong_bases`).
+
+        Returns
+        -------
+        list of Strand or None
+            The created strands if `return_strands` is True, otherwise None.
+        """
         # select the direction of the dovetail
         if sequence:
             pos = True if self._sign >= 0 else False
@@ -147,7 +186,11 @@ class Dovetail(Stem):
         if kwargs.get('strong_bases') is None:
             kwargs['strong_bases'] =  up_cross and down_cross
         ### Create the top and bottom strands (according to wobble_insert and wobble_interval)
-        top_strand, bot_strand = super()._create_strands(sequence=sequence, length=length, compute_coords=False, return_strands=True, **kwargs)
+        top_strand, bot_strand = super()._create_strands(sequence=sequence, 
+                                                         length=length, 
+                                                         compute_coords=False, 
+                                                         return_strands=True, 
+                                                         **kwargs)
 
         ### Positive dovetail
         if pos:

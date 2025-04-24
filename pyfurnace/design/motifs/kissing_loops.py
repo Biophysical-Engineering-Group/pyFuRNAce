@@ -11,10 +11,43 @@ from .loops import Loop
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-# https://doi.org/10.2210/pdb2D1B/pdb
+
 class KissingLoop(Loop):
-    
-    def __init__(self, open_left = False, sequence: str = "", seq_len=0, pk_index: str|int = "0", energy: float = -9, energy_tolerace: float = 1.0, **kwargs):
+
+    def __init__(self,
+                 open_left: bool = False,
+                 sequence: str = "",
+                 seq_len: int = 0,
+                 pk_index: Union[str, int] = "0",
+                 energy: float = -9.0,
+                 energy_tolerace: float = 1.0,
+                 **kwargs) -> None:
+        """
+        Initialize a KissingLoop motif representing an internal pseudoknotted 
+        kissing interaction.
+
+        Parameters
+        ----------
+        open_left : bool, optional
+            If True, flip the loop orientation (default is False).
+        sequence : str, optional
+            Sequence for the internal strand of the kissing loop (default is "").
+        seq_len : int, optional
+            Expected sequence length for validation (default is 0).
+        pk_index : str or int, optional
+            Pseudoknot identifier used to tag the kissing interaction (default is "0").
+        energy : float, optional
+            Free energy associated with the interaction (default is -9.0 kcal/mol).
+        energy_tolerace : float, optional
+            Energy tolerance for structural variants (default is 1.0 kcal/mol).
+        **kwargs : dict
+            Additional parameters passed to `Loop`.
+
+        Raises
+        ------
+        ValueError
+            If sequence length mismatches or pk_index has an invalid type.
+        """
 
         self._pk_index = self._check_pk_index(pk_index)
         self._seq_len = seq_len
@@ -94,8 +127,28 @@ class KissingLoop(Loop):
             pk_index = str(pk_index) + "'" * (pk_index < 0)
         return pk_index
 
-    def _create_strands(self, sequence = "", return_strand = False, pk_index = None):
-        # check the pk_index
+    def _create_strands(self,
+                        sequence: str = "",
+                        return_strand: bool = False,
+                        pk_index: Optional[Union[str, int]] = None
+                        ) -> Union[None, List[Strand]]:
+        """
+        Create a kissing loop strand with pseudoknot metadata and 3D layout.
+
+        Parameters
+        ----------
+        sequence : str, optional
+            Nucleotide sequence to assign (default is "").
+        return_strand : bool, optional
+            Whether to return the strand(s) instead of assigning them (default is False).
+        pk_index : str or int, optional
+            Pseudoknot identifier to embed in the strand metadata.
+
+        Returns
+        -------
+        list of Strand or None
+            The created strand(s) if `return_strand` is True.
+        """
         self._pk_index = self._check_pk_index(pk_index)
     
         seq_len = self._seq_len
@@ -141,6 +194,7 @@ class KissingLoop120(KissingLoop):
         self[0]._coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop120.dat', 
                                                 dummy_ends=(True, True))
 
+# https://doi.org/10.2210/pdb2D1B/pdb
 class KissingLoop180(KissingLoop):
     """ Structure generated from a perfect helix"""
 

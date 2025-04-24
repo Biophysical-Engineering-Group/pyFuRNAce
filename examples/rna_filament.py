@@ -2,7 +2,7 @@ import pyfurnace as pf
 
 # MAKE A SIMPLE TILE AND CLEANUP
 origami = pf.simple_origami(dt_list=[120], 
-                            helix_kl=1, 
+                            kl_columns=1, 
                             main_stem=[22],
                             add_terminal_helix=True, 
                             align="first", 
@@ -38,11 +38,11 @@ for i in range(n_tiles - 1):
         origami.append(line, copy=True)
 
 
-# This is gonna be the basic column
-column = origami.copy()
-
 # REPEATE THE COLUMNS
 n_columns = 2
+
+# This is gonna be the basic column
+column = origami.copy()
 for col_ind in range(1, n_columns):
 
 

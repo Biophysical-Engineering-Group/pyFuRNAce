@@ -28,7 +28,8 @@ DAE_T_35 = np.array([[-0.82936221, -0.04732235, -0.55670361, -0.98603719],
 
 class Dovetail(Stem):
     
-    def __init__(self, length: int = 0 , sequence: str = '', up_cross = True, down_cross = True, sign: int = 1, wobble_interval: int = 5, wobble_tolerance: int = 2, wobble_insert : str = "middle", **kwargs):
+    def __init__(self, length: int = 0 , sequence: str = '', up_cross = True, down_cross = True, sign: int = 1, wobble_interval: int = 5, wobble_tolerance: int = 2, 
+                 wobble_insert : str = "middle", strong_bases=None, **kwargs):
         """
         Attributes of class DoveTail.
         The class DoveTail inherts all attributes from the parentclass Motif.
@@ -45,6 +46,15 @@ class Dovetail(Stem):
             indicates if the bottom connection of the dovetail should be added
         sign: int
             indicates the direction of the dovetail, +1 for positive and -1 for negative
+        wobble_interval: int
+            Number of nucleotides between wobble base pairing (wobbles cannot be consecutive, or at the end/start of a sequence), default is 7
+        wobble_tolerance: int
+            tolerance to randomize the wobble base pairing frequency
+        wobble_insert: str
+            position where the wobble base pairing is inserted (middle, start, end)
+        strong_bases: bool
+            indicates if the wobble base pairing should be strong or weak
+            if None, the value is set to True if the top and bottom connection of the dovetail are added.
         
         """
         if not isinstance(length, int):
@@ -62,7 +72,13 @@ class Dovetail(Stem):
             self._sign = +1 if length >= 0 else -1
 
         kwargs['join'] = False
-        super().__init__(length=length, sequence=sequence, wobble_interval=wobble_interval, wobble_tolerance=wobble_tolerance, wobble_insert=wobble_insert, **kwargs)
+        super().__init__(length=length, 
+                         sequence=sequence, 
+                         wobble_interval=wobble_interval, 
+                         wobble_tolerance=wobble_tolerance, 
+                         wobble_insert=wobble_insert,
+                         strong_bases=strong_bases,
+                        **kwargs)
 
     ### 
     ### PROPERTIES
@@ -128,7 +144,8 @@ class Dovetail(Stem):
         up_cross = self._up_cross
         down_cross = self._down_cross
 
-        kwargs.setdefault('strong_bases', up_cross and down_cross)
+        if kwargs.get('strong_bases') is None:
+            kwargs['strong_bases'] =  up_cross and down_cross
         ### Create the top and bottom strands (according to wobble_insert and wobble_interval)
         top_strand, bot_strand = super()._create_strands(sequence=sequence, length=length, compute_coords=False, return_strands=True, **kwargs)
 

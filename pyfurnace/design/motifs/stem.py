@@ -146,42 +146,35 @@ class Stem(Motif):
             if seq_len <= 3 and strong_bases:
                 seq = 'S' * seq_len
             elif self._wobble_interval:
+
                 def get_wobble_interval():
                     if self._wobble_tolerance == 0:
                         return self._wobble_interval
-                    min_wobble = self._wobble_interval - self._wobble_tolerance
-                    if min_wobble < 1:
-                        min_wobble = 1
-                    return random.randint(min_wobble, self._wobble_interval + self._wobble_tolerance)
-                last_wobble = 0
-                seq = list()
-                max_seq = seq_len + self._wobble_interval + self._wobble_tolerance + 1 # calculate the maximum index to calculate the wobble bases
+                    min_wobble = max(1, 
+                                     self._wobble_interval - self._wobble_tolerance)
+                    return random.randint(min_wobble, 
+                                          self._wobble_interval + self._wobble_tolerance)
+                
+                seq = ['N'] * seq_len
+                # calculate the maximum index to calculate the wobble bases
                 random_wobble = get_wobble_interval()
-                for i in range(1, max_seq):
-                    wobble_count = i - last_wobble
-                    if wobble_count > 1 and wobble_count % random_wobble == 0: # check if it's, don't put two wobble bases in a row
-                        if self._wobble_insert == "end":
-                            seq.append('K')
-                            random_wobble = get_wobble_interval() # calculate a new random wobble frequency
-                        elif self._wobble_insert == "start" and i > random_wobble:
-                            seq.append('N')
-                            seq[i - random_wobble] = 'K'
-                            random_wobble = get_wobble_interval()
-                        elif self._wobble_insert == "middle" and i > (random_wobble + 1) //2:
-                            seq.append('N')
-                            seq[i - (random_wobble + 1) // 2] = 'K'
-                            random_wobble = get_wobble_interval()
-                        last_wobble = i
-                    else:
-                        seq.append('N')
-                seq[seq_len-1] = 'N' # the last nucleotide is always a normal nucleotide
-                seq = ''.join(seq[:seq_len])
-                # if wobble_insert == "end":
-                #     seq = ''.join(['K' if i % get_wobble_interval() == 0 else 'N' for i in range(1, seq_len + 1)])
-                # elif wobble_insert == "start":
-                #     seq = ''.join(['K' if i % get_wobble_interval() == 0 else 'N' for i in range(0, seq_len)])
-                # elif wobble_insert == "middle":
-                #     seq = ''.join(['K' if (i * 2) % get_wobble_interval() == 0 else 'N' for i in range(1, seq_len + 1)])
+                i = 1 # the first and last nucleotides are always a normal nucleotide
+                while i < seq_len - 1:
+                    
+                    if self._wobble_insert == "start":
+                        seq[i] = 'K'
+                    elif self._wobble_insert == "end" and i + random_wobble < seq_len - 1:
+                        seq[i + random_wobble] = 'K'
+                    elif self._wobble_insert == "middle" and i + random_wobble // 2 < seq_len - 1:
+                        seq[i + random_wobble // 2] = 'K'
+                    
+                    # calculate the next index to insert a wobble base
+                    i += random_wobble + 1
+                    # calculate a new random wobble frequency
+                    random_wobble = get_wobble_interval() 
+
+                seq = ''.join(seq)
+
             else:
                 seq = 'N' * seq_len
             strands = [Strand(seq, coords=top_coord), Strand(seq.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=(-1, 0), coords=bot_coord)]

@@ -46,6 +46,9 @@ dev = [
     "pytest",
 ]
 
+[tool.setuptools]
+packages = ["pyfurnace"]
+
 [tool.black]
 line-length = 88
 target-version = ["py310", "py312", "py312"]

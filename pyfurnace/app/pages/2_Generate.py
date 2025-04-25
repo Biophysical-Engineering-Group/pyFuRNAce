@@ -126,6 +126,10 @@ def generate_sequence():
                                             f"\nSpool:\n{step}"))
 
     ori_txt = '\n\n'.join(st.session_state.code)
+
+    if st.button("Stop optimization"):
+        return
+    
     opti_sequence, zip_out = generate_road(structure, 
                                            sequence_constraint, 
                                            pseudoknot_info, 
@@ -134,19 +138,34 @@ def generate_sequence():
                                            zip_directory=True,
                                            origami_code=ori_txt,
                                            )
+
+
+    # Clear the progress bar
+    progress_bar.progress(1.0, text = f"Generation finished")
+    output_status.empty()
+
+
+    if not opti_sequence:
+        st.warning("Optimization failed." 
+                   "Please check the input parameters for Revoler.")
+        with open(zip_out, "rb") as fp:
+            st.download_button("Download failed optimization files",
+                                data=fp,
+                                file_name = f"{filename}.zip",
+                                mime = "application/zip",
+                                on_click='ignore',
+                                )
+
+        return
     
-    st.session_state.rna_origami_seq = opti_sequence
-    st.session_state.rna_origami_folds = fold_p(opti_sequence)
     # if there was already a zip file, remove it
     if 'zip_path' in st.session_state:
         if os.path.exists(st.session_state.zip_path):
             os.remove(st.session_state.zip_path)
+    st.session_state.rna_origami_seq = opti_sequence
+    st.session_state.rna_origami_folds = fold_p(opti_sequence)
     # save the new zip file
     st.session_state.zip_path = zip_out
-
-    # Clear the progress bar
-    progress_bar.progress(1.0, text = f"Generation Completed")
-    output_status.empty()
 
     if ('origami' in st.session_state 
             and st.session_state.origami
@@ -358,7 +377,7 @@ if __name__ == "__main__":
         copy_to_clipboard(sequence, 'Sequence')
     with col4:
         with open(st.session_state.zip_path, "rb") as fp:
-            st.download_button("Download Optimization Files",
+            st.download_button("Download optimization files",
                                 data=fp,
                                 file_name = f"{filename}.zip",
                                 mime = "application/zip",

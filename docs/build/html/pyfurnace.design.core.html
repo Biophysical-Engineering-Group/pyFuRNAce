@@ -9,6 +9,7 @@
   <title>pyfurnace.design.core package &mdash; pyFuRNAce 0.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -16,12 +17,12 @@
       <script src="_static/documentation_options.js?v=47de8214"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pyfurnace.design.motifs package" href="pyfurnace.design.motifs.html" />
-    <link rel="prev" title="pyFuRNAce Documentation" href="index.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,341 +45,16 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">pyfurnace.design.core package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.basepair">pyfurnace.design.core.basepair module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair"><code class="docutils literal notranslate"><span class="pre">BasePair</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.copy"><code class="docutils literal notranslate"><span class="pre">BasePair.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.get"><code class="docutils literal notranslate"><span class="pre">BasePair.get()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.items"><code class="docutils literal notranslate"><span class="pre">BasePair.items()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.keys"><code class="docutils literal notranslate"><span class="pre">BasePair.keys()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.shift"><code class="docutils literal notranslate"><span class="pre">BasePair.shift()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.update"><code class="docutils literal notranslate"><span class="pre">BasePair.update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair.values"><code class="docutils literal notranslate"><span class="pre">BasePair.values()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.callback">pyfurnace.design.core.callback module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.callback.Callback"><code class="docutils literal notranslate"><span class="pre">Callback</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.callback.Callback._callbacks"><code class="docutils literal notranslate"><span class="pre">Callback._callbacks</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.callback.Callback.callbacks"><code class="docutils literal notranslate"><span class="pre">Callback.callbacks</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.callback.Callback.register_callback"><code class="docutils literal notranslate"><span class="pre">Callback.register_callback()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.coordinates_3d">pyfurnace.design.core.coordinates_3d module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords"><code class="docutils literal notranslate"><span class="pre">Coords</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.array"><code class="docutils literal notranslate"><span class="pre">Coords.array</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.dummy_ends"><code class="docutils literal notranslate"><span class="pre">Coords.dummy_ends</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.proteins"><code class="docutils literal notranslate"><span class="pre">Coords.proteins</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.shape"><code class="docutils literal notranslate"><span class="pre">Coords.shape</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.size"><code class="docutils literal notranslate"><span class="pre">Coords.size</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords._CACHED_HELICES"><code class="docutils literal notranslate"><span class="pre">Coords._CACHED_HELICES</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.add_protein"><code class="docutils literal notranslate"><span class="pre">Coords.add_protein()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.apply_transformation"><code class="docutils literal notranslate"><span class="pre">Coords.apply_transformation()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Coords.array</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.combine_coords"><code class="docutils literal notranslate"><span class="pre">Coords.combine_coords()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.compute_helix_from_nucl"><code class="docutils literal notranslate"><span class="pre">Coords.compute_helix_from_nucl()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.compute_transformation_matrix"><code class="docutils literal notranslate"><span class="pre">Coords.compute_transformation_matrix()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.copy"><code class="docutils literal notranslate"><span class="pre">Coords.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Coords.dummy_ends</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.is_empty"><code class="docutils literal notranslate"><span class="pre">Coords.is_empty()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.load_from_file"><code class="docutils literal notranslate"><span class="pre">Coords.load_from_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.load_from_text"><code class="docutils literal notranslate"><span class="pre">Coords.load_from_text()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Coords.proteins</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.reverse_in_place"><code class="docutils literal notranslate"><span class="pre">Coords.reverse_in_place()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.set_reference"><code class="docutils literal notranslate"><span class="pre">Coords.set_reference()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Coords.shape</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">Coords.size</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.transform"><code class="docutils literal notranslate"><span class="pre">Coords.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.Coords.transform_array"><code class="docutils literal notranslate"><span class="pre">Coords.transform_array()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.ProteinCoords"><code class="docutils literal notranslate"><span class="pre">ProteinCoords</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.ProteinCoords.sequence"><code class="docutils literal notranslate"><span class="pre">ProteinCoords.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.ProteinCoords.coords"><code class="docutils literal notranslate"><span class="pre">ProteinCoords.coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">ProteinCoords.coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.ProteinCoords.copy"><code class="docutils literal notranslate"><span class="pre">ProteinCoords.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id6"><code class="docutils literal notranslate"><span class="pre">ProteinCoords.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.coordinates_3d.ProteinCoords.transform"><code class="docutils literal notranslate"><span class="pre">ProteinCoords.transform()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.motif">pyfurnace.design.core.motif module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif"><code class="docutils literal notranslate"><span class="pre">Motif</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.autopairing"><code class="docutils literal notranslate"><span class="pre">Motif.autopairing</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.basepair"><code class="docutils literal notranslate"><span class="pre">Motif.basepair</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.junctions"><code class="docutils literal notranslate"><span class="pre">Motif.junctions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.lock_coords"><code class="docutils literal notranslate"><span class="pre">Motif.lock_coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.max_pos"><code class="docutils literal notranslate"><span class="pre">Motif.max_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.min_pos"><code class="docutils literal notranslate"><span class="pre">Motif.min_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.num_char"><code class="docutils literal notranslate"><span class="pre">Motif.num_char</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.num_lines"><code class="docutils literal notranslate"><span class="pre">Motif.num_lines</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.pair_map"><code class="docutils literal notranslate"><span class="pre">Motif.pair_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.positions"><code class="docutils literal notranslate"><span class="pre">Motif.positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.seq_positions"><code class="docutils literal notranslate"><span class="pre">Motif.seq_positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.sequence"><code class="docutils literal notranslate"><span class="pre">Motif.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.strands"><code class="docutils literal notranslate"><span class="pre">Motif.strands</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.structure"><code class="docutils literal notranslate"><span class="pre">Motif.structure</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.align"><code class="docutils literal notranslate"><span class="pre">Motif.align()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.append"><code class="docutils literal notranslate"><span class="pre">Motif.append()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id7"><code class="docutils literal notranslate"><span class="pre">Motif.autopairing</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id8"><code class="docutils literal notranslate"><span class="pre">Motif.basepair</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.concat"><code class="docutils literal notranslate"><span class="pre">Motif.concat()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.copy"><code class="docutils literal notranslate"><span class="pre">Motif.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.copy_strands_preserve_blocks"><code class="docutils literal notranslate"><span class="pre">Motif.copy_strands_preserve_blocks()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.extend_junctions"><code class="docutils literal notranslate"><span class="pre">Motif.extend_junctions()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.flip"><code class="docutils literal notranslate"><span class="pre">Motif.flip()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.folding_barriers"><code class="docutils literal notranslate"><span class="pre">Motif.folding_barriers()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_file"><code class="docutils literal notranslate"><span class="pre">Motif.from_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_list"><code class="docutils literal notranslate"><span class="pre">Motif.from_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_structure"><code class="docutils literal notranslate"><span class="pre">Motif.from_structure()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_text"><code class="docutils literal notranslate"><span class="pre">Motif.from_text()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.get_position_map"><code class="docutils literal notranslate"><span class="pre">Motif.get_position_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.get_sequential_shift"><code class="docutils literal notranslate"><span class="pre">Motif.get_sequential_shift()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.get_strand_index_map"><code class="docutils literal notranslate"><span class="pre">Motif.get_strand_index_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.insert"><code class="docutils literal notranslate"><span class="pre">Motif.insert()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.join_strands"><code class="docutils literal notranslate"><span class="pre">Motif.join_strands()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id9"><code class="docutils literal notranslate"><span class="pre">Motif.junctions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id10"><code class="docutils literal notranslate"><span class="pre">Motif.lock_coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id11"><code class="docutils literal notranslate"><span class="pre">Motif.max_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id12"><code class="docutils literal notranslate"><span class="pre">Motif.min_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id13"><code class="docutils literal notranslate"><span class="pre">Motif.num_char</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id14"><code class="docutils literal notranslate"><span class="pre">Motif.num_lines</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id15"><code class="docutils literal notranslate"><span class="pre">Motif.pair_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.pop"><code class="docutils literal notranslate"><span class="pre">Motif.pop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id16"><code class="docutils literal notranslate"><span class="pre">Motif.positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.replace_all_strands"><code class="docutils literal notranslate"><span class="pre">Motif.replace_all_strands()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.rotate"><code class="docutils literal notranslate"><span class="pre">Motif.rotate()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.save_3d_model"><code class="docutils literal notranslate"><span class="pre">Motif.save_3d_model()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.save_fasta"><code class="docutils literal notranslate"><span class="pre">Motif.save_fasta()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.save_text"><code class="docutils literal notranslate"><span class="pre">Motif.save_text()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id17"><code class="docutils literal notranslate"><span class="pre">Motif.seq_positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id18"><code class="docutils literal notranslate"><span class="pre">Motif.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.shift"><code class="docutils literal notranslate"><span class="pre">Motif.shift()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.sort"><code class="docutils literal notranslate"><span class="pre">Motif.sort()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id19"><code class="docutils literal notranslate"><span class="pre">Motif.strands</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.strip"><code class="docutils literal notranslate"><span class="pre">Motif.strip()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id20"><code class="docutils literal notranslate"><span class="pre">Motif.structure</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.trace"><code class="docutils literal notranslate"><span class="pre">Motif.trace()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.origami">pyfurnace.design.core.origami module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami"><code class="docutils literal notranslate"><span class="pre">Origami</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.align"><code class="docutils literal notranslate"><span class="pre">Origami.align</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.assembled"><code class="docutils literal notranslate"><span class="pre">Origami.assembled</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.num_char"><code class="docutils literal notranslate"><span class="pre">Origami.num_char</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.num_lines"><code class="docutils literal notranslate"><span class="pre">Origami.num_lines</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.num_motifs"><code class="docutils literal notranslate"><span class="pre">Origami.num_motifs</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.pair_map"><code class="docutils literal notranslate"><span class="pre">Origami.pair_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.pos_index_map"><code class="docutils literal notranslate"><span class="pre">Origami.pos_index_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.index_shift_map"><code class="docutils literal notranslate"><span class="pre">Origami.index_shift_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.pseudoknots"><code class="docutils literal notranslate"><span class="pre">Origami.pseudoknots</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.sequence"><code class="docutils literal notranslate"><span class="pre">Origami.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.seq_positions"><code class="docutils literal notranslate"><span class="pre">Origami.seq_positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.ss_assembly"><code class="docutils literal notranslate"><span class="pre">Origami.ss_assembly</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.strands"><code class="docutils literal notranslate"><span class="pre">Origami.strands</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.structure"><code class="docutils literal notranslate"><span class="pre">Origami.structure</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id21"><code class="docutils literal notranslate"><span class="pre">Origami.align</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.append"><code class="docutils literal notranslate"><span class="pre">Origami.append()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id22"><code class="docutils literal notranslate"><span class="pre">Origami.assembled</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.barrier_repr"><code class="docutils literal notranslate"><span class="pre">Origami.barrier_repr()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.copy"><code class="docutils literal notranslate"><span class="pre">Origami.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.duplicate_line"><code class="docutils literal notranslate"><span class="pre">Origami.duplicate_line()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.folding_barriers"><code class="docutils literal notranslate"><span class="pre">Origami.folding_barriers()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_at_position"><code class="docutils literal notranslate"><span class="pre">Origami.get_motif_at_position()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_at_seq_index"><code class="docutils literal notranslate"><span class="pre">Origami.get_motif_at_seq_index()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_type"><code class="docutils literal notranslate"><span class="pre">Origami.get_motif_type()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_slice_at_seq_index"><code class="docutils literal notranslate"><span class="pre">Origami.get_slice_at_seq_index()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.improve_folding_pathway"><code class="docutils literal notranslate"><span class="pre">Origami.improve_folding_pathway()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.index"><code class="docutils literal notranslate"><span class="pre">Origami.index()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id23"><code class="docutils literal notranslate"><span class="pre">Origami.index_shift_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.insert"><code class="docutils literal notranslate"><span class="pre">Origami.insert()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id24"><code class="docutils literal notranslate"><span class="pre">Origami.num_char</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id25"><code class="docutils literal notranslate"><span class="pre">Origami.num_lines</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id26"><code class="docutils literal notranslate"><span class="pre">Origami.num_motifs</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id27"><code class="docutils literal notranslate"><span class="pre">Origami.pair_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.pop"><code class="docutils literal notranslate"><span class="pre">Origami.pop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id28"><code class="docutils literal notranslate"><span class="pre">Origami.pos_index_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.positions"><code class="docutils literal notranslate"><span class="pre">Origami.positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id29"><code class="docutils literal notranslate"><span class="pre">Origami.pseudoknots</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.reload"><code class="docutils literal notranslate"><span class="pre">Origami.reload()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.remove"><code class="docutils literal notranslate"><span class="pre">Origami.remove()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_3d_model"><code class="docutils literal notranslate"><span class="pre">Origami.save_3d_model()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_fasta"><code class="docutils literal notranslate"><span class="pre">Origami.save_fasta()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_text"><code class="docutils literal notranslate"><span class="pre">Origami.save_text()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id30"><code class="docutils literal notranslate"><span class="pre">Origami.seq_positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id31"><code class="docutils literal notranslate"><span class="pre">Origami.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id32"><code class="docutils literal notranslate"><span class="pre">Origami.ss_assembly</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id33"><code class="docutils literal notranslate"><span class="pre">Origami.strands</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id34"><code class="docutils literal notranslate"><span class="pre">Origami.structure</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.to_road"><code class="docutils literal notranslate"><span class="pre">Origami.to_road()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.position">pyfurnace.design.core.position module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.position.Direction"><code class="docutils literal notranslate"><span class="pre">Direction</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Direction.UP"><code class="docutils literal notranslate"><span class="pre">Direction.UP</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Direction.RIGHT"><code class="docutils literal notranslate"><span class="pre">Direction.RIGHT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Direction.DOWN"><code class="docutils literal notranslate"><span class="pre">Direction.DOWN</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Direction.LEFT"><code class="docutils literal notranslate"><span class="pre">Direction.LEFT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id35"><code class="docutils literal notranslate"><span class="pre">Direction.DOWN</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id36"><code class="docutils literal notranslate"><span class="pre">Direction.LEFT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id37"><code class="docutils literal notranslate"><span class="pre">Direction.RIGHT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id38"><code class="docutils literal notranslate"><span class="pre">Direction.UP</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.position.DirectionMeta"><code class="docutils literal notranslate"><span class="pre">DirectionMeta</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.DirectionMeta.names"><code class="docutils literal notranslate"><span class="pre">DirectionMeta.names()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.position.Position"><code class="docutils literal notranslate"><span class="pre">Position</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position._dimension"><code class="docutils literal notranslate"><span class="pre">Position._dimension</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.change_sign_xy"><code class="docutils literal notranslate"><span class="pre">Position.change_sign_xy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.replace"><code class="docutils literal notranslate"><span class="pre">Position.replace()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.set_dimension"><code class="docutils literal notranslate"><span class="pre">Position.set_dimension()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.swap_change_sign_xy"><code class="docutils literal notranslate"><span class="pre">Position.swap_change_sign_xy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.swap_xy"><code class="docutils literal notranslate"><span class="pre">Position.swap_xy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.x"><code class="docutils literal notranslate"><span class="pre">Position.x</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.y"><code class="docutils literal notranslate"><span class="pre">Position.y</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.z"><code class="docutils literal notranslate"><span class="pre">Position.z</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.position.Position.zero"><code class="docutils literal notranslate"><span class="pre">Position.zero()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.sequence">pyfurnace.design.core.sequence module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.directionality"><code class="docutils literal notranslate"><span class="pre">Sequence.directionality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.complement"><code class="docutils literal notranslate"><span class="pre">Sequence.complement()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.copy"><code class="docutils literal notranslate"><span class="pre">Sequence.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id39"><code class="docutils literal notranslate"><span class="pre">Sequence.directionality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.distance"><code class="docutils literal notranslate"><span class="pre">Sequence.distance()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence"><code class="docutils literal notranslate"><span class="pre">Sequence.find_repeated_subsequence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.gc_content"><code class="docutils literal notranslate"><span class="pre">Sequence.gc_content()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.get_random_sequence"><code class="docutils literal notranslate"><span class="pre">Sequence.get_random_sequence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.molecular_weight"><code class="docutils literal notranslate"><span class="pre">Sequence.molecular_weight()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.pop"><code class="docutils literal notranslate"><span class="pre">Sequence.pop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.replace"><code class="docutils literal notranslate"><span class="pre">Sequence.replace()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.reverse"><code class="docutils literal notranslate"><span class="pre">Sequence.reverse()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.reverse_complement"><code class="docutils literal notranslate"><span class="pre">Sequence.reverse_complement()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.split"><code class="docutils literal notranslate"><span class="pre">Sequence.split()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.translate"><code class="docutils literal notranslate"><span class="pre">Sequence.translate()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.upper"><code class="docutils literal notranslate"><span class="pre">Sequence.upper()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.strand">pyfurnace.design.core.strand module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand"><code class="docutils literal notranslate"><span class="pre">Strand</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.coords"><code class="docutils literal notranslate"><span class="pre">Strand.coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.direction"><code class="docutils literal notranslate"><span class="pre">Strand.direction</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.directionality"><code class="docutils literal notranslate"><span class="pre">Strand.directionality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.directions"><code class="docutils literal notranslate"><span class="pre">Strand.directions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.end"><code class="docutils literal notranslate"><span class="pre">Strand.end</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.end_direction"><code class="docutils literal notranslate"><span class="pre">Strand.end_direction</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.max_pos"><code class="docutils literal notranslate"><span class="pre">Strand.max_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.min_pos"><code class="docutils literal notranslate"><span class="pre">Strand.min_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.minimal_dimensions"><code class="docutils literal notranslate"><span class="pre">Strand.minimal_dimensions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.next_pos"><code class="docutils literal notranslate"><span class="pre">Strand.next_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.pk_info"><code class="docutils literal notranslate"><span class="pre">Strand.pk_info</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.positions"><code class="docutils literal notranslate"><span class="pre">Strand.positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.prec_pos"><code class="docutils literal notranslate"><span class="pre">Strand.prec_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.seq_positions"><code class="docutils literal notranslate"><span class="pre">Strand.seq_positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.sequence"><code class="docutils literal notranslate"><span class="pre">Strand.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.sequence_list"><code class="docutils literal notranslate"><span class="pre">Strand.sequence_list</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.sequence_slice"><code class="docutils literal notranslate"><span class="pre">Strand.sequence_slice</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.start"><code class="docutils literal notranslate"><span class="pre">Strand.start</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.strand"><code class="docutils literal notranslate"><span class="pre">Strand.strand</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.strands_block"><code class="docutils literal notranslate"><span class="pre">Strand.strands_block</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id40"><code class="docutils literal notranslate"><span class="pre">Strand.coords</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.copy"><code class="docutils literal notranslate"><span class="pre">Strand.copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id41"><code class="docutils literal notranslate"><span class="pre">Strand.direction</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id42"><code class="docutils literal notranslate"><span class="pre">Strand.directionality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id43"><code class="docutils literal notranslate"><span class="pre">Strand.directions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.draw"><code class="docutils literal notranslate"><span class="pre">Strand.draw()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id44"><code class="docutils literal notranslate"><span class="pre">Strand.end</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id45"><code class="docutils literal notranslate"><span class="pre">Strand.end_direction</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.flip"><code class="docutils literal notranslate"><span class="pre">Strand.flip()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_base_at_pos"><code class="docutils literal notranslate"><span class="pre">Strand.get_base_at_pos()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_char_at_pos"><code class="docutils literal notranslate"><span class="pre">Strand.get_char_at_pos()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_position_map"><code class="docutils literal notranslate"><span class="pre">Strand.get_position_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.insert"><code class="docutils literal notranslate"><span class="pre">Strand.insert()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.invert"><code class="docutils literal notranslate"><span class="pre">Strand.invert()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.join"><code class="docutils literal notranslate"><span class="pre">Strand.join()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.join_strands"><code class="docutils literal notranslate"><span class="pre">Strand.join_strands()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id46"><code class="docutils literal notranslate"><span class="pre">Strand.max_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id47"><code class="docutils literal notranslate"><span class="pre">Strand.min_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id48"><code class="docutils literal notranslate"><span class="pre">Strand.minimal_dimensions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id49"><code class="docutils literal notranslate"><span class="pre">Strand.next_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.pop"><code class="docutils literal notranslate"><span class="pre">Strand.pop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id50"><code class="docutils literal notranslate"><span class="pre">Strand.positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id51"><code class="docutils literal notranslate"><span class="pre">Strand.prec_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.reverse"><code class="docutils literal notranslate"><span class="pre">Strand.reverse()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.save_3d_model"><code class="docutils literal notranslate"><span class="pre">Strand.save_3d_model()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id52"><code class="docutils literal notranslate"><span class="pre">Strand.seq_positions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id53"><code class="docutils literal notranslate"><span class="pre">Strand.sequence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id54"><code class="docutils literal notranslate"><span class="pre">Strand.sequence_list</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id55"><code class="docutils literal notranslate"><span class="pre">Strand.sequence_slice</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.shift"><code class="docutils literal notranslate"><span class="pre">Strand.shift()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id56"><code class="docutils literal notranslate"><span class="pre">Strand.start</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id57"><code class="docutils literal notranslate"><span class="pre">Strand.strand</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id58"><code class="docutils literal notranslate"><span class="pre">Strand.strands_block</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.transform"><code class="docutils literal notranslate"><span class="pre">Strand.transform()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.strand.StrandsBlock"><code class="docutils literal notranslate"><span class="pre">StrandsBlock</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.StrandsBlock.items"><code class="docutils literal notranslate"><span class="pre">StrandsBlock.items</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.StrandsBlock.add"><code class="docutils literal notranslate"><span class="pre">StrandsBlock.add()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.StrandsBlock.remove"><code class="docutils literal notranslate"><span class="pre">StrandsBlock.remove()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.StrandsBlock.transform"><code class="docutils literal notranslate"><span class="pre">StrandsBlock.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.StrandsBlock.update"><code class="docutils literal notranslate"><span class="pre">StrandsBlock.update()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyfurnace.design.core.symbols">pyfurnace.design.core.symbols module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.AmbiguosStructure"><code class="docutils literal notranslate"><span class="pre">AmbiguosStructure</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.MotifStructureError"><code class="docutils literal notranslate"><span class="pre">MotifStructureError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.index"><code class="docutils literal notranslate"><span class="pre">Node.index</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.label"><code class="docutils literal notranslate"><span class="pre">Node.label</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.paired_index"><code class="docutils literal notranslate"><span class="pre">Node.paired_index</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.parent"><code class="docutils literal notranslate"><span class="pre">Node.parent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.seq"><code class="docutils literal notranslate"><span class="pre">Node.seq</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.children"><code class="docutils literal notranslate"><span class="pre">Node.children</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.symbols.Node.search"><code class="docutils literal notranslate"><span class="pre">Node.search()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.base_pair_difference"><code class="docutils literal notranslate"><span class="pre">base_pair_difference()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.base_pair_distance"><code class="docutils literal notranslate"><span class="pre">base_pair_distance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.complement"><code class="docutils literal notranslate"><span class="pre">complement()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.dot_bracket_to_pair_map"><code class="docutils literal notranslate"><span class="pre">dot_bracket_to_pair_map()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.dot_bracket_to_stacks"><code class="docutils literal notranslate"><span class="pre">dot_bracket_to_stacks()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.dot_bracket_to_tree"><code class="docutils literal notranslate"><span class="pre">dot_bracket_to_tree()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.folding_barriers"><code class="docutils literal notranslate"><span class="pre">folding_barriers()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.gc_content"><code class="docutils literal notranslate"><span class="pre">gc_content()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.hamming_distance"><code class="docutils literal notranslate"><span class="pre">hamming_distance()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.mutate_nucleotide"><code class="docutils literal notranslate"><span class="pre">mutate_nucleotide()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.pair_map_to_dot_bracket"><code class="docutils literal notranslate"><span class="pre">pair_map_to_dot_bracket()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.pair_nucleotide"><code class="docutils literal notranslate"><span class="pre">pair_nucleotide()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.reverse_complement"><code class="docutils literal notranslate"><span class="pre">reverse_complement()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.rotate_dot_bracket"><code class="docutils literal notranslate"><span class="pre">rotate_dot_bracket()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyfurnace.design.core.symbols.tree_to_dot_bracket"><code class="docutils literal notranslate"><span class="pre">tree_to_dot_bracket()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#web-application">Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 </ul>
 
@@ -5089,10 +4765,7 @@ constraints.</p>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="pyFuRNAce Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyfurnace.design.motifs.html" class="btn btn-neutral float-right" title="pyfurnace.design.motifs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

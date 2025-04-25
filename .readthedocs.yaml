@@ -7,7 +7,15 @@ build:
 
 python:
   install:
-    - requirements: requirements.txt
+    # install the requirements for the docs only
+    - requirements: docs/requirements.txt
+    # Install our python package before building the docs
+    - method: pip
+      path: .
 
 sphinx:
   configuration: docs/source/conf.py
+
+formats:
+  - pdf
+  - epub

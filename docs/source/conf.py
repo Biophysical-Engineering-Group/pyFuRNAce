@@ -28,6 +28,7 @@ extensions = [
     "numpydoc",
     "myst_parser",
     "nbsphinx",
+    'sphinx_copybutton',
 ]
 
 templates_path = ['_templates']

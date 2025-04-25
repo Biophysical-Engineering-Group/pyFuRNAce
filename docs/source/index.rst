@@ -6,15 +6,27 @@
 pyFuRNAce Documentation
 =======================
 
-.. include:: ../../README.md
-   :parser: myst_parser.sphinx_
+.. .. include:: ../../README.md
+..    :parser: myst_parser.sphinx_
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   pyfurnace.design.core
-   pyfurnace.design.motifs
-   pyfurnace.design.utils
-   pyfurnace.generate
+Welcome to pyFuRNAce's documentation!
+=====================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   home
+   installation
+   webapp
+   features
+   api_usage
+   citation
+   license
+   acknowledgements
+   api
    examples

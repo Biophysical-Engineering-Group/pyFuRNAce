@@ -8,6 +8,7 @@
   <title>pyfurnace.generate.road &mdash; pyFuRNAce 0.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -15,6 +16,8 @@
       <script src="../../../_static/documentation_options.js?v=47de8214"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -42,10 +45,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#web-application">Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Script API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 </ul>
 
@@ -364,21 +372,19 @@
     <span class="c1"># include it in the zip</span>
     <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">design_path</span><span class="p">)</span>
 
-    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="n">zip_directory</span><span class="p">:</span>
         <span class="c1"># create a temporary zip file</span>
         <span class="n">temp_zip</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.zip&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">temp_zip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># Close so we can write to it</span>
 
         <span class="c1"># Create the zip and add selected files</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipf</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_to_include</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipf</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_to_include</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># Store relative to directory for cleaner archive structure</span>
                     <span class="n">zipf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create zip file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2"> to zip: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         
     <span class="k">if</span> <span class="n">tempdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Close the temporary directory</span>
@@ -386,10 +392,6 @@
     
     <span class="c1"># Return the path to the zip file</span>
     <span class="k">if</span> <span class="n">zip_directory</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
-            <span class="c1"># Clean up the zip file if it was not created successfully</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">last_seq</span>
         <span class="k">return</span> <span class="n">last_seq</span><span class="p">,</span> <span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span>
     
     <span class="k">return</span> <span class="n">last_seq</span></div>

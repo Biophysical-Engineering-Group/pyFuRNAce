@@ -5,7 +5,7 @@
    "id": "e14c827c",
    "metadata": {},
    "source": [
-    "# RNA FILAMENTS ASSEMBLY TUTORIAL\n",
+    "# RNA filaments assembly tutorial\n",
     "\n",
     "### Create a basic RNA structure"
    ]
@@ -139,7 +139,7 @@
    "id": "03b24561",
    "metadata": {},
    "source": [
-    "### REPEAT THE TILES TO MAKE A FILAMENT CORE"
+    "### Repeat the tiles to make a filament section"
    ]
   },
   {
@@ -242,7 +242,7 @@
    "id": "5da3e8dd",
    "metadata": {},
    "source": [
-    "### REPEAT THE FILAMENT CORE TO MAKE A FILAMENT"
+    "### Repeat the sections to make a filament"
    ]
   },
   {

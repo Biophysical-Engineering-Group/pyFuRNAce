@@ -8,7 +8,9 @@ line1 = [pf.TetraLoop(),
          pf.KissingDimer(),
          pf.Stem(6),
          pf.Dovetail(-2, up_cross=False),
-         pf.Stem(7),
+         pf.Stem(4),
+         pf.Broccoli(),
+         pf.Stem(4),
          pf.TetraLoop(True),
          ]
 

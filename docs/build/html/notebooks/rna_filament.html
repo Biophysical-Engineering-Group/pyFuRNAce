@@ -6,9 +6,10 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RNA FILAMENTS ASSEMBLY TUTORIAL &mdash; pyFuRNAce 0.0.3 documentation</title>
+  <title>RNA filaments assembly tutorial &mdash; pyFuRNAce 0.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
 
   
@@ -17,6 +18,8 @@
       <script src="../_static/documentation_options.js?v=47de8214"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -45,22 +48,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#web-application">Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Script API Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../examples.html#basic-usage">Basic usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples.html#basic-notebooks-road-origami">Basic Notebooks: ROAD origami</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples.html#advanced-rna-filament">Advanced: RNA filament</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples.html#advanced-full-folding-barrier-optimization">Advanced: full folding barrier optimization</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#advanced-notebooks">Advanced Notebooks</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">RNA FILAMENTS ASSEMBLY TUTORIAL</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Create-a-basic-RNA-structure">Create a basic RNA structure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Adjust-the-ends-to-make-a-tile">Adjust the ends to make a tile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#REPEAT-THE-TILES-TO-MAKE-A-FILAMENT-CORE">REPEAT THE TILES TO MAKE A FILAMENT CORE</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#REPEAT-THE-FILAMENT-CORE-TO-MAKE-A-FILAMENT">REPEAT THE FILAMENT CORE TO MAKE A FILAMENT</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Generete-the-sequence-for-a-tile">Generete the sequence for a tile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#basics-usage">Basics usage</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../examples.html#advanced">Advanced</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../examples.html#rna-filament">RNA filament</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples.html#full-folding-barrier-optimization">Full folding barrier optimization</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../examples.html#filament-notebook">Filament notebook</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">RNA filaments assembly tutorial</a></li>
 </ul>
 </li>
 </ul>
@@ -84,7 +87,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
-      <li class="breadcrumb-item active">RNA FILAMENTS ASSEMBLY TUTORIAL</li>
+      <li class="breadcrumb-item active">RNA filaments assembly tutorial</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/notebooks/rna_filament.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -94,8 +97,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="RNA-FILAMENTS-ASSEMBLY-TUTORIAL">
-<h1>RNA FILAMENTS ASSEMBLY TUTORIAL<a class="headerlink" href="#RNA-FILAMENTS-ASSEMBLY-TUTORIAL" title="Link to this heading"></a></h1>
+  <section id="RNA-filaments-assembly-tutorial">
+<h1>RNA filaments assembly tutorial<a class="headerlink" href="#RNA-filaments-assembly-tutorial" title="Link to this heading"></a></h1>
 <section id="Create-a-basic-RNA-structure">
 <h2>Create a basic RNA structure<a class="headerlink" href="#Create-a-basic-RNA-structure" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
@@ -196,8 +199,8 @@
     </div></div>
 </div>
 </section>
-<section id="REPEAT-THE-TILES-TO-MAKE-A-FILAMENT-CORE">
-<h2>REPEAT THE TILES TO MAKE A FILAMENT CORE<a class="headerlink" href="#REPEAT-THE-TILES-TO-MAKE-A-FILAMENT-CORE" title="Link to this heading"></a></h2>
+<section id="Repeat-the-tiles-to-make-a-filament-section">
+<h2>Repeat the tiles to make a filament section<a class="headerlink" href="#Repeat-the-tiles-to-make-a-filament-section" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -283,8 +286,8 @@
     </div></div>
 </div>
 </section>
-<section id="REPEAT-THE-FILAMENT-CORE-TO-MAKE-A-FILAMENT">
-<h2>REPEAT THE FILAMENT CORE TO MAKE A FILAMENT<a class="headerlink" href="#REPEAT-THE-FILAMENT-CORE-TO-MAKE-A-FILAMENT" title="Link to this heading"></a></h2>
+<section id="Repeat-the-sections-to-make-a-filament">
+<h2>Repeat the sections to make a filament<a class="headerlink" href="#Repeat-the-sections-to-make-a-filament" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>

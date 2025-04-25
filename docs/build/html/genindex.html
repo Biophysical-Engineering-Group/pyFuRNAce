@@ -8,6 +8,7 @@
   <title>Index &mdash; pyFuRNAce 0.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -15,6 +16,8 @@
       <script src="_static/documentation_options.js?v=47de8214"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -42,10 +45,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#web-application">Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 </ul>
 
@@ -147,7 +155,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.apply_transformation">apply_transformation() (pyfurnace.design.core.coordinates_3d.Coords static method)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Aptamer">Aptamer (class in pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Aptamer">Aptamer (class in pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Aptamer">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.array">array (pyfurnace.design.core.coordinates_3d.Coords attribute)</a>
 
@@ -191,13 +199,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.structural.Bend90">Bend90() (in module pyfurnace.design.motifs.structural)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Biotin">Biotin() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Biotin">Biotin() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Biotin">[1]</a>
 </li>
       <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer">BranchedDimer (class in pyfurnace.design.motifs.kissing_loops)</a>
 </li>
       <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop">BranchedKissingLoop (class in pyfurnace.design.motifs.kissing_loops)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Broccoli">Broccoli() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Broccoli">Broccoli() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Broccoli">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -227,7 +235,7 @@
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.concat">concat() (pyfurnace.design.core.motif.Motif class method)</a>
 </li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.convert_angles_to_dt">convert_angles_to_dt() (in module pyfurnace.design.utils.origami_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.origami_lib.convert_angles_to_dt">convert_angles_to_dt() (in module pyfurnace.design.utils.origami_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.convert_angles_to_dt">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords">Coords (class in pyfurnace.design.core.coordinates_3d)</a>
 </li>
@@ -261,7 +269,7 @@
       </ul></li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.copy_strands_preserve_blocks">copy_strands_preserve_blocks() (pyfurnace.design.core.motif.Motif static method)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.create_aptamer">create_aptamer() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.create_aptamer">create_aptamer() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.create_aptamer">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -305,11 +313,11 @@
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.symbols.dot_bracket_to_tree">dot_bracket_to_tree() (in module pyfurnace.design.core.symbols)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail">Dovetail (class in pyfurnace.design.motifs.dovetail)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.dovetail.Dovetail">Dovetail (class in pyfurnace.design.motifs.dovetail)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#id35">DOWN (pyfurnace.design.core.position.Direction attribute)</a>, <a href="pyfurnace.design.core.html#pyfurnace.design.core.position.Direction.DOWN">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.down_cross">down_cross (pyfurnace.design.motifs.dovetail.Dovetail property)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.dovetail.Dovetail.down_cross">down_cross (pyfurnace.design.motifs.dovetail.Dovetail property)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.down_cross">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.draw">draw() (pyfurnace.design.core.strand.Strand method)</a>
 </li>
@@ -397,7 +405,7 @@
         <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.gc_content">(pyfurnace.design.core.sequence.Sequence method)</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.generate.html#pyfurnace.generate.road.generate_road">generate_road() (in module pyfurnace.generate.road)</a>
+      <li><a href="api.html#pyfurnace.generate.road.generate_road">generate_road() (in module pyfurnace.generate.road)</a>, <a href="pyfurnace.generate.html#pyfurnace.generate.road.generate_road">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.basepair.BasePair.get">get() (pyfurnace.design.core.basepair.BasePair method)</a>
 </li>
@@ -473,13 +481,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.invert">invert() (pyfurnace.design.core.strand.Strand method)</a>
 </li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_3D">ipython_display_3D() (in module pyfurnace.design.utils.origami_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.origami_lib.ipython_display_3D">ipython_display_3D() (in module pyfurnace.design.utils.origami_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_3D">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_txt">ipython_display_txt() (in module pyfurnace.design.utils.origami_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.origami_lib.ipython_display_txt">ipython_display_txt() (in module pyfurnace.design.utils.origami_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_txt">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.is_empty">is_empty() (pyfurnace.design.core.coordinates_3d.Coords method)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Ispinach">Ispinach() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Ispinach">Ispinach() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Ispinach">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock.items">items (pyfurnace.design.core.strand.StrandsBlock attribute)</a>
 </li>
@@ -533,7 +541,7 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.L7Ae">L7Ae() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.L7Ae">L7Ae() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.L7Ae">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.symbols.Node.label">label (pyfurnace.design.core.symbols.Node attribute)</a>
 </li>
@@ -541,7 +549,7 @@
 </li>
       <li><a href="pyfurnace.design.core.html#id36">LEFT (pyfurnace.design.core.position.Direction attribute)</a>, <a href="pyfurnace.design.core.html#pyfurnace.design.core.position.Direction.LEFT">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.length">length (pyfurnace.design.motifs.stem.Stem property)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.length">length (pyfurnace.design.motifs.stem.Stem property)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.length">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -555,7 +563,7 @@
         <li><a href="pyfurnace.design.core.html#id10">(pyfurnace.design.core.motif.Motif property)</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.Loop">Loop (class in pyfurnace.design.motifs.loops)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.loops.Loop">Loop (class in pyfurnace.design.motifs.loops)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.Loop">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -563,11 +571,11 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreen">MalachiteGreen() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.MalachiteGreen">MalachiteGreen() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreen">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreenShort">MalachiteGreenShort() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.MalachiteGreenShort">MalachiteGreenShort() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreenShort">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Mango">Mango() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Mango">Mango() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Mango">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.max_pos">max_pos (pyfurnace.design.core.motif.Motif attribute)</a>
 
@@ -625,29 +633,29 @@
 </li>
         <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs">pyfurnace.design.motifs</a>
 </li>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.aptamers">pyfurnace.design.motifs.aptamers</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.aptamers">pyfurnace.design.motifs.aptamers</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.aptamers">[1]</a>
 </li>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.dovetail">pyfurnace.design.motifs.dovetail</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.dovetail">pyfurnace.design.motifs.dovetail</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.dovetail">[1]</a>
 </li>
         <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.kissing_loops">pyfurnace.design.motifs.kissing_loops</a>
 </li>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.loops">pyfurnace.design.motifs.loops</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.loops">pyfurnace.design.motifs.loops</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.loops">[1]</a>
 </li>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.stem">pyfurnace.design.motifs.stem</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.stem">pyfurnace.design.motifs.stem</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.stem">[1]</a>
 </li>
         <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.structural">pyfurnace.design.motifs.structural</a>
 </li>
         <li><a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils">pyfurnace.design.utils</a>
 </li>
-        <li><a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.motif_lib">pyfurnace.design.utils.motif_lib</a>
+        <li><a href="api.html#module-pyfurnace.design.utils.motif_lib">pyfurnace.design.utils.motif_lib</a>, <a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.motif_lib">[1]</a>
 </li>
-        <li><a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.origami_lib">pyfurnace.design.utils.origami_lib</a>
+        <li><a href="api.html#module-pyfurnace.design.utils.origami_lib">pyfurnace.design.utils.origami_lib</a>, <a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.origami_lib">[1]</a>
 </li>
         <li><a href="pyfurnace.generate.html#module-pyfurnace.generate">pyfurnace.generate</a>
 </li>
         <li><a href="pyfurnace.generate.html#module-pyfurnace.generate.pk_utils">pyfurnace.generate.pk_utils</a>
 </li>
-        <li><a href="pyfurnace.generate.html#module-pyfurnace.generate.road">pyfurnace.generate.road</a>
+        <li><a href="api.html#module-pyfurnace.generate.road">pyfurnace.generate.road</a>, <a href="pyfurnace.generate.html#module-pyfurnace.generate.road">[1]</a>
 </li>
         <li><a href="pyfurnace.generate.html#module-pyfurnace.generate.utils">pyfurnace.generate.utils</a>
 </li>
@@ -666,7 +674,7 @@
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.symbols.MotifStructureError">MotifStructureError</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MS2">MS2() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.MS2">MS2() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MS2">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.symbols.mutate_nucleotide">mutate_nucleotide() (in module pyfurnace.design.core.symbols)</a>
 </li>
@@ -752,15 +760,15 @@
 </li>
       <li><a href="pyfurnace.generate.html#pyfurnace.generate.pk_utils.parse_pseudoknots">parse_pseudoknots() (in module pyfurnace.generate.pk_utils)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Pepper">Pepper() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Pepper">Pepper() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Pepper">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3">PIP3() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.PIP3">PIP3() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut1">PIP3_mut1() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.PIP3_mut1">PIP3_mut1() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut1">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut3">PIP3_mut3() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.PIP3_mut3">PIP3_mut3() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut3">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut5">PIP3_mut5() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.PIP3_mut5">PIP3_mut5() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut5">[1]</a>
 </li>
       <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.pk_index">pk_index (pyfurnace.design.motifs.kissing_loops.KissingLoop property)</a>
 </li>
@@ -796,7 +804,7 @@
         <li><a href="pyfurnace.design.core.html#id50">(pyfurnace.design.core.strand.Strand property)</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PP7">PP7() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.PP7">PP7() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PP7">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.prec_pos">prec_pos (pyfurnace.design.core.strand.Strand attribute)</a>
 
@@ -915,14 +923,14 @@
     pyfurnace.design.motifs.aptamers
 
       <ul>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.aptamers">module</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.aptamers">module</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.aptamers">[1]</a>
 </li>
       </ul></li>
       <li>
     pyfurnace.design.motifs.dovetail
 
       <ul>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.dovetail">module</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.dovetail">module</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.dovetail">[1]</a>
 </li>
       </ul></li>
       <li>
@@ -936,14 +944,14 @@
     pyfurnace.design.motifs.loops
 
       <ul>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.loops">module</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.loops">module</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.loops">[1]</a>
 </li>
       </ul></li>
       <li>
     pyfurnace.design.motifs.stem
 
       <ul>
-        <li><a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.stem">module</a>
+        <li><a href="api.html#module-pyfurnace.design.motifs.stem">module</a>, <a href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.stem">[1]</a>
 </li>
       </ul></li>
       <li>
@@ -964,14 +972,14 @@
     pyfurnace.design.utils.motif_lib
 
       <ul>
-        <li><a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.motif_lib">module</a>
+        <li><a href="api.html#module-pyfurnace.design.utils.motif_lib">module</a>, <a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.motif_lib">[1]</a>
 </li>
       </ul></li>
       <li>
     pyfurnace.design.utils.origami_lib
 
       <ul>
-        <li><a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.origami_lib">module</a>
+        <li><a href="api.html#module-pyfurnace.design.utils.origami_lib">module</a>, <a href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.origami_lib">[1]</a>
 </li>
       </ul></li>
       <li>
@@ -992,7 +1000,7 @@
     pyfurnace.generate.road
 
       <ul>
-        <li><a href="pyfurnace.generate.html#module-pyfurnace.generate.road">module</a>
+        <li><a href="api.html#module-pyfurnace.generate.road">module</a>, <a href="pyfurnace.generate.html#module-pyfurnace.generate.road">[1]</a>
 </li>
       </ul></li>
       <li>
@@ -1029,7 +1037,7 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.R9D_14T">R9D_14T() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.R9D_14T">R9D_14T() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.R9D_14T">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.callback.Callback.register_callback">register_callback() (pyfurnace.design.core.callback.Callback method)</a>
 </li>
@@ -1155,10 +1163,10 @@
         <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_bot_sequence">(pyfurnace.design.motifs.kissing_loops.KissingDimer120 method)</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_bottom_sequence">set_bottom_sequence() (pyfurnace.design.motifs.dovetail.Dovetail method)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.dovetail.Dovetail.set_bottom_sequence">set_bottom_sequence() (pyfurnace.design.motifs.dovetail.Dovetail method)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_bottom_sequence">[1]</a>
 
       <ul>
-        <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.set_bottom_sequence">(pyfurnace.design.motifs.stem.Stem method)</a>
+        <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.set_bottom_sequence">(pyfurnace.design.motifs.stem.Stem method)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.set_bottom_sequence">[1]</a>
 </li>
       </ul></li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.position.Position.set_dimension">set_dimension() (pyfurnace.design.core.position.Position class method)</a>
@@ -1168,12 +1176,12 @@
       <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.set_sequence">set_sequence() (pyfurnace.design.motifs.kissing_loops.KissingLoop method)</a>
 
       <ul>
-        <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.TetraLoop.set_sequence">(pyfurnace.design.motifs.loops.TetraLoop method)</a>
+        <li><a href="api.html#pyfurnace.design.motifs.loops.TetraLoop.set_sequence">(pyfurnace.design.motifs.loops.TetraLoop method)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.TetraLoop.set_sequence">[1]</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.set_strong_bases">set_strong_bases() (pyfurnace.design.motifs.stem.Stem method)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.set_strong_bases">set_strong_bases() (pyfurnace.design.motifs.stem.Stem method)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.set_strong_bases">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_top_sequence">set_top_sequence() (pyfurnace.design.motifs.dovetail.Dovetail method)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.dovetail.Dovetail.set_top_sequence">set_top_sequence() (pyfurnace.design.motifs.dovetail.Dovetail method)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_top_sequence">[1]</a>
 
       <ul>
         <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_top_sequence">(pyfurnace.design.motifs.kissing_loops.BranchedDimer method)</a>
@@ -1182,7 +1190,7 @@
 </li>
         <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_top_sequence">(pyfurnace.design.motifs.kissing_loops.KissingDimer120 method)</a>
 </li>
-        <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.set_top_sequence">(pyfurnace.design.motifs.stem.Stem method)</a>
+        <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.set_top_sequence">(pyfurnace.design.motifs.stem.Stem method)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.set_top_sequence">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1201,7 +1209,7 @@
         <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.shift">(pyfurnace.design.core.strand.Strand method)</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.simple_origami">simple_origami() (in module pyfurnace.design.utils.origami_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.origami_lib.simple_origami">simple_origami() (in module pyfurnace.design.utils.origami_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.simple_origami">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.size">size (pyfurnace.design.core.coordinates_3d.Coords attribute)</a>
 
@@ -1225,11 +1233,11 @@
         <li><a href="pyfurnace.design.core.html#id56">(pyfurnace.design.core.strand.Strand property)</a>
 </li>
       </ul></li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.start_end_stem">start_end_stem() (in module pyfurnace.design.utils.motif_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.motif_lib.start_end_stem">start_end_stem() (in module pyfurnace.design.utils.motif_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.start_end_stem">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem">Stem (class in pyfurnace.design.motifs.stem)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.stem.Stem">Stem (class in pyfurnace.design.motifs.stem)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.stem_cap_link">stem_cap_link() (in module pyfurnace.design.utils.motif_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.motif_lib.stem_cap_link">stem_cap_link() (in module pyfurnace.design.utils.motif_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.stem_cap_link">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand">Strand (class in pyfurnace.design.core.strand)</a>
 </li>
@@ -1257,7 +1265,7 @@
       </ul></li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock">StrandsBlock (class in pyfurnace.design.core.strand)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Streptavidin">Streptavidin() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Streptavidin">Streptavidin() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Streptavidin">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.strip">strip() (pyfurnace.design.core.motif.Motif method)</a>
 </li>
@@ -1281,15 +1289,15 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.TAR_TAT">TAR_TAT() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.TAR_TAT">TAR_TAT() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.TAR_TAT">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.TetraLoop">TetraLoop (class in pyfurnace.design.motifs.loops)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.loops.TetraLoop">TetraLoop (class in pyfurnace.design.motifs.loops)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.TetraLoop">[1]</a>
 </li>
       <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.structural.ThreeWayJunction">ThreeWayJunction() (in module pyfurnace.design.motifs.structural)</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite1">Thrombin_exosite1() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite1">Thrombin_exosite1() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite1">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite2">Thrombin_exosite2() (in module pyfurnace.design.motifs.aptamers)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite2">Thrombin_exosite2() (in module pyfurnace.design.motifs.aptamers)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite2">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami.to_road">to_road() (pyfurnace.design.core.origami.Origami method)</a>
 </li>
@@ -1321,7 +1329,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyfurnace.design.core.html#id38">UP (pyfurnace.design.core.position.Direction attribute)</a>, <a href="pyfurnace.design.core.html#pyfurnace.design.core.position.Direction.UP">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.up_cross">up_cross (pyfurnace.design.motifs.dovetail.Dovetail property)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.dovetail.Dovetail.up_cross">up_cross (pyfurnace.design.motifs.dovetail.Dovetail property)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.up_cross">[1]</a>
 </li>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.basepair.BasePair.update">update() (pyfurnace.design.core.basepair.BasePair method)</a>
 
@@ -1333,7 +1341,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.upper">upper() (pyfurnace.design.core.sequence.Sequence method)</a>
 </li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.Utils">Utils (class in pyfurnace.design.utils.motif_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.motif_lib.Utils">Utils (class in pyfurnace.design.utils.motif_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.Utils">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1345,9 +1353,9 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.vertical_double_link">vertical_double_link() (in module pyfurnace.design.utils.motif_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.motif_lib.vertical_double_link">vertical_double_link() (in module pyfurnace.design.utils.motif_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.vertical_double_link">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.vertical_link">vertical_link() (in module pyfurnace.design.utils.motif_lib)</a>
+      <li><a href="api.html#pyfurnace.design.utils.motif_lib.vertical_link">vertical_link() (in module pyfurnace.design.utils.motif_lib)</a>, <a href="pyfurnace.design.utils.html#pyfurnace.design.utils.motif_lib.vertical_link">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1355,13 +1363,13 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.wobble_insert">wobble_insert (pyfurnace.design.motifs.stem.Stem property)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.wobble_insert">wobble_insert (pyfurnace.design.motifs.stem.Stem property)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.wobble_insert">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.wobble_interval">wobble_interval (pyfurnace.design.motifs.stem.Stem property)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.wobble_interval">wobble_interval (pyfurnace.design.motifs.stem.Stem property)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.wobble_interval">[1]</a>
 </li>
-      <li><a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.wobble_tolerance">wobble_tolerance (pyfurnace.design.motifs.stem.Stem property)</a>
+      <li><a href="api.html#pyfurnace.design.motifs.stem.Stem.wobble_tolerance">wobble_tolerance (pyfurnace.design.motifs.stem.Stem property)</a>, <a href="pyfurnace.design.motifs.html#pyfurnace.design.motifs.stem.Stem.wobble_tolerance">[1]</a>
 </li>
   </ul></td>
 </tr></table>

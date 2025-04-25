@@ -9,6 +9,7 @@
   <title>pyFuRNAce Documentation &mdash; pyFuRNAce 0.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -16,11 +17,13 @@
       <script src="_static/documentation_options.js?v=47de8214"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pyfurnace.design.core package" href="pyfurnace.design.core.html" /> 
+    <link rel="next" title="Home" href="home.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,10 +47,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#web-application">Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 </ul>
 
@@ -77,196 +85,35 @@
              
   <section id="pyfurnace-documentation">
 <h1>pyFuRNAce Documentation<a class="headerlink" href="#pyfurnace-documentation" title="Link to this heading"></a></h1>
-<p><img alt="Alt Text" src="https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/logo_text.png?raw=true" /></p>
-<p><strong>pyFuRNAce</strong> is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.</p>
-<!-- **Documentation & Source:** _Coming Soon_\ -->
-<p><strong>WebApp:</strong> <a class="reference external" href="http://pyfurnace.de">pyfurnace.de</a><br />
-<strong>GitHub:</strong> <a class="reference external" href="https://github.com/Biophysical-Engineering-Group/pyFuRNAce">Biophysical-Engineering-Group/pyFuRNAce</a><br />
-<strong>PyPI:</strong> <a class="reference external" href="https://pypi.org/project/pyfurnace/">pyfurnace</a><br />
-<strong>Script API examples:</strong> <a class="reference external" href="https://github.com/Biophysical-Engineering-Group/pyFuRNAce/tree/main/examples">Code Examples</a></p>
-<p><img alt="Alt Text" src="https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/walkthrough_1min.gif?raw=true" /></p>
-<hr class="docutils" />
-<section id="features">
-<h2>🚀 Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>🧩 <strong>Motif-based assembly:</strong> Build RNA structures using a rich, expandable library of motifs including stems, dovetails, kissing loops, aptamers, and ribozymes.</p></li>
-<li><p>🎨 <strong>GUI &amp; Real-time 3D Visualization:</strong> Interactive blueprint editor and real-time 3D rendering via Streamlit and oxView.</p></li>
-<li><p>🔄 <strong>Integrated Workflow:</strong> Design, generate, convert, and prepare your RNA origami in one unified interface.</p></li>
-<li><p>🧬 <strong>Sequence Generation &amp; Optimization:</strong> Built-in support for sequence folding (Revolvr + ViennaRNA).</p></li>
-<li><p>🧪 <strong>Primer &amp; Template Design:</strong> Includes tools for DNA conversion, promoter addition, and primer calculations.</p></li>
-<li><p>💻 <strong>Python Scripting API:</strong> Automate complex designs or build at scale using a programmable interface.</p></li>
-</ul>
-<hr class="docutils" />
-</section>
-<section id="installation">
-<h2>📦 Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<section id="pyfurnace">
-<h3>Pyfurnace<a class="headerlink" href="#pyfurnace" title="Link to this heading"></a></h3>
-<p>Note: pyFuRNAce requires Python 3.10 or later, and the local installation always includes the GUI via Streamlit.</p>
-<section id="install-from-pypi">
-<h4>Install from PyPI<a class="headerlink" href="#install-from-pypi" title="Link to this heading"></a></h4>
-<p>Install the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyfurnace
-</pre></div>
+<div class="toctree-wrapper compound">
 </div>
 </section>
-<section id="install-from-github">
-<h4>Install from GitHub<a class="headerlink" href="#install-from-github" title="Link to this heading"></a></h4>
-<p>Install the latest development version of pyFuRNAce (and OAT) directly from the GitHub repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git&quot;</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="extra-dependencies">
-<h3>Extra Dependencies<a class="headerlink" href="#extra-dependencies" title="Link to this heading"></a></h3>
-<p><strong>Note</strong>: The <strong>pyFuRNAce installation does not include the oxDNA analysis tools (OAT)</strong>.</p>
-<p>The OAT package is used to convert 3D structures from/to PDB files and write oxDNA force files.
-To install the OAT package, you can use the following command (the <strong>git</strong> command is required, you can install it via anaconda with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">git</span></code>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis&quot;</span>
-</pre></div>
-</div>
-<p>To run sequence generation, a <code class="docutils literal notranslate"><span class="pre">Perl</span></code> interpreter is required by the Revolvr script from ROAD. It is usually installed by default on most systems. If not, you can install it via Anaconda with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">bioconda-legacy::perl</span></code>.</p>
-</section>
-</section>
-<section id="running-the-web-application">
-<h2>🖥️ Running the Web Application<a class="headerlink" href="#running-the-web-application" title="Link to this heading"></a></h2>
-<p>To run the web application locally, clone the repository and install the required dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pyfurnace
-</pre></div>
-</div>
-<p>This will lunch the GUI in your default web browser.
-You can also use the hosted version at <a class="reference external" href="http://pyfurnace.de">pyfurnace.de</a>.
-The WebApp is built using Streamlit and can be run locally or on a server. You can access the webapp directly at
-<a class="reference external" href="https://pyfurnace.streamlit.app">pyfurnace.streamlit.app</a>.</p>
-<p><a class="reference external" href="https://pyfurnace.streamlit.app/"><img alt="Streamlit App" src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" /></a></p>
-</section>
-<section id="modules">
-<h2>🎛 Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h2>
-<ol class="arabic simple">
-<li><p>Design: Create and edit RNA structure blueprints. Visualize assembled structures in 3D.
-Define custom motifs via GUI or scripting.</p></li>
-<li><p>Generate: use inverse folding (Revolvr) to produce RNA sequences matching the target structure. Evaluate folding energies and structural ensemble diversity.</p></li>
-<li><p>Convert: Translate RNA sequences to DNA templates. Add transcriptional promoters (e.g., T7). Analyze sequence properties (e.g., GC content, dimers).</p></li>
-<li><p>Prepare: Design PCR primers with melting temperature calculations. Generate input files for molecular dynamics simulations with oxRNA.</p></li>
-</ol>
-</section>
-<section id="using-the-python-api">
-<h2>🧑‍💻 Using the Python API<a class="headerlink" href="#using-the-python-api" title="Link to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
-
-<span class="n">line1</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-        <span class="p">]</span>
-
-<span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-        <span class="p">]</span>
-
-<span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
-</pre></div>
-</div>
-<section id="output">
-<h3>-&gt; Output:<a class="headerlink" href="#output" title="Link to this heading"></a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                        ╭───────╮
-╭CGNNNKNNN──SS──NKNNNNAA┼─NNNNNN╯╭─ANNKNNN──SS──NNNKNNNUU╮
-│  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
-╰UUNNNKNNN──SS╮╭NKNNNNA─╯╭NNNNNN─┼AANNKNNN──SS╮╭NNNKNNNGC╯
-              ││         ╰───────╯            ││
-          ╭───╯│                         ╭────╯│
-          │╭───╯                         │╭────╯
-          ↓↓                             ↓↓
-╭CGNKNKNNN╯╰SS──NKNNNKNNNN─3 5─NNNKNNNKNN╯╰SS──NKNNKNNUU╮
-│  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
-╰UUNKNKNNN──SS──NKNNNKNNNN─────NNNKNNNKNN──SS──NKNNKNNGC╯
-((((((((((((((((((..[[[[[[.))))))))(((((((....)))))))(((((((((....)))))))))))))))))))(((((((((((((((((((....)))))))(((((((((....)))))))))((((((..]]]]]].))))))))))))))))))
-NNNKNNNKNNSSNNNKNNAANNNNNNANNKNNNSSNNNKNNNUUCGNNNKNNNSSNKNNKNNUUCGNNKNNKNSSNNKNNNKNNNNNNNKNNNKNSSNNNKNKNUUCGNKNKNNNSSNNNKNNNUUCGNNNKNNNSSNKNNNNAANNNNNNANNNNKNSSNKNNNKNNNN
-</pre></div>
-</div>
-</section>
-<section id="examples">
-<h3>📚 Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h3>
-<p>Explore tutorials and example notebooks in the examples directory.</p>
-</section>
-</section>
-<section id="license">
-<h2>📜 License<a class="headerlink" href="#license" title="Link to this heading"></a></h2>
-<p>Code is licensed under the GNU General Public License v3.0 (<a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL-3.0</a>)</p>
-<p><a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="License: GPL-3.0" src="https://img.shields.io/badge/License-GPL%20v3-lightgrey.svg" /></a></p>
-</section>
-<section id="citation">
-<h2>🧠 Citation<a class="headerlink" href="#citation" title="Link to this heading"></a></h2>
-<p>If you use pyFuRNAce in your research, please cite:
-Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami. (2025) <a class="reference external" href="https://doi.org/10.1101/2025.04.17.647389">doi:10.1101/2025.04.17.647389</a>.</p>
-</section>
-<section id="acknowledgements">
-<h2>🙏 Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading"></a></h2>
-<p>Supported by the ERC Starting Grant “ENSYNC”, DFG, HFSP, and Max Planck Society. Developed by Luca Monari, Ina Braun, Erik Poppleton, and Kerstin Göpfrich.</p>
-</section>
+<section id="welcome-to-pyfurnace-s-documentation">
+<h1>Welcome to pyFuRNAce’s documentation!<a class="headerlink" href="#welcome-to-pyfurnace-s-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.core.html">pyfurnace.design.core package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.basepair">pyfurnace.design.core.basepair module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.callback">pyfurnace.design.core.callback module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.coordinates_3d">pyfurnace.design.core.coordinates_3d module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.motif">pyfurnace.design.core.motif module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.origami">pyfurnace.design.core.origami module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.position">pyfurnace.design.core.position module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.sequence">pyfurnace.design.core.sequence module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.strand">pyfurnace.design.core.strand module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.core.html#module-pyfurnace.design.core.symbols">pyfurnace.design.core.symbols module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#web-application">Web Application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="home.html#modules">Modules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.aptamers">pyfurnace.design.motifs.aptamers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.dovetail">pyfurnace.design.motifs.dovetail module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.kissing_loops">pyfurnace.design.motifs.kissing_loops module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.loops">pyfurnace.design.motifs.loops module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.stem">pyfurnace.design.motifs.stem module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.motifs.html#module-pyfurnace.design.motifs.structural">pyfurnace.design.motifs.structural module</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.utils.html">pyfurnace.design.utils package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.motif_lib">pyfurnace.design.utils.motif_lib module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.design.utils.html#module-pyfurnace.design.utils.origami_lib">pyfurnace.design.utils.origami_lib module</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.generate.html">pyfurnace.generate package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.generate.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.generate.html#module-pyfurnace.generate.pk_utils">pyfurnace.generate.pk_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.generate.html#module-pyfurnace.generate.road">pyfurnace.generate.road module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.generate.html#module-pyfurnace.generate.utils">pyfurnace.generate.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyfurnace.generate.html#module-pyfurnace.generate.viennarna">pyfurnace.generate.viennarna module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#design-core-objects">Design Core Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#motifs">Motifs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-pyfurnace.generate.road">Sequence Generation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#basic-usage">Basic usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#basic-notebooks-road-origami">Basic Notebooks: ROAD origami</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#advanced-rna-filament">Advanced: RNA filament</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#advanced-full-folding-barrier-optimization">Advanced: full folding barrier optimization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#advanced-notebooks">Advanced Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#basics-usage">Basics usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#advanced">Advanced</a></li>
 </ul>
 </li>
 </ul>
@@ -277,7 +124,7 @@ Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrate
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyfurnace.design.core.html" class="btn btn-neutral float-right" title="pyfurnace.design.core package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="home.html" class="btn btn-neutral float-right" title="Home" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

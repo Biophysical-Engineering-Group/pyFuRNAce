@@ -9,6 +9,7 @@
   <title>Examples &mdash; pyFuRNAce 0.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -16,12 +17,14 @@
       <script src="_static/documentation_options.js?v=47de8214"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="A collection of origami desinged by ROAD" href="notebooks/ROAD_origami.html" />
-    <link rel="prev" title="pyfurnace.generate package" href="pyfurnace.generate.html" /> 
+    <link rel="prev" title="Script API Reference" href="api.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,20 +48,31 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#features">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#web-application">Web Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#basic-notebooks-road-origami">Basic Notebooks: ROAD origami</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="notebooks/ROAD_origami.html">A collection of origami desinged by ROAD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basics-usage">Basics usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#two-helices-with-flaps">Two helices with FLAPs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#road-origami">ROAD origami</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/ROAD_origami.html">A collection of origami desinged by ROAD</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#advanced-rna-filament">Advanced: RNA filament</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#advanced-full-folding-barrier-optimization">Advanced: full folding barrier optimization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#advanced-notebooks">Advanced Notebooks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="notebooks/rna_filament.html">RNA FILAMENTS ASSEMBLY TUTORIAL</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced">Advanced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rna-filament">RNA filament</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-folding-barrier-optimization">Full folding barrier optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filament-notebook">Filament notebook</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/rna_filament.html">RNA filaments assembly tutorial</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -92,8 +106,10 @@
   <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
 <p>This page shows practical usage examples of <strong>pyFuRNAce</strong> scripting interfaces.</p>
-<section id="basic-usage">
-<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
+<section id="basics-usage">
+<h2>Basics usage<a class="headerlink" href="#basics-usage" title="Link to this heading"></a></h2>
+<section id="two-helices-with-flaps">
+<h3>Two helices with FLAPs<a class="headerlink" href="#two-helices-with-flaps" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">pyfurnace.generate</span> <span class="kn">import</span> <span class="n">generate_road</span>
 <span class="linenos"> 3</span>
@@ -104,44 +120,46 @@
 <span class="linenos"> 8</span>         <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
 <span class="linenos"> 9</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
 <span class="linenos">10</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos">11</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-<span class="linenos">12</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-<span class="linenos">13</span>         <span class="p">]</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span><span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
-<span class="linenos">16</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-<span class="linenos">17</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos">18</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
-<span class="linenos">19</span>         <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+<span class="linenos">11</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+<span class="linenos">12</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Broccoli</span><span class="p">(),</span>
+<span class="linenos">13</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+<span class="linenos">14</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+<span class="linenos">15</span>         <span class="p">]</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+<span class="linenos">18</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos">19</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
 <span class="linenos">20</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
-<span class="linenos">21</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos">22</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-<span class="linenos">23</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-<span class="linenos">24</span>         <span class="p">]</span>
-<span class="linenos">25</span>
-<span class="linenos">26</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="linenos">21</span>         <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+<span class="linenos">22</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="linenos">23</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">24</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos">25</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+<span class="linenos">26</span>         <span class="p">]</span>
 <span class="linenos">27</span>
-<span class="linenos">28</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
-<span class="linenos">29</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
-<span class="linenos">30</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
-<span class="linenos">31</span>
-<span class="linenos">32</span><span class="c1">### Optimization</span>
-<span class="linenos">33</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">sequence</span>
-<span class="linenos">34</span><span class="n">constraints</span> <span class="o">=</span> <span class="s1">&#39;GGGA&#39;</span> <span class="o">+</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
-<span class="linenos">35</span>
-<span class="linenos">36</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">generate_road</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
-<span class="linenos">37</span>                         <span class="n">sequence</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
-<span class="linenos">38</span>                         <span class="n">pseudoknots</span><span class="o">=</span><span class="n">origami</span><span class="o">.</span><span class="n">pseudoknots</span><span class="p">)</span>
-<span class="linenos">39</span>
-<span class="linenos">40</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
-<span class="linenos">41</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
-<span class="linenos">42</span><span class="n">origami</span><span class="o">.</span><span class="n">save_3d_model</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
-<span class="linenos">43</span><span class="n">origami</span><span class="o">.</span><span class="n">save_fasta</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
+<span class="linenos">28</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="linenos">31</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
+<span class="linenos">32</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span><span class="c1">### Optimization</span>
+<span class="linenos">35</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">sequence</span>
+<span class="linenos">36</span><span class="n">constraints</span> <span class="o">=</span> <span class="s1">&#39;GGGA&#39;</span> <span class="o">+</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">generate_road</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+<span class="linenos">39</span>                         <span class="n">sequence</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+<span class="linenos">40</span>                         <span class="n">pseudoknots</span><span class="o">=</span><span class="n">origami</span><span class="o">.</span><span class="n">pseudoknots</span><span class="p">)</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+<span class="linenos">43</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="linenos">44</span><span class="n">origami</span><span class="o">.</span><span class="n">save_3d_model</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
+<span class="linenos">45</span><span class="n">origami</span><span class="o">.</span><span class="n">save_fasta</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="basic-notebooks-road-origami">
-<h2>Basic Notebooks: ROAD origami<a class="headerlink" href="#basic-notebooks-road-origami" title="Link to this heading"></a></h2>
+<section id="road-origami">
+<h3>ROAD origami<a class="headerlink" href="#road-origami" title="Link to this heading"></a></h3>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -154,8 +172,11 @@
 </ul>
 </div>
 </section>
-<section id="advanced-rna-filament">
-<h2>Advanced: RNA filament<a class="headerlink" href="#advanced-rna-filament" title="Link to this heading"></a></h2>
+</section>
+<section id="advanced">
+<h2>Advanced<a class="headerlink" href="#advanced" title="Link to this heading"></a></h2>
+<section id="rna-filament">
+<h3>RNA filament<a class="headerlink" href="#rna-filament" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="c1"># MAKE A SIMPLE TILE AND CLEANUP</span>
@@ -231,8 +252,8 @@
 </pre></div>
 </div>
 </section>
-<section id="advanced-full-folding-barrier-optimization">
-<h2>Advanced: full folding barrier optimization<a class="headerlink" href="#advanced-full-folding-barrier-optimization" title="Link to this heading"></a></h2>
+<section id="full-folding-barrier-optimization">
+<h3>Full folding barrier optimization<a class="headerlink" href="#full-folding-barrier-optimization" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
 <span class="linenos">  2</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="linenos">  3</span>
@@ -347,17 +368,17 @@
 </pre></div>
 </div>
 </section>
-<section id="advanced-notebooks">
-<h2>Advanced Notebooks<a class="headerlink" href="#advanced-notebooks" title="Link to this heading"></a></h2>
+<section id="filament-notebook">
+<h3>Filament notebook<a class="headerlink" href="#filament-notebook" title="Link to this heading"></a></h3>
 <p>The following Jupyter notebooks provide interactive examples of using <strong>pyFuRNAce</strong> for RNA design and optimization tasks.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/rna_filament.html">RNA FILAMENTS ASSEMBLY TUTORIAL</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/rna_filament.html">RNA filaments assembly tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#Create-a-basic-RNA-structure">Create a basic RNA structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#Adjust-the-ends-to-make-a-tile">Adjust the ends to make a tile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#REPEAT-THE-TILES-TO-MAKE-A-FILAMENT-CORE">REPEAT THE TILES TO MAKE A FILAMENT CORE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#REPEAT-THE-FILAMENT-CORE-TO-MAKE-A-FILAMENT">REPEAT THE FILAMENT CORE TO MAKE A FILAMENT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#Repeat-the-tiles-to-make-a-filament-section">Repeat the tiles to make a filament section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#Repeat-the-sections-to-make-a-filament">Repeat the sections to make a filament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/rna_filament.html#Generete-the-sequence-for-a-tile">Generete the sequence for a tile</a></li>
 </ul>
 </li>
@@ -365,12 +386,13 @@
 </div>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyfurnace.generate.html" class="btn btn-neutral float-left" title="pyfurnace.generate package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-left" title="Script API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="notebooks/ROAD_origami.html" class="btn btn-neutral float-right" title="A collection of origami desinged by ROAD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

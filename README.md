@@ -7,6 +7,7 @@
 **GitHub:** [Biophysical-Engineering-Group/pyFuRNAce](https://github.com/Biophysical-Engineering-Group/pyFuRNAce)\
 **PyPI:** [pyfurnace](https://pypi.org/project/pyfurnace/)\
 **Script API examples:** [Code Examples](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/tree/main/examples)
+**Documentation:** [Read the Docs](https://pyfurnace.readthedocs.io/en/latest/)
 
 ![Alt Text](https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/walkthrough_1min.gif?raw=true)
 

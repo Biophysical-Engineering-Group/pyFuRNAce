@@ -286,21 +286,19 @@ def generate_road(structure: str,
     # include it in the zip
     files_to_include.append(design_path)
 
-    success = True
     if zip_directory:
         # create a temporary zip file
         temp_zip = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
         temp_zip.close()  # Close so we can write to it
 
         # Create the zip and add selected files
-        try:
-            with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for file in files_to_include:
+        with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file in files_to_include:
+                try:
                     # Store relative to directory for cleaner archive structure
                     zipf.write(file, arcname=os.path.basename(file))
-        except Exception as e:
-            success = False
-            warnings.warn(f"Failed to create zip file: {e}")
+                except Exception as e:
+                    warnings.warn(f"Failed to add {file} to zip: {e}")
         
     if tempdir is not None:
         # Close the temporary directory
@@ -308,10 +306,6 @@ def generate_road(structure: str,
     
     # Return the path to the zip file
     if zip_directory:
-        if not success:
-            # Clean up the zip file if it was not created successfully
-            os.remove(temp_zip.name)
-            return last_seq
         return last_seq, temp_zip.name
     
     return last_seq

@@ -17,7 +17,7 @@ Welcome to pyFuRNAce's documentation!
 | **Script API examples:** `Code Examples <https://github.com/Biophysical-Engineering-Group/pyFuRNAce/tree/main/examples>`_
 | **Documentation:** `Read the Docs <https://pyfurnace.readthedocs.io/en/latest/>`_
 
-.. image:: https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/walkthrough_1min.gif?raw=true
+.. image:: https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/vid/demo_1min.mp4?raw=true
    :alt: pyFuRNAce demo
 
 .. toctree::

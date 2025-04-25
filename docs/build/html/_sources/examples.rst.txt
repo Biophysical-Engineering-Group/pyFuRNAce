@@ -7,7 +7,7 @@ Basics usage
 ------------
 
 Two helices with FLAPs
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. literalinclude:: ../../examples/basic_usage.py
    :language: python

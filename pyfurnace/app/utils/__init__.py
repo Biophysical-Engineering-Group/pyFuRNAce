@@ -47,13 +47,14 @@ def check_import_pyfurnace():
     sys.path.insert(0, str(pyfurnace_path))
     import pyfurnace
 
-def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo_lr.png")):
+def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.png")):
     # First instructions to run the app, set the layout and logo
-    # print('Loading logo')
-    # print(app_path / "static" / "logo_text.png")
-    st.set_page_config(page_title=page_title, page_icon=page_icon, layout="wide", initial_sidebar_state='collapsed',)
+    st.set_page_config(page_title=page_title, 
+                       page_icon=page_icon, 
+                       layout="wide", 
+                       initial_sidebar_state='collapsed',)
     st.logo(str(app_path / "static" / "logo_text.png"), 
-            icon_image=str(app_path / "static" / "logo_lr.png"),
+            icon_image=str(app_path / "static" / "logo.png"),
             # link='https://pyfurnace.streamlit.app',
             size='large')
     # st.html("""

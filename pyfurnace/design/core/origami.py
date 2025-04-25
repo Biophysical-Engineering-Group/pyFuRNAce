@@ -1520,7 +1520,7 @@ class Origami(Callback):
         if return_text:
             return text
         
-        with open(path + '.fasta', 'w') as f:
+        with open(str(path), 'w') as f:
             f.write(text)
 
     def save_text(self, 
@@ -1558,7 +1558,7 @@ class Origami(Callback):
         
         if return_text:
             return text
-        with open(path + '.txt', 'w') as f:
+        with open(str(path), 'w') as f:
             f.write(text)
 
     def to_road(self) -> str:

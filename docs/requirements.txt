@@ -6,4 +6,4 @@ myst-parser
 nbsphinx
 ipykernel
 nbconvert
-pandoc
+sphinx_copybutton

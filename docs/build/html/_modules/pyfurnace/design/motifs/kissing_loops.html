@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyfurnace.design.motifs.kissing_loops &mdash; pyFuRNAce 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyFuRNAce
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyFuRNAce</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyfurnace.design.motifs.kissing_loops</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyfurnace.design.motifs.kissing_loops</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">RNA</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">CONFS_PATH</span>
+<span class="kn">from</span> <span class="nn">..core.symbols</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..core.coordinates_3d</span> <span class="kn">import</span> <span class="n">Coords</span>
+<span class="kn">from</span> <span class="nn">..core.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">..core.strand</span> <span class="kn">import</span> <span class="n">Strand</span>
+<span class="kn">from</span> <span class="nn">.loops</span> <span class="kn">import</span> <span class="n">Loop</span>
+
+<span class="c1">### File Location for the kissing loop energy dictionaries</span>
+<span class="n">__location__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
+
+
+<div class="viewcode-block" id="KissingLoop">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop">[docs]</a>
+<span class="k">class</span> <span class="nc">KissingLoop</span><span class="p">(</span><span class="n">Loop</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">open_left</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">seq_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">pk_index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                 <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span>
+                 <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a KissingLoop motif representing an internal pseudoknotted </span>
+<span class="sd">        kissing interaction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        open_left : bool, optional</span>
+<span class="sd">            If True, flip the loop orientation (default is False).</span>
+<span class="sd">        sequence : str, optional</span>
+<span class="sd">            Sequence for the internal strand of the kissing loop (default is &quot;&quot;).</span>
+<span class="sd">        seq_len : int, optional</span>
+<span class="sd">            Expected sequence length for validation (default is 0).</span>
+<span class="sd">        pk_index : str or int, optional</span>
+<span class="sd">            Pseudoknot identifier used to tag the kissing interaction (default is &quot;0&quot;).</span>
+<span class="sd">        energy : float, optional</span>
+<span class="sd">            Free energy associated with the interaction (default is -9.0 kcal/mol).</span>
+<span class="sd">        energy_tolerace : float, optional</span>
+<span class="sd">            Energy tolerance for structural variants (default is 1.0 kcal/mol).</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional parameters passed to `Loop`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If sequence length mismatches or pk_index has an invalid type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pk_index</span><span class="p">(</span><span class="n">pk_index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seq_len</span> <span class="o">=</span> <span class="n">seq_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="n">energy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span> <span class="o">=</span> <span class="n">energy_tolerace</span>
+        <span class="k">if</span> <span class="s1">&#39;strands&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">strands</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;strands&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">strands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">return_strand</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">pk_index</span><span class="p">)</span>
+
+        <span class="c1"># create motif with the strands making up the external kissing loop structure</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strands</span><span class="p">,</span> <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># insert the pk_index in the strand</span>
+
+    <span class="c1">### </span>
+    <span class="c1">### Properties</span>
+    <span class="c1">###</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pk_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the pseudoknot symbol of the kissing loop &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span>
+    
+    <span class="nd">@pk_index</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">pk_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_kissing_sequence</span><span class="p">(),</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the energy tolerance of the internal kissing loop &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span>
+    
+    <span class="nd">@energy_tolerance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">energy_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_energy_tolerance</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the energy tolerance of the internal kissing loop &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_energy_tolerance</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">or</span> <span class="n">new_energy_tolerance</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The energy tolerance should be a positive number.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span> <span class="o">=</span> <span class="n">new_energy_tolerance</span>
+        <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">strand</span><span class="p">,</span> <span class="s1">&#39;pk_info&#39;</span><span class="p">):</span>
+                <span class="n">strand</span><span class="o">.</span><span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;dE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_energy_tolerance</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the energy of the internal kissing loop &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span>
+    
+    <span class="nd">@energy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_energy</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the energy of the internal kissing loop &quot;&quot;&quot;</span>
+        <span class="n">new_energy</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">new_energy</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="n">new_energy</span>
+        <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">strand</span><span class="p">,</span> <span class="s1">&#39;pk_info&#39;</span><span class="p">):</span>
+                <span class="n">strand</span><span class="o">.</span><span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_energy</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">()</span>
+
+    <span class="c1">###</span>
+    <span class="c1">### METHODS</span>
+    <span class="c1">###</span>
+
+<div class="viewcode-block" id="KissingLoop.get_kissing_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.get_kissing_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_kissing_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the kissing sequence of the kissing loop &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span></div>
+
+
+<div class="viewcode-block" id="KissingLoop.set_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.set_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the strand &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_check_pk_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pk_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pk_index</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pk_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The pk_index should be an integer or a string.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pk_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">pk_index</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pk_index</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pk_index</span>
+
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">return_strand</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="n">pk_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Strand</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a kissing loop strand with pseudoknot metadata and 3D layout.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sequence : str, optional</span>
+<span class="sd">            Nucleotide sequence to assign (default is &quot;&quot;).</span>
+<span class="sd">        return_strand : bool, optional</span>
+<span class="sd">            Whether to return the strand(s) instead of assigning them (default is False).</span>
+<span class="sd">        pk_index : str or int, optional</span>
+<span class="sd">            Pseudoknot identifier to embed in the strand metadata.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of Strand or None</span>
+<span class="sd">            The created strand(s) if `return_strand` is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pk_index</span><span class="p">(</span><span class="n">pk_index</span><span class="p">)</span>
+    
+        <span class="n">seq_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_len</span>
+
+        <span class="k">if</span> <span class="n">sequence</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+                <span class="n">sequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">directionality</span><span class="o">=</span><span class="s1">&#39;53&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">seq_len</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="n">seq_len</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The sequence length doesn&#39;t match the length required for this kissing loop, which is </span><span class="si">{</span><span class="n">seq_len</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">s</span> <span class="ow">in</span> <span class="s1">&#39;ACGU&#39;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">RNA</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">&amp;</span><span class="si">{</span><span class="n">sequence</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="s1">&#39;N&#39;</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">directionality</span><span class="o">=</span><span class="s1">&#39;53&#39;</span><span class="p">)</span>
+        
+        <span class="c1">### if the strands are already created, just update the sequence</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_strands&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span>
+        
+        <span class="c1">### create the strand</span>
+        <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;┼─</span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">╭╰</span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">seq_len</span><span class="si">}</span><span class="s2">─╯┼│╭&quot;</span><span class="p">,</span> 
+                        <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                        <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="n">directionality</span><span class="o">=</span><span class="n">sequence</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
+        <span class="n">pk_info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span><span class="p">],</span> <span class="s1">&#39;ind_fwd&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">seq_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)],</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">],</span> <span class="s1">&#39;dE&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span><span class="p">]}</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">strand</span><span class="p">,</span> <span class="s1">&#39;pk_info&#39;</span><span class="p">,</span> <span class="n">pk_info</span><span class="p">)</span>
+
+        <span class="c1">### if we don&#39;t want to replace the strands, just return the strand, otherwise replace the strands</span>
+        <span class="k">if</span> <span class="n">return_strand</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">strand</span><span class="p">]</span>
+        <span class="c1"># replace the strands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">([</span><span class="n">strand</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KissingLoop120">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop120">[docs]</a>
+<span class="k">class</span> <span class="nc">KissingLoop120</span><span class="p">(</span><span class="n">KissingLoop</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Structure from PDB: 1BJ2&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="nb">str</span><span class="o">|</span><span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;seq_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="n">open_left</span><span class="p">,</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="n">pk_index</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_tolerace</span> <span class="o">=</span> <span class="n">energy_tolerace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;KissingLoop120.dat&#39;</span><span class="p">,</span> 
+                                                <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span></div>
+
+
+<span class="c1"># https://doi.org/10.2210/pdb2D1B/pdb</span>
+<div class="viewcode-block" id="KissingLoop180">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop180">[docs]</a>
+<span class="k">class</span> <span class="nc">KissingLoop180</span><span class="p">(</span><span class="n">KissingLoop</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Structure generated from a perfect helix&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="nb">str</span><span class="o">|</span><span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;seq_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="n">open_left</span><span class="p">,</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="n">pk_index</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_tolerace</span> <span class="o">=</span> <span class="n">energy_tolerace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="KissingLoop180.get_kissing_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop180.get_kissing_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_kissing_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_kissing_sequence</span><span class="p">()[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">return_strand</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># if the strands are already created, just update the sequence</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_strands&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="s1">&#39;AA&#39;</span> <span class="o">+</span> <span class="n">sequence</span> <span class="o">+</span> <span class="s1">&#39;A&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span>
+        
+        <span class="n">strand</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">pk_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># create the strand</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;AA&#39;</span> <span class="o">+</span> <span class="n">strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s1">&#39;─A&#39;</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_fwd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span>
+        
+        <span class="c1">### COORDINATES FROM OXVIEW HELIX </span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;KissingLoop180.dat&#39;</span><span class="p">)</span>
+
+        <span class="c1"># if we don&#39;t want to replace the strands, just return the strand</span>
+        <span class="k">if</span> <span class="n">return_strand</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">strand</span><span class="p">]</span>
+        <span class="c1"># replace the strands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">([</span><span class="n">strand</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BranchedKissingLoop">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop">[docs]</a>
+<span class="k">class</span> <span class="nc">BranchedKissingLoop</span><span class="p">(</span><span class="n">KissingLoop</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="nb">str</span><span class="o">|</span><span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;seq_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="n">open_left</span><span class="p">,</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="n">pk_index</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_tolerace</span> <span class="o">=</span> <span class="n">energy_tolerace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BranchedKissingLoop.get_kissing_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop.get_kissing_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_kissing_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the kissing sequence of the kissing loop &quot;&quot;&quot;</span>
+        <span class="n">strand_ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">strand_ind</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">return_strand</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># if the strands are already created, just update the sequence</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_strands&#39;</span><span class="p">):</span>
+            <span class="n">strand_ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">[</span><span class="n">strand_ind</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span> <span class="o">+</span> <span class="s1">&#39;A&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span>
+        
+        <span class="n">strand</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">pk_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># create the strand</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;│╮&#39;</span> <span class="o">+</span> <span class="n">strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s1">&#39;─A&#39;</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_fwd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
+        <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;BranchedKissingLoop_1.dat&#39;</span><span class="p">,</span>
+                                                       <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+
+        <span class="n">connect_strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;╭│&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">connect_strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;BranchedKissingLoop_2.dat&#39;</span><span class="p">,</span>
+                                                       <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+        <span class="n">strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">strand</span><span class="p">,</span> <span class="n">connect_strand</span><span class="p">]</span>
+        <span class="c1"># if we don&#39;t want to replace the strands, just return the strand</span>
+        <span class="k">if</span> <span class="n">return_strand</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">strands</span>
+        <span class="c1"># replace the strands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KissingDimer">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer">[docs]</a>
+<span class="k">class</span> <span class="nc">KissingDimer</span><span class="p">(</span><span class="n">KissingLoop180</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="nb">str</span><span class="o">|</span><span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attributes of the class KissingDimer, which is a daugther class of the class Motif.</span>
+<span class="sd">        -----------------------------------------------------------------------------------</span>
+<span class="sd">        sequence: str</span>
+<span class="sd">            nucelotide sequnce in the internal KL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">pk_index</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_tolerace</span> <span class="o">=</span> <span class="n">energy_tolerace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1">### </span>
+    <span class="c1">### METHODS</span>
+    <span class="c1">###</span>
+
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">new_pk_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pk_index</span><span class="p">(</span><span class="n">pk_index</span><span class="p">)</span>
+        <span class="c1"># the bottom pk_index is the inverse of the top one</span>
+        <span class="k">if</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">==</span> <span class="n">new_pk_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">bottom_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bottom_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+        <span class="n">bottom_strand</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">bottom_pk_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">bottom_strand</span><span class="o">.</span><span class="n">sequence</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">rev_comp</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">()</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span> <span class="c1"># add the pk_index to override the pk_index of the bottom strand</span>
+
+        <span class="c1">### if the strands are already created, just update the sequence and return the strands</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_strands&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="s1">&#39;AA&#39;</span> <span class="o">+</span> <span class="n">rev_comp</span> <span class="o">+</span> <span class="s1">&#39;A&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span>
+        
+        <span class="c1">### shift the second strand to make space for the second one</span>
+        <span class="n">bottom_strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">bottom_strand</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="s1">&#39;AA&#39;</span> <span class="o">+</span> <span class="n">rev_comp</span> <span class="o">+</span> <span class="s1">&#39;A&#39;</span>  <span class="c1"># the second strand is the reverse complement of the first</span>
+
+        <span class="c1">### create the second</span>
+        <span class="n">top_strand</span> <span class="o">=</span> <span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                    <span class="n">sequence</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> 
+                                    <span class="n">pk_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span><span class="p">,</span> 
+                                    <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> 
+                                    <span class="n">energy_tolerace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="c1">## COORDINATES FROM OXVIEW HELIX</span>
+        <span class="n">top_strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;KissingLoop180_2.dat&#39;</span><span class="p">)</span>
+
+        <span class="n">strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">top_strand</span><span class="p">,</span> <span class="n">bottom_strand</span><span class="p">]</span>
+
+        <span class="c1">### if we don&#39;t want to replace the strands, just return the strand, otherwise replace the strands</span>
+        <span class="k">if</span> <span class="n">return_strand</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">strands</span>
+        <span class="c1"># replace the strands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="KissingDimer.set_top_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer.set_top_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_top_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KissingDimer.set_bot_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer.set_bot_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_bot_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand&quot;&quot;&quot;</span>
+        <span class="n">new_seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="KissingDimer120">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120">[docs]</a>
+<span class="k">class</span> <span class="nc">KissingDimer120</span><span class="p">(</span><span class="n">KissingLoop120</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="nb">str</span><span class="o">|</span><span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attributes of the class KissingDimer, which is a daugther class of the class Motif.</span>
+<span class="sd">        -----------------------------------------------------------------------------------</span>
+<span class="sd">        sequence: str</span>
+<span class="sd">            nucelotide sequnce in the internal KL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">pk_index</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_tolerace</span> <span class="o">=</span> <span class="n">energy_tolerace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1">### </span>
+    <span class="c1">### METHODS</span>
+    <span class="c1">###</span>
+
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">new_pk_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pk_index</span><span class="p">(</span><span class="n">pk_index</span><span class="p">)</span>
+        <span class="c1"># the bottom pk_index is the inverse of the top one</span>
+        <span class="k">if</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">==</span> <span class="n">new_pk_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">bottom_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bottom_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+        <span class="n">bottom_strand</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">bottom_pk_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">bottom_strand</span><span class="o">.</span><span class="n">sequence</span>
+        <span class="n">rev_comp</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">()</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span> <span class="c1"># add the pk_index to override the pk_index of the bottom strand</span>
+
+        <span class="c1">### if the strands are already created, just update the sequence and return the strands</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_strands&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">rev_comp</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span>
+        
+        <span class="c1">### shift the second strand to make space for the second one</span>
+        <span class="n">bottom_strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">bottom_strand</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">rev_comp</span>  <span class="c1"># the second strand is the reverse complement of the first</span>
+
+        <span class="c1">### create the second</span>
+        <span class="n">top_strand</span> <span class="o">=</span> <span class="n">KissingLoop120</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                    <span class="n">sequence</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> 
+                                    <span class="n">pk_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span><span class="p">,</span> 
+                                    <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> 
+                                    <span class="n">energy_tolerace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="c1">## COORDINATES FROM OXVIEW HELIX</span>
+        <span class="c1"># changing the bottom strand because the top strand</span>
+        <span class="c1"># coordinates are set at the end of KL120</span>
+        <span class="n">bottom_strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;KissingLoop120_2.dat&#39;</span><span class="p">,</span> 
+                                                        <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+
+        <span class="n">strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">top_strand</span><span class="p">,</span> <span class="n">bottom_strand</span><span class="p">]</span>
+
+        <span class="c1">### if we don&#39;t want to replace the strands, just return the strand, otherwise replace the strands</span>
+        <span class="k">if</span> <span class="n">return_strand</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">strands</span>
+        <span class="c1"># replace the strands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="KissingDimer120.set_top_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_top_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_top_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KissingDimer120.set_bot_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_bot_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_bot_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand&quot;&quot;&quot;</span>
+        <span class="n">new_seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BranchedDimer">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer">[docs]</a>
+<span class="k">class</span> <span class="nc">BranchedDimer</span><span class="p">(</span><span class="n">BranchedKissingLoop</span><span class="p">):</span>
+    <span class="c1"># strand 0: branched KL</span>
+    <span class="c1"># strand 1: bkl connection</span>
+    <span class="c1"># strand 2: Dimer strand</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="nb">str</span><span class="o">|</span><span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">energy_tolerace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attributes of the class KissingDimer, which is a daugther class of the class Motif.</span>
+<span class="sd">        -----------------------------------------------------------------------------------</span>
+<span class="sd">        sequence: str</span>
+<span class="sd">            nucelotide sequnce in the internal KL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">pk_index</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_tolerace</span> <span class="o">=</span> <span class="n">energy_tolerace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1">### </span>
+    <span class="c1">### METHODS</span>
+    <span class="c1">###</span>
+
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">new_pk_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pk_index</span><span class="p">(</span><span class="n">pk_index</span><span class="p">)</span>
+        <span class="c1"># the bottom pk_index is the inverse of the top one</span>
+        <span class="k">if</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">==</span> <span class="n">new_pk_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">bottom_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bottom_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="s1">&#39;N&#39;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_len</span><span class="p">,</span> <span class="n">directionality</span><span class="o">=</span><span class="s1">&#39;53&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">directionality</span><span class="o">=</span><span class="s1">&#39;53&#39;</span><span class="p">)</span>
+
+        <span class="n">rev_comp</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">()</span>
+        <span class="n">strands</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">rev_comp</span><span class="p">,</span> <span class="n">return_strand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="n">bottom_pk_index</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span> <span class="o">=</span> <span class="n">new_pk_index</span> <span class="c1"># add the pk_index to override the pk_index of the bottom strand</span>
+
+        <span class="c1">### if the strands are already created, just update the sequence and return the strands</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_strands&#39;</span><span class="p">):</span>
+            <span class="n">kl_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">[</span><span class="n">kl_index</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="s1">&#39;AA&#39;</span> <span class="o">+</span> <span class="n">sequence</span> <span class="o">+</span> <span class="s1">&#39;A&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span>
+        
+        <span class="c1">### shift the bottom branched KL</span>
+        <span class="n">strands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">strands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">strands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">strands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">strands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">strands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">### create the top strand</span>
+        <span class="n">top_strand</span> <span class="o">=</span> <span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> 
+                                    <span class="n">pk_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span><span class="p">,</span> 
+                                    <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> 
+                                    <span class="n">energy_tolerace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy_tolerance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">## COORDINATES FROM OXVIEW HELIX</span>
+        <span class="n">top_strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;BranchedKissingLoop_3.dat&#39;</span><span class="p">)</span>
+
+        <span class="n">strands</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">top_strand</span><span class="p">)</span>
+        <span class="c1">### if we don&#39;t want to replace the strands, just return the strand, otherwise replace the strands</span>
+        <span class="k">if</span> <span class="n">return_strand</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">strands</span>
+        <span class="c1"># replace the strands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BranchedDimer.set_top_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_top_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_top_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BranchedDimer.set_bot_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_bot_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_bot_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand&quot;&quot;&quot;</span>
+        <span class="n">new_seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">())</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Luca Monari.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

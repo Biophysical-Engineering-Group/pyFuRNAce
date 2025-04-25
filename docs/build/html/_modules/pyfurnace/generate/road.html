@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyfurnace.generate.road &mdash; pyFuRNAce 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyFuRNAce
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyFuRNAce</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyfurnace.generate.road</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyfurnace.generate.road</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="c1">### Local imports</span>
+<span class="kn">from</span> <span class="nn">..design.core.symbols</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">find_stems_in_multiloop</span>
+<span class="kn">from</span> <span class="nn">.pk_utils</span> <span class="kn">import</span> <span class="n">parse_pseudoknots</span>
+
+<div class="viewcode-block" id="generate_road">
+<a class="viewcode-back" href="../../../pyfurnace.generate.html#pyfurnace.generate.road.generate_road">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_road</span><span class="p">(</span><span class="n">structure</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">pseudoknots</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;origami&#39;</span><span class="p">,</span>
+                  <span class="n">initial_sequence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> 
+                                              <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7200</span><span class="p">,</span>
+                  <span class="n">directory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">zip_directory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">origami_code</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                  <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate an RNA origami design using the ROAD Revolvr algorithm.</span>
+
+<span class="sd">    This function orchestrates the structure processing, pseudoknot embedding,</span>
+<span class="sd">    and Perl-based design process for RNA origami, with optional support for </span>
+<span class="sd">    real-time updates and zipped output.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    structure : str</span>
+<span class="sd">        RNA secondary structure in dot-bracket notation.</span>
+<span class="sd">    sequence : str</span>
+<span class="sd">        Initial sequence to use for the design (must match structure length).</span>
+<span class="sd">    pseudoknots : str or dict, optional</span>
+<span class="sd">        Pseudoknot definitions in ROAD-compatible format (string or parsed dict).</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Base name for the design file (default is &#39;origami&#39;).</span>
+<span class="sd">    initial_sequence : str, optional</span>
+<span class="sd">        Optional initial sequence to pre-fill as the starting point of the </span>
+<span class="sd">        optimization.</span>
+<span class="sd">    callback : callable, optional</span>
+<span class="sd">        A function called during ROAD execution with progress updates:</span>
+<span class="sd">        `callback(structure, sequence, line, stage_name, stage_progress)`</span>
+<span class="sd">    timeout : int, optional</span>
+<span class="sd">        Timeout in seconds for the ROAD optimization </span>
+<span class="sd">        (default is 7200 seconds = 2 hours).</span>
+<span class="sd">    directory : str, optional</span>
+<span class="sd">        Directory where files should be written. If None, a temporary directory </span>
+<span class="sd">        is used.</span>
+<span class="sd">    zip_directory : bool, optional</span>
+<span class="sd">        Whether to generate a `.zip` file with all intermediate and result files.</span>
+<span class="sd">    origami_code : str, optional</span>
+<span class="sd">        Source code (e.g., Python) representing the origami design, to be saved </span>
+<span class="sd">        and zipped.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str or tuple</span>
+<span class="sd">        If `zip_directory` is False: returns the designed RNA sequence as a string.</span>
+<span class="sd">        If `zip_directory` is True: returns </span>
+<span class="sd">        the tuple `(designed_sequence, path_to_zip_file)`.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the structure and sequence lengths do not match, or if multistrand </span>
+<span class="sd">        &#39;&amp;&#39; is used.</span>
+<span class="sd">    </span>
+<span class="sd">    Warnings</span>
+<span class="sd">    --------</span>
+<span class="sd">    - If the working directory doesn&#39;t exist, it is created.</span>
+<span class="sd">    - If the final design file is missing, a warning is issued.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">road_dir</span> <span class="o">=</span> <span class="vm">__file__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;road.py&#39;</span><span class="p">,</span> <span class="s1">&#39;road_bin&#39;</span><span class="p">)</span>
+    
+    <span class="n">files_to_include</span> <span class="o">=</span> <span class="p">[]</span>
+        
+    <span class="c1"># Sanity check</span>
+    <span class="k">if</span> <span class="s1">&#39;&amp;&#39;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">or</span> <span class="s1">&#39;&amp;&#39;</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The ROAD Revolvr algorithm does not support &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;multistranded structures.&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The length of the sequence and structure must match.&quot;</span>
+                         <span class="s2">&quot; Got </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)))</span>
+    
+    <span class="c1">### Fix the short stems with &#39;{&#39; ROAD symbols</span>
+    <span class="n">struct_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
+    <span class="n">pair_map</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">find_stems_in_multiloop</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+        <span class="c1"># force pairing in dovetails that are shorter than 3</span>
+        <span class="k">if</span> <span class="n">dt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span> 
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">struct_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span>
+                <span class="n">struct_list</span><span class="p">[</span><span class="n">pair_map</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;}&#39;</span>
+
+    <span class="c1">### ADD THE PSEUDOKNOTS ROAD NOTATION</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">pseudoknots</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">pk_dict</span> <span class="o">=</span> <span class="n">pseudoknots</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pk_dict</span> <span class="o">=</span> <span class="n">parse_pseudoknots</span><span class="p">(</span><span class="n">pseudoknots</span><span class="p">)</span>
+
+    <span class="n">road_pk_notation</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span> <span class="p">:</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span> <span class="p">:</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span> <span class="p">:</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span> <span class="p">:</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span> <span class="p">:</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span> 
+                        <span class="s1">&#39;F&#39;</span> <span class="p">:</span> <span class="s1">&#39;6&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span> <span class="p">:</span> <span class="s1">&#39;7&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span> <span class="p">:</span> <span class="s1">&#39;8&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span> <span class="p">:</span> <span class="s1">&#39;9&#39;</span><span class="p">}</span>
+    <span class="n">external_pk_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">avg_pk_E</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">avg_pk_dE</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># sort the pseudoknots by their index</span>
+    <span class="n">pk_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pk_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> 
+                                       <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> 
+                                            <span class="nb">min</span><span class="p">(</span><span class="n">inds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                                <span class="k">for</span> <span class="n">inds</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;ind_fwd&#39;</span><span class="p">]</span> <span class="o">+</span> 
+                                                            <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;ind_rev&#39;</span><span class="p">]))}</span>
+    <span class="c1"># Calculate the average energy and dE of the pseudoknots</span>
+    <span class="k">for</span> <span class="n">pk_info</span> <span class="ow">in</span> <span class="n">pk_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">used</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">avg_pk_E</span> <span class="o">+=</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">]</span>
+        <span class="n">avg_pk_dE</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;dE&#39;</span><span class="p">])</span>
+        <span class="n">pk_sym</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">road_pk_notation</span><span class="p">)[</span><span class="n">external_pk_count</span><span class="p">]</span>
+
+        <span class="c1"># Find the pk with the lowest index, between fwd and rev</span>
+        <span class="n">min_fwd</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">inds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">inds</span> <span class="ow">in</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_fwd&#39;</span><span class="p">]],</span> <span class="n">default</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
+        <span class="n">min_rev</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">inds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">inds</span> <span class="ow">in</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_rev&#39;</span><span class="p">]],</span> <span class="n">default</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">min_fwd</span> <span class="o">&lt;</span> <span class="n">min_rev</span><span class="p">:</span>
+            <span class="n">first_pk</span> <span class="o">=</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_fwd&#39;</span><span class="p">]</span>
+            <span class="n">second_pk</span> <span class="o">=</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_rev&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">first_pk</span> <span class="o">=</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_rev&#39;</span><span class="p">]</span>
+            <span class="n">second_pk</span> <span class="o">=</span> <span class="n">pk_info</span><span class="p">[</span><span class="s1">&#39;ind_fwd&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="n">first_pk</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">struct_list</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;.()&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">struct_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk_sym</span>
+            <span class="n">used</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="n">second_pk</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">struct_list</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;.()&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">struct_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">road_pk_notation</span><span class="p">[</span><span class="n">pk_sym</span><span class="p">]</span>
+            <span class="n">used</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">used</span><span class="p">:</span>
+            <span class="n">external_pk_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">pk_dict</span><span class="p">:</span>
+        <span class="n">avg_pk_E</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pk_dict</span><span class="p">)</span>
+        <span class="n">avg_pk_dE</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pk_dict</span><span class="p">)</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">struct_list</span><span class="p">)</span>
+
+    <span class="c1">### COPY THE PYTHON PATH AND ADD RNAfold</span>
+    <span class="n">python_path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="c1"># Get path to the current Python interpreter</span>
+    <span class="n">python_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">python_path</span><span class="p">)</span>
+
+    <span class="c1"># Prepend it to PATH, to make sure the correct Python is used</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">env</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">python_dir</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">pathsep</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span>
+
+    <span class="c1">### CHECK THE TEMPORARY DIRECTORY</span>
+    <span class="k">if</span> <span class="n">directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory </span><span class="si">{</span><span class="n">directory</span><span class="si">}</span><span class="s2"> does not exist. Creating it.&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">tempdir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span>
+
+    <span class="c1">### WORK IN THE DIRECTORY</span>
+
+    <span class="c1"># save the origami code</span>
+    <span class="k">if</span> <span class="n">origami_code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">origami_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.py&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origami_code_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">origami_code</span><span class="p">)</span>
+        <span class="c1"># include it in the zip</span>
+        <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origami_code_path</span><span class="p">)</span>
+        
+    <span class="c1"># create the target input file</span>
+    <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;target.txt&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">structure</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">initial_sequence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> 
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">initial_sequence</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># include it in the zip</span>
+    <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
+
+    <span class="c1"># read the revolvr file</span>
+    <span class="n">revolvr_local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">road_dir</span><span class="p">,</span> <span class="s1">&#39;revolvr.pl&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">revolvr_local_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">revolvr_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        
+    <span class="c1"># replace the KL energy parameters</span>
+    <span class="n">revolvr_text</span> <span class="o">=</span> <span class="n">revolvr_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;my $MinKL = -7.2;&#39;</span><span class="p">,</span>
+                                        <span class="sa">f</span><span class="s1">&#39;my $MinKL = </span><span class="si">{</span><span class="n">avg_pk_E</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">avg_pk_dE</span><span class="si">}</span><span class="s1">;&#39;</span><span class="p">)</span>
+    <span class="n">revolvr_text</span> <span class="o">=</span> <span class="n">revolvr_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;my $MaxKL = -10.8;&#39;</span><span class="p">,</span>
+                                        <span class="sa">f</span><span class="s1">&#39;my $MaxKL = </span><span class="si">{</span><span class="n">avg_pk_E</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">avg_pk_dE</span><span class="si">}</span><span class="s1">;&#39;</span><span class="p">)</span>
+    <span class="n">revolvr_text</span> <span class="o">=</span> <span class="n">revolvr_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;my $timeout_length = 7200;&#39;</span><span class="p">,</span>
+                                        <span class="sa">f</span><span class="s1">&#39;my $timeout_length = </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span><span class="si">}</span><span class="s1">;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># create the revolvr file with specific KL parameters</span>
+    <span class="n">out_revolvr</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;revolvr.pl&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_revolvr</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">revolvr_text</span><span class="p">)</span>
+    <span class="c1"># include it in the zip</span>
+    <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_revolvr</span><span class="p">)</span>
+
+    <span class="n">vienna_out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;viennarna_funcs.py&#39;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">road_dir</span><span class="p">,</span> <span class="s1">&#39;viennarna_funcs.py&#39;</span><span class="p">),</span>
+                    <span class="n">vienna_out_path</span>
+                    <span class="p">)</span>
+    <span class="c1"># include it in the zip</span>
+    <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vienna_out_path</span><span class="p">)</span>
+    
+    <span class="n">command</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;perl &quot;</span><span class="si">{</span><span class="n">out_revolvr</span><span class="si">}</span><span class="s1">&quot; &quot;</span><span class="si">{</span><span class="n">directory</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span>
+                               <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">cwd</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span>
+                               <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+                               <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                               <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                               <span class="n">text</span><span class="o">=</span><span class="kc">True</span>  <span class="c1">#makes output strings</span>
+                               <span class="p">)</span>
+
+    <span class="c1"># Read output in real time</span>
+    <span class="n">last_seq</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> 
+    <span class="n">last_struct</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">prev_line</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">n_stage</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Designing&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;GC-Reduction &amp; GC/UA-Rich Reduction&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Mapping Kissing Loops&#39;</span><span class="p">,</span> 
+              <span class="s1">&#39;Optimization&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># update the stage</span>
+        <span class="k">if</span> <span class="n">stages</span><span class="p">[</span><span class="n">n_stage</span><span class="p">]</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">n_stage</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">stages</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">n_stage</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># update the last sequence and structure</span>
+        <span class="k">if</span> <span class="n">prev_line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">prev_line</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_none</span><span class="p">):</span>
+            <span class="n">last_seq</span> <span class="o">=</span> <span class="n">prev_line</span>
+            <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="s1">&#39;.()&#39;</span><span class="p">):</span>
+                <span class="n">last_struct</span> <span class="o">=</span> <span class="n">line</span>
+        
+        <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">last_seq</span> <span class="ow">and</span> <span class="n">last_struct</span> <span class="ow">and</span> <span class="n">callback</span><span class="p">:</span>
+            <span class="n">callback</span><span class="p">(</span><span class="n">last_struct</span><span class="p">,</span> 
+                     <span class="n">last_seq</span><span class="p">,</span> 
+                     <span class="n">line</span><span class="p">,</span> 
+                     <span class="n">stages</span><span class="p">[</span><span class="n">n_stage</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> 
+                     <span class="n">n_stage</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">stages</span><span class="p">))</span>
+
+        <span class="n">prev_line</span> <span class="o">=</span> <span class="n">line</span>
+
+    <span class="c1"># wait for process to finish</span>
+    <span class="n">process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+    <span class="c1"># spool file</span>
+    <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">_spool.txt&#39;</span><span class="p">))</span>
+    
+    <span class="c1"># read the results</span>
+    <span class="n">design_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">_design.txt&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">design_path</span><span class="p">):</span>
+        <span class="n">last_seq</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Design file </span><span class="si">{</span><span class="n">design_path</span><span class="si">}</span><span class="s2"> not found. Optimization failed. &quot;</span>
+                       <span class="s2">&quot;Please check the ROAD algorithm output.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">_design.txt&#39;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="n">last_seq</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># include it in the zip</span>
+    <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">design_path</span><span class="p">)</span>
+
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">zip_directory</span><span class="p">:</span>
+        <span class="c1"># create a temporary zip file</span>
+        <span class="n">temp_zip</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.zip&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">temp_zip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># Close so we can write to it</span>
+
+        <span class="c1"># Create the zip and add selected files</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipf</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_to_include</span><span class="p">:</span>
+                    <span class="c1"># Store relative to directory for cleaner archive structure</span>
+                    <span class="n">zipf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create zip file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">tempdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Close the temporary directory</span>
+        <span class="n">tempdir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+    
+    <span class="c1"># Return the path to the zip file</span>
+    <span class="k">if</span> <span class="n">zip_directory</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="c1"># Clean up the zip file if it was not created successfully</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">last_seq</span>
+        <span class="k">return</span> <span class="n">last_seq</span><span class="p">,</span> <span class="n">temp_zip</span><span class="o">.</span><span class="n">name</span>
+    
+    <span class="k">return</span> <span class="n">last_seq</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Luca Monari.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

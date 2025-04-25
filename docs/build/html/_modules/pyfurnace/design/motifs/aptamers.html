@@ -1,0 +1,421 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyfurnace.design.motifs.aptamers &mdash; pyFuRNAce 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyFuRNAce
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.design.core.html">pyfurnace.design.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.design.motifs.html">pyfurnace.design.motifs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.design.utils.html">pyfurnace.design.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyfurnace.generate.html">pyfurnace.generate package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyFuRNAce</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyfurnace.design.motifs.aptamers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyfurnace.design.motifs.aptamers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">CONFS_PATH</span>
+<span class="kn">from</span> <span class="nn">..core.symbols</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..core.coordinates_3d</span> <span class="kn">import</span> <span class="n">Coords</span>
+<span class="kn">from</span> <span class="nn">..core.strand</span> <span class="kn">import</span> <span class="n">Strand</span>
+<span class="kn">from</span> <span class="nn">..core.motif</span> <span class="kn">import</span> <span class="n">Motif</span>
+<span class="kn">from</span> <span class="nn">.loops</span> <span class="kn">import</span> <span class="n">Loop</span>
+
+<span class="c1"># Shared functionality for all Aptamers</span>
+<div class="viewcode-block" id="Aptamer">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Aptamer">[docs]</a>
+<span class="k">class</span> <span class="nc">Aptamer</span><span class="p">(</span><span class="n">Motif</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all aptamers, inheriting from the Motif class.</span>
+<span class="sd">    This class is used to create aptamers with specific sequences and coordinates.</span>
+<span class="sd">    At the moment, it does not add any additional functionality to the Motif class, </span>
+<span class="sd">    but it can be used to create a common interface for all aptamers or for screening</span>
+<span class="sd">    motifs in an origami.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<span class="c1"># Create the Aptamer class also inheriting from the selected base class</span>
+<div class="viewcode-block" id="create_aptamer">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.create_aptamer">[docs]</a>
+<span class="k">def</span> <span class="nf">create_aptamer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">inherit_from</span><span class="p">:</span> <span class="nb">classmethod</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create an Aptamer object, optionally inheriting from a specified base class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args : list</span>
+<span class="sd">        Positional arguments to be passed to the Aptamer constructor.</span>
+<span class="sd">    inherit_from : classmethod, optional</span>
+<span class="sd">        A class from which the Aptamer class should inherit. If not provided, </span>
+<span class="sd">        the Aptamer class will be used as is.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Keyword arguments to be passed to the Aptamer constructor.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Aptamer</span>
+<span class="sd">        An instance of the Aptamer class, optionally inheriting from the specified</span>
+<span class="sd">          inherit_from class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">aptamer</span> <span class="o">=</span> <span class="n">Aptamer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inherit_from</span><span class="p">:</span>
+        <span class="n">aptamer</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s2">&quot;Aptamer&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">Aptamer</span><span class="p">,</span> <span class="n">inherit_from</span><span class="p">),</span> <span class="p">{})(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aptamer</span> <span class="o">=</span> <span class="n">Aptamer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">aptamer</span></div>
+
+
+<span class="c1">###</span>
+<span class="c1"># FLAPS</span>
+<span class="c1">###</span>
+
+<div class="viewcode-block" id="Ispinach">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Ispinach">[docs]</a>
+<span class="k">def</span> <span class="nf">Ispinach</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 5OB3</span>
+    <span class="n">strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─CUG─UU─GA─GUAGAGUGUGGGCUC─&quot;</span><span class="p">)</span>
+    <span class="n">strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Ispinach_1.dat&quot;</span><span class="p">)</span>
+
+    <span class="n">strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GUGAGG─GU─CGG─G─UC────CAG─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand2</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Ispinach_2.dat&quot;</span><span class="p">)</span>
+
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">([</span><span class="n">strand1</span><span class="p">,</span> <span class="n">strand2</span><span class="p">],</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Mango">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Mango">[docs]</a>
+<span class="k">def</span> <span class="nf">Mango</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 5V3F</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GUGC─GAA─GG─GAC─GG─UGC╰│╭────GG─AGA─GG─AGA─GCAC─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Mango.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> 
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MalachiteGreen">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreen">[docs]</a>
+<span class="k">def</span> <span class="nf">MalachiteGreen</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 1Q8N</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GGAUCC───CG─A──CUGGCGA╰│╭GAGCCAGGUAACGAAUGGAUCC─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;MalachiteGreen.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MalachiteGreenShort">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreenShort">[docs]</a>
+<span class="k">def</span> <span class="nf">MalachiteGreenShort</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 1Q8N</span>
+    <span class="n">strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;CC───CG─A──CUG&quot;</span><span class="p">)</span>
+    <span class="n">strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;MalachiteGreenShort_1.dat&quot;</span><span class="p">)</span>
+
+    <span class="n">strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;CAGGUAACGAAUGG&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand2</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;MalachiteGreenShort_2.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="p">[</span><span class="n">strand1</span><span class="p">,</span> <span class="n">strand2</span><span class="p">],</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+            
+<div class="viewcode-block" id="Broccoli">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Broccoli">[docs]</a>
+<span class="k">def</span> <span class="nf">Broccoli</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 7ZJ5</span>
+    <span class="n">strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;GGAGAC────GGUCGGG─UC────CAG&quot;</span><span class="p">)</span>
+    <span class="n">strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Broccoli_1.dat&quot;</span><span class="p">)</span>
+
+    <span class="n">strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;CUG─UC─GA─GUAGAGUGUG─GGCUCC&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand2</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Broccoli_2.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">([</span><span class="n">strand1</span><span class="p">,</span> <span class="n">strand2</span><span class="p">],</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> </div>
+
+
+
+<div class="viewcode-block" id="Pepper">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Pepper">[docs]</a>
+<span class="k">def</span> <span class="nf">Pepper</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 7ZJ5</span>
+    <span class="n">strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;UCCC─CAAUCGU─GGCGU─GUCG─GCCUGC&quot;</span><span class="p">)</span>
+    <span class="n">strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Pepper_1.dat&quot;</span><span class="p">)</span>
+
+    <span class="n">strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;GCAGGC─ACUG─GCGCC─────────GGGA&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">29</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand2</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Pepper_2.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">([</span><span class="n">strand1</span><span class="p">,</span> <span class="n">strand2</span><span class="p">],</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> </div>
+
+      
+
+<span class="c1">###</span>
+<span class="c1"># Substrate binding aptamers</span>
+<span class="c1">###</span>
+
+<div class="viewcode-block" id="Biotin">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Biotin">[docs]</a>
+<span class="k">def</span> <span class="nf">Biotin</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB 1F27</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;────GGACCGU─CA───╮│╯GAGGACACGGU─────╭U╰AAAAA─────GUCCUCU&quot;</span><span class="p">)</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Biotin.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PIP3">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3">[docs]</a>
+<span class="k">def</span> <span class="nf">PIP3</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)</span>
+    <span class="c1"># Pubblication: https://doi.org/10.1038/ncb3473</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;GGGUAGACUC╰│╭──────GCUC&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;PIP3.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="PIP3_mut1">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut1">[docs]</a>
+<span class="k">def</span> <span class="nf">PIP3_mut1</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)</span>
+    <span class="c1"># Pubblication: https://doi.org/10.1038/ncb3473</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;GGGUCGACUC╰│╭──────GCUC&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;PIP3_mut1.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PIP3_mut3">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut3">[docs]</a>
+<span class="k">def</span> <span class="nf">PIP3_mut3</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)</span>
+    <span class="c1"># Pubblication: https://doi.org/10.1038/ncb3473</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;GGGUAGCCUC╰│╭──────GCUC&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;PIP3_mut3.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PIP3_mut5">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut5">[docs]</a>
+<span class="k">def</span> <span class="nf">PIP3_mut5</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)</span>
+    <span class="c1"># Pubblication: https://doi.org/10.1038/ncb3473</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;GGGUAGACGC╰│╭──────GCUC&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;PIP3_mut5.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="c1">###</span>
+<span class="c1"># Protein binding aptamers</span>
+<span class="c1">###</span>
+
+<div class="viewcode-block" id="MS2">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MS2">[docs]</a>
+<span class="k">def</span> <span class="nf">MS2</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 1ZDH, extended 3 nucleotides on each side</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─ACAUG─A─GG─AUCA╰│╭─────CC───CAUGU─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span>  <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;MS2.dat&quot;</span><span class="p">,</span> 
+                                            <span class="n">topology_file</span><span class="o">=</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;MS2.top&quot;</span><span class="p">,</span>
+                                            <span class="n">protein</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> 
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PP7">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PP7">[docs]</a>
+<span class="k">def</span> <span class="nf">PP7</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 2QUX</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GGCAC─A─GAAG─AUAUGG╰│╭───────CUUC───GUGCC─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;PP7.dat&quot;</span><span class="p">,</span> 
+                                            <span class="n">topology_file</span><span class="o">=</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;PP7.top&quot;</span><span class="p">,</span>
+                                            <span class="n">protein</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TAR_TAT">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.TAR_TAT">[docs]</a>
+<span class="k">def</span> <span class="nf">TAR_TAT</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 6MCE</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GGGCAGA─UU─GAGC─C─UG╰│╭G──GAGCUC────UCUGCCC─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;TAR_TAT.dat&quot;</span><span class="p">,</span> 
+                                            <span class="n">topology_file</span><span class="o">=</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;TAR_TAT.top&quot;</span><span class="p">,</span>
+                                            <span class="n">protein</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="L7Ae">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.L7Ae">[docs]</a>
+<span class="k">def</span> <span class="nf">L7Ae</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 1RLG</span>
+    <span class="n">strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─UCU─GA────CC─&quot;</span><span class="p">)</span>
+    <span class="n">strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;L7Ae_1.dat&quot;</span><span class="p">)</span>
+    <span class="n">strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GG─CGUGA─UGA─&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand2</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;L7Ae_2.dat&quot;</span><span class="p">,</span>
+                                            <span class="n">topology_file</span><span class="o">=</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;L7Ae_2.top&quot;</span><span class="p">,</span>
+                                            <span class="n">protein</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">([</span><span class="n">strand1</span><span class="p">,</span> <span class="n">strand2</span><span class="p">],</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Streptavidin">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Streptavidin">[docs]</a>
+<span class="k">def</span> <span class="nf">Streptavidin</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)</span>
+    <span class="c1"># Pubblication: https://doi.org/10.1093/nar/gkt956</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;AUGCGGCCGCCGACCAGAAUCAUGCAAGUGCGUAAGAUAGU╰│╭─────────CGCG─────────────GGUCGGCGGCCGCAU&#39;</span><span class="p">,</span>
+                    <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">41</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Streptavidin.dat&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Thrombin_exosite1">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite1">[docs]</a>
+<span class="k">def</span> <span class="nf">Thrombin_exosite1</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: none; generate with RNA Composer (https://doi.org/10.1093/nar/gks339, https://doi.org/10.1002/prot.26578)</span>
+    <span class="c1"># Pubblication: https://doi.org/10.1111/j.1538-7836.2012.04679.x</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;─GGCG─GUCGAUC─ACACA╭╰GUUC╮A╯A─AC─╰││╮GUAA╰U╭AA──╯││╭─GCCAAUG╮U╯ACGAGGC╭╰────A─GA─CGACUCGCC─&quot;</span><span class="p">,</span>
+                    <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Thrombin_exosite1.dat&quot;</span><span class="p">)</span>
+    
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="n">R9D_14T</span> <span class="o">=</span> <span class="n">Thrombin_exosite1</span>
+
+<div class="viewcode-block" id="Thrombin_exosite2">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite2">[docs]</a>
+<span class="k">def</span> <span class="nf">Thrombin_exosite2</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># PDB: 5DO4 (replace Fluorinated ribose with regular ribose)</span>
+    <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;-GGG-AACA-AAG-CUGA</span><span class="se">\\</span><span class="s2">|/AGUA-CUU----A-CCC-&quot;</span><span class="p">,</span>
+                    <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Thrombin_exosite2.dat&quot;</span><span class="p">,</span>
+                                            <span class="n">topology_file</span><span class="o">=</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;Thrombin_exosite2.top&quot;</span><span class="p">,</span>
+                                            <span class="n">protein</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inherit_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Loop</span>
+    <span class="k">return</span> <span class="n">create_aptamer</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span>
+                          <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Luca Monari.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

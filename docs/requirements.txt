@@ -1,0 +1,9 @@
+sphinx
+sphinx_rtd_theme
+sphinx-autodoc-typehints
+numpydoc
+myst-parser
+nbsphinx
+ipykernel
+nbconvert
+pandoc

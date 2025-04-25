@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Features &mdash; pyFuRNAce 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=47de8214"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Script API Reference" href="api.html" />
+    <link rel="prev" title="Welcome to pyFuRNAce’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyFuRNAce
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#web-application">Web Application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#using-the-python-api">Using the Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyFuRNAce</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Features</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/features.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="features">
+<span id="id1"></span><h1>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>🧩 <strong>Motif-based assembly:</strong> Build RNA structures using a rich, expandable library of motifs including stems, dovetails, kissing loops, aptamers, and ribozymes.</p></li>
+<li><p>🎨 <strong>GUI &amp; Real-time 3D Visualization:</strong> Interactive blueprint editor and real-time 3D rendering via Streamlit and oxView.</p></li>
+<li><p>🔄 <strong>Integrated Workflow:</strong> Design, generate, convert, and prepare your RNA origami in one unified interface.</p></li>
+<li><p>🧬 <strong>Sequence Generation &amp; Optimization:</strong> Built-in support for sequence folding (Revolvr + ViennaRNA).</p></li>
+<li><p>🧪 <strong>Primer &amp; Template Design:</strong> Includes tools for DNA conversion, promoter addition, and primer calculations.</p></li>
+<li><p>💻 <strong>Python Scripting API:</strong> Automate complex designs or build at scale using a programmable interface.</p></li>
+</ul>
+</section>
+<section id="installation">
+<span id="id2"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<p><strong>Note</strong>: pyFuRNAce requires Python 3.10 or later. Local installation includes the GUI via Streamlit.</p>
+<p>Install from PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyfurnace
+</pre></div>
+</div>
+<p>Install the latest development version from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git&quot;</span>
+</pre></div>
+</div>
+<p>Install OAT for oxDNA structure conversion:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis&quot;</span>
+</pre></div>
+</div>
+<p>Perl (required by Revolvr):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>bioconda-legacy::perl
+</pre></div>
+</div>
+</section>
+<section id="web-application">
+<span id="webapp"></span><h1>Web Application<a class="headerlink" href="#web-application" title="Link to this heading"></a></h1>
+<p>To run locally:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pyfurnace
+</pre></div>
+</div>
+<p>This launches the GUI in your browser.</p>
+<p>Or use the hosted version: <a class="reference external" href="http://pyfurnace.de">pyfurnace.de</a> or <a class="reference external" href="https://pyfurnace.streamlit.app">pyfurnace.streamlit.app</a></p>
+<a class="reference external image-reference" href="https://pyfurnace.streamlit.app"><img alt="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" />
+</a>
+<section id="modules">
+<span id="id3"></span><h2>Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Design:</strong> Create and edit RNA blueprints. Visualize in 3D.</p></li>
+<li><p><strong>Generate:</strong> Use inverse folding to produce target-matching sequences.</p></li>
+<li><p><strong>Convert:</strong> Convert to DNA templates, add promoters, analyze properties.</p></li>
+<li><p><strong>Prepare:</strong> Design primers and generate oxDNA simulation inputs.</p></li>
+</ol>
+</section>
+</section>
+<section id="using-the-python-api">
+<span id="api-usage"></span><h1>Using the Python API<a class="headerlink" href="#using-the-python-api" title="Link to this heading"></a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+<span class="n">line1</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+        <span class="p">]</span>
+
+<span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+        <span class="p">]</span>
+
+<span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="citation">
+<span id="id4"></span><h1>Citation<a class="headerlink" href="#citation" title="Link to this heading"></a></h1>
+<p>If you use pyFuRNAce in your research, please cite:</p>
+<p>Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami. (2025) <a class="reference external" href="https://doi.org/10.1101/2025.04.17.647389">doi:10.1101/2025.04.17.647389</a></p>
+</section>
+<section id="license">
+<span id="id5"></span><h1>License<a class="headerlink" href="#license" title="Link to this heading"></a></h1>
+<p>GPL-3.0 License — <a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License v3.0</a></p>
+<a class="reference external image-reference" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="https://img.shields.io/badge/License-GPL%20v3-lightgrey.svg" src="https://img.shields.io/badge/License-GPL%20v3-lightgrey.svg" />
+</a>
+</section>
+<section id="acknowledgements">
+<span id="id6"></span><h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading"></a></h1>
+<p>This work was supported by the ERC Starting Grant ”ENSYNC” (No. 101076997) and Deutsche Forschungs-
+gemeinschaft (DFG, German Research Foundation) under CRC 392 and CRC 1638. K.G. acknowledges
+funding from the Human Science Frontier Programme (HFSP). The authors thank the Max Planck Society
+for access to computational resources and the Alfried Krupp Foundation. We thank C. Geary for his valuable
+input on the manuscript and insightful feedback on the user interface design.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to pyFuRNAce’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="Script API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Luca Monari.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

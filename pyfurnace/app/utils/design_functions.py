@@ -1090,10 +1090,11 @@ def build_origami_content(barriers=None):
             motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2' if s.directionality == '53' else '1'
     origami_list = [''.join(line) for line in motif_list]
 
-    content = "<div style='font-family: monospace; white-space: nowrap; overflow-x: auto;'>"
+    content = "<div style='white-space: nowrap; overflow-x: auto;'>"
     content += f'<div style="display:inline-block; font-family: monospace; font-size: {st.session_state.origami_font_size}px;">Line:<br />'  # add a column with the line number
     line_nr = -2
     origami_list_len = len(origami_list)
+    span_text = '<span style="font-family: monospace; '
 
     for y, line in enumerate(origami_list):
         line_color = normal_color
@@ -1117,12 +1118,12 @@ def build_origami_content(barriers=None):
         if line_nr != current_line_nr and isinstance(current_line_nr, int):  # is a new origami line
             if current_line_nr == st.session_state.line_index:
                 line_color = highlight_color
-            content += f'<span style="color: {line_color}; line-height:1;">{current_line_nr})</span>' + (4 - len(str(current_line_nr))) * '&nbsp;' 
+            content += span_text + f'color: {line_color}; line-height:1;">{current_line_nr})</span>' + (4 - len(str(current_line_nr))) * '&nbsp;' 
             line_nr = current_line_nr
         elif  isinstance(next_line_nr, int) and line_nr < st.session_state.line_index < next_line_nr:
-            content += f'<span style="color: #D52919; line-height:1;">_____</span>'  # the origami line is empty
+            content += span_text + 'color: #D52919; line-height:1;">_____</span>'  # the origami line is empty
         else:
-            content += '<span style="line-height:1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'  # is not a new origami line
+            content += span_text + 'line-height:1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'  # is not a new origami line
         
         hit = False # to highlight the first symbol
         for x, char in enumerate(line):
@@ -1132,13 +1133,13 @@ def build_origami_content(barriers=None):
                 color = barriers_colors[char]
 
             if char == ' ':
-                content += '<span style="line-height:1;">&nbsp;</span>'
+                content += span_text + 'line-height:1;">&nbsp;</span>'
             elif char == '1':
-                content += f'<span style="color: {highlight_color}; line-height:1;">5</span>'
+                content += span_text + f'color: {highlight_color}; line-height:1;">5</span>'
             elif char == '2':
-                content += f'<span style="color: {highlight_color}; line-height:1;">3</span>'
+                content += span_text + f'color: {highlight_color}; line-height:1;">3</span>'
             elif char in pf.bp_symbols:
-                content += f'<span style="color: {color}; line-height:1;">{char}</span>'  # do not highlight the base pair in red
+                content += span_text + f'color: {color}; line-height:1;">{char}</span>'  # do not highlight the base pair in red
             elif ori_pos in origami.pos_index_map:  # a motif symbol
                 motif_slice = origami.pos_index_map[ori_pos]
                 if st.session_state.gradient: 
@@ -1156,16 +1157,16 @@ def build_origami_content(barriers=None):
                     else:
                         color = highlight_color
 
-                content += f'<a href="javascript:void(0);" id="{motif_slice[0]},{motif_slice[1]},{x - 1},{y - 1}" style="color: {color}; line-height:1;">{char}</a>'
+                content += f'<a style="font-family: monospace; color: {color}; line-height:1;" href="javascript:void(0);" id="{motif_slice[0]},{motif_slice[1]},{x - 1},{y - 1}">{char}</a>'
             else:  # is a junction symbol 
-                content += f'<span style="color: {color}; line-height:1;">{char}</span>'
+                content += span_text + f'color: {color}; line-height:1;">{char}</span>'
         # Check if you wanna add the cursor
         if motif_slice and motif_slice[0] == st.session_state.line_index:
             if len(origami[motif_slice[0]]) == st.session_state.motif_index:
-                content += f'<span style="color: {highlight_color}; line-height:1;">│</span>'
+                content += span_text + f'color: {highlight_color}; line-height:1;">│</span>'
         content += '<br />'
     if line_nr < st.session_state.line_index:
-        content += f'<span style="color: #D52919; line-height:1;">_____</span>'  # the origami line is empty
+        content += span_text + 'color: #D52919; line-height:1;">_____</span>'  # the origami line is empty
     content += '</div>'
     content += '</div>'
     return content

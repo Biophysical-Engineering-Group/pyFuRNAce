@@ -1,18 +1,22 @@
+"""
+This module contains general utility functions and constants for the pyfurnace package.
+
+It includes: 
+functions for manipulating RNA strands and sequences, 
+utilities for RNA structures (dot-bracket notation, pair maps, trees)
+folding barriers calculation for canonical co-transcriptional RNA Origami
+"""
+
 import random
 import warnings
 from typing import Optional, Tuple, Dict, List, Union, Iterable
 from .basepair import BasePair
 
-# This file contains general useful functions and constants for the pyfurnace package.
-# It includes functions for manipulating RNA strands and sequences, RNA structures 
-# (including dot-bracket notation, pair map and tree), and a function for calculating
-# folding barriers of canonical co-transcriptional RNA Origami.
-
 ###
 ### USEFUL SETS AND DICTIONARIES
 ###
 
-# A set of all accepted nucleotides
+#: Set of all accepted nucleotides, including standard bases and extended IUPAC codes.
 nucleotides = {"A", 
                "U", 
                "C", 
@@ -32,9 +36,8 @@ nucleotides = {"A",
                '&', # separator
                }
 
-# https://www.bioinformatics.org/sms/iupac.html
-# A dictionary with the IUPAC codes for nucleotides as keys 
-# and the corresponding nucleotides as values
+#: Dictionary mapping IUPAC codes to corresponding sets of nucleotides.
+#: Source: https://www.bioinformatics.org/sms/iupac.html
 iupac_code = {"A": {"A"}, 
               "U": {"U"}, 
               "C": {"C"}, 
@@ -54,79 +57,100 @@ iupac_code = {"A": {"A"},
               "&": {"&"}, # separator
               }
 
-# A dictionary with the IUPAC codes for nucleotides as keys
-# and the IUPAC codes that can pair with them as values
+#: Dictionary mapping IUPAC codes to the set of codes they can base pair with.
 base_pairing = {"A": {"B", "D", "H", "K", "N", "U", "W", "Y"},
                 "U": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "V", "W"},
                 "C": {"B", "D", "G", "K", "N", "R", "S", "V"},
-                "G": {"B", "C", "D", "H", "K", "M", "N", "S", "U", "V", "W", "Y"}, # standard base pairing
-                "W": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
+                "G": {"B", "C", "D", "H", "K", "M", "N", "S", "U", "V", "W", "Y"},
+                "W": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W",
+                      "Y"},
                 "M": {"B", "D", "G", "H", "K", "N", "R", "S", "U", "V", "W", "Y"},
                 "R": {"B", "C", "D", "H", "K", "M", "N", "S", "U", "V", "W", "Y"},
                 "Y": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "V", "W"},
-                "K": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "S": {"B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "D": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "H": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "V": {"B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "B": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "N": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y"},
-                "X": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W", "Y", "X"},
+                "K": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V",
+                      "W", "Y"},
+                "S": {"B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W",
+                      "Y"},
+                "D": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V",
+                      "W", "Y"},
+                "H": {"A", "B", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W",
+                      "Y"},
+                "V": {"B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", "W",
+                      "Y"},
+                "B": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V",
+                      "W", "Y"},
+                "N": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V",
+                      "W", "Y"},
+                # this symbol is used for external Kissing Loops in ROAD
+                "X": {"A", "B", "C", "D", "G", "H", "K", "M", "N", "R", "S", "U", "V", 
+                      "W", "Y", "X"},
                 "&": {"&"} # separator
                 }
 
-# A dictionary of all possible base pairs in the dot-bracket notation
-db_pairs = {"(": ")", "[": "]", "{": "}", "<": ">", "A": "a", "B": "b", "C": "c", "D": "d", "E": "e", "F": "f", "G": "g", "H": "h", "I": "i", "J": "j", "K": "k", "L": "l", "M": "m", "N": "n", "O": "o", "P": "p", "Q": "q", "R": "r", "S": "s", "T": "t", "U": "u", "V": "v", "W": "w", "X": "x", "Y": "y", "Z": "z"}
+#: Dictionary mapping dot-bracket symbols to their corresponding pairing symbols.
+db_pairs = {"(": ")", "[": "]", "{": "}", "<": ">", "A": "a", "B": "b", "C": "c", 
+            "D": "d", "E": "e", "F": "f", "G": "g", "H": "h", "I": "i", "J": "j",
+            "K": "k", "L": "l", "M": "m", "N": "n", "O": "o", "P": "p", "Q": "q",
+            "R": "r", "S": "s", "T": "t", "U": "u", "V": "v", "W": "w", "X": "x",
+            "Y": "y", "Z": "z"}
 
-# A dictionary of all possible pseudoknot pairs in the dot-bracket notation
-all_pk_symbols =     ('[', ']', '{', '}', '<', '>', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
+#: Tuple containing all possible pseudoknot symbols used in dot-bracket notation.
+all_pk_symbols = ('[', ']', '{', '}', '<', '>', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                  'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                  'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                  'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+                 'y', 'z')
 
-# A set of all accepted symbols
-accept_symbol =  nucleotides | {"." "(", ")"} | set(all_pk_symbols) | {
-                # ROAD special symbols
-                "─", "│", "╭", "╮", "╰", "╯", "^", "*", "┼", "┊", '~', '◦',  
-                # Pyfurnace special symbols
-                '↑', '↓', "⊗", "⊙", "▂", "▄", "█", 
-                # Normal symbols
-                "-", "|", "+", ":", "=", "!", " ", "/", "\\", "3", "5", "&"} 
+#: Set of all accepted symbols including nucleotides, dots, brackets, and special ROAD 
+#: symbols.
+accept_symbol = (
+    nucleotides | {"." "(", ")"} | set(all_pk_symbols) | {
+        "─", "│", "╭", "╮", "╰", "╯", "^", "*", "┼", "┊", '~', '◦',
+        '↑', '↓', "⊗", "⊙", "▂", "▄", "█",
+        "-", "|", "+", ":", "=", "!", " ", "/", "\\", "3", "5", "&"
+    }
+)
 
-# Base pair symbols
+#: Set of symbols representing base pairs.
 bp_symbols = {"┊", "=", ":", "!", "*"}
 
 ###
 ### STRING TRANSLATORS
 ###
 
-# Convert all pseudoknot symbols to dots
+#: String translator mapping all pseudoknot symbols to dots.
 pseudo_to_dot = str.maketrans(''.join(all_pk_symbols), "." * len(all_pk_symbols))
 
-# Convert each dot-bracket symbol to its corresponding pair
-pair_db_sym = str.maketrans(''.join(db_pairs.keys()) + ''.join(db_pairs.values()), 
-                            ''.join(db_pairs.values()) + ''.join(db_pairs.keys()))
+#: String translator to map each dot-bracket opening symbol to its closing counterpart
+#: and vice versa.
+pair_db_sym = str.maketrans(
+    ''.join(db_pairs.keys()) + ''.join(db_pairs.values()),
+    ''.join(db_pairs.values()) + ''.join(db_pairs.keys())
+)
 
-# Remove all nucleotides from a string
+#: String translator that removes all nucleotides from a string.
 nucl_to_none = str.maketrans("", "", "".join(nucleotides))
 
-# Remove all accepted symbols from a string
+#: String translator that removes all accepted symbols from a string.
 symb_to_none = str.maketrans("", "", "".join(accept_symbol))
 
-# Convert all nucleotides to their corresponding pair 
-# (it supports IUPAC codes)
+#: String translator that maps nucleotides (including IUPAC codes) to their  
+#: complementary base.
 nucl_to_pair = str.maketrans("AUCGWMRYKSDHVBNX", "UAGCWKYRKSHDBVNX")
 
-# Remove all symbols from a string, except nucleotides
-only_nucl = str.maketrans("", "", "".join(accept_symbol-nucleotides))
+#: String translator that removes all non-nucleotide symbols from a string.
+only_nucl = str.maketrans("", "", "".join(accept_symbol - nucleotides))
 
-# Convert the strand turning symbols to their corresponding horizontal flip
+#: String translator for horizontal flip of strand turning symbols.
 horiz_flip = str.maketrans("╭╮╰╯/\\", "╮╭╯╰\\/")
 
-# Convert the strand turning symbols to their corresponding vertical flip
+#: String translator for vertical flip of strand turning symbols.
 verti_flip = str.maketrans("╭╮╰╯/\\", "╰╯╭╮\\/")
 
-# Convert the strand turning symbols to their corresponding 90 degree rotation
+#: String translator for 90 degree rotation of strand symbols.
 rotate_90 = str.maketrans("╭╮╰╯│|─-", "╮╯╭╰──││")
 
-# Convert normal symbols to their corresponding ROAD symbols
+#: String translator for converting normal symbols to ROAD strand symbols.
 symb_to_road = str.maketrans("-|+=:*!", "─│┼┊┊┊┊")
 
 ###

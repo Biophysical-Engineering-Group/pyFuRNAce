@@ -1090,7 +1090,7 @@ def build_origami_content(barriers=None):
             motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2' if s.directionality == '53' else '1'
     origami_list = [''.join(line) for line in motif_list]
 
-    content = "<div style='white-space: nowrap; overflow-x: auto;'>"
+    content = "<div style='font-family: monospace; white-space: nowrap; overflow-x: auto;'>"
     content += f'<div style="display:inline-block; font-family: monospace; font-size: {st.session_state.origami_font_size}px;">Line:<br />'  # add a column with the line number
     line_nr = -2
     origami_list_len = len(origami_list)

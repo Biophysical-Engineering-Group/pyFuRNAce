@@ -1133,7 +1133,7 @@ def build_origami_content(barriers=None):
                 color = barriers_colors[char]
 
             if char == ' ':
-                content += span_text + 'line-height:1;">&nbsp;</span>'
+                content += span_text + 'line-height:1; visibility:hidden;">x</span>'
             elif char == '1':
                 content += span_text + f'color: {highlight_color}; line-height:1;">5</span>'
             elif char == '2':

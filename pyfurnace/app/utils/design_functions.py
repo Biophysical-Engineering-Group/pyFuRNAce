@@ -82,7 +82,10 @@ def origami_general_options(origami, expanded=True):
         #               help='The Origami 3d assembly is created concatenating each RNA strand rather than concatenating the motifs')
 
         with cols[2]:
-            new_sticky = st.toggle('Sticky motif menu', value=st.session_state.motif_menu_sticky, key='sticky_menu', help='Keep the motif menu and origami visualization menu to stick to the top of the page.')
+            new_sticky = st.toggle('Stick the motif menu at the top', 
+                                   value=st.session_state.motif_menu_sticky, 
+                                   key='sticky_menu', 
+                                   help='Keep the motif menu and origami visualization menu to stick to the top of the page.')
             if new_sticky != st.session_state.motif_menu_sticky:
                 st.session_state.motif_menu_sticky = new_sticky
                 st.rerun()
@@ -187,7 +190,7 @@ def initiate_session_state():
     # if "redo" not in st.session_state:
     #     st.session_state.redo = []
     if 'motif_menu_sticky' not in st.session_state:
-        st.session_state.motif_menu_sticky = True
+        st.session_state.motif_menu_sticky = False
     if "copied_motif" not in st.session_state:
         st.session_state.copied_motif = None
     if "copied_motif_text" not in st.session_state:

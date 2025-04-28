@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A collection of origami desinged by ROAD &mdash; pyFuRNAce 0.0.3 documentation</title>
+  <title>A collection of origami desinged by ROAD &mdash; pyFuRNAce 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -100,7 +100,7 @@
 <h1>A collection of origami desinged by ROAD<a class="headerlink" href="#A-collection-of-origami-desinged-by-ROAD" title="Link to this heading"></a></h1>
 <p>This is a collection of the some RNA origami design and published with the ROAD software, slightly modified (e.g. twist corrected). (ROAD paper: <a class="reference external" href="https://doi.org/10.1038/s41557-021-00679-1">https://doi.org/10.1038/s41557-021-00679-1</a>)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
@@ -110,7 +110,7 @@
 <section id="3H-2DT">
 <h2>3H-2DT<a class="headerlink" href="#3H-2DT" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ori_3H_2DT</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">main_stem</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">end_helix_len</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -140,24 +140,24 @@
 <div class="output_area rendered_html docutils container">
     <div style="max-height: 500px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
     <pre>                                                                                ╭────────╮
-                  ╭NNNNN────NNNNKNNNNNNN─3 5─NNNNKNNNNNNKNNNNNKNNN────NNNKNNNNKN┼─NNNNNNN╯
+                  ╭NNKNN────NNNNKNNNNKNN─3 5─NNNKNNNNNNKNNNNNKNNNN────NNNKNNNNKN┼─NNNNNNN╯
                   │┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊│
-         ╭NNNNNNN─┼NNNNN╮╭──NNNNKNNNNNNN─────NNNNKNNNNNNKNNNNNKNNN╮╭──NNNKNNNNKN╯
+         ╭NNNNNNN─┼NNKNN╮╭──NNNNKNNNNKNN─────NNNKNNNNNNKNNNNNKNNNN╮╭──NNNKNNNNKN╯
          ╰────────╯     ││                                        ││
                         ││                                        │╰╮
                         ││                                        ╰╮│
-                        ↓↓                                         ↓↓
+                        ↑↓                                         ↑↓
                         ││                 ╭───────╮               ││
-              ╭CGNNNNKNN╯╰SS──NNKNNNNNKNNAA┼─NNNNNN╯╭─ANNNNKNNNNNNN╯╰SS──NNNNKNNUU╮
+              ╭CGNNKNNNN╯╰SS──NNNKNNNKNNNAA┼─NNNNNN╯╭─ANNNNKNNNNNNN╯╰SS──NNKNNNNUU╮
               │  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
-              ╰UUNNNNKNN──SS╮╭NNKNNNNNKNNA─╯╭NNNNNN─┼AANNNNKNNNNNNN──SS╮╭NNNNKNNGC╯
+              ╰UUNNKNNNN──SS╮╭NNNKNNNKNNNA─╯╭NNNNNN─┼AANNNNKNNNNNNN──SS╮╭NNKNNNNGC╯
                             ││              ╰───────╯                  ││
                             ││                                         ││
-                            ↓↓                                         ↓↓
+                            ↑↓                                         ↑↓
                             ││              ╭───────╮                  ││                   ╭────────╮
-         ╭NNNNKNNNNNNNKNNN──╯╰NNNKNNNNKNNNAA┼─NNNNNN╯╭─ANNNKNNNNNNKNN──╯╰NNNNKNNNNNNKNNNNNKN┼─NNNNNNN╯
+         ╭NNKNNNNNKNNNNNNN──╯╰NNNNKNNNNNKNAA┼─NNNNNN╯╭─ANNNKNNNNNKNNN──╯╰NNNNKNNNNNNKNNNNKNN┼─NNNNNNN╯
          │┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊│
-╭NNNNNNN─┼NNNNKNNNNNNNKNNN────NNNKNNNNKNNNA─╯╭NNNNNN─┼AANNNKNNNNNNKNN────NNNNKNNNNNNKNNNNNKN╯
+╭NNNNNNN─┼NNKNNNNNKNNNNNNN────NNNNKNNNNNKNA─╯╭NNNNNN─┼AANNNKNNNNNKNNN────NNNNKNNNNNNKNNNNKNN╯
 ╰────────╯                                   ╰───────╯                                                </pre>
     </div></div>
 </div>
@@ -165,7 +165,7 @@
 <section id="3H-3DT">
 <h2>3H-3DT<a class="headerlink" href="#3H-3DT" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ori_3H_3DT</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">main_stem</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">end_helix_len</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -195,24 +195,24 @@
 <div class="output_area rendered_html docutils container">
     <div style="max-height: 500px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
     <pre>                                                                                 ╭────────╮
-           ╭NNNNKNNNNKNN────NNNKNNNNNKNN─3 5─NNNNKNNNNNKNNNKNNNNNN────NNKNNNNNKNN┼─NNNNNNN╯
+           ╭NNNNKNNNNNNN────NNNKNNNNKNNN─3 5─NNNKNNNNKNNNNKNNNNKNN────NNNKNNNNNKN┼─NNNNNNN╯
            │┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊│
-  ╭NNNNNNN─┼NNNNKNNNNKNN╮╭──NNNKNNNNNKNN─────NNNNKNNNNNKNNNKNNNNNN╮╭──NNKNNNNNKNN╯
+  ╭NNNNNNN─┼NNNNKNNNNNNN╮╭──NNNKNNNNKNNN─────NNNKNNNNKNNNNKNNNNKNN╮╭──NNNKNNNNNKN╯
   ╰────────╯            ││                                        ││
                         ││                                        │╰╮
                         ││                                        ╰╮│
-                        ↓↓                                         ↓↓
+                        ↑↓                                         ↑↓
                         ││                 ╭───────╮               ││
-              ╭CGNNKNNNN╯╰SS──NNNKNNNNNKNAA┼─NNNNNN╯╭─ANNNKNNNNKNNN╯╰SS──NNKNNNNUU╮
+              ╭CGNNNKNNN╯╰SS──NNNNKNNNNNNAA┼─NNNNNN╯╭─ANNKNNNNNKNNN╯╰SS──NNKNNNNUU╮
               │  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
-              ╰UUNNKNNNN──SS╮╭NNNKNNNNNKNA─╯╭NNNNNN─┼AANNNKNNNNKNNN──SS╮╭NNKNNNNGC╯
+              ╰UUNNNKNNN──SS╮╭NNNNKNNNNNNA─╯╭NNNNNN─┼AANNKNNNNNKNNN──SS╮╭NNKNNNNGC╯
                             ││              ╰───────╯                  ││
                             ││                                         ││
-                            ↓↓                                         ↓↓
+                            ↑↓                                         ↑↓
                             ││              ╭───────╮                  ││                     ╭────────╮
-         ╭NNNKNNNNKNNNNNKN──╯╰NNKNNNNKNNNNAA┼─NNNNNN╯╭─ANNNKNNNNNNKNN──╯╰NNKNNNKNNNNNKNNNNNKNN┼─NNNNNNN╯
+         ╭NNNKNNNNNNKNNNNN──╯╰NNNNKNNNNNNNAA┼─NNNNNN╯╭─ANNNNKNNNNNNKN──╯╰NNNKNNNNNKNNNNNKNNNNN┼─NNNNNNN╯
          │┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊│
-╭NNNNNNN─┼NNNKNNNNKNNNNNKN────NNKNNNNKNNNNA─╯╭NNNNNN─┼AANNNKNNNNNNKNN────NNKNNNKNNNNNKNNNNNKNN╯
+╭NNNNNNN─┼NNNKNNNNNNKNNNNN────NNNNKNNNNNNNA─╯╭NNNNNN─┼AANNNNKNNNNNNKN────NNNKNNNNNKNNNNNKNNNNN╯
 ╰────────╯                                   ╰───────╯                                                  </pre>
     </div></div>
 </div>
@@ -220,7 +220,7 @@
 <section id="3H-4DT">
 <h2>3H-4DT<a class="headerlink" href="#3H-4DT" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ori_3H_4DT</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="n">main_stem</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">end_helix_len</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -250,24 +250,24 @@
 <div class="output_area rendered_html docutils container">
     <div style="max-height: 500px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
     <pre>                                                                                 ╭────────╮
-                 ╭NNKNN────NNNKNNNNKNNN─3 5─NNKNNNKNNNKNNNNNKNNNN────NNKNNNNKNNNN┼─NNNNNNN╯
+                 ╭NNNNN────NNNKNNNNKNNN─3 5─NNKNNNNNKNNNNKNNNNNKN────NNKNNNNKNNNN┼─NNNNNNN╯
                  │┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊│
-        ╭NNNNNNN─┼NNKNN╮╭──NNNKNNNNKNNN─────NNKNNNKNNNKNNNNNKNNNN╮╭──NNKNNNNKNNNN╯
+        ╭NNNNNNN─┼NNNNN╮╭──NNNKNNNNKNNN─────NNKNNNNNKNNNNKNNNNNKN╮╭──NNKNNNNKNNNN╯
         ╰────────╯     ││                                        ││
                        ││                                        │╰╮
                        ││                                        ╰╮│
-                       ↓↓                                         ↓↓
+                       ↑↓                                         ↑↓
                        ││                  ╭───────╮              ││
-             ╭CGNNNNKNN╯╰NNKN──NNNNKNNNNNAA┼─NNNNNN╯╭─ANNKNNNNKNNN╯╰NNNN──NNNNKNNUU╮
+             ╭CGNNKNNNN╯╰NNNN──NNKNNNNKNNAA┼─NNNNNN╯╭─ANNNKNNNNNKN╯╰NNNN──NNNNKNNUU╮
              │  ┊┊┊┊┊┊┊  ┊┊┊┊  ┊┊┊┊┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊┊┊┊┊┊  ┊┊┊┊  ┊┊┊┊┊┊┊  │
-             ╰UUNNNNKNN──NNKN╮╭NNNNKNNNNNA─╯╭NNNNNN─┼AANNKNNNNKNNN──NNNN╮╭NNNNKNNGC╯
+             ╰UUNNKNNNN──NNNN╮╭NNKNNNNKNNA─╯╭NNNNNN─┼AANNNKNNNNNKN──NNNN╮╭NNNNKNNGC╯
                              ││             ╰───────╯                   ││
                              ││                                         ││
-                             ↓↓                                         ↓↓
+                             ↑↓                                         ↑↓
                              ││              ╭───────╮                  ││                     ╭────────╮
-         ╭NNNKNNNNNNKNNNNNN──╯╰NNNKNNNNNKNNAA┼─NNNNNN╯╭─ANNNKNNNKNNNNN──╯╰NNNNKNNNNNNKNNNNNNKNN┼─NNNNNNN╯
+         ╭NNNKNNNNNKNNNNNKN──╯╰NNNNKNNNNNNNAA┼─NNNNNN╯╭─ANNNNKNNNNKNNN──╯╰NNNNKNNNNNNKNNNNNNKNN┼─NNNNNNN╯
          │┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊┊┊┊┊┊┊┊┊┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊│
-╭NNNNNNN─┼NNNKNNNNNNKNNNNNN────NNNKNNNNNKNNA─╯╭NNNNNN─┼AANNNKNNNKNNNNN────NNNNKNNNNNNKNNNNNNKNN╯
+╭NNNNNNN─┼NNNKNNNNNKNNNNNKN────NNNNKNNNNNNNA─╯╭NNNNNN─┼AANNNNKNNNNKNNN────NNNNKNNNNNNKNNNNNNKNN╯
 ╰────────╯                                    ╰───────╯                                                  </pre>
     </div></div>
 </div>

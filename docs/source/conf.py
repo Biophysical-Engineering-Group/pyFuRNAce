@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 project = 'pyFuRNAce'
 copyright = '2025, Luca Monari'
 author = 'Luca Monari'
-release = '0.0.3'
+release = '0.0.5'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

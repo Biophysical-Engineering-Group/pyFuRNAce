@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyfurnace.design.core.origami &mdash; pyFuRNAce 0.0.3 documentation</title>
+  <title>pyfurnace.design.core.origami &mdash; pyFuRNAce 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,6 +889,7 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_calculate_connections</span><span class="p">(</span><span class="n">junctions1</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
                                <span class="n">junctions2</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+                               <span class="n">directionalities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
                                <span class="n">x_shift</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Position</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
                                <span class="n">start_y</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Motif</span><span class="p">,</span> <span class="n">Position</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -900,6 +901,8 @@
 <span class="sd">            junctions of the first line</span>
 <span class="sd">        junctions2: dict</span>
 <span class="sd">            junctions of the second line</span>
+<span class="sd">        directionalities: list</span>
+<span class="sd">            the directionalities of the top junctions</span>
 <span class="sd">        x_shift: tuple</span>
 <span class="sd">            The x shift of the junctions of the first and second line</span>
 <span class="sd">        start_y: int</span>
@@ -987,8 +990,12 @@
                 <span class="n">strand</span> <span class="o">=</span> <span class="s2">&quot;│&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_crossing</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
             <span class="c1"># can add the symbol &quot;^&quot; for retrocompatibility with ROAD</span>
-            <span class="n">strand</span> <span class="o">+=</span> <span class="s2">&quot;↑&quot;</span> <span class="c1"># if you  do this, increase the max_crossing by 1</span>
+            <span class="c1"># instead add arrows for the directionality of the strand</span>
+            <span class="c1"># if you  do this, increase the max_crossing by 1</span>
+            <span class="n">strand</span> <span class="o">+=</span> <span class="s2">&quot;↑&quot;</span>
+            
             <span class="n">strands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Strand</span><span class="p">(</span><span class="n">strand</span><span class="p">,</span> 
+                                  <span class="n">directionality</span><span class="o">=</span><span class="n">directionalities</span><span class="p">[</span><span class="n">ind</span><span class="p">],</span>
                                   <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">start_y</span><span class="p">),</span> 
                                   <span class="n">direction</span><span class="o">=</span><span class="n">Direction</span><span class="o">.</span><span class="n">DOWN</span><span class="p">))</span>
 
@@ -1052,10 +1059,23 @@
         <span class="c1">### calculate the junctions</span>
         <span class="n">ind1</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">ind1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">motif_lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">j1</span> <span class="o">=</span> <span class="n">motif_lines</span><span class="p">[</span><span class="n">ind1</span><span class="p">]</span><span class="o">.</span><span class="n">junctions</span>
-            <span class="n">j2</span> <span class="o">=</span> <span class="n">motif_lines</span><span class="p">[</span><span class="n">ind1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">junctions</span>
+            <span class="c1"># get the motifs</span>
+            <span class="n">top_motif</span> <span class="o">=</span> <span class="n">motif_lines</span><span class="p">[</span><span class="n">ind1</span><span class="p">]</span>
+            <span class="n">bot_motif</span> <span class="o">=</span> <span class="n">motif_lines</span><span class="p">[</span><span class="n">ind1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># get the junctions of the motifs</span>
+            <span class="n">j1</span> <span class="o">=</span> <span class="n">top_motif</span><span class="o">.</span><span class="n">junctions</span>
+            <span class="n">j2</span> <span class="o">=</span> <span class="n">bot_motif</span><span class="o">.</span><span class="n">junctions</span>
+
+            <span class="c1"># get the directionalities of the top junction</span>
+            <span class="n">mot_to_strand</span> <span class="o">=</span> <span class="n">motif_lines</span><span class="p">[</span><span class="n">ind1</span><span class="p">]</span><span class="o">.</span><span class="n">get_strand_index_map</span><span class="p">()</span>
+            <span class="n">directs</span> <span class="o">=</span> <span class="p">[</span><span class="n">top_motif</span><span class="p">[</span><span class="n">mot_to_strand</span><span class="p">[</span><span class="n">pos</span><span class="p">]]</span><span class="o">.</span><span class="n">directionality</span>
+                        <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">top_motif</span><span class="p">[</span><span class="n">mot_to_strand</span><span class="p">[</span><span class="n">pos</span><span class="p">]]</span><span class="o">.</span><span class="n">end</span>
+                        <span class="k">else</span> <span class="n">top_motif</span><span class="p">[</span><span class="n">mot_to_strand</span><span class="p">[</span><span class="n">pos</span><span class="p">]]</span><span class="o">.</span><span class="n">directionality</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">j1</span><span class="p">[</span><span class="n">Direction</span><span class="o">.</span><span class="n">DOWN</span><span class="p">]]</span>
+            
             <span class="c1"># create the connection motifs</span>
-            <span class="n">m_connect</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_connections</span><span class="p">(</span><span class="n">j1</span><span class="p">,</span> <span class="n">j2</span><span class="p">)</span>
+            <span class="n">m_connect</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_connections</span><span class="p">(</span><span class="n">j1</span><span class="p">,</span> <span class="n">j2</span><span class="p">,</span> <span class="n">directs</span><span class="p">)</span>
             <span class="c1"># intercalate the connections into the motif lines</span>
             <span class="n">motif_lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m_connect</span><span class="p">)</span>
             <span class="n">ind1</span> <span class="o">+=</span> <span class="mi">2</span>

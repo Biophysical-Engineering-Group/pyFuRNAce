@@ -123,7 +123,7 @@ print(origami.sequence)
               ││         ╰───────╯            ││
           ╭───╯│                         ╭────╯│
           │╭───╯                         │╭────╯
-          ↓↓                             ↓↓
+          ↑↓                             ↑↓
 ╭CGNKNKNNN╯╰SS──NKNNNKNNNN─3 5─NNNKNNNKNN╯╰SS──NKNNKNNUU╮
 │  ┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊  ┊┊  ┊┊┊┊┊┊┊  │
 ╰UUNKNKNNN──SS──NKNNNKNNNN─────NNNKNNNKNN──SS──NKNNKNNGC╯

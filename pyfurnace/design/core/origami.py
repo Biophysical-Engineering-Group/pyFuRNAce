@@ -804,6 +804,7 @@ class Origami(Callback):
     @staticmethod
     def _calculate_connections(junctions1: dict,
                                junctions2: dict,
+                               directionalities: List[str],
                                x_shift: Union[tuple[int, int], Position]=(0, 0), 
                                start_y: int=0) -> Tuple[Motif, Position]:
         """
@@ -815,6 +816,8 @@ class Origami(Callback):
             junctions of the first line
         junctions2: dict
             junctions of the second line
+        directionalities: list
+            the directionalities of the top junctions
         x_shift: tuple
             The x shift of the junctions of the first and second line
         start_y: int
@@ -902,8 +905,12 @@ class Origami(Callback):
                 strand = "│" * (max_crossing + 1)
 
             # can add the symbol "^" for retrocompatibility with ROAD
-            strand += "↑" # if you  do this, increase the max_crossing by 1
+            # instead add arrows for the directionality of the strand
+            # if you  do this, increase the max_crossing by 1
+            strand += "↑"
+            
             strands.append(Strand(strand, 
+                                  directionality=directionalities[ind],
                                   start=(x1, start_y), 
                                   direction=Direction.DOWN))
 
@@ -967,10 +974,23 @@ class Origami(Callback):
         ### calculate the junctions
         ind1 = 0
         while ind1 < len(motif_lines) - 1:
-            j1 = motif_lines[ind1].junctions
-            j2 = motif_lines[ind1 + 1].junctions
+            # get the motifs
+            top_motif = motif_lines[ind1]
+            bot_motif = motif_lines[ind1 + 1]
+
+            # get the junctions of the motifs
+            j1 = top_motif.junctions
+            j2 = bot_motif.junctions
+
+            # get the directionalities of the top junction
+            mot_to_strand = motif_lines[ind1].get_strand_index_map()
+            directs = [top_motif[mot_to_strand[pos]].directionality
+                        if pos == top_motif[mot_to_strand[pos]].end
+                        else top_motif[mot_to_strand[pos]].directionality[::-1]
+                            for pos in j1[Direction.DOWN]]
+            
             # create the connection motifs
-            m_connect, _ = self._calculate_connections(j1, j2)
+            m_connect, _ = self._calculate_connections(j1, j2, directs)
             # intercalate the connections into the motif lines
             motif_lines.insert(ind1 + 1, m_connect)
             ind1 += 2

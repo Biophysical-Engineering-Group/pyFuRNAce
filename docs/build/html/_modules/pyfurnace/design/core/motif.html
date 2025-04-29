@@ -1192,7 +1192,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid structure representation: </span><span class="si">{</span><span class="n">structure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         
         <span class="c1"># initialize the origami object</span>
-        <span class="n">origami</span> <span class="o">=</span> <span class="n">Origami</span><span class="p">([[]],</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="n">origami</span> <span class="o">=</span> <span class="n">Origami</span><span class="p">([[]],</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>
         <span class="n">current_index</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="k">def</span> <span class="nf">recursive_build_origami</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">insert_at</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

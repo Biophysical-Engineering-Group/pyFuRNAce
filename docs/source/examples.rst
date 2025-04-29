@@ -14,17 +14,13 @@ Two helices with FLAPs
    :linenos:
 
 
-RNA droplets
-^^^^^^^^^^^^
+RNA droplets notebook
+^^^^^^^^^^^^^^^^^
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    notebooks/droplets
-
-RNA droplets
-^^^^^^^^^^^^
 
 .. literalinclude:: ../../examples/basic_usage.py
    :language: python
@@ -58,10 +54,9 @@ Full folding barrier optimization
 
 
 Filament notebook
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    notebooks/rna_filament

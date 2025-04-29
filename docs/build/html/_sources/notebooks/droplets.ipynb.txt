@@ -1,0 +1,155 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "e47686dc",
+   "metadata": {},
+   "source": [
+    "## RNA droplets \n",
+    "RNA origami design following the designs of Lorenzo Di Michele and Elisa Franco (https://doi.org/10.1038/s41565-024-01726-x, https://doi.org/10.1038/s41467-024-50003-x)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "951daf21",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pyfurnace as pf\n",
+    "\n",
+    "uracil_connect = pf.Motif.from_structure('.&.', 'U&U')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f982220d",
+   "metadata": {},
+   "source": [
+    "### Droplet A with Malachite Green aptamer"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "e8487b0b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                                                                              ╭───────╮\n",
+      "        ╭─ANNNKNNNNNNCC───CG─A──CUGNNNNKNNNNNU─────NNNNKNNNNNNKNNNNKNNNNNKNNAA┼─UCGCGA╯\n",
+      "        │  ┊┊┊┊┊┊┊┊┊┊┊┊   ┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊┊      ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊  │        \n",
+      "╭AGCGCU─┼AANNNKNNNNNNGGUAAGCAAUGGACNNNNKNNNNN─U╮╭──NNNNKNNNNNNKNNNNKNNNNNKNNA─╯        \n",
+      "╰───────╯                                      ││                                      \n",
+      "                                               ││                                      \n",
+      "                                               ↑↓                                      \n",
+      "                                               ││                             ╭───────╮\n",
+      "            ╭─ANNNNKNNNNNNNN─3 5─NNKNNNNKNNNN──╯╰U─NNNNKNNNNNKNNNNNNKNNNNNKNAA┼─UCGCGA╯\n",
+      "            │  ┊┊┊┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊┊┊      ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊  │        \n",
+      "    ╭AGCGCU─┼AANNNNKNNNNNNNN─────NNKNNNNKNNNN─────UNNNNKNNNNNKNNNNNNKNNNNNKNA─╯        \n",
+      "    ╰───────╯                                                                          \n"
+     ]
+    }
+   ],
+   "source": [
+    "kl = pf.KissingLoop180(sequence='UCGCGA')\n",
+    "\n",
+    "line0 = [kl.copy(),\n",
+    "         pf.Stem(10),\n",
+    "         pf.MalachiteGreenShort(),\n",
+    "         pf.Stem(10),\n",
+    "         uracil_connect.copy(),\n",
+    "         pf.Dovetail(0, up_cross=False),\n",
+    "         pf.Stem(25),\n",
+    "         kl.copy().flip(),\n",
+    "         ]\n",
+    "\n",
+    "line1 = [kl.copy(),\n",
+    "         pf.Stem(13),\n",
+    "         pf.start_end_stem(),\n",
+    "         pf.Stem(12),\n",
+    "         pf.Dovetail(0, down_cross=False),\n",
+    "         uracil_connect.copy(),\n",
+    "         pf.Stem(25),\n",
+    "         kl.copy().flip(),\n",
+    "        ]\n",
+    "\n",
+    "drop_a = pf.Origami(line0, line1, align='first')\n",
+    "\n",
+    "print(drop_a)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3d5f5759",
+   "metadata": {},
+   "source": [
+    "### Droplet B with Broccoli aptamer"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "df1960f5",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                                                                                           ╭───────╮\n",
+      "        ╭─ANNNKNNNNNNGGAGAC────GGUCGGG─UC────CAGNNNNKNNNNNU─────NNNNKNNNNNNKNNNNKNNNNNKNNAA┼─GUCGAC╯\n",
+      "        │  ┊┊┊┊┊┊┊┊┊┊┊┊┊┊ ┊    ┊ ┊┊ ┊  ┊┊    ┊┊┊┊┊┊┊┊┊┊┊┊┊      ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊  │        \n",
+      "╭CAGCUG─┼AANNNKNNNNNNCCUCGG─GUGUGAGAUG─AG─CU─GUCNNNNKNNNNN─U╮╭──NNNNKNNNNNNKNNNNKNNNNNKNNA─╯        \n",
+      "╰───────╯                                                   ││                                      \n",
+      "                                                            ││                                      \n",
+      "                                                            ↑↓                                      \n",
+      "                                                            ││                             ╭───────╮\n",
+      "                         ╭─ANNNNKNNNNNNNN─3 5─NNKNNNNKNNNN──╯╰U─NNNNKNNNNNKNNNNNNKNNNNNKNAA┼─GUCGAC╯\n",
+      "                         │  ┊┊┊┊┊┊┊┊┊┊┊┊┊     ┊┊┊┊┊┊┊┊┊┊┊┊      ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊  │        \n",
+      "                 ╭CAGCUG─┼AANNNNKNNNNNNNN─────NNKNNNNKNNNN─────UNNNNKNNNNNKNNNNNNKNNNNNKNA─╯        \n",
+      "                 ╰───────╯                                                                          \n"
+     ]
+    }
+   ],
+   "source": [
+    "kl_b_seq = 'GUCGAC'\n",
+    "\n",
+    "drop_b = drop_a.copy()\n",
+    "\n",
+    "drop_b[0, 2] = pf.Broccoli()\n",
+    "\n",
+    "# insert the sequence of the kissing loop B\n",
+    "for i in (0, -1):\n",
+    "    for j in (0, -1):\n",
+    "        drop_b[i, j].set_sequence(kl_b_seq)\n",
+    "\n",
+    "print(drop_b)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "vrna",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

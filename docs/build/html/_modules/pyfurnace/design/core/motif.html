@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyfurnace.design.core.motif &mdash; pyFuRNAce 0.0.5 documentation</title>
+  <title>pyfurnace.design.core.motif &mdash; pyFuRNAce 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=282f96c0"></script>
+      <script src="../../../../_static/documentation_options.js?v=1fd71caa"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1192,7 +1192,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid structure representation: </span><span class="si">{</span><span class="n">structure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         
         <span class="c1"># initialize the origami object</span>
-        <span class="n">origami</span> <span class="o">=</span> <span class="n">Origami</span><span class="p">([[]],</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>
+        <span class="n">origami</span> <span class="o">=</span> <span class="n">Origami</span><span class="p">([[]],</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
         <span class="n">current_index</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="k">def</span> <span class="nf">recursive_build_origami</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">insert_at</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1255,10 +1255,6 @@
                     <span class="k">elif</span> <span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;&amp;&#39;</span> <span class="ow">or</span>
                             <span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span> 
                              <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="o">==</span><span class="s1">&#39;(&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[:</span> <span class="n">i</span><span class="p">]))):</span>
-                        <span class="c1"># use a fake connector to adjust alignment</span>
-                        <span class="n">fake_connect_down</span> <span class="o">=</span> <span class="n">Motif</span><span class="p">(</span><span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;──&#39;</span><span class="p">),</span>
-                                                  <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;──&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
-                                                 <span class="p">)</span>
                         <span class="n">connect_down</span> <span class="o">=</span> <span class="n">Motif</span><span class="p">(</span><span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;──&#39;</span><span class="p">),</span>
                                             <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;╮&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
                                             <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;╭&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
@@ -1271,13 +1267,13 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">insert_connect</span> <span class="o">=</span> <span class="n">current_index</span>
 
-                        <span class="c1"># insert the face connector to calculate the shift</span>
-                        <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insert_connect</span><span class="p">,</span> <span class="n">fake_connect_down</span><span class="p">)</span>
-                        <span class="n">origami</span><span class="o">.</span><span class="n">_assemble</span><span class="p">()</span>
-                        <span class="c1"># get the shift of the fake connector</span>
-                        <span class="n">shift_x</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">index_shift_map</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">insert_connect</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
-                        <span class="c1"># replace the fake connect with the real one</span>
-                        <span class="n">origami</span><span class="p">[</span><span class="n">insert_connect</span><span class="p">]</span> <span class="o">=</span> <span class="n">connect_down</span>
+                        <span class="c1"># insert the top connector</span>
+                        <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insert_connect</span><span class="p">,</span> <span class="n">connect_down</span><span class="p">)</span>
+
+                        <span class="n">shift_x</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">num_char</span> 
+                                            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">origami</span><span class="p">[</span><span class="n">insert_connect</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                                                             <span class="p">:</span><span class="n">insert_connect</span><span class="p">[</span><span class="mi">1</span><span class="p">]]])</span>
+
                         <span class="n">connect_up</span><span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="n">shift_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                         <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">connect_up</span><span class="p">])</span>
 
@@ -1294,10 +1290,11 @@
                                                          <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                                                   <span class="p">)</span><span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="n">shift_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                                            <span class="p">)</span>
-                            <span class="c1"># remove the shift from the right</span>
+                            <span class="c1"># shift all the motifs until you reach the first connector</span>
                             <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">origami</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]:</span>
-                                <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">min_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">shift_x</span><span class="p">:</span>
-                                    <span class="n">m</span><span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="o">-</span><span class="n">shift_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                                <span class="n">m</span><span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                                <span class="k">if</span> <span class="s1">&#39;││╰─&#39;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                                    <span class="k">break</span>
 
                     <span class="k">if</span> <span class="n">insert_at</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">insert_at</span> <span class="o">=</span> <span class="n">current_index</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>

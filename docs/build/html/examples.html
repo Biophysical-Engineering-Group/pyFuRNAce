@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examples &mdash; pyFuRNAce 0.0.5 documentation</title>
+  <title>Examples &mdash; pyFuRNAce 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=282f96c0"></script>
+      <script src="_static/documentation_options.js?v=1fd71caa"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -23,7 +23,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="A collection of origami desinged by ROAD" href="notebooks/ROAD_origami.html" />
+    <link rel="next" title="RNA droplets" href="notebooks/droplets.html" />
     <link rel="prev" title="Script API Reference" href="api.html" /> 
 </head>
 
@@ -59,6 +59,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basics-usage">Basics usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#two-helices-with-flaps">Two helices with FLAPs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rna-droplets">RNA droplets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/droplets.html">RNA droplets</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">RNA droplets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#road-origami">ROAD origami</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="notebooks/ROAD_origami.html">A collection of origami desinged by ROAD</a></li>
 </ul>
@@ -109,6 +114,69 @@
 <h2>Basics usage<a class="headerlink" href="#basics-usage" title="Link to this heading"></a></h2>
 <section id="two-helices-with-flaps">
 <h3>Two helices with FLAPs<a class="headerlink" href="#two-helices-with-flaps" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">pyfurnace.generate</span> <span class="kn">import</span> <span class="n">generate_road</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="n">line1</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+<span class="linenos"> 5</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos"> 6</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos"> 7</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+<span class="linenos"> 8</span>         <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
+<span class="linenos"> 9</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+<span class="linenos">10</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">11</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+<span class="linenos">12</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Broccoli</span><span class="p">(),</span>
+<span class="linenos">13</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+<span class="linenos">14</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+<span class="linenos">15</span>         <span class="p">]</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+<span class="linenos">18</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos">19</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">20</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="linenos">21</span>         <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+<span class="linenos">22</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="linenos">23</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">24</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos">25</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+<span class="linenos">26</span>         <span class="p">]</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="linenos">31</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
+<span class="linenos">32</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span><span class="c1">### Optimization</span>
+<span class="linenos">35</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">sequence</span>
+<span class="linenos">36</span><span class="n">constraints</span> <span class="o">=</span> <span class="s1">&#39;GGGA&#39;</span> <span class="o">+</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">generate_road</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+<span class="linenos">39</span>                         <span class="n">sequence</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+<span class="linenos">40</span>                         <span class="n">pseudoknots</span><span class="o">=</span><span class="n">origami</span><span class="o">.</span><span class="n">pseudoknots</span><span class="p">)</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+<span class="linenos">43</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="linenos">44</span><span class="n">origami</span><span class="o">.</span><span class="n">save_3d_model</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
+<span class="linenos">45</span><span class="n">origami</span><span class="o">.</span><span class="n">save_fasta</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="rna-droplets">
+<h3>RNA droplets<a class="headerlink" href="#rna-droplets" title="Link to this heading"></a></h3>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/droplets.html">RNA droplets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/droplets.html#Droplet-A-with-Malachite-Green-aptamer">Droplet A with Malachite Green aptamer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/droplets.html#Droplet-B-with-Broccoli-aptamer">Droplet B with Broccoli aptamer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="id1">
+<h3>RNA droplets<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">pyfurnace.generate</span> <span class="kn">import</span> <span class="n">generate_road</span>
 <span class="linenos"> 3</span>
@@ -369,7 +437,6 @@
 </section>
 <section id="filament-notebook">
 <h3>Filament notebook<a class="headerlink" href="#filament-notebook" title="Link to this heading"></a></h3>
-<p>The following Jupyter notebooks provide interactive examples of using <strong>pyFuRNAce</strong> for RNA design and optimization tasks.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -392,7 +459,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="api.html" class="btn btn-neutral float-left" title="Script API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="notebooks/ROAD_origami.html" class="btn btn-neutral float-right" title="A collection of origami desinged by ROAD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="notebooks/droplets.html" class="btn btn-neutral float-right" title="RNA droplets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

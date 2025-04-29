@@ -1159,10 +1159,6 @@ class Motif(Callback):
                     elif (child.label == '&' or
                             (child.label == '(' 
                              and any(c.label=='(' for c in node.children[: i]))):
-                        # use a fake connector to adjust alignment
-                        fake_connect_down = Motif(Strand('──'),
-                                                  Strand('──', start=(0,2)),
-                                                 )
                         connect_down = Motif(Strand('──'),
                                             Strand('╮', start=(0,2)),
                                             Strand('╭', start=(1,2), direction=(0,-1))
@@ -1175,13 +1171,13 @@ class Motif(Callback):
                         else:
                             insert_connect = current_index
 
-                        # insert the face connector to calculate the shift
-                        origami.insert(insert_connect, fake_connect_down)
-                        origami._assemble()
-                        # get the shift of the fake connector
-                        shift_x = origami.index_shift_map[tuple(insert_connect)][0]
-                        # replace the fake connect with the real one
-                        origami[insert_connect] = connect_down
+                        # insert the top connector
+                        origami.insert(insert_connect, connect_down)
+
+                        shift_x = sum([m.num_char 
+                                            for m in origami[insert_connect[0], 
+                                                             :insert_connect[1]]])
+
                         connect_up.shift((shift_x, 0))
                         origami.append([connect_up])
 
@@ -1198,10 +1194,11 @@ class Motif(Callback):
                                                          start=(1, 0))
                                                   ).shift((shift_x, 0))
                                            )
-                            # remove the shift from the right
+                            # shift all the motifs until you reach the first connector
                             for m in origami[i, 1:]:
-                                if m.min_pos[0] > shift_x:
-                                    m.shift((-shift_x, 0))
+                                m.shift((2, 0))
+                                if '││╰─' in m:
+                                    break
 
                     if insert_at is None:
                         insert_at = current_index.copy()

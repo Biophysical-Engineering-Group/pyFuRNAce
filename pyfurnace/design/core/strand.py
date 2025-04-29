@@ -777,7 +777,7 @@ class Strand(Callback):
         self._prec_pos = pos - direction
         positions = []
         # pos_set = set() # to check weird crossings
-        directions = []
+        directions = [direction]
         seq_positions = []
         # Use list for efficient string concatenation
         new_strand = [] 

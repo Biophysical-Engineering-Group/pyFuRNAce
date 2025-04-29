@@ -13,6 +13,24 @@ Two helices with FLAPs
    :language: python
    :linenos:
 
+
+RNA droplets
+^^^^^^^^^^^^
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   notebooks/droplets
+
+RNA droplets
+^^^^^^^^^^^^
+
+.. literalinclude:: ../../examples/basic_usage.py
+   :language: python
+   :linenos:
+
+
 ROAD origami
 ^^^^^^^^^^^^
 .. toctree::
@@ -41,7 +59,6 @@ Full folding barrier optimization
 
 Filament notebook
 ^^^^^^^^^^^^^^^^^^
-The following Jupyter notebooks provide interactive examples of using **pyFuRNAce** for RNA design and optimization tasks.
 
 .. toctree::
    :maxdepth: 2

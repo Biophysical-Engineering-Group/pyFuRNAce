@@ -203,7 +203,7 @@ def initiate_session_state():
     if 'custom_strands' not in st.session_state:
         st.session_state.custom_strands = []
     if 'custom_motifs' not in st.session_state:
-        st.session_state.custom_motifs = [('Custom Motif', 'dpad', pf.Motif())]
+        st.session_state.custom_motifs = [('Custom Motif', 'dpad', pf.Motif(lock_coords=False))]
     if 'custom_key' not in st.session_state:
         st.session_state.custom_key = 0
     if "custom_edit" not in st.session_state:
@@ -297,7 +297,7 @@ def make_motif_menu(origami):
             if new_name:
                 icon = funny_bootstrap_icons[0]
                 funny_bootstrap_icons[:] = funny_bootstrap_icons[1:] + [funny_bootstrap_icons[0]]
-                st.session_state.custom_motifs.append((new_name, icon, pf.Motif()))
+                st.session_state.custom_motifs.append((new_name, icon, pf.Motif(lock_coords=False)))
                 st.session_state.custom_key += 1
                 st.rerun()
         current_custom_motif = [m for m in st.session_state.custom_motifs if m[0] == motif_selected][0][2]
@@ -458,7 +458,7 @@ def add_motif(origami):
                                               f"coords=pf.Coords({s.coords.array.tolist()}, "
                                               f"dummy_ends=({s.coords.dummy_ends[0].tolist()}, "
                                               f"{s.coords.dummy_ends[1].tolist()}))))\n")
-        st.session_state.motif_buffer += f"motif = pf.Motif(strands, structure = '{motif.structure}')"
+        st.session_state.motif_buffer += f"motif = pf.Motif(strands, structure = '{motif.structure}', lock_coords={motif.lock_coords})"
 
     ### Show the preview of the motif
     def f_col1():

@@ -1266,6 +1266,7 @@ class Motif(Callback):
             motif[i].pk_info = new_pk_info
             seq_offset += len(struct)
 
+        kwargs.setdefault('lock_coords', False)
         obj = cls(**kwargs)
         obj.replace_all_strands(motif, copy=False, join=False)
         return obj

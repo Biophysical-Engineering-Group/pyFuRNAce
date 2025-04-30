@@ -1229,7 +1229,7 @@ class Strand(Callback):
         new_strand._sequence = new_seq
 
         new_strand._coords = self._coords.copy()
-        new_strand._strands_block = StrandsBlock(self)
+        new_strand._strands_block = StrandsBlock(new_strand)
 
         ### callbacks
         new_strand._callbacks = [callback] if callback else []
@@ -1841,8 +1841,8 @@ class StrandsBlock(set):
         if not isinstance(item, Strand):
             raise ValueError(f"The item must be a Strand instance, got {type(item)}")
         
-        # append the strand to the block if it is not already in the block
-        if not item._coords.is_empty():
+        # append the strand to the block if it has coordinates
+        if not item.coords.is_empty():
             super().add(item)
             item._strands_block = self
 

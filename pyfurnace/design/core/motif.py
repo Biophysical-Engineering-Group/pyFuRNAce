@@ -1096,7 +1096,7 @@ class Motif(Callback):
             raise ValueError(f"Invalid structure representation: {structure}")
         
         # initialize the origami object
-        origami = Origami([[]], align='first')
+        origami = Origami([[]], align='first', ss_assembly=True)
         current_index = [0, 0]
 
         def recursive_build_origami(node, insert_at=None, flip=False):

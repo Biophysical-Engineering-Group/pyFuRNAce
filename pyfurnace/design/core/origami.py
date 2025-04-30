@@ -1001,11 +1001,12 @@ class Origami(Callback):
             # add the line to the motif
             mot, v_shifts = Motif.concat(mot, line, 
                                          axis=0, 
+                                         copy=False,
                                          align=False, 
-                                         lock_coords=False,
                                          position_based=True, 
                                          return_shifts=True,
-                                         unlock_strands=self._ss_assembly)
+                                         unlock_strands=self._ss_assembly,
+                                         lock_coords=False)
             if len(v_shifts) > 1 and ind % 2 == 0:
                 # add the vertical shift to the horizontal shift
                 shifts[ind // 2] = [h + v_shifts[1] for h in shifts[ind // 2]]

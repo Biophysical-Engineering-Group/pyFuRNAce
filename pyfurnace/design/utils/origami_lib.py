@@ -179,7 +179,7 @@ def simple_origami(
         # add the end of the helix: a stem of 5 bases and a tetraloop
         helix += [Stem(end_helix_len), TetraLoop(open_left=True)]
         # add the helix to the origami
-        origami.append(helix)
+        origami.append(helix, copy=False)
 
     # remove the top cross from the dovetails of the first helix
     for motif in origami[0]:

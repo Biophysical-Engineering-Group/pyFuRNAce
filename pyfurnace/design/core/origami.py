@@ -741,7 +741,10 @@ class Origami(Callback):
                     
                     # get the strand and set the curent base maps
                     strand = self._matrix[strand_ID[0]][strand_ID[1]][strand_ID[2]]
-                    strand.sequence = new_strand_seq
+                    strand_dir = 1
+                    if strand.directionality == '35':
+                        strand_dir = -1
+                    strand.sequence = new_strand_seq[::strand_dir]
 
                     # reset the current base map with the new strand
                     new_strand_seq = ''
@@ -1020,6 +1023,10 @@ class Origami(Callback):
                                     for i, line in enumerate(self._matrix)
                                         for j, m in enumerate(line)
                                             for pos in m.positions}
+        
+        for s in self._assembled:
+            if s.directionality == '35':
+                s.invert()
 
     def _updated_motif(self, **kwargs) -> None:
         """

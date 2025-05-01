@@ -628,7 +628,9 @@ class Motif(Callback):
         
         seq_list = seq_list[:] # copy the list
         for s in self:
-            s.sequence = seq_list.pop(0)
+            seq = seq_list.pop(0)
+            direct = 1 if s.directionality == '53' else -1
+            s.sequence = seq[::direct]
 
     @property
     def seq_positions(self) -> Tuple[Position]:

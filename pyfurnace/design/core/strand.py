@@ -1440,6 +1440,7 @@ class Strand(Callback):
         """
         # don't trigger the callbacks, the strand is the same for the Motif
         seq_len = len(self.sequence)
+        strand_len = len(self.strand)
 
         # update the start positions and direction
         end = self.end
@@ -1450,7 +1451,7 @@ class Strand(Callback):
         self._strand = self._strand[::-1]
         self._sequence._directionality = self._sequence._directionality[::-1]
         self._sequence._sequence = self._sequence._sequence[::-1]
-        self._seq_slice = [slice(seq_len - sl.stop, seq_len - sl.start)
+        self._seq_slice = [slice(strand_len - sl.stop, strand_len - sl.start)
                                 for sl in self._seq_slice[::-1]]
         
         # invert the positions if already built

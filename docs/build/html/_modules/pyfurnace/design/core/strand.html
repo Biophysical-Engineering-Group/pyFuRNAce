@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyfurnace.design.core.strand &mdash; pyFuRNAce 0.0.6 documentation</title>
+  <title>pyfurnace.design.core.strand &mdash; pyFuRNAce 0.0.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1319,7 +1319,7 @@
         <span class="n">new_strand</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="n">new_seq</span>
 
         <span class="n">new_strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">new_strand</span><span class="o">.</span><span class="n">_strands_block</span> <span class="o">=</span> <span class="n">StrandsBlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">new_strand</span><span class="o">.</span><span class="n">_strands_block</span> <span class="o">=</span> <span class="n">StrandsBlock</span><span class="p">(</span><span class="n">new_strand</span><span class="p">)</span>
 
         <span class="c1">### callbacks</span>
         <span class="n">new_strand</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">callback</span><span class="p">]</span> <span class="k">if</span> <span class="n">callback</span> <span class="k">else</span> <span class="p">[]</span>
@@ -1551,6 +1551,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># don&#39;t trigger the callbacks, the strand is the same for the Motif</span>
         <span class="n">seq_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="n">strand_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strand</span><span class="p">)</span>
 
         <span class="c1"># update the start positions and direction</span>
         <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span>
@@ -1561,7 +1562,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_strand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strand</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">_directionality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">_directionality</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_seq_slice</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">seq_len</span> <span class="o">-</span> <span class="n">sl</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">seq_len</span> <span class="o">-</span> <span class="n">sl</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seq_slice</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">strand_len</span> <span class="o">-</span> <span class="n">sl</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">strand_len</span> <span class="o">-</span> <span class="n">sl</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
                                 <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_slice</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
         
         <span class="c1"># invert the positions if already built</span>
@@ -1976,8 +1977,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Strand</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The item must be a Strand instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         
-        <span class="c1"># append the strand to the block if it is not already in the block</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+        <span class="c1"># append the strand to the block if it has coordinates</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
             <span class="n">item</span><span class="o">.</span><span class="n">_strands_block</span> <span class="o">=</span> <span class="bp">self</span></div>
 

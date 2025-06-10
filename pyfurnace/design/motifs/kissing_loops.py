@@ -20,7 +20,7 @@ class KissingLoop(Loop):
                  seq_len: int = 0,
                  pk_index: Union[str, int] = "0",
                  energy: float = -9.0,
-                 energy_tolerace: float = 1.0,
+                 energy_tolerance: float = 1.0,
                  **kwargs) -> None:
         """
         Initialize a KissingLoop motif representing an internal pseudoknotted 
@@ -38,7 +38,7 @@ class KissingLoop(Loop):
             Pseudoknot identifier used to tag the kissing interaction (default is "0").
         energy : float, optional
             Free energy associated with the interaction (default is -9.0 kcal/mol).
-        energy_tolerace : float, optional
+        energy_tolerance : float, optional
             Energy tolerance for structural variants (default is 1.0 kcal/mol).
         **kwargs : dict
             Additional parameters passed to `Loop`.
@@ -52,7 +52,7 @@ class KissingLoop(Loop):
         self._pk_index = self._check_pk_index(pk_index)
         self._seq_len = seq_len
         self._energy = energy
-        self._energy_tolerance = energy_tolerace
+        self._energy_tolerance = energy_tolerance
         if 'strands' in kwargs:
             strands = kwargs.pop('strands')
         else:
@@ -188,9 +188,9 @@ class KissingLoop(Loop):
 class KissingLoop120(KissingLoop):
     """ Structure from PDB: 1BJ2"""
 
-    def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+    def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerance: float = 1.0, **kwargs):
         kwargs['seq_len'] = 7
-        super().__init__(open_left = open_left, sequence = sequence, pk_index = pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+        super().__init__(open_left = open_left, sequence = sequence, pk_index = pk_index, energy = energy, energy_tolerance = energy_tolerance, **kwargs)
         self[0]._coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop120.dat', 
                                                 dummy_ends=(True, True))
 
@@ -198,9 +198,9 @@ class KissingLoop120(KissingLoop):
 class KissingLoop180(KissingLoop):
     """ Structure generated from a perfect helix"""
 
-    def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+    def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerance: float = 1.0, **kwargs):
         kwargs['seq_len'] = 6
-        super().__init__(open_left = open_left, sequence = sequence, pk_index = pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+        super().__init__(open_left = open_left, sequence = sequence, pk_index = pk_index, energy = energy, energy_tolerance = energy_tolerance, **kwargs)
 
     def get_kissing_sequence(self):
         return super().get_kissing_sequence()[2:-1]
@@ -229,9 +229,9 @@ class KissingLoop180(KissingLoop):
 
 class BranchedKissingLoop(KissingLoop):
 
-    def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+    def __init__(self, open_left = False, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerance: float = 1.0, **kwargs):
         kwargs['seq_len'] = 6
-        super().__init__(open_left = open_left, sequence = sequence, pk_index = pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+        super().__init__(open_left = open_left, sequence = sequence, pk_index = pk_index, energy = energy, energy_tolerance = energy_tolerance, **kwargs)
 
     def get_kissing_sequence(self):
         """ Returns the kissing sequence of the kissing loop """
@@ -266,14 +266,14 @@ class BranchedKissingLoop(KissingLoop):
 
 class KissingDimer(KissingLoop180):
     
-    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerance: float = 1.0, **kwargs):
         """
         Attributes of the class KissingDimer, which is a daugther class of the class Motif.
         -----------------------------------------------------------------------------------
         sequence: str
             nucelotide sequnce in the internal KL
         """
-        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerance = energy_tolerance, **kwargs)
 
     ### 
     ### METHODS
@@ -307,7 +307,7 @@ class KissingDimer(KissingLoop180):
                                     sequence=seq, 
                                     pk_index=self._pk_index, 
                                     energy=self._energy, 
-                                    energy_tolerace=self._energy_tolerance)[0]
+                                    energy_tolerance=self._energy_tolerance)[0]
         
         ## COORDINATES FROM OXVIEW HELIX
         top_strand._coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop180_2.dat')
@@ -332,14 +332,14 @@ class KissingDimer(KissingLoop180):
 
 class KissingDimer120(KissingLoop120):
     
-    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerance: float = 1.0, **kwargs):
         """
         Attributes of the class KissingDimer, which is a daugther class of the class Motif.
         -----------------------------------------------------------------------------------
         sequence: str
             nucelotide sequnce in the internal KL
         """
-        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerance = energy_tolerance, **kwargs)
 
     ### 
     ### METHODS
@@ -373,7 +373,7 @@ class KissingDimer120(KissingLoop120):
                                     sequence=seq, 
                                     pk_index=self._pk_index, 
                                     energy=self._energy, 
-                                    energy_tolerace=self._energy_tolerance)[0]
+                                    energy_tolerance=self._energy_tolerance)[0]
         
         ## COORDINATES FROM OXVIEW HELIX
         # changing the bottom strand because the top strand
@@ -404,14 +404,14 @@ class BranchedDimer(BranchedKissingLoop):
     # strand 1: bkl connection
     # strand 2: Dimer strand
     
-    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerace: float = 1.0, **kwargs):
+    def __init__(self, sequence: str = "", pk_index: str|int = '0', energy: float = -9.0, energy_tolerance: float = 1.0, **kwargs):
         """
         Attributes of the class KissingDimer, which is a daugther class of the class Motif.
         -----------------------------------------------------------------------------------
         sequence: str
             nucelotide sequnce in the internal KL
         """
-        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerace = energy_tolerace, **kwargs)
+        super().__init__(sequence = sequence, pk_index=pk_index, energy = energy, energy_tolerance = energy_tolerance, **kwargs)
 
     ### 
     ### METHODS
@@ -450,7 +450,7 @@ class BranchedDimer(BranchedKissingLoop):
                                     sequence=sequence, 
                                     pk_index=self._pk_index, 
                                     energy=self._energy, 
-                                    energy_tolerace=self._energy_tolerance)[0]
+                                    energy_tolerance=self._energy_tolerance)[0]
         ## COORDINATES FROM OXVIEW HELIX
         top_strand._coords = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_3.dat')
 

@@ -37,8 +37,7 @@ def find_stems_in_multiloop(node: Union[str, Node],
         parent_mloop = []
 
     # A multiloop is a node with at least two paired children
-    if (node.label == '(' 
-            and len([1 for child in node.children if child.label == '(']) > 1):
+    if len([1 for child in node.children if child.label == '(']) > 1:
         # if the parent mloop is not empty, 
         # append the last child index to the dovetails
         if parent_mloop:

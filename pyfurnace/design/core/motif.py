@@ -667,7 +667,7 @@ class Motif(Callback):
 
         ### ADD THE BREAK POINTS ###
         for i, bp in enumerate(break_points):
-            dotbracket = dotbracket[:bp + i] + '&' + dotbracket[bp + i:]
+            dotbracket = dotbracket[:bp] + '&' + dotbracket[bp:]
         self._structure = dotbracket
 
         return self._structure

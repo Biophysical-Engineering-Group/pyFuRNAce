@@ -1,6 +1,7 @@
 from IPython.display import display, HTML
 from typing import List, Optional, Union, Any
 import tempfile
+
 # try to import the oxDNA_analysis_tools package
 try:
     from oxDNA_analysis_tools.UTILS.oxview import oxdna_conf
@@ -8,30 +9,31 @@ try:
     oat_installed = True
 except:
     oat_installed = False
+
 # own imports
 from ..core import *
 from ..motifs import *
 from .motif_lib import *
 
 # A dictionary to convert angles to dovetail values
-ANGLES_DT_DICT = {26: -6,
-                  58: - 5,
-                  90 : -4,
-                  122 : -3,
+ANGLES_DT_DICT = { 26: -6,
+                   58: -5,
+                   90: -4,
+                  122: -3,
                   122: -3,
                   154: -2,
                   186: -1,
-                  218: 0,
-                  250: 1,
-                  282: 2,
-                  314: 3,
-                  346: 4,
-                  378: 5,
-                  410: 6}
+                  218:  0,
+                  250:  1,
+                  282:  2,
+                  314:  3,
+                  346:  4,
+                  378:  5,
+                  410:  6}
 
 def convert_angles_to_dt(angles_list: List[float]) -> List[int]:
     """
-    Convert a list of helix angles into corresponding dovetail values based 
+    Convert a list of helix angles into corresponding dovetail values based
     on a predefined mapping.
 
     Parameters
@@ -78,10 +80,10 @@ def simple_origami(
     main_stem : int or list of int or list of list of int, optional
         Length(s) of the main stem in each kissing loop.
         Can be a single int, a list (same for all loops), or a matrix for per-loop
-          customization.
+        customization.
     left_stem_kl : int or list of int or list of list of int, optional
         Length(s) of the left stem for each kissing loop. Defaults to automatic
-          computation.
+        computation.
     stem_pos : int or list of int, optional
         Position(s) of the main stem insertion among helices. Default is 0 for all.
     start : int, optional
@@ -91,7 +93,7 @@ def simple_origami(
     end_helix_len : int, optional
         Length of the stems at the ends of the helices (default is 8).
     use_angles : bool, optional
-        If True, interpret `dt_list` as helix angles and convert them to dovetail 
+        If True, interpret `dt_list` as helix angles and convert them to dovetail
         values (default is False).
     add_start_end : bool, default True
         Whether to add a start-end motif in the initial helix.
@@ -107,6 +109,7 @@ def simple_origami(
     # initialize the origami structure
     origami = Origami(align=align)
 
+    # convert angles to dovetail values if needed
     if use_angles:
         dt_list = convert_angles_to_dt(dt_list)
     
@@ -114,70 +117,101 @@ def simple_origami(
     if add_terminal_helix:
         dt_list = [0] + dt_list + [0]
 
-    # if the main_stem list is not given, set it to the minimum value for each KL
-    if main_stem is None:
+    ### ADJUST THE MAIN STEM MATRIX
+
+    if main_stem is None: # set it to the minimum value for each KL
         max_dt = max([abs(dt) for dt in dt_list], default=0)
         main_stem = [[11 * ((max_dt + 17) // 11 + 1)] * kl_columns] * len(dt_list)
+
     elif type(main_stem) == int:
-        main_stem = [[main_stem for _ in range(kl_columns)] for _ in range(len(dt_list))]
-    elif type(main_stem) == list and all(isinstance(x, int) for x in main_stem):
+        main_stem = [[main_stem for _ in range(kl_columns)] 
+                                    for _ in range(len(dt_list))]
+
+    elif (type(main_stem) == list 
+            and all(isinstance(x, int) for x in main_stem)):
         main_stem = [main_stem for _ in range(len(dt_list))]
-    elif type(main_stem) == list and all(isinstance(x, (tuple, list)) for x in main_stem):
+
+    elif (type(main_stem) == list 
+            and all(isinstance(x, (tuple, list)) for x in main_stem)):
+        
         if not all(len(x) == kl_columns for x in main_stem):
-            raise ValueError("The main_stem list should have the same length as the kissing loops repeats")
+            raise ValueError("The main_stem list should have the same length"
+                             " as the kissing loops repeats")
     else:
-        raise ValueError("The main_stem can be an int, a list of int or a matrix of int")
+        raise ValueError("The main_stem can be an int, a list of int or a"
+                         " matrix of int")
+
+    ### ADJUST THE LEFT KL STEM MATRIX
 
     if left_stem_kl is None:
         left_stem_kl = [[None] * kl_columns for _ in range(len(dt_list))]
+
     elif type(left_stem_kl) == int:
-        left_stem = [[left_stem_kl for _ in range(kl_columns)] for _ in range(len(dt_list))]
-    elif type(left_stem_kl) == list and all(isinstance(x, int) for x in left_stem_kl):
-        left_stem_kl = [[left_stem_kl[i]] * kl_columns for i in range(len(dt_list))]
-    elif type(left_stem_kl) == list and all(isinstance(x, (tuple, list)) for x in left_stem_kl):
+        left_stem_kl = [[left_stem_kl for _ in range(kl_columns)] 
+                                            for _ in range(len(dt_list))]
+
+    elif (type(left_stem_kl) == list 
+            and all(isinstance(x, int) for x in left_stem_kl)):
+        left_stem_kl = [[left_stem_kl[i]] * kl_columns 
+                                        for i in range(len(dt_list))]
+
+    elif (type(left_stem_kl) == list 
+            and all(isinstance(x, (tuple, list)) for x in left_stem_kl)):
+        
         if not all(len(x) == kl_columns for x in left_stem_kl):
-            raise ValueError("The left_stem_kl list should have the same length as the kissing loops repeats")
+            raise ValueError("The left_stem_kl list should have the same length "
+                             "as the kissing loops repeats")
     else:
-        raise ValueError("The left_stem_kl can be an int, a list of int or a matrix of int")
+        raise ValueError("The left_stem_kl can be an int, a list of int or a "
+                         "matrix of int")
 
     if stem_pos is None:
         stem_pos = [0 for _ in range(kl_columns)]
     elif type(stem_pos) == int:
         stem_pos = [stem_pos for _ in range(kl_columns)]
 
-    # create an helix for each dovetail in the list
+    ### BUILD THE ORIGAMI STRUCTURE, helix by helix
     for helix_in, dt in enumerate(dt_list):
 
-        # create the start of the stem: a tetraloop and a stem of 5 bases
+        # create the start of the stem
         helix = [TetraLoop(), Stem(end_helix_len), Dovetail(dt)]
 
         # add Kissing loops repeats to the helix
         for kl_index in range(kl_columns):
+
+            # calculate the stem lengths
             stem_len = main_stem[helix_in][kl_index]
             left_stem = left_stem_kl[helix_in][kl_index]
             if left_stem is None:
                 left_stem = (stem_len - 8 - abs(dt)) // 2
             right_stem = (stem_len - 8 - abs(dt)) - left_stem
 
-            # if the helix position is in the stem_position list for the given KL index, add a stem
+            # this is a position where to add a continuous stem
             if stem_pos[kl_index] == helix_in:
-                if kl_index == start and add_start_end: # add the start motif after the first stem
+
+                # add the start position in this stem
+                if kl_index == start and add_start_end: 
                     half_l_stem = (stem_len - abs(dt)) // 2
                     half_r_stem = stem_len - abs(dt) - half_l_stem
-                    helix += [Stem(half_l_stem)
-                                .shift((1,0), extend=True), 
+                    helix += [Stem(half_l_stem).shift((1,0), extend=True),
                               start_end_stem(), 
-                              Stem(half_r_stem), Dovetail(dt)]
-                else:
-                    helix += [Stem(main_stem[helix_in][kl_index] - abs(dt))
-                                .shift((6,0), extend=True),
+                              Stem(half_r_stem), 
                               Dovetail(dt)]
-            # add a kissing normal loop repeat
+                else:
+                    stem_len = main_stem[helix_in][kl_index] - abs(dt)
+                    helix += [Stem(stem_len).shift((6,0), extend=True),
+                              Dovetail(dt)]
+                    
+            # normal kissing loop repeat
             else:
-                helix += [Stem(left_stem), KissingDimer(), Stem(right_stem), Dovetail(dt)]
+                helix += [Stem(left_stem), 
+                          KissingDimer(), 
+                          Stem(right_stem), 
+                          Dovetail(dt)]
 
-        # add the end of the helix: a stem of 5 bases and a tetraloop
+        # add the end of the helix
         helix += [Stem(end_helix_len), TetraLoop(open_left=True)]
+
         # add the helix to the origami
         origami.append(helix, copy=False)
 
@@ -212,7 +246,8 @@ def ipython_display_3D(origami: Origami, **kwargs: Any) -> None:
     None
     """
     if not oat_installed:
-        warnings.warn("The oxDNA_analysis_tools package is not installed, the 3D display is not available.")
+        warnings.warn("The oxDNA_analysis_tools package is not installed, "
+                      "the 3D display is not available.")
         return
     # Create a temporary directory
     with tempfile.TemporaryDirectory() as tmpdirname:
@@ -240,7 +275,8 @@ def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
     """
     # Convert your text to scrollable HTML
     scrollable_html = f"""
-    <div style="max-height: {max_height}px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
+    <div style="max-height: {max_height}px; overflow-y: scroll; 
+                border: 1px solid #ccc; padding: 10px;">
     <pre>{origami_text}</pre>
     </div>
     """

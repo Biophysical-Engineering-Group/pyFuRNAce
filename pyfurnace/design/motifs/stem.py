@@ -9,6 +9,47 @@ from typing import Optional, List, Union
 
 
 class Stem(Motif):
+    """
+    Represents a helical RNA stem motif consisting of complementary base-paired strands.
+
+    The `Stem` class models a double-stranded RNA region with optional support for
+    wobble base pairs and short-sequences set to strong bases.
+    It can be created from a user-defined sequence or automatically
+    generated based on a target length.
+
+    Parameters
+    ----------
+    length : int, optional
+        Number of base pairs in the stem. Ignored if `sequence` is provided.
+    sequence : str or Sequence, optional
+        Sequence for the top strand. If provided, the bottom strand is inferred
+        as its reverse complement.
+    wobble_interval : int, optional
+        Spacing interval for inserting wobble base pairs, e.g., every N bases.
+        Default is 5. Ignored if `sequence` is given.
+    wobble_tolerance : int, optional
+        Maximum random deviation from the defined wobble interval. Default is 2.
+    wobble_insert : {"middle", "start", "end"}, optional
+        Positioning strategy for wobble base insertions. Default is "middle".
+    strong_bases : bool, optional
+        If True, use strong (GC) base pairing for short stems (≤ 3 bp).
+        Default is True.
+    **kwargs : dict, optional
+        Additional keyword arguments passed to the `Motif` superclass.
+
+    Attributes
+    ----------
+    length : int
+        Signed length of the stem (positive for forward orientation).
+    wobble_interval : int
+        Interval used for wobble base insertion. Zero if sequence is specified.
+    wobble_tolerance : int
+        Allowed range of randomness around the wobble interval.
+    wobble_insert : str
+        Strategy for where to place wobble base pairs.
+    strands : list of Strand
+        Two strands forming the helical stem, including sequence and 3D coordinates.
+    """
     
     def __init__(self,
                  length: int = 0,
@@ -55,27 +96,36 @@ class Stem(Motif):
         """
         ### set default values
         if wobble_insert not in ["middle", "start", "end"]:
-            raise ValueError(f"Invalid value for wobble_insert: {wobble_insert}. The value must be 'middle', 'start' or 'end'.")
+            raise ValueError(f"Invalid value for wobble_insert: {wobble_insert}. "
+                             "The value must be 'middle', 'start' or 'end'.")
         if not isinstance(wobble_interval, int) or wobble_interval < 0:
-            raise TypeError(f'The wobble frequency must be a positive integer, got {wobble_interval}.')
+            raise TypeError(f'The wobble frequency must be a positive integer,'
+                            f' got {wobble_interval}.')
         if not isinstance(wobble_tolerance, int) or wobble_tolerance < 0:
-            raise TypeError(f'The wobble tolerance must be a positive integer, got {wobble_tolerance}.')
+            raise TypeError(f'The wobble tolerance must be a positive integer, '
+                            f'got {wobble_tolerance}.')
         if not isinstance(length, int):
             raise TypeError(f'The length of a stem must be an integer, got {length}.')
         if not isinstance(sequence, (str, Sequence)):
-            raise TypeError(f'The sequence of a stem must be a string or a Sequence object, got {type(sequence)}.')
+            raise TypeError(f'The sequence of a stem must be a string or a Sequence '
+                            f'object, got {type(sequence)}.')
 
         self._wobble_interval = wobble_interval if not sequence else 0
         self._wobble_tolerance = wobble_tolerance if not sequence else 0
         self._wobble_insert = wobble_insert
-        self._length = len(sequence) * getattr(self, '_sign', 1) if sequence else length
+        self._length = length
+        if sequence:
+            self._length = len(sequence) * getattr(self, '_sign', 1)
         
         ### If the user doesn't provide strands, update them directly
         if "strands" in kwargs:
             strands = kwargs.pop("strands")
         else:
             ### create the strands
-            strands = self._create_strands(sequence=sequence, length=length, return_strands=True, strong_bases=strong_bases)
+            strands = self._create_strands(sequence=sequence, 
+                                           length=length, 
+                                           return_strands=True, 
+                                           strong_bases=strong_bases)
 
         kwargs["join"] = False
         # Initialize the motif
@@ -93,7 +143,8 @@ class Stem(Motif):
     @length.setter
     def length(self, new_length):
         if not isinstance(new_length, int):
-            raise TypeError(f'The length of a stem must be an integer, got {new_length}.')
+            raise TypeError(f'The length of a stem must be an integer, '
+                            f'got {new_length}.')
         self._create_strands(length=new_length)
 
     @property
@@ -103,7 +154,8 @@ class Stem(Motif):
     @wobble_interval.setter
     def wobble_interval(self, new_freq):
         if not isinstance(new_freq, int) or new_freq < 0:
-            raise TypeError(f'The wobble frequency must be a positive integer, got {new_freq}.')
+            raise TypeError(f'The wobble frequency must be a positive integer, '
+                            f'got {new_freq}.')
         self._wobble_interval = new_freq
         # update the sequence of the top strand and the bottom strand
         self.length = self._length
@@ -115,7 +167,8 @@ class Stem(Motif):
     @wobble_tolerance.setter
     def wobble_tolerance(self, new_tolerance):
         if not isinstance(new_tolerance, int) or new_tolerance < 0:
-            raise TypeError(f'The wobble tolerance must be a positive integer, got {new_tolerance}.')
+            raise TypeError(f'The wobble tolerance must be a positive integer, '
+                            f'got {new_tolerance}.')
         self._wobble_tolerance = new_tolerance
         # update the sequence of the top strand and the bottom strand
         self.length = self._length
@@ -127,7 +180,8 @@ class Stem(Motif):
     @wobble_insert.setter
     def wobble_insert(self, new_insert):
         if new_insert not in ["middle", "start", "end"]:
-            raise ValueError(f"Invalid value for wobble_insert: {new_insert}. The value must be 'middle', 'start' or 'end'.")
+            raise ValueError(f"Invalid value for wobble_insert: {new_insert}. "
+                             f"The value must be 'middle', 'start' or 'end'.")
         self._wobble_insert = new_insert
         # update the sequence of the top strand and the bottom strand
         self.length = self._length
@@ -136,13 +190,13 @@ class Stem(Motif):
     ### METHOD
     ###
 
-    def set_top_sequence(self, new_seq):
+    def set_up_sequence(self, new_seq):
         """ Set the sequence of the top strand """
         if not isinstance(new_seq, str):
             raise TypeError(f'The sequence of a stem must be a string, got {new_seq}.')
         self._create_strands(sequence=new_seq)
 
-    def set_bottom_sequence(self, new_seq):
+    def set_down_sequence(self, new_seq):
         """ Set the sequence of the bottom strand """
         self.set_top_sequence(sequence=new_seq.translate(nucl_to_pair)[::-1])
 
@@ -197,7 +251,12 @@ class Stem(Motif):
         ### Create the top and bottom strands
         if sequence: # if a sequence is provided, it has the priority
             self._length = seq_len  * getattr(self, '_sign', 1)
-            strands = [Strand(sequence, coords=top_coord), Strand(sequence.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=(-1, 0), coords=bot_coord)]
+            strands = [Strand(sequence, coords=top_coord), 
+                       Strand(sequence.translate(nucl_to_pair)[::-1], 
+                              directionality='53', 
+                              start=(seq_len - 1, 2), 
+                              direction=(-1, 0), 
+                              coords=bot_coord)]
         else:
             self._length = length
             if seq_len <= 3 and strong_bases:
@@ -210,7 +269,7 @@ class Stem(Motif):
                     min_wobble = max(1, 
                                      self._wobble_interval - self._wobble_tolerance)
                     return random.randint(min_wobble, 
-                                          self._wobble_interval + self._wobble_tolerance)
+                                        self._wobble_interval + self._wobble_tolerance)
                 
                 seq = ['N'] * seq_len
                 # calculate the maximum index to calculate the wobble bases
@@ -220,9 +279,13 @@ class Stem(Motif):
                     
                     if self._wobble_insert == "start":
                         seq[i] = 'K'
-                    elif self._wobble_insert == "end" and i + random_wobble < seq_len - 1:
+
+                    elif (self._wobble_insert == "end" 
+                            and i + random_wobble < seq_len - 1):
                         seq[i + random_wobble] = 'K'
-                    elif self._wobble_insert == "middle" and i + random_wobble // 2 < seq_len - 1:
+
+                    elif (self._wobble_insert == "middle" 
+                            and i + random_wobble // 2 < seq_len - 1):
                         seq[i + random_wobble // 2] = 'K'
                     
                     # calculate the next index to insert a wobble base
@@ -234,7 +297,12 @@ class Stem(Motif):
 
             else:
                 seq = 'N' * seq_len
-            strands = [Strand(seq, coords=top_coord), Strand(seq.translate(nucl_to_pair)[::-1], directionality='53', start=(seq_len - 1, 2), direction=(-1, 0), coords=bot_coord)]
+            strands = [Strand(seq, coords=top_coord), 
+                       Strand(seq.translate(nucl_to_pair)[::-1], 
+                              directionality='53', 
+                              start=(seq_len - 1, 2), 
+                              direction=(-1, 0), 
+                              coords=bot_coord)]
 
         if return_strands:
             return strands

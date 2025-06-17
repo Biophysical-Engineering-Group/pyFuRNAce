@@ -18,10 +18,10 @@ def oxdna_simulations(origami: Origami,
                       ) -> Union[str, None]:
     """
     Prepare the files for the OxDNA simulations. The function saves the
-    files for oxdna simulations in the specified directory (created if it does not exist).
-    The function also creates a zip file with the files for the simulations if the flag
-    zip_directory is set to True. If the directory is set to None, the program automatically
-    creates a zip file and returns the path to the zip file.
+    files for oxdna simulations in the specified directory (created if it does not 
+    exist). The function also creates a zip file with the files for the simulations 
+    if the flag zip_directory is set to True. If the directory is set to None, the 
+    program automatically creates a zip file and returns the path to the zip file.
 
     Parameters
     ----------

@@ -389,7 +389,7 @@ def primers_setup():
 
 def md_setup():
     if (not st.session_state.get('origami') or
-        not all(n in 'AUCG' for n in st.session_state.origami.sequence)):
+        not all(n in 'AUCG&' for n in st.session_state.origami.sequence)):
 
         st.error("The origami blueprint is empty or it doesn't contain a sequence",
                  icon=":material/personal_injury:")
@@ -527,7 +527,7 @@ def md_input():
                 )
         
     # delete the zip file
-    if os.path.exists(st.session_state.zip_path):
+    if os.path.exists(zip_path):
         os.remove(zip_path)
     return
 

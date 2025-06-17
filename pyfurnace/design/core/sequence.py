@@ -270,6 +270,22 @@ class Sequence(Callback):
                 distance += 1
 
         return distance
+    
+    def find(self, sub: str) -> int:
+        """
+        Find the first occurrence of a subsequence in the sequence.
+
+        Parameters
+        ----------
+        sub : str
+            Subsequence to find.
+
+        Returns
+        -------
+        int
+            Index of the first occurrence of the subsequence, or -1 if not found.
+        """
+        return self._sequence.find(sub)
 
     def find_repeated_subsequence(self, min_length: int = 8) -> Set[str]:
         """
@@ -382,6 +398,17 @@ class Sequence(Callback):
                     seq[v] = random.choice(list(possible_paired_nucleotides))
 
         return Sequence("".join(seq), self.directionality)
+    
+    def lower(self) -> str:
+        """
+        Convert sequence to lowercase.
+        
+        Returns
+        -------
+        str
+            Lowercase sequence string.
+        """
+        return self._sequence.lower()
 
     def molecular_weight(self) -> float:
         """

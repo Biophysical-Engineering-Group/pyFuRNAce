@@ -1105,9 +1105,11 @@ class Strand(Callback):
                                     callback=self._updated_sequence)
 
         new_seq_str = new_sequence._sequence
-        # reset the coordinates if the sequence changed length
-        if len(new_seq_str) != len(self._coords):
+        
+        # reset the coordinates and positions if the sequence changed length
+        if len(new_seq_str) != len(self._sequence):
             self._coords = Coords(()) # reset the oxDNA coordinates
+            self._reset_positions()
 
         # assign the new sequence
         self._sequence = new_sequence
@@ -1127,8 +1129,6 @@ class Strand(Callback):
         # add the rest of the sequence if any
         if new_seq_str[seq_ind:]:
             build_strand += new_seq_str[seq_ind:]
-            # this updates the positions too
-            self._reset_positions()
 
         # update the strand
         self._strand = build_strand

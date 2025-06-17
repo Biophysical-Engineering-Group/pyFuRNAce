@@ -169,15 +169,7 @@ def test_motif_sequence_assignment(m_two_strands):
     motif = m_two_strands.copy()
     sequences = ['AUCG', 'GCGA']
     motif.sequence = sequences
-    expected_seqs = ''
-    for strand, seq in zip(m_two_strands, sequences):
-        if strand.directionality == '53':
-            expected_seqs += str(seq)
-        else:
-            expected_seqs += str(seq[::-1])
-        expected_seqs += '&'
-    expected_seqs = expected_seqs[:-1]
-    assert motif.sequence == expected_seqs
+    assert motif.sequence == '&'.join(sequences)
 
 
 def test_motif_concat(m_two_strands):

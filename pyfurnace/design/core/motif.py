@@ -596,7 +596,7 @@ class Motif(Callback):
         return self._sequence
 
     @sequence.setter
-    def sequence(self, seq_list: str = None) -> None:
+    def sequence(self, seq_list: Union[str, List[str], Sequence] = None) -> None:
         """
         Set the sequence of each strand the motif 
 

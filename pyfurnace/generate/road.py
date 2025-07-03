@@ -173,7 +173,8 @@ def generate_road(structure: str,
             warnings.warn(f"Directory {directory} does not exist. Creating it.")
             os.makedirs(directory)
         tempdir = None
-        directory = directory
+        # take the absolute path of the directory
+        directory = os.path.abspath(directory)
 
     ### WORK IN THE DIRECTORY
 
@@ -224,7 +225,10 @@ def generate_road(structure: str,
     # include it in the zip
     files_to_include.append(vienna_out_path)
     
-    command = f'perl "{out_revolvr}" "{directory}"'
+
+    # move to the directory
+    os.chdir(directory)
+    command = f'perl revolvr.pl "{directory}"'
     process = subprocess.Popen(command,
                                shell=True,
                                cwd=directory,

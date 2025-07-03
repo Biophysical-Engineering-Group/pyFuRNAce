@@ -5,12 +5,23 @@ import tempfile
 import zipfile
 import shutil
 import warnings
+from contextlib import contextmanager
 from typing import Callable, Optional, Tuple, Union
 
 ### Local imports
 from ..design.core.symbols import *
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
+
+@contextmanager
+def cwd(path: str):
+    """Context manager to change the current working directory and revert it back."""
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)
 
 def generate_road(structure: str,
                   sequence: str,
@@ -227,51 +238,51 @@ def generate_road(structure: str,
     
 
     # move to the directory
-    os.chdir(directory)
-    command = f'perl revolvr.pl "{directory}"'
-    process = subprocess.Popen(command,
-                               shell=True,
-                               cwd=directory,
-                               env=env,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT,
-                               text=True  #makes output strings
-                               )
+    with cwd(directory):
+        command = f'perl revolvr.pl "{directory}"'
+        process = subprocess.Popen(command,
+                                shell=True,
+                                cwd=directory,
+                                env=env,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                text=True  #makes output strings
+                                )
 
-    # Read output in real time
-    last_seq = '' 
-    last_struct = ''
-    prev_line = ''
-    n_stage = 0
-    stages = ['Designing', 
-              'GC-Reduction & GC/UA-Rich Reduction', 
-              'Mapping Kissing Loops', 
-              'Optimization']
+        # Read output in real time
+        last_seq = '' 
+        last_struct = ''
+        prev_line = ''
+        n_stage = 0
+        stages = ['Designing', 
+                'GC-Reduction & GC/UA-Rich Reduction', 
+                'Mapping Kissing Loops', 
+                'Optimization']
 
-    for line in process.stdout:
-        line = line.strip()
+        for line in process.stdout:
+            line = line.strip()
 
-        # update the stage
-        if stages[n_stage] in line and n_stage < len(stages) - 1:
-            n_stage += 1
+            # update the stage
+            if stages[n_stage] in line and n_stage < len(stages) - 1:
+                n_stage += 1
 
-        # update the last sequence and structure
-        if prev_line and not prev_line.translate(nucl_to_none):
-            last_seq = prev_line
-            if line and any(s in line for s in '.()'):
-                last_struct = line
-        
-        if line and last_seq and last_struct and callback:
-            callback(last_struct, 
-                     last_seq, 
-                     line, 
-                     stages[n_stage - 1], 
-                     n_stage / len(stages))
+            # update the last sequence and structure
+            if prev_line and not prev_line.translate(nucl_to_none):
+                last_seq = prev_line
+                if line and any(s in line for s in '.()'):
+                    last_struct = line
+            
+            if line and last_seq and last_struct and callback:
+                callback(last_struct, 
+                        last_seq, 
+                        line, 
+                        stages[n_stage - 1], 
+                        n_stage / len(stages))
 
-        prev_line = line
+            prev_line = line
 
-    # wait for process to finish
-    process.wait()
+        # wait for process to finish
+        process.wait()
 
     # spool file
     files_to_include.append(os.path.join(directory, f'{name}_spool.txt'))

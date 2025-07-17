@@ -7,11 +7,13 @@ import shutil
 import warnings
 from contextlib import contextmanager
 from typing import Callable, Optional, Tuple, Union
+import multiprocessing
 
 ### Local imports
 from ..design.core.symbols import *
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
+from .viennarna import fold_p
 
 @contextmanager
 def cwd(path: str):
@@ -30,6 +32,7 @@ def generate_road(structure: str,
                   initial_sequence: Optional[str] = None,
                   callback: Optional[Callable[[str, str, str, str, float], 
                                               None]] = None,
+                  verbose: bool = False,
                   timeout: int = 7200,
                   directory: Optional[str] = None,
                   zip_directory: bool = False,
@@ -58,6 +61,9 @@ def generate_road(structure: str,
     callback : callable, optional
         A function called during ROAD execution with progress updates:
         `callback(structure, sequence, line, stage_name, stage_progress)`
+    verbose : bool, optional
+        If True, prints progress updates to the console.
+        If `callback` is provided, this is ignored. Default is False.
     timeout : int, optional
         Timeout in seconds for the ROAD optimization 
         (default is 7200 seconds = 2 hours).
@@ -101,6 +107,11 @@ def generate_road(structure: str,
     if len(sequence) != len(structure):
         raise ValueError("The length of the sequence and structure must match."
                          " Got {} and {}.".format(len(sequence), len(structure)))
+    
+
+    if verbose and callback is None:
+        def callback(_, __, spool_line, stage_name, *args):
+            print(f"{stage_name}: {spool_line.strip()}", flush=True)
     
     ### Fix the short stems with '{' ROAD symbols
     struct_list = list(structure)
@@ -324,3 +335,214 @@ def generate_road(structure: str,
         return last_seq, temp_zip.name
     
     return last_seq
+
+def _worker_single_road(structure: str,
+                        sequence: str,
+                        pseudoknots,
+                        name: str,
+                        callback:callable = None,
+                        verbose: bool = False,
+                        timeout: int = 7200,
+                        zip_directory: bool = False,
+                        origami_code: Optional[str] = None,
+                        initial_sequence: Optional[str] = None,
+                        result_queue: multiprocessing.Queue = None,
+                        stop_event: 'multiprocessing.Event' = None,):
+    """
+    Internal worker function that runs a single ROAD design trial.
+
+    This function wraps `generate_road` for parallel execution. It checks
+    whether an early stop is requested via `stop_event`, runs the design
+    pipeline, and returns the result via a shared `result_queue`.
+
+    Parameters
+    ----------
+    structure : str
+        RNA secondary structure in dot-bracket notation.
+    sequence : str
+        Input sequence, same length as the structure.
+    pseudoknots : str or dict
+        Pseudoknot annotations in ROAD-compatible format.
+    name : str
+        Base name for generated files.
+    callback : callable, optional
+        Optional function for progress updates.
+    verbose : bool, optional
+        If True, prints updates to the console.
+    timeout : int, optional
+        Max time in seconds to allow ROAD to run.
+    zip_directory : bool, optional
+        Whether to store intermediate and output files in a ZIP archive.
+    origami_code : str, optional
+        Python code to be stored with the output files.
+    initial_sequence : str, optional
+        Optional prefilled sequence as the starting point.
+    result_queue : multiprocessing.Queue, optional
+        Queue for storing results from each trial.
+    stop_event : multiprocessing.Event, optional
+        Used to signal early stopping when a successful result is found.
+    """
+    try:
+        if stop_event.is_set():
+            return
+
+        result = generate_road(
+            structure=structure,
+            sequence=sequence,
+            pseudoknots=pseudoknots,
+            name=name,
+            initial_sequence=initial_sequence,
+            callback=callback,
+            verbose=verbose,
+            timeout=timeout,
+            zip_directory=zip_directory,
+            origami_code=origami_code,
+        )
+
+        if result:
+            result_queue.put(result)
+            stop_event.set()
+
+    except Exception as e:
+        print(f"Error in ROAD design process: {e}", file=sys.stderr)
+
+
+def parallel_road(structure: str,
+                  sequence: str,
+                  pseudoknots='',
+                  name: str = 'origami',
+                  callback=None,
+                  verbose=False,
+                  timeout: int = 7200,
+                  zip_directory: bool = True,
+                  origami_code: str = None,
+                  initial_sequence: str = None,
+                  n_trials: int = 8,
+                  save_to: Optional[str] = None,
+                  wait_for_all: bool = False) -> Union[str, Tuple[str, str]]:
+    """
+    Run multiple ROAD optimization trials in parallel and return results.
+
+    You can choose between returning early on the first successful result
+    or waiting for all trials to complete. Results can optionally be 
+    ZIP-archived and saved. If the wait_for_all flag is set to True,
+    the sequences are returned sorted by their MFE frequency in the ensemble
+    (highest to lowest).
+
+    Parameters
+    ----------
+    structure : str
+        Dot-bracket notation of the target RNA secondary structure.
+    sequence : str
+        Reference sequence with the same length as the structure.
+    pseudoknots : str or dict, optional
+        ROAD-style or pyFuRNAce-style pseudoknot definition.
+    name : str, optional
+        Base name for output files (default: "origami").
+    callback : callable, optional
+        Optional function that receives real-time progress updates.
+    verbose : bool, optional
+        If True, prints progress to console.
+    timeout : int, optional
+        Timeout in seconds per trial (default: 7200).
+    zip_directory : bool, optional
+        Whether to save each trial's output as a ZIP archive.
+    origami_code : str, optional
+        Python source code to include with the design output.
+    initial_sequence : str, optional
+        Optional sequence to use as a starting point in optimization.
+    n_trials : int, optional
+        Number of parallel optimization trials to run.
+    save_to : str, optional
+        Directory to store ZIP outputs if `zip_directory=True`.
+    wait_for_all : bool, optional
+        If True, waits for all trials to finish and returns results sorted
+        by MFE frequency. If False, returns as soon as the first trial succeeds.
+
+    Returns
+    -------
+    str or Tuple[str, str] or List[str]
+        - If `wait_for_all=False` returns the first designed sequence.
+        - If `wait_for_all=True` returns a list of designed sequences.
+
+    Raises
+    ------
+    RuntimeError
+        If no trials successfully generate a design.
+    """
+    manager = multiprocessing.Manager()
+    result_queue = manager.Queue()
+    stop_event = manager.Event()
+    processes = []
+
+    for i in range(n_trials):
+        p = multiprocessing.Process(
+            target=_worker_single_road,
+            args=(
+                structure,
+                sequence,
+                pseudoknots,
+                name,
+                callback,
+                verbose,
+                timeout,
+                zip_directory,
+                origami_code,
+                initial_sequence,
+                result_queue,
+                stop_event,
+            ),
+        )
+        processes.append(p)
+        p.start()
+
+    results = []
+
+    try:
+        if wait_for_all:
+            # Wait for all trials to finish and collect all successful results
+            for _ in range(n_trials):
+                try:
+                    result = result_queue.get(timeout=timeout)
+                    results.append(result)
+                except Exception:
+                    pass  # skip failed or timed-out results
+        else:
+            # Wait for the first successful result
+            result = result_queue.get(timeout=timeout)
+            results.append(result)
+            stop_event.set()
+    finally:
+        for p in processes:
+            p.terminate()
+        for p in processes:
+            p.join()
+    
+    if not results:
+        raise RuntimeError("No successful ROAD design found in any trial.")
+
+    # order the sequences from highest frequency of MFE in the ensemble to lowest
+    results = sorted(results, key=lambda x: -fold_p(x[0])[2])
+
+    if zip_directory and isinstance(result, tuple) and save_to:
+        # If saving zips and save_to is set, move them all
+        if not os.path.exists(save_to):
+            os.makedirs(save_to)
+            warnings.warn(f"Directory {save_to} did not exist. Created it.")
+        for i, res in enumerate(results):
+            if isinstance(res, tuple):
+                final_zip_path = os.path.join(save_to, f"{name}_trial{i + 1}.zip")
+                shutil.move(res[1], final_zip_path)
+        
+        if wait_for_all:
+            # return all sequences in a list
+            return [res[0] for res in results if isinstance(res, tuple)]
+        else:
+            # return the first sequence
+            return results[0][0]
+
+    # Return appropriately
+    if wait_for_all:
+        return results
+    else:
+        return results[0]

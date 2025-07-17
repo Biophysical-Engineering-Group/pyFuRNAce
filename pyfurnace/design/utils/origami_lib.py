@@ -293,7 +293,7 @@ def ipython_clickable_txt(origami: Origami,
                           font_size: int = 12) -> str:
     """
     Generate an interactive, scrollable HTML view of a RNA origami structure 
-    with clickable motif positions.
+    with clickable motifs that display their indexes in a JavaScript alert.
 
     Parameters
     ----------
@@ -325,6 +325,8 @@ def ipython_clickable_txt(origami: Origami,
     normal_color = 'inherit'
 
     motif = origami.assembled
+    # create a dictionary from positions to index
+    pos_to_index = {pos: ind for ind, pos in enumerate(motif.seq_positions)}
 
     if barriers:
         origami_lines = origami.barrier_repr(return_list=True)
@@ -335,8 +337,6 @@ def ipython_clickable_txt(origami: Origami,
         
     # create color gradient
     if gradient:
-        # create a dictionary from positions to index
-        pos_to_index = {pos: ind for ind, pos in enumerate(motif.seq_positions)}
         tot_len = 0
         for s in origami.strands:
             tot_len += len(s.sequence)
@@ -398,17 +398,20 @@ def ipython_clickable_txt(origami: Origami,
                 
             elif ori_pos in origami.pos_index_map:  # a motif symbol
                 sl = origami.pos_index_map[ori_pos]
-                if gradient: 
-                    index = pos_to_index.get(ori_pos)
-                    if index is not None:
+                index = pos_to_index.get(ori_pos)
+                msg_text = f"Line {sl[0]}, Motif {sl[1]}"
+                if index is not None:
+                    msg_text = f"Base {index}, Line {sl[0]}, Motif {sl[1]}"
+                    if gradient: 
                         color = c_map[index]
+                
 
                 content += (f'<a style="text-decoration: none;'
                                         "font-family: monospace; "
                                         f"color: {color}; "
                                         'line-height:1;" '
                                   f'href="#/" '
-                                  f"""onclick="alert('Line {sl[0]}, Motif {sl[1]}')" """
+                                  f"""onclick="alert('{msg_text}')" """
                                   f'id="{sl[0]},{sl[1]},{x - 1},{y - 1}">'
                                   f"{char}"
                                 "</a>"

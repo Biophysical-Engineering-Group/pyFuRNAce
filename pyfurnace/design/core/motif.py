@@ -1162,10 +1162,12 @@ class Motif(Callback):
                             (child.label == '(' 
                              and any(c.label=='(' for c in node.children[: i]))):
                         connect_down = Motif(Strand('──'),
-                                            Strand('╮', start=(0,2)),
+                                            Strand('╮', start=(0,2),
+                                            directionality='35'),
                                             Strand('╭', start=(1,2), direction=(0,-1))
                                             )
-                        connect_up = Motif(Strand('││╰─', direction=(0, 1)),
+                        connect_up = Motif(Strand('││╰─', direction=(0, 1),
+                                                  directionality='35'),
                                         Strand('╰', start=(1, 0), direction=(0, 1))
                                         )
                         if child_inds:
@@ -1191,7 +1193,8 @@ class Motif(Callback):
                         for i in range(insert_connect[0] + 1, current_index[0]):
                             # add the vertical connector
                             origami.insert((i, 0),
-                                            Motif(Strand('│', direction=(0, 1)),
+                                            Motif(Strand('│', direction=(0, 1),
+                                                            directionality='35'),
                                                   Strand('│', direction=(0, 1), 
                                                          start=(1, 0))
                                                   ).shift((shift_x, 0))

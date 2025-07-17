@@ -1,4 +1,6 @@
 from IPython.display import display, HTML
+from matplotlib import colors as mcolors, pyplot as plt
+import numpy as np
 from typing import List, Optional, Union, Any
 import tempfile
 
@@ -264,7 +266,7 @@ def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
 
     Parameters
     ----------
-    origami_text : str
+    origami_text : str, Origami
         The content to display in scrollable format.
     max_height : str, optional
         Maximum height of the scrollable box in pixels (default is '500').
@@ -275,9 +277,146 @@ def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
     """
     # Convert your text to scrollable HTML
     scrollable_html = f"""
-    <div style="max-height: {max_height}px; overflow-y: scroll; 
+    <div style="max-height: {max_height}px; white-space: nowrap; 
+                overflow-x: auto; overflow-y: scroll; 
+                font-family: monospace;
                 border: 1px solid #ccc; padding: 10px;">
-    <pre>{origami_text}</pre>
+    {str(origami_text).replace('\n', '<br>').replace(' ', '&nbsp;')}
     </div>
     """
     display(HTML(scrollable_html))
+
+def ipython_clickable_txt(origami: Origami,
+                          max_height: Union[str, int] = '500',
+                          barriers: Optional[Any] = None,
+                          gradient: Union[bool, str] = False,
+                          font_size: int = 12) -> str:
+    """
+    Generate an interactive, scrollable HTML view of a RNA origami structure 
+    with clickable motif positions.
+
+    Parameters
+    ----------
+    origami : Origami
+        An Origami object representing the RNA structure.
+    max_height : str or int, optional
+        The maximum height of the scrollable view in pixels. Default is '500'.
+    barriers : optional
+        Optional barrier data to overlay on the origami representation.
+    gradient : bool or str, optional
+        Whether to color motifs using a gradient. 
+        If str, interpreted as colormap name from matplotlib.
+        Default is False.
+    font_size : int, optional
+        Font size of the text in pixels. Default is 12.
+
+    Returns
+    -------
+    str
+        An HTML string rendered via IPython's display system.
+
+    Notes
+    -----
+    - This function uses inline CSS and JavaScript for visual styling and interaction.
+    - Clicking a motif will trigger a JavaScript alert showing its position.
+    """
+    barriers_colors ={'▂':'#FFBA08', '▄':'#FFBA08', '█':'#D00000'}
+    high_color = '#D00000'
+    normal_color = 'inherit'
+
+    motif = origami.assembled
+
+    if barriers:
+        origami_lines = origami.barrier_repr(return_list=True)
+    else:
+        origami_str = str(origami)
+        origami_lines = origami_str.split('\n')
+
+        
+    # create color gradient
+    if gradient:
+        # create a dictionary from positions to index
+        pos_to_index = {pos: ind for ind, pos in enumerate(motif.seq_positions)}
+        tot_len = 0
+        for s in origami.strands:
+            tot_len += len(s.sequence)
+            for protein in s.coords.proteins:
+                tot_len += len(protein)
+        cmap = plt.get_cmap(gradient)
+        c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len)]
+    
+    # Prepare the string to add 5' and 3' symbols for the strands
+    motif_list = ([[' '] * (motif.num_char + 2)]  
+                + [[' '] + [char for char in line] 
+                + [' '] for line in origami_lines] 
+                + [[' '] * (motif.num_char + 2)
+                  ])
+
+    for s in motif:  # Add the 5' and 3' symbols to the motif as 1 and 2
+        if not s.sequence:
+            continue
+        if (s.sequence and s[0] not in '35' 
+                and motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] == ' '):
+            if s.directionality == '53':
+                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = '1'
+            else:
+                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = '2'
+        if (s.sequence and s[-1] not in '35' 
+                and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' '):
+            if s.directionality == '53':
+                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '1'
+            else:
+                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2'
+
+    origami_list = [''.join(line) for line in motif_list]
+
+    content = (f"<div style='font-family: monospace;"
+                        f"font-size: {font_size}px; "
+                        "white-space: nowrap; "
+                        "overflow-x: auto; "
+                        "overflow-y: scroll; "
+                        f"max-height: {max_height}px;'>")
+    span = '<span style="font-family: monospace; '
+
+    for y, line in enumerate(origami_list):
+        
+        for x, char in enumerate(line):
+            ori_pos = (x - 1, y - 1)
+            color = normal_color
+            if barriers_colors and char in barriers_colors:
+                color = barriers_colors[char]
+
+            if char == ' ':
+                content += span + 'line-height:1;">&nbsp;</span>'
+            elif char == '1':
+                content += span + f'color: {high_color}; line-height:1;">5</span>'
+            elif char == '2':
+                content += span + f'color: {high_color}; line-height:1;">3</span>'
+
+            elif char in bp_symbols:  # do not highlight the base pair in red
+                content += span + f'color: {color}; line-height:1;">{char}</span>' 
+                
+            elif ori_pos in origami.pos_index_map:  # a motif symbol
+                sl = origami.pos_index_map[ori_pos]
+                if gradient: 
+                    index = pos_to_index.get(ori_pos)
+                    if index is not None:
+                        color = c_map[index]
+
+                content += (f'<a style="text-decoration: none;'
+                                        "font-family: monospace; "
+                                        f"color: {color}; "
+                                        'line-height:1;" '
+                                  f'href="#/" '
+                                  f"""onclick="alert('Line {sl[0]}, Motif {sl[1]}')" """
+                                  f'id="{sl[0]},{sl[1]},{x - 1},{y - 1}">'
+                                  f"{char}"
+                                "</a>"
+                                )
+
+            else:  # is a junction symbol 
+                content += span + f'color: {color}; line-height:1;">{char}</span>'
+        content += '<br />'
+    content += '</div>'
+
+    return display(HTML(content))

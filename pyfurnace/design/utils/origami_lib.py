@@ -276,14 +276,12 @@ def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
     None
     """
     # Convert your text to scrollable HTML
-    scrollable_html = f"""
-    <div style="max-height: {max_height}px; white-space: nowrap; 
-                overflow-x: auto; overflow-y: scroll; 
-                font-family: monospace;
-                border: 1px solid #ccc; padding: 10px;">
-    {str(origami_text).replace('\n', '<br>').replace(' ', '&nbsp;')}
-    </div>
-    """
+    scrollable_html = (f'<div style="max-height: {max_height}px; white-space: nowrap;'
+                            f'overflow-x: auto; overflow-y: scroll;'
+                            f'font-family: monospace;'
+                            f'border: 1px solid #ccc; padding: 10px;">'
+                f"{str(origami_text).replace('\n', '<br>').replace(' ', '&nbsp;')}"
+                "</div>")
     display(HTML(scrollable_html))
 
 def ipython_clickable_txt(origami: Origami,
@@ -364,9 +362,9 @@ def ipython_clickable_txt(origami: Origami,
         if (s.sequence and s[-1] not in '35' 
                 and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' '):
             if s.directionality == '53':
-                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '1'
-            else:
                 motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2'
+            else:
+                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '1'
 
     origami_list = [''.join(line) for line in motif_list]
 

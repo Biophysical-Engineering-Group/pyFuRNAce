@@ -1041,13 +1041,16 @@ class Motif(Callback):
 
     @classmethod
     def from_structure(cls,
-                       structure: Union[str, dict, BasePair, Node], 
+                       structure: Optional[Union[str, dict, BasePair, Node]] = None, 
                        sequence: Optional[str] = None,
                        pk_energy=-8.5, 
                        pk_denergy=0.5,
                        **kwargs) -> "Motif":
         """
-        Convert a structure representation to a Motif object.
+        Parse a structure or sequence representation to a Motif object.
+        If a structure is not provided, it is calculated from the sequence
+        with RNAfold. If a sequence is not provided, it is assumed to be
+        a sequence of 'N's of the same length as the structure.
 
         Parameters
         ----------
@@ -1070,7 +1073,11 @@ class Motif(Callback):
         """
         # import here to avoid circular imports
         from .origami import Origami
+        from RNA import fold
 
+        if structure is None:
+            # if only sequence is provided, fold it to get the structure
+            structure = fold(sequence)[0]
         if sequence is None:
             sequence = 'N' * len(structure)
 
@@ -1105,8 +1112,8 @@ class Motif(Callback):
             """
             Recursively build the origami from the tree representation.
             """
-
             nonlocal current_index
+
             # initialize the variables
             if insert_at is None:
                 insert_at = current_index
@@ -1214,7 +1221,7 @@ class Motif(Callback):
                                             flip=flip)
 
                 # this could not work in the case a stem doesn't end with at least
-                # one unpaired nucleotide, but that dooes never happen in natural
+                # one unpaired nucleotide, but that does never happen in natural
                 # structures, so we can ignore this case
                 if not any(c.children or c.label =='&' for c in node.children):
                     origami.append(Motif(Strand('╮│╯')))

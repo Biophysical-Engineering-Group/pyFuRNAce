@@ -74,6 +74,278 @@ class Origami(Callback):
     --------
     Motif, Strand, Sequence
     """
+    
+    @classmethod
+    def from_structure(cls,
+                       structure: Optional[Union[str, dict, BasePair, Node]] = None, 
+                       sequence: Optional[str] = None,
+                       pk_energy=-8.5, 
+                       pk_denergy=0.5,
+                       **kwargs) -> "Origami":
+        """
+        Parse a structure or sequence representation to an Origami object.
+        If a structure is not provided, it is calculated from the sequence
+        with RNAfold. If a sequence is not provided, it is assumed to be
+        a sequence of 'N's of the same length as the structure.
+
+        Parameters
+        ----------
+        structure : Union[str, dict, BasePair, Node]
+            The structure representation to convert.
+        sequence : str, optional
+            The sequence or sequence constraints of the motif.
+        pk_energy : float, optional
+            The energy of the pseudoknots (if present).
+        pk_denergy : float, optional
+            The energy tolerance of the pseudoknots (if present).
+        **kwargs : dict
+            Additional arguments to pass to the Motif constructor.
+        
+
+        Returns
+        -------
+        Origami
+            The Origami object created from the structure representation.
+        """
+        from RNA import fold
+        from ..motifs import Stem
+
+        if structure is None:
+            # if only sequence is provided, fold it to get the structure
+            structure = fold(sequence)[0]
+        if sequence is None:
+            sequence = 'N' * len(structure)
+
+        if isinstance(structure, str) and len(structure) != len(sequence):
+            raise ValueError(f"The sequence length must be equal to the structure "
+                             f"length. Got {len(sequence)} for {len(structure)}")
+
+        # input dot-bracket notation
+        if type(structure) == str:
+            node = dot_bracket_to_tree(structure, 
+                                       sequence=sequence)
+            pair_map = dot_bracket_to_pair_map(structure)
+        # input pair map
+        elif isinstance(structure, (BasePair, dict)):
+            pair_map = structure.copy()
+            node = dot_bracket_to_tree(pair_map_to_dot_bracket(structure), 
+                                    sequence=sequence)
+            structure = pair_map_to_dot_bracket(structure)
+        # input tree
+        elif isinstance(structure, Node):
+            node = structure
+            pair_map = dot_bracket_to_pair_map(tree_to_dot_bracket(node))
+            structure = tree_to_dot_bracket(node)
+        else:
+            raise ValueError(f"Invalid structure representation: {structure}")
+        
+        # initialize the origami object
+        origami = Origami([[]], align='first', ss_assembly=True)
+        current_index = [0, 0]
+        m_seq = ['', '']
+
+        def recursive_build_origami(node, insert_at=None, flip=False):
+            """
+            Recursively build the origami from the tree representation.
+
+            Parameters
+            ----------
+            node : Node
+                The current node in the tree representation.
+            insert_at : Tuple[int, int], optional
+                The position in the origami to insert the motif.
+            flip : bool, optional
+                Whether to flip the motif horizontally and vertically.
+            current_index : List[int]
+                The current index in the origami matrix, used to track the position
+                where the next motif should be inserted.
+            """
+
+            nonlocal current_index, m_seq
+
+            # initialize the variables
+            if insert_at is None:
+                insert_at = current_index.copy()
+            motif = None
+
+            ### BASE CASES: sequence break, stem, unpaired nucleotide
+            if node.label == '&':
+                return
+            
+            # find the index of the current node in the parent children
+            if node.parent is not None:
+                child_seq_ind = [c.index for c in node.parent.children]
+                n_c_ind = child_seq_ind.index(node.index)
+
+            if node.label == '(':
+                m_seq[0] += node.seq
+                m_seq[1] += sequence[pair_map[node.index]]
+
+                # if the next node is not a stem, create a stem motif
+                if (not node.children 
+                       or any(c.label != '(' for c in node.children)):
+                    motif = Stem(sequence=m_seq[0])
+                    motif[1].sequence = m_seq[1][::-1]
+
+            elif node.label == '.':
+                m_seq[0] += node.seq
+
+                # if the next node adjacent node is not unpaired, create a motif
+                if (n_c_ind == len(child_seq_ind) - 1 or
+                        node.parent.children[n_c_ind + 1].label != '.'):
+                    motif = Motif(Strand(m_seq[0]), 
+                                  Strand('-' * len(m_seq[0]), start=(0, 2)))
+
+            # add the motif and update the current index
+            if motif:
+                origami.insert(insert_at,
+                            motif.flip(flip, flip)
+                            )
+                current_index[1] += 1 # increment the x index
+                m_seq = ['', ''] # reset the motif sequence
+
+            # recursive call for the children
+            if node.children:
+                child_inds = []
+
+                # check each child before recursive call
+                for i, child in enumerate(node.children):
+                    insert_at = None
+                    flip = False
+
+                    # bulge after a stem
+                    if (child.label == '.' 
+                            and any(c.label=='(' for c in node.children[: i])):
+                        insert_at = child_inds.pop()
+                        flip = True
+
+                    # sequence break + only unpaired
+                    elif (child.label in '.&' and 
+                            all(c.label in '.&' for c in node.children)):
+                        if '&' in [c.label for c in node.children[: i]]:
+                            insert_at = child_inds.pop()
+                            flip = True
+
+                    # sequence break or multiple stems
+                    elif (child.label == '&' or
+                            (child.label == '(' 
+                             and any(c.label=='(' for c in node.children[: i]))):
+                        connect_down = Motif(Strand('──'),
+                                            Strand('╮', start=(0,2),
+                                            directionality='35'),
+                                            Strand('╭', start=(1,2), direction=(0,-1))
+                                            )
+                        connect_up = Motif(Strand('││╰─', direction=(0, 1),
+                                                  directionality='35'),
+                                        Strand('╰', start=(1, 0), direction=(0, 1))
+                                        )
+                        if child_inds:
+                            insert_connect = child_inds.pop()
+                        else:
+                            insert_connect = current_index
+
+                        # insert the top connector
+                        origami.insert(insert_connect, connect_down)
+
+                        shift_x = sum([m.num_char 
+                                            for m in origami[insert_connect[0], 
+                                                             :insert_connect[1]]])
+
+                        connect_up.shift((shift_x, 0))
+                        origami.append([connect_up])
+
+                        # increment the y index
+                        current_index[0] += 1 
+                        # set the x index to the end of the line
+                        current_index[1] = len(origami[-1]) 
+
+                        for i in range(insert_connect[0] + 1, current_index[0]):
+                            # add the vertical connector
+                            origami.insert((i, 0),
+                                            Motif(Strand('│', direction=(0, 1),
+                                                            directionality='35'),
+                                                  Strand('│', direction=(0, 1), 
+                                                         start=(1, 0))
+                                                  ).shift((shift_x, 0))
+                                           )
+                            # shift all the motifs until you reach the first connector
+                            for m in origami[i, 1:]:
+                                m.shift((2, 0))
+                                if '││╰─' in m:
+                                    break
+
+                    if insert_at is None:
+                        insert_at = current_index.copy()
+
+                    child_inds.append(insert_at)
+                    recursive_build_origami(child, 
+                                            insert_at=insert_at, 
+                                            flip=flip)
+
+                # this could not work in the case a stem doesn't end with at least
+                # one unpaired nucleotide, but that does never happen in natural
+                # structures, so we can ignore this case
+                if not any(c.children or c.label =='&' for c in node.children):
+                    origami.append(Motif(Strand('╮│╯')))
+                    current_index[1] -= 1 # decrement the x index
+
+        # call the recursive function
+        recursive_build_origami(node)
+        # get the motif from the origami object
+        # motif = origami.assembled
+
+        return origami
+
+        # ### ADD THE PSEUDOKNOTS ###
+        # seq_offset = 0
+        # # dictionary with index as key and pseudoknot id as value
+        # full_map = dict()
+        # pair_map = dot_bracket_to_pair_map(structure.replace('&', ''))
+
+        # # iterate over the  subsequences
+        # for i, struct in enumerate(structure.split('&')):
+        #     new_pk_info = {"id": [], 'ind_fwd': [], 'E': [], 'dE': []}
+        #     j = 0
+        #     ss_len = len(struct)
+
+        #     # iterate over the subsequences structure
+        #     while j < ss_len:
+        #         sym = struct[j]
+
+        #         # found pseudoknot
+        #         if sym not in '.()' and (seq_offset + j) not in full_map:
+        #             # get the length of the pseudoknot
+        #             length = 1
+        #             while struct[j + length] == sym:
+        #                 length += 1
+                    
+        #             # get the pseudoknot id of get a new one
+        #             if pair_map[seq_offset + j] in full_map:
+        #                 pk_id = full_map[pair_map[seq_offset + j]] + "'"
+        #             else:
+        #                 inds = [k.split('_')[1].strip("'") for k in full_map.values()]
+        #                 pk_id = '100_' + str(int(max(inds, default='-1')) + 1)
+                    
+        #             # add the pseudoknot to the motif
+        #             new_pk_info['id'].append(pk_id)
+        #             new_pk_info['ind_fwd'].append((j, j + length - 1))
+        #             indices = range(seq_offset + j, seq_offset + j + length)
+        #             # update the full map
+        #             full_map.update({k: pk_id for k in indices})
+                        
+        #             new_pk_info['E'].append(pk_energy)
+        #             new_pk_info['dE'].append(pk_denergy)
+        #             j += length
+        #         j += 1
+
+        #     # add the pseudoknots info to the strand
+        #     motif[i].pk_info = new_pk_info
+        #     seq_offset += len(struct)
+
+        # kwargs.setdefault('lock_coords', False)
+        # obj = cls(**kwargs)
+        # obj.replace_all_strands(motif, copy=False, join=False)
+        # return obj
 
     def __init__(self, 
                  matrix: Union[Motif, List[Motif], List[List[Motif]]] = None, 

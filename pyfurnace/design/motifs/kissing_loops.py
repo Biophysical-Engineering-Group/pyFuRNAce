@@ -238,10 +238,10 @@ class KissingLoop(Loop):
         else:
             sequence = Sequence('N' * seq_len, directionality='53')
         
-        ### if the strands are already created, just update the sequence
-        if hasattr(self, '_strands'):
-            self._strands[0].sequence = sequence
-            return self._strands
+        # ### if the strands are already created, just update the sequence
+        # if hasattr(self, '_strands') and not fold_180kl:
+        #     self._strands[0].sequence = sequence
+        #     return self._strands
         
         ### create the strand
         strand = Strand(f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭", 
@@ -541,10 +541,10 @@ class KissingDimer(KissingLoop180):
         seq = bottom_strand.sequence[2:-1]
         rev_comp = seq.reverse_complement()
 
-        ### if the strands are already created, just update the sequence
-        if hasattr(self, '_strands'):
-            self._strands[1].sequence = 'AA' + rev_comp + 'A'
-            return self._strands
+        # ### if the strands are already created, just update the sequence
+        # if hasattr(self, '_strands'):
+        #     self._strands[1].sequence = 'AA' + rev_comp + 'A'
+        #     return self._strands
         
         ### shift the second strand to make space for the second one
         bottom_strand.start = (13, 3)
@@ -750,11 +750,11 @@ class BranchedDimer(BranchedKissingLoop):
         # add the pk_index to override the pk_index of the bottom strand
         self._pk_index = pk_index 
 
-        ### if the strands are already created, just update the sequence
-        if hasattr(self, '_strands'):
-            kl_index = [i for i, s in enumerate(self) if len(s.sequence) == 9][0]
-            self._strands[kl_index].sequence = 'AA' + sequence + 'A'
-            return self._strands
+        # ### if the strands are already created, just update the sequence
+        # if hasattr(self, '_strands'):
+        #     kl_index = [i for i, s in enumerate(self) if len(s.sequence) == 9][0]
+        #     self._strands[kl_index].sequence = 'AA' + sequence + 'A'
+        #     return self._strands
         
         ### shift the bottom branched KL
         strands[0].start = (strands[0].start[0] + 3, strands[0].start[1] + 1)

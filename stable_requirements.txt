@@ -1,0 +1,13 @@
+colour==0.1.5
+pytest==8.3.3
+numpy==1.26.4
+scipy==1.15.2
+matplotlib==3.10.1
+streamlit==1.44.1
+st-click-detector==0.1.3
+streamlit-code-editor==0.1.22
+st_forna_component==1.0.1
+streamlit-option-menu==0.4.0
+st_oxview==0.1.3
+biopython==1.85
+ViennaRNA==2.6.4

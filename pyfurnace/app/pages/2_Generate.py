@@ -326,9 +326,9 @@ if __name__ == "__main__":
     folds = st_state.rna_origami_folds
 
     diversity = round(folds[6], 1)
-    if diversity < 30:
+    if diversity < 50:
         diversity_text = f":green[low {diversity}]"
-    elif diversity < 50:
+    elif diversity < 100:
         diversity_text = f":orange[medium {diversity}]"
     else:
         diversity_text = f":red[high {diversity}]"

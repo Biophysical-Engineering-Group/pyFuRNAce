@@ -3,22 +3,21 @@ from streamlit_option_menu import option_menu
 import json
 import os
 import warnings
-from functools import partial
 
 # App utilities
 from utils import (load_logo, 
                    main_menu_style, 
-                   second_menu_style, 
                    copy_to_clipboard, 
-                   write_format_text)
+                   write_format_text,
+                   check_import_pyfurnace)
 from utils.template_functions import symbols, reference, sanitize_input
 from utils.design_functions import origami_build_view
-from pyfurnace import Sequence
+check_import_pyfurnace()
 from pyfurnace import prepare as prep
 
 # Melting and primer logic
 from pyfurnace.prepare.utils import (
-    tm_methods, tm_models, NN_models, default_values,
+    tm_methods, tm_models, default_values,
     calculate_gc, make_tm_calculator, check_dimer,
     auto_design_primers, annealing_temp
 )
@@ -68,12 +67,13 @@ def calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs):
     c_bases = len(c_primer)
     nc_bases = len(nc_primer)
     with st.expander("Dimerization preview"):
-        st.markdown(f'<div style="text-align: center;"><span style="color: #FF5733">'
+        st.markdown(f'<div style="text-align: center;"><span style="color: #D00000">'
                     f'{c_primer}</span>{seq[c_bases]}[...]{seq[-nc_bases-1:]}</div>', 
                     unsafe_allow_html=True)
         st.markdown(f'<div style="text-align: center;">'
-                    f'{Sequence(seq[:c_bases+1]).complement()}'
-                    f'[...]'f'{seq[-nc_bases]}<span style="color: #FF5733">'
+                    f'{prep.Seq(seq[:c_bases+1]).complement()}'
+                    f'[...]'f'{prep.Seq(seq[-nc_bases - 1]).complement()}'
+                    f'<span style="color: #D00000">'
                     f'{nc_primer[::-1]}</span></div>', 
                     unsafe_allow_html=True)
         st.divider()
@@ -121,7 +121,6 @@ def calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs):
     # write the annealing temperature in big
     st.markdown(f"### Anneal at: :{anneal_color}[{t_anneal}°C]")
 
-@st.fragment
 def primers_tab(seq, mt_correct):
     """ Calculate the melting temperature of the primers and check 
     the dimer between the primers and the sequence"""
@@ -137,8 +136,9 @@ def primers_tab(seq, mt_correct):
             st.markdown('###### Forward')
 
         c_bases = st.slider('Primer length:', 
-                            min_value=5, max_value=50, value = 21, 
-                            key="coding_primer")
+                            min_value=5, max_value=50, 
+                            value=st.session_state.prim_fwd_len,
+                            key=f"coding_primer_{st.session_state.auto_count}")
         c_primer = seq[:c_bases]
 
         mts[0] = round(mt_correct(c_primer),2)
@@ -149,43 +149,146 @@ def primers_tab(seq, mt_correct):
             st.markdown('###### Reverse')
 
         nc_bases = st.slider('Primer length:', 
-                             min_value=5, max_value=50, value = 21, 
-                             key="non_coding_primer")
-        nc_primer = str(Sequence(seq[-nc_bases:]).reverse_complement())
+                             min_value=5, max_value=50, 
+                             value=st.session_state.prim_rev_len, 
+                             key=f"non_coding_primer_{st.session_state.auto_count}")
+        
+        nc_primer = str(prep.Seq(seq[-nc_bases:]).reverse_complement())
 
         mts[1] = round(mt_correct(nc_primer),2)
 
     return mts, c_primer, nc_primer
 
-def auto_primer(seq, mt_correct):
-    """ Automatically design the primers for the sequence"""
-    # check if the sequence is a DNA sequence
-    target_temp = st.number_input('Target melting temperature (°C)', 
-                                  value=65, min_value=0, max_value=100, step=1)
-
-    if st.button("Design primers", key='auto_primer'):
-        status = st.empty()
-        status.info("Designing primers...", 
-                    icon=":material/precision_manufacturing:")
-
-        primers, final_mts = auto_design_primers(seq, target_temp, mt_correct)
-
-        status.success(f"Primer designed!", 
-                        icon=":material/precision_manufacturing:")
-
-        col1, col2 = st.columns(2, gap='large')
-        # settings for the coding primer
-        with col1:
-            with st.columns(5)[2]:
-                st.markdown('###### Forward')
-        with col2:
-            with st.columns(5)[2]:
-                st.markdown('###### Reverse')
-
-        return final_mts, primers[0], primers[1]
-    else:
-        return None, '', ''
+def tm_parameters():
+    # load settings if you want to upload custom settings
+    load_settings = st.checkbox("Upload previous energy parameter:",
+                                help='If you have saved a json file with the '
+                                    'energy parameters, you can upload it and'
+                                    ' use the same settings.')
+    if load_settings:
+        saved_setting = st.file_uploader("Upload previous energy parameter "
+                                            "(optional):",
+                                            on_change=upload_setting_button,
+                                        type='json',
+                                        help='If you have saved a json file '
+                                            'with the energy parameters, you '
+                                            'can upload it and use the same '
+                                            'settings.')
         
+        # if load the settings, upload the valuse from the json file
+        if saved_setting and st.session_state['upload_setting']:
+            # To read file as bytes:
+            session_old = json.load(saved_setting)
+            for key, value in session_old.items():
+                st.session_state[key] = value
+            st.session_state['upload_setting'] = False
+            st.rerun()
+
+
+    # initialize session state values for the energy model
+    for key, val in default_values.items():
+        if key not in st.session_state:
+            st.session_state[key] = val
+
+    # select the energy model
+    st.write('Energy model:')
+    col1, col2, col3 = st.columns([2, 2, 1])
+
+    # select the melting temperature method
+    with col1: 
+        mt_type = st.selectbox("Melting Temperature Method", 
+                                list(tm_methods), 
+                                help=(prep.mt.__doc__), 
+                                key='mt_method', 
+                                label_visibility='collapsed')
+        method = tm_methods[mt_type]
+
+    # select the melting temperature model
+    with col2:
+        mt_model = st.selectbox("Energy Correction", 
+                                list(tm_models[mt_type]), 
+                                key='mt_model', 
+                                label_visibility='collapsed')
+    
+    # add a button to show the help of the selected method
+    with col3:
+        help_model = st.button("Show info", key='energy_model_info')
+    if help_model:
+        st.help(method)
+        
+    # buffer correction parameters
+    st.divider()
+    if method != list(tm_methods)[2]:
+
+        st.write('Buffer corrections (mM):')
+
+        cols = st.columns(8)
+        with cols[0]: 
+            na = st.number_input('Na', key="Na")
+        with cols[1]: 
+            k = st.number_input('K', key='K')
+        with cols[2]: 
+            tris = st.number_input('Tris', key='Tris')
+        with cols[3]: 
+            mg = st.number_input('Mg', 
+                                value=st.session_state["Mg"], 
+                                key='Mg')
+        with cols[4]: 
+            dntps = st.number_input('dNTPs', 
+                                        value=st.session_state["dNTPs"],
+                                        key='dNTPs')
+        with cols[5]: 
+            dmso = st.number_input('DMSO (%)', 
+                                    value=st.session_state["DMSO (%)"],
+                                    key='DMSO (%)')
+        with cols[6]: 
+            correction_met = st.selectbox('Method', 
+                                            [0, 1, 2, 3, 4, 6, 7],
+                                            key='Method')
+        with cols[7]: 
+            help_correction = st.button("Show info", 
+                                        key='energy_correction_info')
+
+        tm_kwargs = {'Na': na, 
+                        'K': k, 
+                        'Tris': tris, 
+                        'Mg': mg, 
+                        'saltcorr': correction_met,
+                        'dNTPs': dntps, 
+                        'DMSO': dmso}
+
+    if help_correction:
+        # add a button to show the help of the selected method
+        st.help(prep.mt.salt_correction)
+        st.help(prep.mt.chem_correction)
+
+    primer_conc = st.number_input('Primer conc. (nM)', key="Primer")
+
+    # create the function to calculate the TM
+    calculate_mt = make_tm_calculator(method_name=mt_type,
+                                        model_name=mt_model,
+                                        primer_conc=primer_conc,
+                                        tm_kwargs=tm_kwargs)
+
+    # save settings and allow download
+    with open('energy_parameters.json', 'w') as settings:
+        # cannot save session state as it is, 
+        # I have to convert it to a dictionary
+        session_dict = {key: st.session_state[key] for key in default_values}
+        json.dump(session_dict, settings)
+    with open("energy_parameters.json", "rb") as file:
+        btn = st.download_button(
+            label="Download energy parameters",
+            data=file,
+            file_name="energy_parameters.json",
+            mime="application/json",
+            help='Save the current settings (e.g. ions concentration, '
+                    'Tm model), so you can easily reload them if you refresh '
+                    'the page!'
+            )
+        
+    return calculate_mt, tm_kwargs
+
 def primers_setup():
     if "dna_template" not in st.session_state:
         st.session_state["dna_template"] = ''
@@ -209,173 +312,76 @@ def primers_setup():
         st.stop()
     
     ###
-    # Melting Temperature for PCR settings
+    # Various for PCR settings
     ###
 
-    mcol1, mcol2, mcol3 = st.columns(3, vertical_alignment='center') 
+    mcol1, mcol2, mcol3, mcol4 = st.columns(4, 
+                                            vertical_alignment='center',
+                                            gap='large') 
     with mcol1:
-        with st.popover("**Melting temperature parameters**"):
-            # load settings if you want to upload custom settings
-            load_settings = st.checkbox("Upload previous energy parameter:",
-                                     help='If you have saved a json file with the '
-                                           'energy parameters, you can upload it and'
-                                           ' use the same settings.')
-            if load_settings:
-                saved_setting = st.file_uploader("Upload previous energy parameter "
-                                                 "(optional):",
-                                                 on_change=upload_setting_button,
-                                                type='json',
-                                                help='If you have saved a json file '
-                                                    'with the energy parameters, you '
-                                                    'can upload it and use the same '
-                                                    'settings.')
-                
-                # if load the settings, upload the valuse from the json file
-                if saved_setting and st.session_state['upload_setting']:
-                    # To read file as bytes:
-                    session_old = json.load(saved_setting)
-                    for key, value in session_old.items():
-                        st.session_state[key] = value
-                    st.session_state['upload_setting'] = False
-                    st.rerun()
-
-
-            # initialize session state values for the energy model
-            for key, val in default_values.items():
-                if key not in st.session_state:
-                    st.session_state[key] = val
-        
-            # select the energy model
-            st.write('Energy model:')
-            col1, col2, col3 = st.columns([2, 2, 1])
-
-            # select the melting temperature method
-            with col1: 
-                mt_type = st.selectbox("Melting Temperature Method", 
-                                       list(tm_methods), 
-                                       help=(prep.mt.__doc__), 
-                                       key='mt_method', 
-                                       label_visibility='collapsed')
-                method = tm_methods[mt_type]
-
-            # select the melting temperature model
-            with col2:
-                mt_model = st.selectbox("Energy Correction", 
-                                        list(tm_models[mt_type]), 
-                                        key='mt_model', 
-                                        label_visibility='collapsed')
+        with st.popover("Melting temperature parameters",
+                        use_container_width=True):
             
-            # add a button to show the help of the selected method
-            with col3:
-                help_model = st.button("Show info", key='energy_model_info')
-            if help_model:
-                st.help(method)
-                
-            # buffer correction parameters
-            st.divider()
-            if method != list(tm_methods)[2]:
-
-                st.write('Buffer corrections (mM):')
-
-                cols = st.columns(8)
-                with cols[0]: 
-                    na = st.number_input('Na', key="Na")
-                with cols[1]: 
-                    k = st.number_input('K', key='K')
-                with cols[2]: 
-                    tris = st.number_input('Tris', key='Tris')
-                with cols[3]: 
-                    mg = st.number_input('Mg', 
-                                        value=st.session_state["Mg"], 
-                                        key='Mg')
-                with cols[4]: 
-                    dntps = st.number_input('dNTPs', 
-                                             value=st.session_state["dNTPs"],
-                                             key='dNTPs')
-                with cols[5]: 
-                    dmso = st.number_input('DMSO (%)', 
-                                            value=st.session_state["DMSO (%)"],
-                                            key='DMSO (%)')
-                with cols[6]: 
-                    correction_met = st.selectbox('Method', 
-                                                  [0, 1, 2, 3, 4, 6, 7],
-                                                   key='Method')
-                with cols[7]: 
-                    help_correction = st.button("Show info", 
-                                                key='energy_correction_info')
-
-                tm_kwargs = {'Na': na, 
-                             'K': k, 
-                             'Tris': tris, 
-                             'Mg': mg, 
-                             'saltcorr': correction_met,
-                             'dNTPs': dntps, 
-                             'DMSO': dmso}
-
-            if help_correction:
-                # add a button to show the help of the selected method
-                st.help(prep.mt.salt_correction)
-                st.help(prep.mt.chem_correction)
-
-            primer_conc = st.number_input('Primer conc. (nM)', key="Primer")
-
-            # create the function to calculate the TM
-            calculate_mt = make_tm_calculator(method_name=mt_type,
-                                              model_name=mt_model,
-                                              primer_conc=primer_conc,
-                                              tm_kwargs=tm_kwargs)
-
-            # save settings and allow download
-            with open('energy_parameters.json', 'w') as settings:
-                # cannot save session state as it is, 
-                # I have to convert it to a dictionary
-                session_dict = {key: st.session_state[key] for key in default_values}
-                json.dump(session_dict, settings)
-            with open("energy_parameters.json", "rb") as file:
-                btn = st.download_button(
-                    label="Download energy parameters",
-                    data=file,
-                    file_name="energy_parameters.json",
-                    mime="application/json",
-                    help='Save the current settings (e.g. ions concentration, '
-                         'Tm model), so you can easily reload them if you refresh '
-                         'the page!'
-                    )
+            calculate_mt, tm_kwargs = tm_parameters()
     
     with mcol2:
-        with st.popover('Add restriction sites'):
+        with st.popover('Add restriction sites',
+                        use_container_width=True):
             restric_site_1 = st.text_input("Restriction site sequence (5'->3')"
                                            " before the promoter:")
             restric_site_2 = st.text_input("Restriction site sequence (5'->3')"
                                            " after the fragment:")
             
     with mcol3:
-        with st.popover('Annealing calculation'):
+        with st.popover('Annealing calculation',
+                        use_container_width=True):
             st.selectbox("Calculate annealing:", 
                         ['IDT method [2]', 'Phusion method [3]'],
                         key='annealing_model',
                         label_visibility='collapsed',
-                            )
+                        help='Select the method to calculate the annealing '
+                             'temperature. Check the references for more information.'
+                             )
+    with mcol4:
+        # default primers length
+        with st.popover('**Auto design primers**', 
+                        icon=":material/precision_manufacturing:",
+                        use_container_width=True):
+            
+            target_temp = st.number_input('Target melting temperature (°C)', 
+                                value=65, min_value=0, max_value=100, step=1)
+            if st.button("Auto design primers", 
+                      key='auto_design_primers',
+                      help='Automatically design the primers for the sequence. '
+                           'The primers are designed to have a melting temperature '
+                           'and follow best practices (see documentation).'):
 
-    seq = restric_site_1 + seq + str(Sequence(restric_site_2).reverse_complement())
+                status = st.empty()
+                status.info("Designing primers...", 
+                            icon=":material/precision_manufacturing:")
 
-    option_data = {'Manual': "bi bi-vector-pen",
-                   'Automatic': "bi bi-person-workspace"}
+                primers, final_mts = auto_design_primers(seq, 
+                                                         target_temp, 
+                                                         calculate_mt)
 
-    selected_operation = option_menu(None, 
-                                    list(option_data.keys()),
-                                    icons=list(option_data.values()),
-                                    menu_icon="cast", 
-                                    orientation="horizontal",
-                                    styles=second_menu_style)
+                st.session_state.auto_count += 1
+
+                # set the new primers length in the session state
+                if (st.session_state.prim_fwd_len != len(primers[0]) or 
+                        st.session_state.prim_rev_len != len(primers[1])):
+                    st.session_state.prim_fwd_len = len(primers[0])
+                    st.session_state.prim_rev_len = len(primers[1])
+
+                status.success(f"Primer designed!", 
+                                icon=":material/precision_manufacturing:")
+                
+
+    seq = restric_site_1 + seq + str(prep.Seq(restric_site_2).reverse_complement())
     
-    if selected_operation == 'Manual':
-        mts, c_primer, nc_primer = primers_tab(seq, calculate_mt)
-    elif selected_operation == 'Automatic':
-        mts, c_primer, nc_primer = auto_primer(seq, calculate_mt)
+    mts, c_primer, nc_primer = primers_tab(seq, 
+                                           calculate_mt)
 
-    if mts:
-        calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs)
+    calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs)
 
     # add bibliography
     reference(True)
@@ -535,6 +541,12 @@ if __name__ == "__main__":
 
     if "prepare_ind" not in st.session_state:
         st.session_state.prepare_ind = 0
+    if 'prim_fwd_len' not in st.session_state:
+        st.session_state.prim_fwd_len = 21
+    if 'prim_rev_len' not in st.session_state:
+        st.session_state.prim_rev_len = 21
+    if 'auto_count' not in st.session_state:
+        st.session_state.auto_count = 0
 
     # create the tabs with the functions
     st.header('Prepare', help='Design primers for your DNA template '

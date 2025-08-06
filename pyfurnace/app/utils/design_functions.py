@@ -1542,123 +1542,156 @@ def edit(x, y):
         st.rerun()
 
     select_line()
-    advaced_edit(motif, motif_slice)
+    st_state['mot_adv_edit'] = motif.copy()
+    advaced_edit(motif_slice)
 
 @st.fragment
-def advaced_edit(motif, motif_slice):
-    motif_copy = motif.copy()
+def advaced_edit(motif_slice):
     y, x = motif_slice
 
     ### try to change each strand
-    with st. container():
-        with st.popover('Advanced feature, modify the strands of the selected motif:',
-                        use_container_width=True,):
-            
-            col1, col2 = st.columns(2)
+    with st.popover('Advanced feature, modify the strands of the selected motif:',
+                    use_container_width=True,):
+        
+        cols = st.columns(7, vertical_alignment='bottom')
+        with cols[0]:
+            flip_vert = st.toggle("Flip vertically", 
+                                value=True,
+                                key="adv_flip_vert")
+        with cols[1]:
+            flip_h = st.toggle("Flip horizontally", 
+                                value=True,
+                                key="adv_flip_h")
+        with cols[2]:
+            if flip_vert or flip_h:
+                flip = st.button("Flip", key=f"adv_flip")
+                flip_vert &= flip
+                flip_h &= flip
+                
+        with cols[3]:
+            if st.button("Rotate 90° clockwise", key="adv_rotate"):
+                st_state.mot_adv_edit.rotate()
+                st_state.modified_motif_text += ('\nmotif.rotate()')
+
+        if flip_h or flip_vert:
+            st_state.mot_adv_edit.flip(horizontally=flip_h, vertically=flip_vert)
+            st_state.modified_motif_text += (f'\nmotif.flip('
+                                                f'horizontally={flip_h}, '
+                                                f'vertically={flip_vert})')
+
+
+        with cols[4]:
+            x_shift = st.number_input("Horizontal shift amount:", value=0)
+        with cols[5]:
+            y_shift = st.number_input("Vertical shift amount:", value=0)
+
+        with cols[6]:
+            shift = st.button("Shift motif", 
+                              help="Shift the motif by the specified x and y values. "
+                                   "The shift is applied to all strands in the motif.")
+
+        if (x_shift != 0 or y_shift != 0) and shift:
+            st_state.mot_adv_edit.shift((x_shift, y_shift))
+            st_state.modified_motif_text += (f'\nmotif.shift(('
+                                            f'{x_shift}, {y_shift}))')
+
+        for i, s in enumerate(st.session_state.mot_adv_edit):
+            col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
             with col1:
-                x_shift = st.number_input("Motif horizontal shift:", value=0)
+                start_x = st.number_input("Start x:", 
+                                            min_value=0, 
+                                            value=s.start[0], 
+                                            key=f'start_x_{x}_{y}_{i}')
             with col2:
-                y_shift = st.number_input("Motif vertical shift:", value=0)
+                    start_y = st.number_input("Start y:", 
+                                                min_value=0, 
+                                                value=s.start[1], 
+                                                key=f'start_y_{x}_{y}_{i}')
+                    
+            with col3:
+                strand_direction_ind = [d for d in pf.Direction].index(s.direction)
+                new_dir = st.selectbox('Start direction:', 
+                                        direction_list, 
+                                        index=strand_direction_ind, 
+                                        key=f'dir_{x}_{y}_{i}')
+                new_dir_tuple = pf.Direction[new_dir]
 
-            shifted = False
-            if x_shift != 0 or y_shift != 0:
-                shifted = True
-                motif_copy.shift((x_shift, y_shift))
+            with col4:
+                seq_dir = st.selectbox('Directionality:', 
+                                        ['35', '53'], 
+                                        index=['35', '53'].index(s.directionality), 
+                                        key=f'seq_dir_{x}_{y}_{i}')
 
-            for i, s in enumerate(motif_copy):
-                col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
-                with col1:
-                    start_x = st.number_input("Start x:", 
-                                              min_value=0, 
-                                              value=s.start[0], 
-                                              key=f'start_x_{x}_{y}_{i}')
-                with col2:
-                        start_y = st.number_input("Start y:", 
-                                                  min_value=0, 
-                                                  value=s.start[1], 
-                                                  key=f'start_y_{x}_{y}_{i}')
-                        
-                with col3:
-                    strand_direction_ind = [d for d in pf.Direction].index(s.direction)
-                    new_dir = st.selectbox('Start direction:', 
-                                           direction_list, 
-                                           index=strand_direction_ind, 
-                                           key=f'dir_{x}_{y}_{i}')
-                    new_dir_tuple = pf.Direction[new_dir]
+            with col5:
+                new_strand = st.text_input(f'New strand (strand directionality: '
+                                            f'{s.directionality}) ', 
+                                            value=str(s), key=f'strand_{x}_{y}_{i}',
+                                            help=' The strand contains all '
+                                                'the symbols of the structure '
+                                                '(nucleotides and direction '
+                                                'symbols). ')
 
-                with col4:
-                    seq_dir = st.selectbox('Directionality:', 
-                                           ['35', '53'], 
-                                           index=['35', '53'].index(s.directionality), 
-                                           key=f'seq_dir_{x}_{y}_{i}')
-                with col5:
-                    new_strand = st.text_input(f'New strand (strand directionality: '
-                                               f'{s.directionality}) ', 
-                                               value=str(s), key=f'strand_{x}_{y}_{i}')
-                ### check if the strand is modified and update the motif
-                stripped = new_strand.strip()
-                if s.start != (start_x, start_y):
-                    s.start = (start_x, start_y)
-                    st_state.modified_motif_text += (f'\nmotif[{i}].start = '
-                                                     f'({start_x}, {start_y})')
-                if s.directionality != seq_dir:
-                    s.directionality = seq_dir
-                    st_state.modified_motif_text += (f'\nmotif[{i}].directionality '
-                                                     f'= "{seq_dir}"')
-                if s.direction != new_dir_tuple:
-                    s.direction = new_dir_tuple
-                    st_state.modified_motif_text += (f'\nmotif[{i}].direction = '
-                                                     f'{new_dir_tuple}')
-                if s.strand != stripped:
-                    s.strand = stripped
-                    st_state.modified_motif_text += (f'\nmotif[{i}].strand = '
-                                                     f'"{stripped}"')
 
-            ### check the base pair symbols of the motif
-            current_structure = motif_copy.structure
-            new_db = st.text_input('Add dot-bracket notation:', 
-                                   value=current_structure,  
-                                   key=f'structure_{x}_{y}', 
-                                   help='Add the dot-bracket notation of the motif for'
-                                        ' each strand, separated by a "&". If the '
-                                        'paired bases are more than one position '
-                                        'apart, the pairing symbol "┊" is not shown.')
-            
-            if new_db != current_structure:
-                if not new_db:
-                    motif_copy.autopairing = True
-                    st_state.modified_motif_text += f'\nmotif.autopairing = True'
-                else:
-                    motif_copy.structure = new_db
-                    st_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'
-            
-            ### update the motif
-            try:
-                st.write(':orange[Preview:]')
+            ### check if the strand is modified and update the motif
+            strand_stripped = new_strand.strip()
+            if s.start != (start_x, start_y):
+                s.start = (start_x, start_y)
+                st_state.modified_motif_text += (f'\nmotif[{i}].start = '
+                                                    f'({start_x}, {start_y})')
+            if s.directionality != seq_dir:
+                s.directionality = seq_dir
+                st_state.modified_motif_text += (f'\nmotif[{i}].directionality '
+                                                    f'= "{seq_dir}"')
+            if s.direction != new_dir_tuple:
+                s.direction = new_dir_tuple
+                st_state.modified_motif_text += (f'\nmotif[{i}].direction = '
+                                                    f'{new_dir_tuple}')
+            if s.strand != strand_stripped:
+                s.strand = strand_stripped
+                st_state.modified_motif_text += (f'\nmotif[{i}].strand = '
+                                                    f'"{strand_stripped}"')
 
-                scrollable_text(motif_text_format(motif_copy))
-                if not st_state.modified_motif_text and not shifted:
-                    st.write(':green[Structure is updated]') 
-                else:
-                    st.warning('Be careful before updating, there is a high risk of '
-                               'breaking the structure.')
-                    update = st.button('Update strands')
+        ### check the base pair symbols of the motif
+        current_structure = st_state.mot_adv_edit.structure
+        new_db = st.text_input('Add dot-bracket notation:', 
+                                value=current_structure,  
+                                key=f'structure_{x}_{y}', 
+                                help='Add the dot-bracket notation of the motif for'
+                                    ' each strand, separated by a "&". If the '
+                                    'paired bases are more than one position '
+                                    'apart, the pairing symbol "┊" is not shown.')
+        
+        if new_db != current_structure:
+            if not new_db:
+                st_state.mot_adv_edit.autopairing = True
+                st_state.modified_motif_text += f'\nmotif.autopairing = True'
+            else:
+                st_state.mot_adv_edit.structure = new_db
+                st_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'
+        
+        ### update the motif
+        try:
+            st.write(':orange[Preview:]')
 
-                    if update:
-                        if shifted:
-                            st_state.modified_motif_text += (f'\nmotif.shift(('
-                                                             f'{x_shift}, {y_shift}))')
-                            
-                        st_state.code.append(f'motif = origami[({motif_slice[0]}, '
-                                             f'{motif_slice[1]})] # select the motif '
-                                             f'at index, line: {motif_slice}' 
-                                             + st_state.modified_motif_text)
-                        
-                        st_state.origami[motif_slice] = motif_copy
-                        st.rerun()
+            scrollable_text(motif_text_format(st_state.mot_adv_edit))
+            if not st_state.modified_motif_text:
+                st.write(':green[Structure is updated]') 
+            else:
+                st.warning('Be careful before updating, there is a high risk of '
+                            'breaking the structure.')
+                update = st.button('Update strands')
 
-            except pf.MotifStructureError as e:
-                st.error(e)
+                if update:
+                    st_state.code.append(f'motif = origami[({motif_slice[0]}, '
+                                            f'{motif_slice[1]})] # select the motif '
+                                            f'at index, line: {motif_slice}' 
+                                            + st_state.modified_motif_text)
+                    
+                    st_state.origami[motif_slice] = st_state.mot_adv_edit.copy()
+                    st.rerun()
+
+        except pf.MotifStructureError as e:
+            st.error(e)
 
 
 def scrollable_text(text: str):

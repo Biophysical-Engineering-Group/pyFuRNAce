@@ -82,7 +82,8 @@ class KissingLoop(Loop):
             If sequence length mismatches or pk_index has an invalid type.
         """
 
-        self._pk_index = self._check_pk_index(pk_index)
+        pk_index = self._check_pk_index(pk_index)
+        self._pk_index = pk_index
         self._seq_len = seq_len
         self._energy = energy
         self._energy_tolerance = energy_tolerance
@@ -187,7 +188,7 @@ class KissingLoop(Loop):
         elif not isinstance(pk_index, (int, str)):
             raise ValueError(f"The pk_index should be an integer or a string.")
         elif isinstance(pk_index, int):
-            pk_index = str(pk_index) + "'" * (pk_index < 0)
+            pk_index = str(abs(pk_index)) + "'" * (pk_index < 0)
         return pk_index
 
     def _create_strands(self,
@@ -217,8 +218,8 @@ class KissingLoop(Loop):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
-        self._pk_index = pk_index
-    
+        self._pk_index = self._check_pk_index(pk_index)
+
         seq_len = self._seq_len
 
         if sequence:
@@ -252,7 +253,7 @@ class KissingLoop(Loop):
                         start=(seq_len + 2, 2),
                         direction=(-1, 0),
                         directionality=sequence.directionality)
-        pk_info = {"id": [pk_index], 
+        pk_info = {"id": [self._pk_index], 
                    'ind_fwd': [(0, seq_len - 1)], 
                    'E': [self._energy], 
                    'dE': [self._energy_tolerance]}
@@ -540,7 +541,7 @@ class KissingDimer(KissingLoop180):
                                                 return_strand=True, 
                                                 pk_index=bottom_pk_index)[0]
         # add the pk_index to override the pk_index of the bottom strand
-        self._pk_index = pk_index 
+        self._pk_index = self._check_pk_index(pk_index)
 
         seq = bottom_strand.sequence[2:-1]
         rev_comp = seq.reverse_complement()
@@ -646,7 +647,7 @@ class KissingDimer120(KissingLoop120):
                                                 return_strand=True, 
                                                 pk_index=bottom_pk_index)[0]
         # add the pk_index to override the pk_index of the bottom strand
-        self._pk_index = pk_index 
+        self._pk_index = self._check_pk_index(pk_index)
         seq = bottom_strand.sequence
         
         ### shift the second strand to make space for the second one
@@ -752,7 +753,7 @@ class BranchedDimer(BranchedKissingLoop):
                                           return_strand=True, 
                                           pk_index=bottom_pk_index)
         # add the pk_index to override the pk_index of the bottom strand
-        self._pk_index = pk_index 
+        self._pk_index = self._check_pk_index(pk_index)
 
         # ### if the strands are already created, just update the sequence
         # if hasattr(self, '_strands'):

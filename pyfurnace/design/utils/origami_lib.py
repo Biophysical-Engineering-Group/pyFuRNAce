@@ -422,3 +422,268 @@ def ipython_clickable_txt(origami: Origami,
     content += '</div>'
 
     return display(HTML(content))
+
+def template_2_helix():
+    """
+    Generate the RNA origami template for a 2-helix structure.
+    Reference:
+    1. Krissanaprasit, A. et al. A functional RNA-origami as direct thrombin 
+        inhibitor with fast-acting and specific single-molecule reversal agents in 
+        vivo model. Molecular Therapy 32, 2286-2298 (2024).
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the 2-helix RNA structure.
+    """
+    import pyfurnace as pf
+    line_0 = [pf.TetraLoop(),
+              pf.Stem(11),
+              pf.Dovetail(0, up_cross=False),
+              pf.Stem(11),
+              pf.start_end_stem(),
+              pf.Stem(11),
+              pf.Dovetail(0, up_cross=False),
+              pf.Stem(11),
+              pf.TetraLoop(open_left=True)
+              ]
+    line_1 = [pf.TetraLoop(),
+              pf.Stem(11),
+              pf.Dovetail(0, down_cross=False),
+              pf.Stem(7),
+              pf.KissingDimer(),
+              pf.Stem(7),
+              pf.Dovetail(0, down_cross=False),
+              pf.Stem(11),
+              pf.TetraLoop(open_left=True)
+              ]
+    origami = pf.Origami([line_0, line_1], align='first')
+    return origami
+
+
+def template_rna_filament():
+    """
+    Generate the RNA origami template for an RNA filament structure.
+    
+    Reference:
+    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami 
+        cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the RNA filament structure.
+    """
+    import pyfurnace as pf
+    origami = pf.simple_origami(dt_list=[-3], 
+                                kl_columns=1,
+                                main_stem=[22], 
+                                align="first", ) 
+    
+    # adjust middle helix terminal stem
+    origami[(1, 7)].length = 5 
+    origami[(1, 1)].length = 5 
+
+    ### STEMS BEFORE THE EXTERNAL KL
+    origami[(0, 7)].length = 6 
+    origami[(2, 7)].length = 6 
+    origami[(2, 1)].length = 8 
+    origami[(0, 1)].length = 7 
+
+    origami[(0, 0)]   = pf.KissingLoop180(open_left = False, pk_index = "2")
+    origami[(-1, 0)]  = pf.KissingLoop180(open_left = False, pk_index = "1")
+    origami[(0, -1)]  = pf.KissingLoop180(open_left = True,  pk_index = "1'")
+    origami[(-1, -1)] = pf.KissingLoop180(open_left = True,  pk_index = "2'")
+    return origami
+
+def template_rna_filament_ispinach():
+    """
+    Generate the RNA origami template for an RNA filament structure.
+    The tiles contains an ispinach aptamer for fluorescence imaging.
+    
+    Reference:
+    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami 
+        cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the RNA filament structure.
+    """
+    import pyfurnace as pf
+    origami = pf.simple_origami(dt_list=[-3], 
+                                kl_columns=1,
+                                main_stem=[22], 
+                                align="first", ) 
+    
+    # adjust middle helix terminal stem
+    origami[(1, 7)].length = 5 
+    origami[(1, 1)].length = 5 
+
+    ### STEMS BEFORE THE EXTERNAL KL
+    origami[(0, 7)].length = 6 
+    origami[(2, 7)].length = 6 
+    origami[(2, 1)].length = 8 
+    origami[(0, 1)].length = 7 
+
+    origami[(0, 0)]   = pf.KissingLoop180(open_left = False, pk_index = "2")
+    origami[(-1, 0)]  = pf.KissingLoop180(open_left = False, pk_index = "1")
+    origami[(0, -1)]  = pf.KissingLoop180(open_left = True,  pk_index = "1'")
+    origami[(-1, -1)] = pf.KissingLoop180(open_left = True,  pk_index = "2'")
+
+    
+    # add connector for ispinach line
+    origami.insert((0, 4), pf.Dovetail(0, down_cross=False))
+
+    # add ispinach line
+    ispi_line = [pf.TetraLoop(),
+                 pf.Stem(3, strong_bases=False),
+                 pf.Ispinach().flip(),
+                 pf.Stem(3),
+                 pf.Motif.from_structure('...&', 'UUU&').flip(),
+                 pf.stem_cap_link(hflip=True),
+                 ]
+    origami.insert(0, ispi_line)
+    return origami
+
+def template_3_arms_droplet():
+    """
+    Generate the RNA origami template for a 3-arms droplet structure.
+    
+    References:
+    1. Stewart, J. M. et al. Modular RNA motifs for orthogonal phase separated 
+        compartments. Nat Commun 15, (2024).
+    2. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates
+        and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).
+    3. Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated 
+        design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the 3-arms droplet structure.
+    """
+    import pyfurnace as pf
+    palindr_kl = pf.KissingLoop(sequence='AUCGCGAAA')
+    line_0 = [palindr_kl.copy(),
+              pf.Stem(8),
+              pf.start_end_stem(),
+              pf.Stem(17),
+              pf.Motif.from_structure('.&', 'U&').flip(),
+              pf.Dovetail(0, up_cross=False),
+              pf.Motif.from_structure('.&.', 'U&U'),
+              pf.Stem(25),
+              palindr_kl.copy().flip()
+              ]
+    line_1 = [palindr_kl.copy(),
+              pf.Stem(5),
+              pf.Broccoli(),
+              pf.Stem(8),
+              pf.stem_cap_link().flip()
+              ]
+    origami = pf.Origami([line_0, line_1], align='first')
+    return origami
+
+def template_4_arms_droplet():
+    """
+    Generate the RNA origami template for a 4-arms droplet structure.
+    
+    Reference:
+    1. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates
+        and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the 4-arms droplet structure.
+    """
+    import pyfurnace as pf
+    uracil_connect = pf.Motif.from_structure('.&.', 'U&U')
+    palindr_kl = pf.KissingLoop(sequence='AUCGCGAAA')
+
+    line_0 = [palindr_kl.copy(),
+              pf.Stem(10),
+              pf.MalachiteGreenShort(),
+              pf.Stem(10),
+              uracil_connect.copy(),
+              pf.Dovetail(0, up_cross=False),
+              pf.Stem(25),
+              palindr_kl.copy().flip(),
+              ]
+
+    line_1 = [palindr_kl.copy(),
+              pf.Stem(13),
+              pf.start_end_stem(),
+              pf.Stem(12),
+              pf.Dovetail(0, down_cross=False),
+              uracil_connect.copy(),
+              pf.Stem(25),
+              palindr_kl.copy().flip(),
+             ]
+    origami = pf.Origami([line_0, line_1], align='first')
+    return origami
+
+def template_pentagon_tile():
+    """
+    Generate the RNA origami template for a pentagon tile structure.
+    This follows the 3H-4DT design from Geary et al. (2021).
+    
+    Reference:
+    1. Geary, C., Grossi, G., McRae, E. K. S., Rothemund, P. W. K. & Andersen, E. S. 
+        RNA origami design tools enable cotranscriptional folding of kilobase-sized 
+        nanoscaffolds. Nat. Chem. 13, 549-558 (2021).
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the pentagon tile structure.
+    """
+    import pyfurnace as pf
+    origami = pf.simple_origami([-4], main_stem=33, end_helix_len=7)
+    
+    # adjust start position
+    origami[0, 3].length = 12
+    origami[0, 5].length = 21
+
+    # adjust stems before the KL
+    origami[0, 1].length = 5
+    origami[-1, 1].length = 17
+    origami[0, -2].length = 12
+    origami[-1, -2].length = 21
+
+    # put the KL in the right place
+    origami[0, 0] = pf.KissingLoop120(pk_index=1)
+    origami[0, -1] = pf.KissingLoop120(open_left=True, pk_index=-1)
+    origami[-1, 0] = pf.KissingLoop120(pk_index=2)
+    origami[-1, -1] = pf.KissingLoop120(open_left=True, pk_index=-2)
+
+    return origami
+
+def template_rectangle_10H_3X():
+    """
+    Generate the RNA origami template for a rectangle 10H-3X structure.
+    
+    References:
+    1. Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated 
+        design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.
+
+    Returns
+    -------
+    Origami
+        An Origami object representing the rectangle 10H-3X structure.
+    """
+    import pyfurnace as pf
+    origami = pf.simple_origami(dt_list=[180] * 8, 
+                                kl_columns=3, 
+                                main_stem=33, 
+                                add_terminal_helix=True, 
+                                align="first", 
+                                use_angles=True) # Create a simple origami
+
+    origami = origami.improve_folding_pathway(kl_delay=150)
+
+    origami.insert((0, 11), pf.Broccoli().flip(1, 1)) # Add motif
+
+    origami.insert((0, 12), pf.Stem(5)) # Add motif
+
+    return origami

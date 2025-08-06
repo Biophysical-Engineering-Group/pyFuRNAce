@@ -5,12 +5,22 @@ from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio.SeqUtils import gc_fraction, molecular_weight
 import warnings
-from utils import load_logo, main_menu_style, copy_to_clipboard
-from utils.template_functions import symbols, write_format_text, check_dimer, sanitize_input, reference
+from utils import (load_logo, 
+                   main_menu_style, 
+                   copy_to_clipboard, 
+                   write_format_text)
+
+from utils.template_functions import (symbols, 
+                                      check_dimer, 
+                                      sanitize_input, 
+                                      reference)
 
 def convert_tab(seq):
-    """ Calculate the main property of the sequence (gc content, molecular weight, nucleotide composition, melting temperature) 
-        and convert the sequence to the different formats: reverse, complement, reverse complement, RNA transcribed, DNA template.
+    """ 
+    Calculate the main property of the sequence (gc content, molecular weight, 
+    nucleotide composition, melting temperature) and convert the sequence to the 
+    different formats: reverse, complement, reverse complement, RNA transcribed, 
+    DNA template.
     """
     # format the input sequence
     # st.write(f"Your sequence ({len(seq)} nt):")
@@ -44,7 +54,7 @@ def convert_tab(seq):
                                          c_seq=complement, 
                                          nn_table=nn_table),2))
     
-    # convert the sequence to the different formats: reverse, complement, reverse complement, RNA transcribed (for DNA), DNA template (for RNA)
+    # Useful conversions
     col1, col2, col3 = st.columns(3)
     with col1:
         copy_to_clipboard(seq[::-1], "Reverse:")
@@ -68,7 +78,8 @@ def convert_tab(seq):
     else:
         col1, col2 = st.columns([1, 5])
         # st.write("#### DNA template:")
-        promoter = st.text_input("**Select a promoter** (default: T7 promoter)", value='TAATACGACTCACTATA')
+        promoter = st.text_input("**Select a promoter** (default: T7 promoter)", 
+                                 value='TAATACGACTCACTATA')
         # take a specific promoter sequence for the DNA template and check that the RNA sequence starts with G
         if promoter == 'TAATACGACTCACTATA' and seq[0] != 'G':
             st.warning("The RNA sequence doesn't start with G", icon="⚠️")

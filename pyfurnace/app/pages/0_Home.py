@@ -21,11 +21,11 @@ if __name__ == '__main__':
                  label=":orange[Generate:]", 
                  icon=":material/network_node:")
 
-    st.markdown("- Generate the RNA sequence that matches the desired dot-bracket" 
+    st.markdown("- Generate the RNA sequence that matches the desired dot-bracket"
                 " notation for the nanostructure.")
 
     st.page_link("pages/3_Convert.py", 
-                 label=":orange[Template:]", 
+                 label=":orange[Convert:]", 
                  icon=":material/genetics:")
 
     st.markdown("- Prepare the DNA template for you RNA Origami, search subsequences"

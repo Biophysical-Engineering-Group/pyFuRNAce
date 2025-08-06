@@ -1,5 +1,5 @@
 import inspect
-from pyfurnace.design import utils, start_end_stem  # Import the module with the variables
+from pyfurnace.design import utils, start_end_stem  
 
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -11,7 +11,9 @@ from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
 
 # Filter and collect the motif utils
-util_names = [ut_name for ut_name, obj in inspect.getmembers(utils.motif_lib) if inspect.isfunction(obj)]
+util_names = [ut_name 
+                for ut_name, obj in inspect.getmembers(utils.motif_lib)
+                    if inspect.isfunction(obj)]
 
 # ignore the simple vertical connection
 del util_names[util_names.index('vertical_link')]
@@ -54,8 +56,11 @@ class ConnectionsCommand(MotifCommand):
             if rotate:
                 motif_text += f".rotate({rotate})"
             # save the motif in the session state
-            st.session_state.motif_buffer = motif = f"motif = pf.{name}(hflip={flip_hor}, vflip={flip_vert}, rotate={rotate})"
-            st.session_state.motif = motif_util(hflip=flip_hor, vflip=flip_vert, rotate=rotate)
+            st.session_state.motif_buffer = (f"motif = pf.{name}(hflip={flip_hor}, "
+                                               f"vflip={flip_vert}, rotate={rotate})")
+            st.session_state.motif = motif_util(hflip=flip_hor, 
+                                                vflip=flip_vert, 
+                                                rotate=rotate)
         
 
     def interface(self, key=''):
@@ -65,22 +70,43 @@ class ConnectionsCommand(MotifCommand):
 class start_end_stemCommand(MotifCommand):
 
     def execute(self, motif=None):
-        kwargs = dict()
-        if st.session_state.flip:
-            kwargs = {'top_l_def': '5', 'top_r_def': '3', 'bot_l_def': '3', 'bot_r_def': '5', 'top_ind': 1, 'bot_ind': 0}
-        t_l, t_r, b_l, b_r = self.interface(**kwargs)
-        st.session_state.motif_buffer = f"motif = pf.start_end_stem(top_left='{t_l}', top_right='{t_r}', bot_left='{b_l}', bot_right='{b_r}')"
-        st.session_state.motif = start_end_stem(top_left=t_l, top_right=t_r, bot_left=b_l, bot_right=b_r)
+        t_l, t_r, b_l, b_r = self.interface()
+        st.session_state.motif_buffer = (f"motif = pf.start_end_stem(up_left='{t_l}', "
+                                         f"up_right='{t_r}', down_left='{b_l}', "
+                                         f"down_right='{b_r}')")
+        st.session_state.motif = start_end_stem(up_left=t_l, 
+                                                up_right=t_r, 
+                                                down_left=b_l, 
+                                                down_right=b_r)
 
 
-    def interface(self, key='', top_l_def='3', top_r_def='5', bot_l_def='5', bot_r_def='3', top_ind = 0, bot_ind = 1):
+    def interface(self, 
+                  key='', 
+                  up_l_def='3', 
+                  up_r_def='5', 
+                  down_l_def='5', 
+                  down_r_def='3', 
+                  up_ind = 0, 
+                  down_ind = 1):
         _, _, col1, col2, _, _ =st.columns([1, 1, 1, 1, 1, 1])
         with col1:
-            t_l = st.selectbox('Top left:', [top_l_def] + ['─', None], index=top_ind, key=f'start_end_stem_top_left{key}')
-            b_l = st.selectbox('Bottom left:', [bot_l_def] +['─', None], index=bot_ind, key=f'start_end_stem_bot_left{key}')
+            t_l = st.selectbox('Top left:', 
+                               [up_l_def] + ['─', None], 
+                               index=up_ind, 
+                               key=f'start_end_stem_up_left{key}')
+            t_r = st.selectbox('Top right:', 
+                               [up_r_def] + ['─', None], 
+                               index=up_ind, key=f'start_end_stem_up_right{key}')
+            b_l = st.selectbox('Bottom left:', 
+                               [down_l_def] +['─', None], 
+                               index=down_ind, key=f'start_end_stem_down_left{key}')
         with col2:
-            t_r = st.selectbox('Top right:', [top_r_def] + ['─', None], index=top_ind, key=f'start_end_stem_top_right{key}')
-            b_r = st.selectbox('Bottom right:', [bot_r_def] + ['─', None], index=bot_ind, key=f'start_end_stem_bot_right{key}')
+            t_r = st.selectbox('Top right:', 
+                               [up_r_def] + ['─', None], 
+                               index=up_ind, key=f'start_end_stem_up_right{key}')
+            b_r = st.selectbox('Bottom right:', 
+                               [down_r_def] + ['─', None], 
+                               index=down_ind, key=f'start_end_stem_down_right{key}')
         if not t_l: t_l = ''
         if not t_r: t_r = ''
         if not b_l: b_l = ''

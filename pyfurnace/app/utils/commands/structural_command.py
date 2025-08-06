@@ -9,7 +9,8 @@ from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
 
 
-struct_names = [ut_name for ut_name, obj in inspect.getmembers(structural) if inspect.isfunction(obj)]
+struct_names = [ut_name for ut_name, obj in inspect.getmembers(structural)
+                        if inspect.isfunction(obj)]
 
 # ignore the three-way junction
 del struct_names[struct_names.index('ThreeWayJunction')]
@@ -27,18 +28,23 @@ class StructuralCommand(MotifCommand):
                                styles=second_menu_style,
                                key='StructuralOption',
                                )
-        match selected:
-            case 'Stem':
-                StemCommand().execute()
-            case 'Dovetail':
-                DovetailCommand().execute()
-            case _:
-                motif = [func() for name, func in motifs.__dict__.items() if callable(func) and name == selected][0]
-                flip_default = False
-                if st.session_state.current_line_occupied and isinstance(motif, Loop):
-                    flip_default = True
-                st.session_state.motif = motif
-                st.session_state.motif_buffer = f"motif = pf.{selected}()"
-                if st.toggle("Flip the aptamer", value=flip_default, key='flip_aptamer'):
-                    motif.flip(1, 1)
-                    st.session_state.motif_buffer += ".flip(1, 1)"
+        if selected == "Stem":
+            StemCommand().execute()
+            return
+        elif selected == "Dovetail":
+            DovetailCommand().execute()
+            return
+
+        motif = [func() for name, func in motifs.__dict__.items() 
+                            if callable(func) and name == selected][0]
+        flip_default = False
+
+        if st.session_state.current_line_occupied and isinstance(motif, Loop):
+            flip_default = True
+
+        st.session_state.motif = motif
+        st.session_state.motif_buffer = f"motif = pf.{selected}()"
+
+        if st.toggle("Flip the aptamer", value=flip_default, key='flip_aptamer'):
+            motif.flip(1, 1)
+            st.session_state.motif_buffer += ".flip(1, 1)"

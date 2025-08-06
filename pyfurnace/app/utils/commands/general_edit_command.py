@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit import session_state as st_state
 from .motif_command import MotifCommand
 
 class GeneralEditCommand(MotifCommand):
@@ -8,10 +9,12 @@ class GeneralEditCommand(MotifCommand):
         if motif:
             flip_vert, flip_hor, rotate = self.interface('mod')
             if flip_vert or flip_hor:
-                st.session_state.modified_motif_text += f"\nmotif.flip(horizontally={flip_hor}, vertically={flip_vert})"
+                st_state.modified_motif_text += (f"\nmotif.flip(horizontally="
+                                                 f"{flip_hor}, "
+                                                 f"vertically={flip_vert})")
                 motif.flip(horizontally=flip_hor, vertically=flip_vert)
             elif rotate:
-                st.session_state.modified_motif_text += f"\nmotif.rotate({rotate})"
+                st_state.modified_motif_text += f"\nmotif.rotate({rotate})"
                 motif.rotate(rotate)
 
     @staticmethod
@@ -44,6 +47,9 @@ class GeneralEditCommand(MotifCommand):
             with col2:
                 flip_hor = st.toggle("Flip horizontally", key=f"{key}flip_hor")
             with col3:
-                rotate = st.number_input("Rotate 90° clockwise:", min_value=0, max_value=4, key=f"{key}rotate")
+                rotate = st.number_input("Rotate 90° clockwise:", 
+                                         min_value=0, 
+                                         max_value=4, 
+                                         key=f"{key}rotate")
 
         return flip_vert, flip_hor, rotate

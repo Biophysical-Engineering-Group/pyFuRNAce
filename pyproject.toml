@@ -37,6 +37,9 @@ dependencies = [
     "ViennaRNA",
 ]
 
+[project.scripts]
+pyfurnace = "pyfurnace.__main__:main"
+
 [project.optional-dependencies]
 
 dev = [

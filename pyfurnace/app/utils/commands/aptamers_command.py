@@ -38,7 +38,8 @@ class AptamersCommand(MotifCommand):
                 menu_style = inactive_menu_style
             aptamer_selection = option_menu(None,
                                             common_aptamers,
-                                            icons=[MOTIF_ICONS[name] for name in common_aptamers],
+                                            icons=[MOTIF_ICONS[name] 
+                                                    for name in common_aptamers],
                                             menu_icon="cast",
                                             orientation="horizontal",
                                             styles=menu_style,
@@ -47,7 +48,7 @@ class AptamersCommand(MotifCommand):
         if aptamers_box != 'No selection':
             aptamer_selection = aptamers_box
         if aptamer_selection:
-            motif = [func() for name, func in aptamers.__dict__.items() if callable(func) and name == aptamer_selection][0]
+            motif = aptamers.__dict__[aptamer_selection]()
             flip_default = False
             if st.session_state.current_line_occupied and isinstance(motif, Loop):
                 flip_default = True

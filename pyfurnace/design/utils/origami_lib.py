@@ -276,11 +276,12 @@ def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
     None
     """
     # Convert your text to scrollable HTML
+    ori_txt = str(origami_text).replace('\n', '<br>')
     scrollable_html = (f'<div style="max-height: {max_height}px; white-space: nowrap;'
                             f'overflow-x: auto; overflow-y: scroll;'
                             f'font-family: monospace;'
                             f'border: 1px solid #ccc; padding: 10px;">'
-                f"{str(origami_text).replace('\n', '<br>').replace(' ', '&nbsp;')}"
+                f"{ori_txt.replace(' ', '&nbsp;')}"
                 "</div>")
     display(HTML(scrollable_html))
 

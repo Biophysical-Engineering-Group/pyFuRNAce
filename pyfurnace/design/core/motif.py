@@ -1080,6 +1080,8 @@ class Motif(Callback):
             structure = fold(sequence)[0]
         if sequence is None:
             sequence = 'N' * len(structure)
+        else:
+            sequence = str(sequence).replace('T', 'U').upper()
 
         if isinstance(structure, str) and len(structure) != len(sequence):
             raise ValueError(f"The sequence length must be equal to the structure "
@@ -1908,6 +1910,7 @@ class Motif(Callback):
         This function resets the dot-bracket notation representation of the motif.
         """
         self._structure = None # reset the dot bracket
+        self._pair_map = BasePair()
         self._trigger_callbacks(**kwargs)
 
     def _updated_strands(self, **kwargs) -> None:
@@ -2166,7 +2169,8 @@ class Motif(Callback):
     def flip(self, 
              horizontally: bool = True, 
              vertically: bool = True, 
-             strand_index: list = None) -> 'Motif':
+             strand_index: list = None,
+             reorder = False) -> 'Motif':
         """
         Flip the strands of the motif horizontally and/or vertically inplace.
 
@@ -2179,6 +2183,11 @@ class Motif(Callback):
         strand_index : list, default None
             The list of indices of the strands to flip.
             If None, all the strands are flipped.
+        reorder : bool, default False
+            If True, reorder the strands after flipping,
+            so that the first strand is the one with the 5' end,
+            then the strand with the lowest y start position,
+            and finally the strand with the lowest x start position.
 
         Returns
         -------
@@ -2217,6 +2226,14 @@ class Motif(Callback):
 
             strand.start = new_start
             strand.flip(horizontally, vertically, flip_start=False) 
+
+        if reorder:
+            # reorder the strands in order to have:
+            # - the strands with 5' end
+            # - strand with the lowest y start position
+            # - strand with the lowest x start position
+            self._strands.sort(key=lambda s: (-int('5' in s.strand), *s.start[::-1]))
+        
         return self
 
     @wraps(fold_bar) # inherit the documentation from the function

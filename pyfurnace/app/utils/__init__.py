@@ -38,7 +38,7 @@ def check_import_pyfurnace():
         return
     
     ### The module is installed but not imported, import it
-    if importlib.util.find_spec('pyfurnace') is not None: # Check if the module is installed
+    if importlib.util.find_spec('pyfurnace') is not None: 
         import pyfurnace
         return
     
@@ -47,7 +47,8 @@ def check_import_pyfurnace():
     sys.path.insert(0, str(pyfurnace_path))
     import pyfurnace
 
-def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.png")):
+def load_logo(page_title="pyFuRNAce", 
+              page_icon=str(app_path / "static" / "logo.png")):
     # First instructions to run the app, set the layout and logo
     st.set_page_config(page_title=page_title, 
                        page_icon=page_icon, 
@@ -70,16 +71,19 @@ def copy_to_clipboard(text_to_copy, button_text=''):
     if not button_text:
         copied_text = ''
     st.components.v1.html(f"""
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" 
+        rel="stylesheet" />
 
         <script>
             function copyToClipboard() {{
                 button = document.querySelector('.copy_button');
                 navigator.clipboard.writeText("{text_to_copy}")
-                button.innerHTML = '<span class="material-symbols-outlined">done</span>{copied_text}';
+                button.innerHTML = '<span class="material-symbols-outlined">\\
+                                    done</span>{copied_text}';
                 setTimeout(() => {{
                      button.style.backgroundColor = 'white';  // Change label after copying
-                     button.innerHTML = '<span class="material-symbols-outlined">content_copy</span>{button_text}';
+                     button.innerHTML = '<span class="material-symbols-outlined">\\
+                                        content_copy</span>{button_text}';
                 }}, 1000);
         }}
         </script>
@@ -125,18 +129,24 @@ def save_origami(origami_name='Origami'):
     st.write('### Download RNA origami structure')
     col1, col2 = st.columns([1, 6])
     with col1:
-        file_type = st.selectbox('Select file type', ['py', 'txt', 'fasta', 'PDB', 'oxDNA'], key = 'file_type')
+        file_type = st.selectbox('Select file type', 
+                                 ['py', 'txt', 'fasta', 'PDB', 'oxDNA'], 
+                                 key = 'file_type')
     with col2:
-        ori_name = st.text_input('Name of RNA origami', value=origami_name, key = 'ori_name')
+        ori_name = st.text_input('Name of RNA origami', 
+                                 value=origami_name, 
+                                 key = 'ori_name')
         if not ori_name:
             st.stop()
 
         if file_type == 'PDB':
             sequence = origami.sequence
             if any(nucl not in "AUCG&" for nucl in origami.sequence):
-                st.warning('The sequence contains non-standard nucleotides (only AUCG are allowed).')
+                st.warning('The sequence contains non-standard nucleotides '
+                           '(only AUCG are allowed).')
                 st.warning('The PDB will be filled with a random sequence!')
-                sequence = origami.sequence.get_random_sequence(structure=origami.structure)
+                sequence = sequence.get_random_sequence(structure=origami.structure)
+
             with tempfile.TemporaryDirectory() as tmpdirname:
                 file_path = f"{tmpdirname}/origami"
                 origami.save_3d_model(file_path, sequence=sequence, pdb=True)
@@ -185,12 +195,13 @@ def save_origami(origami_name='Origami'):
                                        on_click="ignore")
 
         else:
+
+            # create a text data with the structure of the RNA origami in python code
             if file_type == 'py' and 'code' in st.session_state:
-                # create a text data with the structure of the RNA origami in python code
                 text_data = '\n\n'.join(st.session_state.code)
 
+            # create a text data with the structure of the RNA origami
             elif file_type == 'txt':
-                # create a text data with the structure of the RNA origami
                 to_road = st.session_state.get('to_road')
                 text_data = origami.save_text('ori_name', 
                                               to_road=to_road,
@@ -207,6 +218,8 @@ def save_origami(origami_name='Origami'):
                                f"{ori_name}.{file_type}",
                                on_click="ignore")
     
-
+def write_format_text(text):
+    """ Format text in a code block"""
+    st.markdown(f"```\n{text}\n```")
 
 

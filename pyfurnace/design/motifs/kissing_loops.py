@@ -1,5 +1,6 @@
 import os
-import RNA
+# RNA used if a specific sequence is provided to calculate the energy
+
 # pyfurnace imports
 from . import CONFS_PATH
 from ..core.symbols import *
@@ -228,12 +229,15 @@ class KissingLoop(Loop):
             if seq_len and len(sequence) != seq_len:
                 raise ValueError(f"The sequence length doesn't match the length "
                                  f"for this kissing loop, which is {seq_len}.")
+            else:
+                seq_len = len(sequence)
             if all([s in 'ACGU' for s in sequence]):
+                from RNA import fold
                 if fold_180kl:
                     seq_to_fold = f"A{sequence}A&A{sequence.reverse_complement()}A"
                 else:
                     seq_to_fold = f"{sequence}&{sequence.reverse_complement()}"
-                self._energy = round(RNA.fold(seq_to_fold)[1], 2)
+                self._energy = round(fold(seq_to_fold)[1], 2)
                 self._energy_tolerance = 0
         else:
             sequence = Sequence('N' * seq_len, directionality='53')

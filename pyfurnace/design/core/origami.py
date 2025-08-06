@@ -61,7 +61,7 @@ class Origami(Callback):
         Full nucleotide sequence of the Origami.
     seq_positions : Tuple[Position]
         The positions of each nucleotide in the origami sequence (x,y coordinates).
-        Same as calling origami.motif.seq_positions. Always 5' to 3'.
+        Same as calling origami.assembled.seq_positions. Always 5' to 3'.
     ss_assembly : bool
         Whether to assemble the 3D structure of the origami without locking
         the coordinates of the motifs.
@@ -81,6 +81,7 @@ class Origami(Callback):
                        sequence: Optional[str] = None,
                        pk_energy=-8.5, 
                        pk_denergy=0.5,
+                       motif_list: Optional[List[Motif]] = None,
                        **kwargs) -> "Origami":
         """
         Parse a structure or sequence representation to an Origami object.
@@ -98,6 +99,9 @@ class Origami(Callback):
             The energy of the pseudoknots (if present).
         pk_denergy : float, optional
             The energy tolerance of the pseudoknots (if present).
+        motif_list : List[Motif], optional
+            A list of specific motifs to parse the structure. 
+            By default, the motifs are stems and aptamers.
         **kwargs : dict
             Additional arguments to pass to the Motif constructor.
         
@@ -108,29 +112,56 @@ class Origami(Callback):
             The Origami object created from the structure representation.
         """
         from RNA import fold
-        from ..motifs import Stem
+        from ..motifs import Stem, aptamers, aptamers_list
 
         if structure is None:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
         if sequence is None:
             sequence = 'N' * len(structure)
+        else:
+            sequence = str(sequence).replace('T', 'U').upper()
 
         if isinstance(structure, str) and len(structure) != len(sequence):
             raise ValueError(f"The sequence length must be equal to the structure "
                              f"length. Got {len(sequence)} for {len(structure)}")
+        
+        if motif_list and not all(isinstance(m, Motif) for m in motif_list):
+            raise ValueError("The motif_list must contain only Motif objects.")
+        else:
+            motif_list = []
+        motif_list.extend([aptamers.__dict__[name]() for name in aptamers_list])
+        motif_list.extend([m.copy().flip(reorder=True) for m in motif_list])
+
+        ### Idea in principle: if the structure is folded with ViennaRNA,
+        #  fold the aptamers with ViennaRNA too, so you can find them in the tree.
+        #  But single aptamers don't fold in the same way when when they are in a
+        # structure, so we cannot use this approach.
+        # CODE:
+        # if folded:
+        #     tree_to_mot = {dot_bracket_to_tree(fold(str(m.sequence))[0], 
+        #                                        sequence=str(m.sequence)): m
+        #                         for m in motif_list}
+        # else:
+        
+        tree_to_mot = {dot_bracket_to_tree(m.structure, 
+                                            sequence=str(m.sequence)): m
+                            for m in motif_list}
+
 
         # input dot-bracket notation
         if type(structure) == str:
             node = dot_bracket_to_tree(structure, 
                                        sequence=sequence)
             pair_map = dot_bracket_to_pair_map(structure)
+
         # input pair map
         elif isinstance(structure, (BasePair, dict)):
             pair_map = structure.copy()
             node = dot_bracket_to_tree(pair_map_to_dot_bracket(structure), 
                                     sequence=sequence)
             structure = pair_map_to_dot_bracket(structure)
+
         # input tree
         elif isinstance(structure, Node):
             node = structure
@@ -143,6 +174,59 @@ class Origami(Callback):
         origami = Origami([[]], align='first', ss_assembly=True)
         current_index = [0, 0]
         m_seq = ['', '']
+
+        def match_subtree(node: Node, motif_node: Node, depth: int = 0) -> bool:
+            """
+            Recursively checks if motif_root matches the subtree rooted at node.
+
+            Parameters
+            ----------
+            node : Node
+                The root of the subtree to compare.
+            motif_node : Node
+                The root of the motif tree.
+            depth : int, optional
+                The current depth in the tree, used to track the last matched node.
+
+            Returns
+            -------
+            bool
+                True if motif_root matches the subtree rooted at node.
+            """
+            if (motif_node.parent # not valid for the root node
+                and node.label != motif_node.label):
+                return None
+
+            if (motif_node.parent # not valid for the root node
+                    and motif_node.seq is not None 
+                    and node.seq is not None
+                    and  not (iupac_code[node.seq] & iupac_code[motif_node.seq])):
+                return None
+
+            # sanitize the children comparison
+            motif_child = [c for c in motif_node.children if c.label != '&']
+            node_child = [c for c in node.children if c.label != '&']
+            
+            if not motif_child:
+                return node, depth # Leaf node matched
+            
+            if len(motif_child) != len(node_child):
+                return None
+ 
+            node_depths = [match_subtree(nc, mc, depth=depth + 1)
+                               for nc, mc in zip(node_child, motif_child)]
+            if not all(node_depths):
+                return None
+            
+            # save the node at the maximum depth
+            node, max_depth = max(node_depths, 
+                                  key=lambda x: x[1] if x is not None else 0)
+
+            if depth == 0:
+                # if we are at the root node, we return the node
+                return node
+
+            return node, max_depth
 
         def recursive_build_origami(node, insert_at=None, flip=False):
             """
@@ -172,20 +256,53 @@ class Origami(Callback):
             if node.label == '&':
                 return
             
+            ### Check if the current node matches any motif in the motif list
+            if node.parent:
+                for tree_mot, mot in tree_to_mot.items():
+                    found_node = match_subtree(node.parent, tree_mot)
+
+                    if found_node:
+                        print("MATCH")
+                        # First, flush stems accumulated
+                        # this cause problems with bulges before aptamers
+                        # but too many edge cases to handle
+                        if m_seq[0]:
+                            if m_seq[0] == 'N' * len(m_seq[0]):
+                                stem = Stem(len(m_seq[0]))
+                            else:
+                                stem = Stem(sequence=m_seq[0])
+                                stem[1].sequence = m_seq[1][::-1]
+                            origami.insert(insert_at, stem.flip(flip, flip))
+                            insert_at[1] += 1
+                            current_index[1] += 1
+                            m_seq = ['', '']
+
+                        motif = mot.copy()
+                        node = found_node
+                        break
+
             # find the index of the current node in the parent children
             if node.parent is not None:
                 child_seq_ind = [c.index for c in node.parent.children]
                 n_c_ind = child_seq_ind.index(node.index)
 
-            if node.label == '(':
+            if motif is not None: # if a motif was found, insert it
+                pass
+
+            elif node.label == '(':
                 m_seq[0] += node.seq
                 m_seq[1] += sequence[pair_map[node.index]]
 
                 # if the next node is not a stem, create a stem motif
-                if (not node.children 
+                if (not node.children
+                        or len(node.children) > 1
                        or any(c.label != '(' for c in node.children)):
-                    motif = Stem(sequence=m_seq[0])
-                    motif[1].sequence = m_seq[1][::-1]
+                    # add wobbles in the stem
+                    if m_seq[0] == 'N' * len(m_seq[0]):
+                        motif = Stem(len(m_seq[0]))
+                    else:
+                        motif = Stem(sequence=m_seq[0])
+                        motif[1].sequence = m_seq[1][::-1]
 
             elif node.label == '.':
                 m_seq[0] += node.seq
@@ -291,61 +408,67 @@ class Origami(Callback):
 
         # call the recursive function
         recursive_build_origami(node)
-        # get the motif from the origami object
-        # motif = origami.assembled
+
+        ### ADD THE PSEUDOKNOTS ###
+        # dictionary with index as key and pseudoknot id as value
+        full_map = dict()
+        struct = structure.replace('&', '') 
+        pair_map = dot_bracket_to_pair_map(struct)
+
+        # map the sequence index to the slice
+        pos_to_slice = origami.pos_index_map
+        seq_positions = origami.seq_positions
+        motif_shifts = origami.index_shift_map
+
+        # iterate over the structure
+        i = 0
+        while i < len(struct):
+            new_pk_info = {"id": [], 'ind_fwd': [], 'E': [], 'dE': []}
+
+            # iterate over the subsequences structure
+            sym = struct[i]
+
+            # found pseudoknot
+            if sym not in '.()' and i not in full_map:
+                # get the length of the pseudoknot
+                length = 1
+                while struct[i + length] == sym:
+                    length += 1
+                
+                # get the pseudoknot id of get a new one
+                if pair_map[i] in full_map:
+                    pk_id = full_map[pair_map[i]] + "'"
+                else:
+                    inds = [k.split('_')[1].strip("'") for k in full_map.values()]
+                    pk_id = '1_' + str(int(max(inds, default='-1')) + 1)
+
+                # get the pseudoknot motif, stand an insert offset
+                pos = seq_positions[i]
+                motif_yx = pos_to_slice[pos]
+                shift_yx = motif_shifts[motif_yx]
+                motif = origami._matrix[motif_yx[0]][motif_yx[1]]
+                original_pos = (pos[0] - shift_yx[0], pos[1] - shift_yx[1])
+                strand_ind = next(i for i, s in enumerate(motif) 
+                                        if original_pos in s.seq_positions)
+                seq_offset = motif[strand_ind].seq_positions.index(original_pos)
+
+                print(i, length, sym, pk_id, seq_offset)
+                # add the pseudoknot to the motif
+                new_pk_info['id'].append(pk_id)
+                new_pk_info['ind_fwd'].append((seq_offset, seq_offset + length - 1))
+                indices = range(seq_offset + i, seq_offset + i + length)
+                # update the full map
+                full_map.update({k: pk_id for k in indices})
+                    
+                new_pk_info['E'].append(pk_energy)
+                new_pk_info['dE'].append(pk_denergy)
+
+                # add the pseudoknots info to the strand
+                motif[strand_ind].pk_info = new_pk_info
+                i += length
+            i += 1
 
         return origami
-
-        # ### ADD THE PSEUDOKNOTS ###
-        # seq_offset = 0
-        # # dictionary with index as key and pseudoknot id as value
-        # full_map = dict()
-        # pair_map = dot_bracket_to_pair_map(structure.replace('&', ''))
-
-        # # iterate over the  subsequences
-        # for i, struct in enumerate(structure.split('&')):
-        #     new_pk_info = {"id": [], 'ind_fwd': [], 'E': [], 'dE': []}
-        #     j = 0
-        #     ss_len = len(struct)
-
-        #     # iterate over the subsequences structure
-        #     while j < ss_len:
-        #         sym = struct[j]
-
-        #         # found pseudoknot
-        #         if sym not in '.()' and (seq_offset + j) not in full_map:
-        #             # get the length of the pseudoknot
-        #             length = 1
-        #             while struct[j + length] == sym:
-        #                 length += 1
-                    
-        #             # get the pseudoknot id of get a new one
-        #             if pair_map[seq_offset + j] in full_map:
-        #                 pk_id = full_map[pair_map[seq_offset + j]] + "'"
-        #             else:
-        #                 inds = [k.split('_')[1].strip("'") for k in full_map.values()]
-        #                 pk_id = '100_' + str(int(max(inds, default='-1')) + 1)
-                    
-        #             # add the pseudoknot to the motif
-        #             new_pk_info['id'].append(pk_id)
-        #             new_pk_info['ind_fwd'].append((j, j + length - 1))
-        #             indices = range(seq_offset + j, seq_offset + j + length)
-        #             # update the full map
-        #             full_map.update({k: pk_id for k in indices})
-                        
-        #             new_pk_info['E'].append(pk_energy)
-        #             new_pk_info['dE'].append(pk_denergy)
-        #             j += length
-        #         j += 1
-
-        #     # add the pseudoknots info to the strand
-        #     motif[i].pk_info = new_pk_info
-        #     seq_offset += len(struct)
-
-        # kwargs.setdefault('lock_coords', False)
-        # obj = cls(**kwargs)
-        # obj.replace_all_strands(motif, copy=False, join=False)
-        # return obj
 
     def __init__(self, 
                  matrix: Union[Motif, List[Motif], List[List[Motif]]] = None, 
@@ -1000,7 +1123,7 @@ class Origami(Callback):
                 # get the motif at the position
                 motif = self._matrix[motif_yx[0]][motif_yx[1]]
                 # get the strand index of the motif at the base position
-                strand_ind = next(i for i, s in enumerate(motif) 
+                strand_ind = next(i for i, s in enumerate(motif)
                                         if original_pos in s.seq_positions)
                 if strand_ID is None:
                     strand_ID = (motif_yx[0], motif_yx[1], strand_ind)

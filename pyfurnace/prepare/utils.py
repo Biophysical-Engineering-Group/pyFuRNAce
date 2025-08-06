@@ -8,8 +8,8 @@ from functools import partial
 # dictionary of melting temperature methods: 
 # name as key and function as value
 tm_methods = {"Nearest Neighbor": mt.Tm_NN,
-              "Empirical formulas based on GC content": mt.Tm_GC,
-              "Wallace, 'Rule of thumb'": mt.Tm_Wallace,
+              "Empirical GC content": mt.Tm_GC,
+              "Wallace, rule of thumb": mt.Tm_Wallace,
               }
 
 # dictionary of melting temperature models:
@@ -22,8 +22,8 @@ tm_models = {"Nearest Neighbor": ['DNA_NN4',
                                   'RNA_NN2', 
                                   'RNA_NN3', 
                                   'R_DNA_NN1'],
-             "Empirical formulas based on GC content": [1, 2, 3, 4, 5, 6, 7, 8],
-             "Wallace, 'Rule of thumb'": [],
+             "Empirical GC content": [1, 2, 3, 4, 5, 6, 7, 8],
+             "Wallace, rule of thumb": [],
              }
 
 # dictionary of Nearest Neighbour melting temperature models:
@@ -60,7 +60,8 @@ def make_tm_calculator(method_name: str = "Nearest Neighbor",
     method_name : str, optional
         The method used for Tm calculation. 
         Options include "Nearest Neighbor", 
-        "Empirical formulas based on GC content", or "Wallace".
+        "Empirical GC content",
+        and "Wallace, rule of thumb".
         Default is "Nearest Neighbor".
     model_name : str, optional
         The nearest neighbor model to use for Tm calculation. 
@@ -97,7 +98,9 @@ def make_tm_calculator(method_name: str = "Nearest Neighbor",
     """
     method = tm_methods[method_name]
 
-    if method_name == "Nearest Neighbor":
+    first_word = method_name.split()[0].lower()
+
+    if first_word == "nearest":
         model = NN_models[model_name]
         method_kwargs = tm_kwargs.copy()
         if 'dNTPs' in method_kwargs:
@@ -110,7 +113,7 @@ def make_tm_calculator(method_name: str = "Nearest Neighbor",
                                dnac2=0, 
                                **method_kwargs)
 
-    elif method_name == "Empirical formulas based on GC content":
+    elif first_word == "empirical":
         method_kwargs = tm_kwargs.copy()
         if 'DMSO' in method_kwargs:
             method_kwargs.pop('DMSO')

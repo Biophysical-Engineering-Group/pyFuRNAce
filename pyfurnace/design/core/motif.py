@@ -1075,10 +1075,10 @@ class Motif(Callback):
         from .origami import Origami
         from RNA import fold
 
-        if structure is None:
+        if not structure:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
-        if sequence is None:
+        if not sequence:
             sequence = 'N' * len(structure)
         else:
             sequence = str(sequence).replace('T', 'U').upper()

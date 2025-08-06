@@ -114,10 +114,10 @@ class Origami(Callback):
         from RNA import fold
         from ..motifs import Stem, aptamers, aptamers_list
 
-        if structure is None:
+        if not structure:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
-        if sequence is None:
+        if not sequence:
             sequence = 'N' * len(structure)
         else:
             sequence = str(sequence).replace('T', 'U').upper()
@@ -262,7 +262,6 @@ class Origami(Callback):
                     found_node = match_subtree(node.parent, tree_mot)
 
                     if found_node:
-                        print("MATCH")
                         # First, flush stems accumulated
                         # this cause problems with bulges before aptamers
                         # but too many edge cases to handle

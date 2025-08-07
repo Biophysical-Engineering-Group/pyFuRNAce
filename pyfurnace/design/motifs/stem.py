@@ -250,6 +250,10 @@ class Stem(Motif):
 
         ### Create the top and bottom strands
         if sequence: # if a sequence is provided, it has the priority
+            
+            if not isinstance(sequence, Sequence):
+                sequence = Sequence(sequence, directionality='53')
+
             self._length = seq_len  * getattr(self, '_sign', 1)
             strands = [Strand(sequence, coords=top_coord), 
                        Strand(sequence.translate(nucl_to_pair)[::-1], 

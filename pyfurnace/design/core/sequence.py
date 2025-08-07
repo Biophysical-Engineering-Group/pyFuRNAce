@@ -57,8 +57,8 @@ class Sequence(Callback):
                              f"got {directionality} instead.")
         
         self._directionality = directionality
-        self._check_line(sequence)
-        self._sequence = str(sequence).upper().translate(only_nucl)
+        sequence = self._check_line(sequence)
+        self._sequence = str(sequence).translate(only_nucl)
 
     def __str__(self) -> str:
         """ Return the string representation of the sequence."""
@@ -83,7 +83,7 @@ class Sequence(Callback):
                     idx: Union[int, slice],
                     val: Union[str, 'Sequence']) -> None:
         """ Set a subsequence of the sequence."""
-        self._check_line(val)
+        val = self._check_line(val)
         if isinstance(idx, slice):
             seq_line = list(self._sequence)
             seq_line[idx] = val.upper()
@@ -186,7 +186,7 @@ class Sequence(Callback):
     def _check_addition(self, other: Union[str, 'Sequence']) -> bool:
         """ Check that the sequence is valid and have same directionality"""
         if isinstance(other, str):
-            self._check_line(other)
+            other = self._check_line(other)
 
         elif not isinstance(other, Sequence):
             raise ValueError(f'{other} is not a valid type for addition')
@@ -201,16 +201,19 @@ class Sequence(Callback):
             raise ValueError(f"The sequence must be a string or a sequence object. "
                              f"Got {type(line)} instead.")
         
-        if isinstance(line, str) and line.translate(nucl_to_none).replace('&', ''):
-            warnings.warn(f"Warning: The string '{line}' contains nucleotides not "
-                          f"allowed in ROAD that will be removed. The allowed "
-                          f"nucleotides are: {nucleotides.union('&')}.", 
-                          AmbiguosStructure, stacklevel=3)
+        if isinstance(line, str):
+            line = line.upper()
+            if line.translate(nucl_to_none).replace('&', ''):
+                warnings.warn(f"Warning: The string '{line}' contains nucleotides not"
+                              f" allowed in ROAD that will be removed. The allowed "
+                              f"nucleotides are: {nucleotides.union('&')}.", 
+                              AmbiguosStructure, stacklevel=3)
 
         if self.directionality[0] in line[1:] or self.directionality[1] in line[:-1]:
             raise ValueError(f"The start/end symbols '{self.directionality}' "
                              f"are not at the end of the sequence: '{line}'") 
-        return True
+        
+        return line
 
     ### 
     ### METHODS
@@ -258,7 +261,7 @@ class Sequence(Callback):
         ValueError
             If the input is invalid or lengths do not match.
         """
-        self._check_line(other)
+        other = self._check_line(other)
 
         if len(self) != len(other):
             raise ValueError("Sequences must have the same length.")
@@ -465,7 +468,7 @@ class Sequence(Callback):
         Sequence
             Updated sequence.
         """      
-        self._check_line(new)
+        new = self._check_line(new)
         self._sequence = str(self._sequence.replace(old, new))
         self._trigger_callbacks(new_sequence = self._sequence)
         return self
@@ -544,7 +547,7 @@ class Sequence(Callback):
                             directionality=self.directionality)
         
         new_sequence = str(self._sequence.translate(dictionary))
-        self._check_line(new_sequence)
+        new_sequence = self._check_line(new_sequence)
         self._sequence = new_sequence
         self._trigger_callbacks(new_sequence = self._sequence)
         return self

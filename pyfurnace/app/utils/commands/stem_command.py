@@ -62,8 +62,8 @@ class StemCommand(MotifCommand):
                   key='', 
                   top_seq=None, 
                   len_default=7, 
-                  wobble_interval=7, 
-                  wobble_tolerance=3):
+                  wobble_interval=5, 
+                  wobble_tolerance=2):
         
         ### initialize the variables
         seq_length = 0

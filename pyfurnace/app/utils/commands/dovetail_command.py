@@ -95,7 +95,7 @@ class DovetailCommand(MotifCommand):
                   key='', 
                   top_seq=None, 
                   len_default=-2, 
-                  wobble_interval=8, 
+                  wobble_interval=5, 
                   wobble_tolerance=2, 
                   up_cross=True, 
                   down_cross=True):

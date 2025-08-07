@@ -94,9 +94,6 @@ class start_end_stemCommand(MotifCommand):
                                [up_l_def] + ['─', None], 
                                index=up_ind, 
                                key=f'start_end_stem_up_left{key}')
-            t_r = st.selectbox('Top right:', 
-                               [up_r_def] + ['─', None], 
-                               index=up_ind, key=f'start_end_stem_up_right{key}')
             b_l = st.selectbox('Bottom left:', 
                                [down_l_def] +['─', None], 
                                index=down_ind, key=f'start_end_stem_down_left{key}')

@@ -120,7 +120,7 @@ def vertical_double_link(*args, **kwargs) -> Utils:
     """
     kwargs['strands'] = [
         Strand('│', direction=(0, -1)),
-        Strand('│', direction=(0, -1), start=(1, 0))
+        Strand('│', direction=(0, 1), start=(1, 0))
     ]
     return Utils(*args, **kwargs)
 

@@ -1317,10 +1317,79 @@ class Strand(Callback):
         
         if return_string: 
             return '\n'.join(canvas)
-    
-    def flip(self, 
-             horizontally: bool = True, 
-             vertically: bool = False, 
+        
+    def extend(self,
+               direction: Union[Position, Tuple[int, int]],
+               until: Union[Position, Tuple[int, int]] = None,
+               check: bool = True) -> None:
+        """
+        Extend the strand in the specified direction by a given length.
+
+        Parameters
+        ----------
+        direction : Union[Position, Tuple[int, int]], default (1, 0)
+            The direction to extend the strand in. It can be a Position object or
+            a tuple of (x, y) coordinates. It must contain coordinates that are either
+            1, -1 or 0, where 0 is the coordinate that does not change.
+        until : Union[Position, Tuple[int, int]], default None
+            The position until which to extend the strand. If None, the strand is 
+            extended until the origin position (0, 0).
+        check : bool, default True
+            If True, check the direction and until position for validity.
+        """
+        if check:
+            direction = self._check_position(direction, direction=True)
+        if until is None:
+            until = Position.zero()
+        elif check:
+            until = self._check_position(until)
+
+        dir_symb = ["─", "│", '•']
+
+        # don't extend terminal symbols
+        if self._strand[0] in "35":
+            start_mask = Position.zero()
+        else:
+            start_mask = Position(d1 if d1 == d2 else 0 
+                                    for d1, d2 in zip(direction, -self._direction))
+        if self._strand[-1] in "35":
+            end_mask = Position.zero()
+        else:
+            end_mask = Position(d1 if d1 == d2 else 0 
+                                for d1, d2 in zip(direction, self.end_direction))
+            
+        # if 1 not in start_mask and 1 not in end_mask:
+        #     return self
+
+        # normalize the direction according to until
+        start_until = Position(u if u is not None else s 
+                                    for u, s in zip(until, self._start))
+        end_until = Position(u if u is not None else e 
+                                    for u, e in zip(until, self.end))
+        
+        # calculate the start and end amounts to extend
+        start_amount = (start_until - self._start) * start_mask
+        end_amount = (end_until - self.end) * end_mask
+
+        for i, d in enumerate(direction):
+            if d == 0:
+                continue
+            if start_amount[i] > 0:
+                self._start += start_amount * direction
+                self._strand = dir_symb[i] * start_amount[i] + self._strand
+            if end_amount[i] > 0:
+                self._strand += dir_symb[i] * end_amount[i]
+
+        # update the strand and the sequence
+        self._update_sequence_insertion(self._strand)
+        # update the positions
+        self._reset_positions()
+        # notify the upper class that the strand has changed
+        self._trigger_callbacks()
+
+    def flip(self,
+             horizontally: bool = True,
+             vertically: bool = False,
              flip_start: bool = True) -> None:
         """
         Flip the 2D structure of the strand. This affects the orientation on the 

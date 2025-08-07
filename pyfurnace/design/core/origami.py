@@ -113,6 +113,7 @@ class Origami(Callback):
         """
         from RNA import fold
         from ..motifs import Stem, aptamers, aptamers_list
+        from ..utils import vertical_double_link, stem_cap_link
 
         if not structure:
             # if only sequence is provided, fold it to get the structure
@@ -351,10 +352,7 @@ class Origami(Callback):
                                             directionality='35'),
                                             Strand('╭', start=(1,2), direction=(0,-1))
                                             )
-                        connect_up = Motif(Strand('││╰─', direction=(0, 1),
-                                                  directionality='35'),
-                                        Strand('╰', start=(1, 0), direction=(0, 1))
-                                        )
+                        connect_up = stem_cap_link(vflip=True)
                         if child_inds:
                             insert_connect = child_inds.pop()
                         else:
@@ -378,11 +376,7 @@ class Origami(Callback):
                         for i in range(insert_connect[0] + 1, current_index[0]):
                             # add the vertical connector
                             origami.insert((i, 0),
-                                            Motif(Strand('│', direction=(0, 1),
-                                                            directionality='35'),
-                                                  Strand('│', direction=(0, 1), 
-                                                         start=(1, 0))
-                                                  ).shift((shift_x, 0))
+                                           vertical_double_link().shift((shift_x, 0))
                                            )
                             # shift all the motifs until you reach the first connector
                             for m in origami[i, 1:]:
@@ -451,7 +445,6 @@ class Origami(Callback):
                                         if original_pos in s.seq_positions)
                 seq_offset = motif[strand_ind].seq_positions.index(original_pos)
 
-                print(i, length, sym, pk_id, seq_offset)
                 # add the pseudoknot to the motif
                 new_pk_info['id'].append(pk_id)
                 new_pk_info['ind_fwd'].append((seq_offset, seq_offset + length - 1))
@@ -1381,17 +1374,21 @@ class Origami(Callback):
 
             # get the directionalities of the top junction
             mot_to_strand = motif_lines[ind1].get_strand_index_map()
-            directs = [top_motif[mot_to_strand[pos]].directionality
-                        if pos == top_motif[mot_to_strand[pos]].end
-                        else top_motif[mot_to_strand[pos]].directionality[::-1]
-                            for pos in j1[Direction.DOWN]]
+            directs = []
+            for pos in j1[Direction.DOWN]:
+                strand = top_motif[mot_to_strand[pos]]
+                if (pos == strand.end
+                        and strand.end_direction == Direction.DOWN):
+                    directs.append(strand.directionality)
+                else:
+                    directs.append(strand.directionality[::-1])
             
             # create the connection motifs
             m_connect, _ = self._calculate_connections(j1, j2, directs)
             # intercalate the connections into the motif lines
             motif_lines.insert(ind1 + 1, m_connect)
             ind1 += 2
-            
+
         # assemble the origami, piece by piece
         mot = Motif()
         for ind, line in enumerate(motif_lines):

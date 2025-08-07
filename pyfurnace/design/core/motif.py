@@ -800,7 +800,7 @@ class Motif(Callback):
         if extend:
             # Extend the junctions
             max_extend = max([m.max_pos[axis] for m in aligned], default=0)
-            extend_until = [None, None]
+            extend_until = [None, None, None]
             extend_until[axis] = max_extend
             aligned = [m.extend_junctions(until=extend_until) for m in aligned] 
 
@@ -2070,9 +2070,13 @@ class Motif(Callback):
     def extend_junctions(self, 
                          skip_axis: Literal[None, 0, 1] = None, 
                          skip_directions: List[Direction] = None,
-                         until: tuple = (None, None)) -> 'Motif':
+                         until: Optional[Position] = None,
+                         ) -> 'Motif':
         """
         Extend the junctions of the motif in the direction of the junctions.
+        Unless the skip_axis is specified, the junctions are extended
+        in all directions. The until parameter allows to specify
+        the position until which to extend the junctions in the positive direction.
 
         Parameters
         ----------
@@ -2081,8 +2085,10 @@ class Motif(Callback):
             (1 for horizontal, 0 for vertical).
         skip_directions: List[Direction], optional
             The list of directions to skip when extending the junctions.
-        until : tuple, default (None, None)
-            The position until which to extend the junctions.
+        until : Position, optional
+            The position until which to extend the junctions
+            If None, extend until the end of the motif in all directions
+            (to the origin and to the maximum position).
 
         Returns
         -------
@@ -2096,8 +2102,7 @@ class Motif(Callback):
         MotifStructureError
             If there is an error in extending the junction
         """
-
-        juncts = self.junctions
+        axis = [d for d in Direction]
         if skip_directions is None:
             skip_directions = []
 
@@ -2110,58 +2115,83 @@ class Motif(Callback):
         
         # make a dictionary from positions to index
         index_map = {p: ind for ind, s in enumerate(self) for p in s.positions}
+        # create a dictionry from junction direction to strand index
+        j_to_ind = {d: {index_map[pos] for pos in pos_list} 
+                            for d, pos_list in self.junctions.items()
+                                    if d not in skip_directions}
+
+        if until is None:
+            until = self.max_pos
 
         try:
-            for axis, sym in ((1, '─'), (0, '│')): # consider the two axis
-                naxis = int(not axis)
-                neg_direction = Position((- axis, - naxis))
-                pos_direction = Position((axis, naxis)) 
+            # this code doens't check for eventual overlaps,
+            # so it can lead to MotifStructureError if the junctions are not extendable
+            for d, inds in j_to_ind.items():
+                for i in inds:
+                    s = self[i]
+                    if -1 in d:
+                        s.extend(direction=d,
+                                check=False)
+                    # if it's a positive direction and until is None, extend to max_pos
+                    if 1 in d:
+                        s.extend(direction=d, 
+                                 until=until, 
+                                 check=False)
 
-                if neg_direction not in skip_directions:
-                    # consider all the junction positions in the negative direction
-                    for pos in juncts[neg_direction]: 
+        # The following code works, it's more efficient, and check for overlaps, 
+        # but it's hard to maintain, doesn't keep directionality check and understand.
+        # So better using the simpler version above.
+        # Here the previous code:
+            # for axis, sym in ((1, '─'), (0, '│')): # consider the two axis
+            #     naxis = int(not axis)
+            #     neg_direction = Position((- axis, - naxis))
+            #     pos_direction = Position((axis, naxis)) 
 
-                        # if the position is not at the minimum border
-                        if pos[naxis] != 0: 
-                            # add a strand from the position and going to the border
-                            extend_strand = Strand(sym * pos[naxis], 
-                                                   start=(pos[0] * naxis, 
-                                                   pos[1] * axis),
-                                                   direction=pos_direction)
+            #     if neg_direction not in skip_directions:
+            #         # consider all the junction positions in the negative direction
+            #         for pos in juncts[neg_direction]: 
+
+            #             # if the position is not at the minimum border
+            #             if pos[naxis] != 0: 
+            #                 # add a strand from the position and going to the border
+            #                 extend_strand = Strand(sym * pos[naxis], 
+            #                                        start=(pos[0] * naxis, 
+            #                                        pos[1] * axis),
+            #                                        direction=pos_direction)
                             
-                            # check that the extension doesn't overlap 
-                            # with other strands
-                            if not (set(extend_strand.positions) 
-                                            & set(index_map)): 
-                                # get the strand at the position
-                                strand_at_pos = self[index_map[pos]] 
-                                strand_at_pos.join(extend_strand)
+            #                 # check that the extension doesn't overlap 
+            #                 # with other strands
+            #                 if not (set(extend_strand.positions) 
+            #                                 & set(index_map)): 
+            #                     # get the strand at the position
+            #                     strand_at_pos = self[index_map[pos]] 
+            #                     strand_at_pos.join(extend_strand)
 
-                if pos_direction not in skip_directions:
-                    for pos in juncts[pos_direction]:
+            #     if pos_direction not in skip_directions:
+            #         for pos in juncts[pos_direction]:
 
-                        strand_at_pos = self[index_map[pos]] 
-                        max_pos = self.max_pos[naxis]
+            #             strand_at_pos = self[index_map[pos]]
+            #             max_pos = self.max_pos[naxis]
 
-                        # set the maximum position to the until parameter
-                        if until[naxis]: 
-                            max_pos = until[naxis] 
+            #             # set the maximum position to the until parameter
+            #             if until[naxis]: 
+            #                 max_pos = until[naxis] 
 
-                        if pos[naxis] < max_pos: 
-                            # add a strand from the position and going to the border,
-                            extend_strand = Strand(sym * (max_pos - pos[naxis]), 
-                                                   start=(pos[0] + 1 * axis, 
-                                                          pos[1] + 1 * naxis), 
-                                                   direction=pos_direction)
+            #             if pos[naxis] < max_pos: 
+            #                 # add a strand from the position and going to the border,
+            #                 extend_strand = Strand(sym * (max_pos - pos[naxis]), 
+            #                                        start=(pos[0] + 1 * axis, 
+            #                                               pos[1] + 1 * naxis), 
+            #                                        direction=pos_direction)
                             
-                            # check that the extension doesn't overlap 
-                            # with other strands
-                            if not (set(extend_strand.positions) 
-                                            & set(index_map)): 
-                                strand_at_pos.join(extend_strand)
+            #                 # check that the extension doesn't overlap 
+            #                 # with other strands
+            #                 if not (set(extend_strand.positions) 
+            #                                 & set(index_map)): 
+            #                     strand_at_pos.join(extend_strand)
 
         except MotifStructureError as e:
-            print(f"Error in extending junction at position {pos}. Full error:")
+            print(f"Error in extending junction at strand {s}. Full error:")
             print("\t", e)
 
         return self
@@ -2696,6 +2726,7 @@ class Motif(Callback):
         Strand._check_position(input_pos_dir = shift_vect)
         shift = Position(shift_vect)
         min_pos = self.min_pos
+
         # check if the shift will bring the strands to negative positions
         if min_pos[0] + shift[0] < 0 or min_pos[1] + shift[1] < 0:
             raise MotifStructureError(
@@ -2703,45 +2734,26 @@ class Motif(Callback):
                         f" at negative positons. Attempt to draw the motif at "
                         f"position ({min_pos[0] + shift_vect[0]}, "
                         f"{min_pos[1] + shift_vect[1]})")
-                        
-        
-        # take the junctions in the opposite direction of the shift
-        junc_vert, junc_hor = [], []
-        if extend:
-            if shift[1]:
-                junc_vert = self.junctions[Position((0, 
-                                                     -int(copysign(1, shift[1]))))]
-            if shift[0]:
-                junc_hor = self.junctions[Position((-int(copysign(1, shift[0])),
-                                                    0))] 
-                
-        for s in self:
-            extend_strand = []
 
-            ### CREATE EXTENSION STRANDS FOR THE JUNCTIONS ###
-            for pos in junc_vert:
-                if pos in s.positions:
-                    extend_strand.append(Strand('│' * abs(shift[1]), 
-                                                start=(pos[0] + shift[0], 
-                                                       pos[1]), 
-                                                direction=(0, 
-                                                           int(copysign(1, 
-                                                                        shift[1])))))
-            for pos in junc_hor:
-                if pos in s.positions: 
-                    extend_strand.append(Strand('─' * abs(shift[0]), 
-                                                start=(pos[0], 
-                                                       pos[1] + shift[1]),
-                                                direction=(int(copysign(1, 
-                                                                        shift[0])), 
-                                                           0)))
+        # shift the strands    
+        for s in self:
             
-            # for each strand shift the starting position
+            # save the initial start and end positions
+            s_start = s.start
+            s_end = s.end
+
+            # shift the strand
             s.shift(shift, check=False)
 
-            #loop through the strands forming the extensions
-            for s2 in extend_strand:
-                s.join(s2) # join the strand to the vertical extension
+            if extend:
+                # extend the strand in the opposite direction
+                s.extend(direction=s.end_direction, 
+                        until=s_end,
+                        check=False)
+                s.extend(direction=-s.direction, 
+                        until=s_start,
+                        check=False)
+
             
         # shift every basepair too
         if not self._autopairing:

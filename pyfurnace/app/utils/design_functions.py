@@ -1019,16 +1019,25 @@ def code():
         st_state["last_code_id"] = ''
     code_text = '\n\n'.join(st_state.code)
 
-    render_lines = st.slider("Number of lines to render:", 
-                             min_value=1, 
-                             max_value=200, 
-                             value=15, 
-                             key="render_lines")
+    col1, col2 = st.columns([4, 1], 
+                            gap='large',
+                            vertical_alignment='center')
+    with col1:
+        render_lines = st.slider("Number of lines to render:", 
+                                min_value=1, 
+                                max_value=200, 
+                                value=15, 
+                                key="render_lines")
+    with col2:
+        wrap = st.toggle("Wrap lines", 
+                         value=False, 
+                         key="wrap_lines", 
+                         help="Wrap lines in the code editor to fit the screen.")
 
     response_dict = code_editor(code_text, 
                                 buttons=code_editor_buttons,
                                 height=render_lines,
-                                options={"showLineNumbers":True}, 
+                                options={"showLineNumbers":True, "wrap": wrap}, 
                                 allow_reset=True, 
                                 key="pyroad_code_editor")
     

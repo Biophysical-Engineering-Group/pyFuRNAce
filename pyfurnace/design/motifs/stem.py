@@ -198,7 +198,7 @@ class Stem(Motif):
 
     def set_down_sequence(self, new_seq):
         """ Set the sequence of the bottom strand """
-        self.set_top_sequence(sequence=new_seq.translate(nucl_to_pair)[::-1])
+        self.set_up_sequence(sequence=new_seq.translate(nucl_to_pair)[::-1])
 
     def set_strong_bases(self, strong_bases):
         """ Set wether to use strong bases for short stems """

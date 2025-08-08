@@ -26,9 +26,9 @@ class DovetailCommand(MotifCommand):
                     and str(motif[0].sequence) != top_seq 
                     and str(motif[1].sequence) != top_seq 
                     or top_seq and sign and sign != motif._sign):
-                st_state.modified_motif_text += (f"\nmotif.set_top_sequence('"
+                st_state.modified_motif_text += (f"\nmotif.set_up_sequence('"
                                                  f"{top_seq}', sign = str({sign})")
-                motif.set_top_sequence(top_seq, sign)
+                motif.set_up_sequence(top_seq, sign)
             elif type(seq_length) == int and motif.length != seq_length:
                 st_state.modified_motif_text += (f"\nmotif.length = "
                                                    f"{seq_length}")
@@ -113,7 +113,7 @@ class DovetailCommand(MotifCommand):
                                                     vertical_alignment='bottom')
                 with col1:
                     top_seq = st.text_input('Sequence:', 
-                                            key=f'txt_top_seq_dt{key}', 
+                                            key=f'txt_up_seq_dt{key}', 
                                             value=top_seq)
                 with col2:
                     sign = st.selectbox('Sign:', 

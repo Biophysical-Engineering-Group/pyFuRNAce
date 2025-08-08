@@ -19,9 +19,9 @@ class StemCommand(MotifCommand):
             top_seq, seq_length, wobble_interval, wobble_tolerance = data
 
             if top_seq and motif[0].sequence != top_seq:
-                st_state.modified_motif_text += (f"\nmotif.set_top_sequence("
+                st_state.modified_motif_text += (f"\nmotif.set_up_sequence("
                                                  f"'{top_seq}')")
-                motif.set_top_sequence(top_seq)
+                motif.set_up_sequence(top_seq)
 
             elif seq_length and motif.length != seq_length:
                 st_state.modified_motif_text += f"\nmotif.length = {seq_length}"

@@ -1,5 +1,5 @@
 from .design import *
 
 __all__ = ["motifs", "strand", "origami", "symbols"]
-__version__ = "0.0.9.post2"
+__version__ = "0.0.9.post3"
 

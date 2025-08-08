@@ -22,9 +22,17 @@
 - 🧪 **Primer & Template Design:** Includes tools for DNA conversion, promoter addition, and primer calculations.
 - 💻 **Python Scripting API:** Automate complex designs or build at scale using a programmable interface.
 
+### System requirements
+
+- Python 3.10 or later
+- Operating System: Linux, macOS, or Windows
+- dependencies are listed in `requirements.txt`; with stable versions recommended in `stable_requirements.txt`
+
 ---
 
 ## 📦 Installation
+
+Typical installation time: 5 minutes
 
 ### Pyfurnace 
 

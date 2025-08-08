@@ -160,7 +160,7 @@ class Origami(Callback):
         elif isinstance(structure, (BasePair, dict)):
             pair_map = structure.copy()
             node = dot_bracket_to_tree(pair_map_to_dot_bracket(structure), 
-                                    sequence=sequence)
+                                       sequence=sequence)
             structure = pair_map_to_dot_bracket(structure)
 
         # input tree
@@ -220,8 +220,12 @@ class Origami(Callback):
                 return None
             
             # save the node at the maximum depth
+            # exclude invalid nodes and nodes that are unpaired
+            # (the successive tree can grow only from paired nodes)
             node, max_depth = max(node_depths, 
-                                  key=lambda x: x[1] if x is not None else 0)
+                                  key=lambda x: x[1] if (x is not None
+                                                         and x[0].label != '.') 
+                                                     else 0)
 
             if depth == 0:
                 # if we are at the root node, we return the node

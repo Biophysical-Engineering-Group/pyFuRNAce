@@ -986,7 +986,7 @@ def finish_editing(current_custom_motif):
                                                  copy=False)
         st.rerun()
 
-def update_code(code_text):
+def update_code(code_text, return_origami=False):
     # Check for forbidden keywords
     forbidden_keywords = ['exec', 'eval', 'compile', ' open', ' os', ' sys', ' __']
     for kw in forbidden_keywords:
@@ -1001,16 +1001,24 @@ def update_code(code_text):
     try:
         exec(code_text, {'__builtins__': __builtins__, 'pf': pf}, local_context)
         # Retrieve the modified origami variable
-        st_state.origami = local_context['origami'] 
-        st.success("Nanostructure updated successfully!")
+        origami = local_context['origami'] 
 
-        # select the end of the origami
-        st_state.line_index = len(st_state.origami) - 1
-        st_state.motif_index = len(st_state.origami[-1])
+        if origami:
+            # select the end of the origami
+            st_state.line_index = len(origami) - 1
+            st_state.motif_index = len(origami[-1])
 
     except Exception as e:
         st.error(f"Error in executing the code: {e}")
         return False
+    
+    if return_origami:
+        return origami
+    
+    st.success("Nanostructure updated successfully!")
+
+
+    st_state.origami = origami
     st_state.code = code_text.split('\n\n')
     st.rerun()
 

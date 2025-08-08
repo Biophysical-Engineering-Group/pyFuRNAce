@@ -998,19 +998,19 @@ def update_code(code_text):
     # Define the local environment in which the user's code will be executed
     local_context = {'origami': st_state.origami}
     # Attempt to execute the code safely
-    # try:
-    exec(code_text, {'__builtins__': __builtins__, 'pf': pf}, local_context)
-     # Retrieve the modified origami variable
-    st_state.origami = local_context['origami'] 
-    st.success("Nanostructure updated successfully!")
+    try:
+        exec(code_text, {'__builtins__': __builtins__, 'pf': pf}, local_context)
+        # Retrieve the modified origami variable
+        st_state.origami = local_context['origami'] 
+        st.success("Nanostructure updated successfully!")
 
-    # select the end of the origami
-    st_state.line_index = len(st_state.origami) - 1
-    st_state.motif_index = len(st_state.origami[-1])
+        # select the end of the origami
+        st_state.line_index = len(st_state.origami) - 1
+        st_state.motif_index = len(st_state.origami[-1])
 
-    # except Exception as e:
-    #     st.error(f"Error in executing the code: {e}")
-    #     return False
+    except Exception as e:
+        st.error(f"Error in executing the code: {e}")
+        return False
     st_state.code = code_text.split('\n\n')
     st.rerun()
 

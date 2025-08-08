@@ -4,9 +4,9 @@ from streamlit import session_state as st_state
 
 ### pyFuRNAce modules
 from utils import load_logo, check_import_pyfurnace
+check_import_pyfurnace()
 from utils.template_functions import sanitize_input
 from utils.design_functions import update_code, initiate_session_state
-check_import_pyfurnace()
 import pyfurnace as pf
 import pyfurnace.design.utils.origami_lib as origami_lib
 

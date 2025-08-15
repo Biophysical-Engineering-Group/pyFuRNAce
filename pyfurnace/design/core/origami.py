@@ -145,10 +145,9 @@ class Origami(Callback):
         #                         for m in motif_list}
         # else:
         
-        tree_to_mot = {dot_bracket_to_tree(m.structure, 
-                                            sequence=str(m.sequence)): m
-                            for m in motif_list}
-
+        mot_trees = [dot_bracket_to_tree(m.structure, 
+                                         sequence=str(m.sequence))
+                            for m in motif_list if len(m.strands) > 1]
 
         # input dot-bracket notation
         if type(structure) == str:
@@ -263,7 +262,7 @@ class Origami(Callback):
             
             ### Check if the current node matches any motif in the motif list
             if node.parent:
-                for tree_mot, mot in tree_to_mot.items():
+                for tree_mot, mot in zip(mot_trees, motif_list):
                     found_node = match_subtree(node.parent, tree_mot)
 
                     if found_node:

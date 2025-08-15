@@ -129,7 +129,8 @@ class Strand(Callback):
         self._next_pos = None
         self._max_pos = None
         self._min_pos = None
-        
+        self._seq_slice = []
+
         strand = self._check_line(strand)
 
         # Set the strand and sequence

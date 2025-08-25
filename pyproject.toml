@@ -47,6 +47,7 @@ dev = [
     "flake8",
     "mypy",
     "pytest",
+    "Flake8-pyproject",
 ]
 
 [tool.setuptools]

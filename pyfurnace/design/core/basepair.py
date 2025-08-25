@@ -5,14 +5,15 @@ from typing import Any, Dict, Iterator
 from .symbols import *
 from .callback import Callback
 
+
 class BasePair(MutableMapping, Callback):
     """
     A bidirectional dictionary that maintains a mapping between keys and values,
     ensuring that each value has a unique corresponding key and vice versa.
-    
+
     Inherits from MutableMapping to provide dictionary-like behavior and from
     Callback to support event-driven notifications on updates.
-    
+
     Parameters
     ----------
     *args : tuple
@@ -21,11 +22,11 @@ class BasePair(MutableMapping, Callback):
         Keyword arguments passed to the internal dictionary. Special keys
         `callback` and `callbacks` are removed before processing.
     """
-    
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         Callback.__init__(self, **kwargs)
-        kwargs.pop('callback', None)
-        kwargs.pop('callbacks', None)
+        kwargs.pop("callback", None)
+        kwargs.pop("callbacks", None)
         self._store: Dict[Any, Any] = dict(*args, **kwargs)
         self._reverse: Dict[Any, Any] = {v: k for k, v in self._store.items()}
         self._callbacks = []
@@ -33,17 +34,17 @@ class BasePair(MutableMapping, Callback):
     def __getitem__(self, key: Any) -> Any:
         """
         Retrieve the value associated with the given key.
-        
+
         Parameters
         ----------
         key : hashable
             The key or value to retrieve its counterpart.
-        
+
         Returns
         -------
         Any
             The corresponding value or key.
-        
+
         Raises
         ------
         KeyError
@@ -54,11 +55,11 @@ class BasePair(MutableMapping, Callback):
         if key in self._reverse:
             return self._reverse[key]
         raise KeyError(key)
-    
+
     def __setitem__(self, key: Any, value: Any) -> None:
         """
         Set a key-value pair in the dictionary, maintaining bidirectionality.
-        
+
         Parameters
         ----------
         key : hashable
@@ -77,7 +78,7 @@ class BasePair(MutableMapping, Callback):
     def __delitem__(self, key: Any) -> None:
         """
         Delete a key-value pair from the dictionary.
-        
+
         Parameters
         ----------
         key : hashable
@@ -107,14 +108,14 @@ class BasePair(MutableMapping, Callback):
     def __len__(self) -> int:
         """Return the number of key-value pairs in the dictionary."""
         return len(self._store)
-    
+
     def __eq__(self, other: Any) -> bool:
         """Check if two Basepair or dictionary have the same key-value pairs."""
         if not isinstance(other, (BasePair, dict)):
             return False
         return all(self[k] == other[k] for k in self.keys())
-    
-    ### 
+
+    ###
     ### PUBLIC METHODS
     ###
 
@@ -130,17 +131,17 @@ class BasePair(MutableMapping, Callback):
         """Return the dictionary's key-value pairs."""
         return self._store.items()
 
-    def update(self, *args: Dict[Any, Any], **kwargs: Any) -> 'BasePair':
+    def update(self, *args: Dict[Any, Any], **kwargs: Any) -> "BasePair":
         """
         Update the dictionary with new key-value pairs.
-        
+
         Parameters
         ----------
         *args : dict
             Dictionaries to merge into the current instance.
         **kwargs : dict
             Additional key-value pairs to update.
-        
+
         Returns
         -------
         BasePair
@@ -153,18 +154,18 @@ class BasePair(MutableMapping, Callback):
             self[k] = v
         self._trigger_callbacks()
         return self
-    
+
     def get(self, key: Any, default: Any = None) -> Any:
         """
         Retrieve a value by key, returning a default if not found.
-        
+
         Parameters
         ----------
         key : hashable
             The key to retrieve.
         default : Any, optional
             The value to return if key is not found (default is None).
-        
+
         Returns
         -------
         Any
@@ -176,15 +177,15 @@ class BasePair(MutableMapping, Callback):
             return self._reverse[key]
         return default
 
-    def copy(self, **kwargs: Any) -> 'BasePair':
+    def copy(self, **kwargs: Any) -> "BasePair":
         """
         Create a copy of the dictionary.
-        
+
         Parameters
         ----------
         **kwargs : dict
             Additional parameters for the new instance.
-        
+
         Returns
         -------
         BasePair
@@ -192,17 +193,17 @@ class BasePair(MutableMapping, Callback):
         """
         new_instance = BasePair(self._store, **kwargs)
         return new_instance
-    
-    def shift(self, shift: Any) -> 'BasePair':
+
+    def shift(self, shift: Any) -> "BasePair":
         """
         Apply a shift transformation to the key-value pairs.
         The shift is added to both the keys and values.
-        
+
         Parameters
         ----------
         shift : hashable
             The amount to shift each key and value.
-        
+
         Returns
         -------
         BasePair

@@ -1,5 +1,6 @@
 from ..core import Motif, Strand
 
+
 class Utils(Motif):
     """
     Utility class that extends the Motif class with optional flipping and rotation.
@@ -17,13 +18,11 @@ class Utils(Motif):
     **kwargs : dict
         Additional keyword arguments passed to the `Motif` base class.
     """
-    def __init__(self, 
-                 *args, 
-                 hflip: bool = False, 
-                 vflip : bool=False, 
-                 rotate : int =0, 
-                 **kwargs):
-        kwargs.setdefault('lock_coords', False)
+
+    def __init__(
+        self, *args, hflip: bool = False, vflip: bool = False, rotate: int = 0, **kwargs
+    ):
+        kwargs.setdefault("lock_coords", False)
         super().__init__(*args, **kwargs)
         if hflip or vflip:
             self.flip(horizontally=hflip, vertically=vflip)
@@ -31,11 +30,13 @@ class Utils(Motif):
             self.rotate(rotate)
 
 
-def start_end_stem(up_left: str = '3', 
-                   up_right: str = '5', 
-                   down_left: str = '-', 
-                   down_right: str = '-', 
-                   **kwargs) -> Utils:
+def start_end_stem(
+    up_left: str = "3",
+    up_right: str = "5",
+    down_left: str = "-",
+    down_right: str = "-",
+    **kwargs,
+) -> Utils:
     """
     Creates a `Utils` motif representing the start or end of a stem with optional
     strand labels. For each position, the acceptable values are:
@@ -59,7 +60,7 @@ def start_end_stem(up_left: str = '3',
     Utils
         An instance of the `Utils` class with the appropriate strands.
     """
-    accepted_values = ['3', '5', '─', '-', '', None]
+    accepted_values = ["3", "5", "─", "-", "", None]
 
     def _check_input(value):
         if value not in accepted_values:
@@ -72,26 +73,26 @@ def start_end_stem(up_left: str = '3',
         _check_input(val)
 
     # Normalize None values
-    up_left = up_left or ''
-    up_right = up_right or ''
-    down_left = down_left or ''
-    down_right = down_right or ''
+    up_left = up_left or ""
+    up_right = up_right or ""
+    down_left = down_left or ""
+    down_right = down_right or ""
 
-    if down_left and down_right and down_left in '─-' and down_right in '─-':
-        down_right += '─'
-    if up_left and up_right and up_left in '─-' and up_right in '─-':
-        up_left += '─'
+    if down_left and down_right and down_left in "─-" and down_right in "─-":
+        down_right += "─"
+    if up_left and up_right and up_left in "─-" and up_right in "─-":
+        up_left += "─"
 
-    strands = kwargs.pop('strands', [])
+    strands = kwargs.pop("strands", [])
     if not strands:
         if up_left:
-            strands.append(Strand('-' + up_left))
+            strands.append(Strand("-" + up_left))
         if up_right:
-            strands.append(Strand(up_right + '-', start=(3, 0)))
+            strands.append(Strand(up_right + "-", start=(3, 0)))
         if down_left:
-            strands.append(Strand(down_left + '-', start=(1, 2), direction=(-1, 0)))
+            strands.append(Strand(down_left + "-", start=(1, 2), direction=(-1, 0)))
         if down_right:
-            strands.append(Strand('-' + down_right, start=(4, 2), direction=(-1, 0)))
+            strands.append(Strand("-" + down_right, start=(4, 2), direction=(-1, 0)))
 
     return Utils(strands=strands, **kwargs)
 
@@ -105,7 +106,7 @@ def vertical_link(*args, **kwargs) -> Utils:
     Utils
         A vertical link `Utils` object.
     """
-    kwargs['strands'] = [Strand('│', direction=(0, -1))]
+    kwargs["strands"] = [Strand("│", direction=(0, -1))]
     return Utils(*args, **kwargs)
 
 
@@ -118,9 +119,9 @@ def vertical_double_link(*args, **kwargs) -> Utils:
     Utils
         A vertical double link `Utils` object.
     """
-    kwargs['strands'] = [
-        Strand('│', direction=(0, -1)),
-        Strand('│', direction=(0, 1), start=(1, 0))
+    kwargs["strands"] = [
+        Strand("│", direction=(0, -1)),
+        Strand("│", direction=(0, 1), start=(1, 0)),
     ]
     return Utils(*args, **kwargs)
 
@@ -134,11 +135,12 @@ def stem_cap_link(*args, **kwargs) -> Utils:
     Utils
         A stem cap `Utils` object.
     """
-    kwargs['strands'] = (
-        Strand('││╭─', start=(0, 2), direction=(0, -1)),
-        Strand('╭', start=(1, 2), direction=(0, -1))
+    kwargs["strands"] = (
+        Strand("││╭─", start=(0, 2), direction=(0, -1)),
+        Strand("╭", start=(1, 2), direction=(0, -1)),
     )
     return Utils(*args, **kwargs)
+
 
 # def stem_cap(*args,**kwargs):
 #     kwargs['strands'] = Strand('─╰│╭─', start=(1, 2), direction=(-1, 0))

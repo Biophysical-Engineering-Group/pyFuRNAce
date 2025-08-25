@@ -1,6 +1,7 @@
 from pathlib import Path
 import inspect
-CONFS_PATH = Path(__file__).parent / 'conf_files'
+
+CONFS_PATH = Path(__file__).parent / "conf_files"
 
 from ..core.motif import Motif
 from .stem import *
@@ -19,7 +20,9 @@ BKL = BranchedKissingLoop
 BD = BranchedDimer
 DT = Dovetail
 
-aptamers_list = [func_name for func_name, member 
-                 in inspect.getmembers(aptamers, inspect.isfunction)
-                 if member.__module__ == aptamers.__name__]
-aptamers_list.remove('create_aptamer')
+aptamers_list = [
+    func_name
+    for func_name, member in inspect.getmembers(aptamers, inspect.isfunction)
+    if member.__module__ == aptamers.__name__
+]
+aptamers_list.remove("create_aptamer")

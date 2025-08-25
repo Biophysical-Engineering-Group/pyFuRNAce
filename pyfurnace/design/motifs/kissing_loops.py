@@ -1,4 +1,5 @@
 import os
+
 # RNA used if a specific sequence is provided to calculate the energy
 
 # pyfurnace imports
@@ -10,8 +11,7 @@ from ..core.strand import Strand
 from .loops import Loop
 
 ### File Location for the kissing loop energy dictionaries
-__location__ = os.path.realpath(
-    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 class KissingLoop(Loop):
@@ -47,16 +47,18 @@ class KissingLoop(Loop):
 
     _KL_coords = Coords()
 
-    def __init__(self,
-                 open_left: bool = False,
-                 sequence: str = "",
-                 seq_len: int = 0,
-                 pk_index: Union[str, int] = "0",
-                 energy: float = -8.5,
-                 energy_tolerance: float = 1.0,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        open_left: bool = False,
+        sequence: str = "",
+        seq_len: int = 0,
+        pk_index: Union[str, int] = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ) -> None:
         """
-        Initialize a KissingLoop motif representing an internal pseudoknotted 
+        Initialize a KissingLoop motif representing an internal pseudoknotted
         kissing interaction.
 
         Parameters
@@ -87,71 +89,71 @@ class KissingLoop(Loop):
         self._seq_len = seq_len
         self._energy = energy
         self._energy_tolerance = energy_tolerance
-        if 'strands' in kwargs:
-            strands = kwargs.pop('strands')
+        if "strands" in kwargs:
+            strands = kwargs.pop("strands")
         else:
-            strands = self._create_strands(sequence=sequence, 
-                                           return_strand=True, 
-                                           pk_index=pk_index)
+            strands = self._create_strands(
+                sequence=sequence, return_strand=True, pk_index=pk_index
+            )
 
         # create motif with the strands making up the external kissing loop structure
         super().__init__(strands=strands, open_left=open_left, **kwargs)
 
-    ### 
+    ###
     ### Properties
     ###
-    
+
     @property
     def pk_index(self):
-        """ Returns the pseudoknot symbol of the kissing loop """
+        """Returns the pseudoknot symbol of the kissing loop"""
         return self._pk_index
-    
+
     @pk_index.setter
     def pk_index(self, new_index):
-        """ Set the pseudoknot symbol of the kissing loop """
+        """Set the pseudoknot symbol of the kissing loop"""
         new_index = self._check_pk_index(new_index)
-        self._create_strands(sequence=self.get_kissing_sequence(), 
-                             pk_index=new_index)
+        self._create_strands(sequence=self.get_kissing_sequence(), pk_index=new_index)
 
     @property
     def energy_tolerance(self):
-        """ Returns the energy tolerance of the internal kissing loop """
+        """Returns the energy tolerance of the internal kissing loop"""
         return self._energy_tolerance
-    
+
     @energy_tolerance.setter
     def energy_tolerance(self, new_energy_tolerance):
-        """ Set the energy tolerance of the internal kissing loop """
-        if (not isinstance(new_energy_tolerance, (float, int)) 
-                or new_energy_tolerance < 0):
+        """Set the energy tolerance of the internal kissing loop"""
+        if (
+            not isinstance(new_energy_tolerance, (float, int))
+            or new_energy_tolerance < 0
+        ):
             raise ValueError(f"The energy tolerance should be a positive number.")
         self._energy_tolerance = new_energy_tolerance
         for strand in self:
-            if hasattr(strand, 'pk_info'):
-                strand.pk_info['dE'] = [new_energy_tolerance]
+            if hasattr(strand, "pk_info"):
+                strand.pk_info["dE"] = [new_energy_tolerance]
         self._trigger_callbacks()
 
     @property
     def energy(self):
-        """ Returns the energy of the internal kissing loop """
+        """Returns the energy of the internal kissing loop"""
         return self._energy
-    
+
     @energy.setter
     def energy(self, new_energy):
-        """ Set the energy of the internal kissing loop """
+        """Set the energy of the internal kissing loop"""
         new_energy = round(float(new_energy), 2)
         self._energy = new_energy
         for strand in self:
-            if hasattr(strand, 'pk_info'):
-                strand.pk_info['E'] = [new_energy]
+            if hasattr(strand, "pk_info"):
+                strand.pk_info["E"] = [new_energy]
         self._trigger_callbacks()
 
     ###
     ### METHODS
     ###
 
-    def complementary_pk_index(self, 
-                               pk_index: Optional[Union[str, int]] = None) -> str:
-        """ Returns the complementary pseudoknot symbol of the kissing loop 
+    def complementary_pk_index(self, pk_index: Optional[Union[str, int]] = None) -> str:
+        """Returns the complementary pseudoknot symbol of the kissing loop
 
         Parameters
         ----------
@@ -162,7 +164,7 @@ class KissingLoop(Loop):
         -------
         str
             The complementary pseudoknot index.
-        
+
         """
         if pk_index is None:
             pk_index = self._pk_index
@@ -175,31 +177,32 @@ class KissingLoop(Loop):
             return pk_index + "'"
 
     def get_kissing_sequence(self):
-        """ Returns the kissing sequence of the kissing loop """
+        """Returns the kissing sequence of the kissing loop"""
         return self[0].sequence
 
     def set_sequence(self, new_seq):
-        """ Set the sequence of the strand """
-        self._create_strands(sequence = new_seq, pk_index = self._pk_index)
+        """Set the sequence of the strand"""
+        self._create_strands(sequence=new_seq, pk_index=self._pk_index)
 
     def _check_pk_index(self, pk_index):
         if pk_index is None:
-            pk_index = '0'
+            pk_index = "0"
         elif not isinstance(pk_index, (int, str)):
             raise ValueError(f"The pk_index should be an integer or a string.")
         elif isinstance(pk_index, int):
             pk_index = str(abs(pk_index)) + "'" * (pk_index < 0)
         return pk_index
 
-    def _create_strands(self,
-                        sequence: str = "",
-                        return_strand: bool = False,
-                        pk_index: Optional[Union[str, int]] = None,
-                        fold_180kl: bool = False
-                        ) -> Union[None, List[Strand]]:
+    def _create_strands(
+        self,
+        sequence: str = "",
+        return_strand: bool = False,
+        pk_index: Optional[Union[str, int]] = None,
+        fold_180kl: bool = False,
+    ) -> Union[None, List[Strand]]:
         """
         Protected class that takes a sequence and a pk_index and creates a strand
-        with the kissing loop structure and metadata. 
+        with the kissing loop structure and metadata.
 
         Parameters
         ----------
@@ -225,15 +228,18 @@ class KissingLoop(Loop):
         if sequence:
 
             if not isinstance(sequence, Sequence):
-                sequence = Sequence(sequence, directionality='53')
+                sequence = Sequence(sequence, directionality="53")
 
             if seq_len and len(sequence) != seq_len:
-                raise ValueError(f"The sequence length doesn't match the length "
-                                 f"for this kissing loop, which is {seq_len}.")
+                raise ValueError(
+                    f"The sequence length doesn't match the length "
+                    f"for this kissing loop, which is {seq_len}."
+                )
             else:
                 seq_len = len(sequence)
-            if all([s in 'ACGU' for s in sequence]):
+            if all([s in "ACGU" for s in sequence]):
                 from RNA import fold
+
                 if fold_180kl:
                     seq_to_fold = f"A{sequence}A&A{sequence.reverse_complement()}A"
                 else:
@@ -241,32 +247,37 @@ class KissingLoop(Loop):
                 self._energy = round(fold(seq_to_fold)[1], 2)
                 self._energy_tolerance = 0
         else:
-            sequence = Sequence('N' * seq_len, directionality='53')
-        
+            sequence = Sequence("N" * seq_len, directionality="53")
+
         # ### if the strands are already created, just update the sequence
         # if hasattr(self, '_strands') and not fold_180kl:
         #     self._strands[0].sequence = sequence
         #     return self._strands
-        
+
         ### create the strand
-        strand = Strand(f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭", 
-                        start=(seq_len + 2, 2),
-                        direction=(-1, 0),
-                        directionality=sequence.directionality)
-        pk_info = {"id": [self._pk_index], 
-                   'ind_fwd': [(0, seq_len - 1)], 
-                   'E': [self._energy], 
-                   'dE': [self._energy_tolerance]}
-        setattr(strand, 'pk_info', pk_info)
+        strand = Strand(
+            f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭",
+            start=(seq_len + 2, 2),
+            direction=(-1, 0),
+            directionality=sequence.directionality,
+        )
+        pk_info = {
+            "id": [self._pk_index],
+            "ind_fwd": [(0, seq_len - 1)],
+            "E": [self._energy],
+            "dE": [self._energy_tolerance],
+        }
+        setattr(strand, "pk_info", pk_info)
 
         # Add oxDNA coordinates
         strand._coords = self._KL_coords.copy()
 
         if return_strand:
             return [strand]
-        
+
         # replace the strands
         self.replace_all_strands([strand], copy=False, join=False)
+
 
 class KissingLoop120(KissingLoop):
     """
@@ -288,24 +299,29 @@ class KissingLoop120(KissingLoop):
         Additional arguments passed to the parent constructor.
     """
 
-    _KL_coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop120.dat', 
-                                       dummy_ends=(True, True))
+    _KL_coords = Coords.load_from_file(
+        CONFS_PATH / "KissingLoop120.dat", dummy_ends=(True, True)
+    )
 
-    def __init__(self, 
-                 open_left: bool = False, 
-                 sequence: str = "", 
-                 pk_index: str|int = '0', 
-                 energy: float = -8.5, 
-                 energy_tolerance: float = 1.0,
-                 **kwargs):
-        kwargs['seq_len'] = 7
-        super().__init__(open_left=open_left, 
-                         sequence=sequence, 
-                         pk_index=pk_index, 
-                         energy=energy, 
-                         energy_tolerance=energy_tolerance, 
-                         **kwargs)
-        
+    def __init__(
+        self,
+        open_left: bool = False,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        kwargs["seq_len"] = 7
+        super().__init__(
+            open_left=open_left,
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
+
 
 # https://doi.org/10.2210/pdb2D1B/pdb
 class KissingLoop180(KissingLoop):
@@ -328,33 +344,37 @@ class KissingLoop180(KissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords = Coords.load_from_file(CONFS_PATH / 'KissingLoop180.dat')
+    _KL_coords = Coords.load_from_file(CONFS_PATH / "KissingLoop180.dat")
 
-    def __init__(self, 
-                 open_left: bool = False, 
-                 sequence: str = "", 
-                 pk_index: str|int = '0', 
-                 energy: float = -8.5, 
-                 energy_tolerance: float = 1.0, **kwargs):
-        kwargs['seq_len'] = 6
-        super().__init__(open_left=open_left, 
-                         sequence=sequence, 
-                         pk_index=pk_index, 
-                         energy=energy, 
-                         energy_tolerance=energy_tolerance, 
-                         **kwargs)
+    def __init__(
+        self,
+        open_left: bool = False,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        kwargs["seq_len"] = 6
+        super().__init__(
+            open_left=open_left,
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
 
     def get_kissing_sequence(self):
-        """ Returns the kissing sequence of the kissing loop """
+        """Returns the kissing sequence of the kissing loop"""
         return super().get_kissing_sequence()[2:-1]
 
-    def _create_strands(self, 
-                        sequence: str = "", 
-                        return_strand: bool = False, 
-                        pk_index: int = 0):
+    def _create_strands(
+        self, sequence: str = "", return_strand: bool = False, pk_index: int = 0
+    ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
-        with the kissing loop structure and metadata. 
+        with the kissing loop structure and metadata.
 
         Parameters
         ----------
@@ -371,14 +391,13 @@ class KissingLoop180(KissingLoop):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
-        strand = super()._create_strands(sequence, 
-                                         return_strand=True, 
-                                         pk_index=pk_index,
-                                         fold_180kl=True)[0]
+        strand = super()._create_strands(
+            sequence, return_strand=True, pk_index=pk_index, fold_180kl=True
+        )[0]
         # create the strand
         strand.start = (10, 2)
-        strand.strand = 'AA' + strand.strand + '─A'
-        strand.pk_info['ind_fwd'] = [(2, 7)]
+        strand.strand = "AA" + strand.strand + "─A"
+        strand.pk_info["ind_fwd"] = [(2, 7)]
 
         # if we don't want to replace the strands, just return the strand
         if return_strand:
@@ -411,38 +430,43 @@ class BranchedKissingLoop(KissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_1.dat',
-                                        dummy_ends=(True, False))
-    _KL_coords2 = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_2.dat',
-                                        dummy_ends=(True, True))
+    _KL_coords = Coords.load_from_file(
+        CONFS_PATH / "BranchedKissingLoop_1.dat", dummy_ends=(True, False)
+    )
+    _KL_coords2 = Coords.load_from_file(
+        CONFS_PATH / "BranchedKissingLoop_2.dat", dummy_ends=(True, True)
+    )
 
-    def __init__(self, 
-                 open_left = False, 
-                 sequence: str = "", 
-                 pk_index: str|int = '0', 
-                 energy: float = -8.5, 
-                 energy_tolerance: float = 1.0, 
-                 **kwargs):
-        kwargs['seq_len'] = 6
-        super().__init__(open_left=open_left, 
-                         sequence=sequence, 
-                         pk_index=pk_index, 
-                         energy=energy, 
-                         energy_tolerance=energy_tolerance, 
-                         **kwargs)
+    def __init__(
+        self,
+        open_left=False,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        kwargs["seq_len"] = 6
+        super().__init__(
+            open_left=open_left,
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
 
     def get_kissing_sequence(self):
-        """ Returns the kissing sequence of the kissing loop """
+        """Returns the kissing sequence of the kissing loop"""
         strand_ind = [i for i, s in enumerate(self) if len(s.sequence) == 7][0]
         return self[strand_ind].sequence[:-1]
 
-    def _create_strands(self, 
-                        sequence: str = "", 
-                        return_strand: bool = False, 
-                        pk_index: int = 0):
+    def _create_strands(
+        self, sequence: str = "", return_strand: bool = False, pk_index: int = 0
+    ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
-        with the kissing loop structure and metadata. 
+        with the kissing loop structure and metadata.
 
         Parameters
         ----------
@@ -459,25 +483,25 @@ class BranchedKissingLoop(KissingLoop):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
-        strand = super()._create_strands(sequence, 
-                                         return_strand=True, 
-                                         pk_index=pk_index)[0]
+        strand = super()._create_strands(
+            sequence, return_strand=True, pk_index=pk_index
+        )[0]
         # create the strand
         strand.start = (9, 3)
         strand.direction = (0, -1)
-        strand.strand = '│╮' + strand.strand + '─A'
-        strand.pk_info['ind_fwd'] = [(0, 5)]
+        strand.strand = "│╮" + strand.strand + "─A"
+        strand.pk_info["ind_fwd"] = [(0, 5)]
 
-        connect_strand = Strand('╭│', start=(10, 2), direction=(-1, 0))
+        connect_strand = Strand("╭│", start=(10, 2), direction=(-1, 0))
         connect_strand._coords = self._KL_coords2.copy()
         strands = [strand, connect_strand]
 
-
         if return_strand:
             return strands
-        
+
         # replace the strands
         self.replace_all_strands(strands, copy=False, join=False)
+
 
 class KissingDimer(KissingLoop180):
     """
@@ -497,29 +521,34 @@ class KissingDimer(KissingLoop180):
         Additional keyword arguments.
     """
 
-    _KL_coords2 = Coords.load_from_file(CONFS_PATH / 'KissingLoop180_2.dat')
-    
-    def __init__(self, sequence: str = "", 
-                 pk_index: str|int = '0', 
-                 energy: float = -8.5, 
-                 energy_tolerance: float = 1.0, **kwargs):
-        super().__init__(sequence=sequence, 
-                         pk_index=pk_index, 
-                         energy=energy, 
-                         energy_tolerance=energy_tolerance, 
-                         **kwargs)
+    _KL_coords2 = Coords.load_from_file(CONFS_PATH / "KissingLoop180_2.dat")
 
-    ### 
+    def __init__(
+        self,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        super().__init__(
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
+
+    ###
     ### METHODS
     ###
 
-    def _create_strands(self, 
-                        sequence: str = "", 
-                        return_strand: bool = False, 
-                        pk_index: int = 0):
+    def _create_strands(
+        self, sequence: str = "", return_strand: bool = False, pk_index: int = 0
+    ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
-        with the kissing loop structure and metadata. 
+        with the kissing loop structure and metadata.
 
         Parameters
         ----------
@@ -537,9 +566,9 @@ class KissingDimer(KissingLoop180):
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
         bottom_pk_index = self.complementary_pk_index(pk_index)
-        bottom_strand = super()._create_strands(sequence, 
-                                                return_strand=True, 
-                                                pk_index=bottom_pk_index)[0]
+        bottom_strand = super()._create_strands(
+            sequence, return_strand=True, pk_index=bottom_pk_index
+        )[0]
         # add the pk_index to override the pk_index of the bottom strand
         self._pk_index = self._check_pk_index(pk_index)
 
@@ -550,19 +579,21 @@ class KissingDimer(KissingLoop180):
         # if hasattr(self, '_strands'):
         #     self._strands[1].sequence = 'AA' + rev_comp + 'A'
         #     return self._strands
-        
+
         ### shift the second strand to make space for the second one
         bottom_strand.start = (13, 3)
         # the second strand is the reverse complement of the first
-        bottom_strand.sequence = 'AA' + rev_comp + 'A'  
+        bottom_strand.sequence = "AA" + rev_comp + "A"
 
         ### create the second
-        top_strand = KissingLoop180(open_left=True, 
-                                    sequence=seq, 
-                                    pk_index=self._pk_index, 
-                                    energy=self._energy, 
-                                    energy_tolerance=self._energy_tolerance)[0]
-        
+        top_strand = KissingLoop180(
+            open_left=True,
+            sequence=seq,
+            pk_index=self._pk_index,
+            energy=self._energy,
+            energy_tolerance=self._energy_tolerance,
+        )[0]
+
         ## COORDINATES FROM OXVIEW HELIX
         top_strand._coords = self._KL_coords2.copy()
 
@@ -570,16 +601,16 @@ class KissingDimer(KissingLoop180):
 
         if return_strand:
             return strands
-        
+
         # replace the strands
         self.replace_all_strands(strands, copy=False, join=False)
 
     def set_up_sequence(self, new_seq: Union[str, Sequence]):
-        """ Set the sequence of the top strand """
+        """Set the sequence of the top strand"""
         self.set_sequence(new_seq)
 
     def set_down_sequence(self, new_seq: Union[str, Sequence]):
-        """ Set the sequence of the bottom strand"""
+        """Set the sequence of the bottom strand"""
         new_seq = Sequence(new_seq, self[1].directionality)
         self.set_sequence(new_seq.reverse_complement())
 
@@ -602,29 +633,34 @@ class KissingDimer120(KissingLoop120):
         Additional keyword arguments.
     """
 
-    _KL_coords2 = Coords.load_from_file(CONFS_PATH / 'KissingLoop120_2.dat', 
-                                        dummy_ends=(True, True))
-    
-    def __init__(self, 
-                 sequence: str = "", 
-                 pk_index: str|int = '0', 
-                 energy: float = -8.5, 
-                 energy_tolerance: float = 1.0, 
-                 **kwargs):
-        super().__init__(sequence=sequence, 
-                         pk_index=pk_index, 
-                         energy=energy, 
-                         energy_tolerance=energy_tolerance, 
-                         **kwargs)
+    _KL_coords2 = Coords.load_from_file(
+        CONFS_PATH / "KissingLoop120_2.dat", dummy_ends=(True, True)
+    )
 
-    ### 
+    def __init__(
+        self,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        super().__init__(
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
+
+    ###
     ### METHODS
     ###
 
-    def _create_strands(self, sequence="", return_strand=False, pk_index = 0):
+    def _create_strands(self, sequence="", return_strand=False, pk_index=0):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
-        with the kissing loop structure and metadata. 
+        with the kissing loop structure and metadata.
 
         Parameters
         ----------
@@ -643,39 +679,41 @@ class KissingDimer120(KissingLoop120):
         """
         # the bottom pk_index is the inverse of the top one
         bottom_pk_index = self.complementary_pk_index(pk_index)
-        bottom_strand = super()._create_strands(sequence, 
-                                                return_strand=True, 
-                                                pk_index=bottom_pk_index)[0]
+        bottom_strand = super()._create_strands(
+            sequence, return_strand=True, pk_index=bottom_pk_index
+        )[0]
         # add the pk_index to override the pk_index of the bottom strand
         self._pk_index = self._check_pk_index(pk_index)
         seq = bottom_strand.sequence
-        
+
         ### shift the second strand to make space for the second one
         bottom_strand.start = (10, 3)
         # the second strand is the reverse complement of the first
-        bottom_strand.sequence = seq.reverse_complement()  
+        bottom_strand.sequence = seq.reverse_complement()
 
         ### create the second
-        top_strand = KissingLoop120(open_left=True, 
-                                    sequence=seq, 
-                                    pk_index=self._pk_index, 
-                                    energy=self._energy, 
-                                    energy_tolerance=self._energy_tolerance)[0]
+        top_strand = KissingLoop120(
+            open_left=True,
+            sequence=seq,
+            pk_index=self._pk_index,
+            energy=self._energy,
+            energy_tolerance=self._energy_tolerance,
+        )[0]
         top_strand._coords = self._KL_coords2.copy()
 
         strands = [top_strand, bottom_strand]
 
         if return_strand:
             return strands
-        
+
         self.replace_all_strands(strands, copy=False, join=False)
 
     def set_up_sequence(self, new_seq: Union[str, Sequence]):
-        """ Set the sequence of the top strand """
+        """Set the sequence of the top strand"""
         self.set_sequence(new_seq)
 
     def set_down_sequence(self, new_seq: Union[str, Sequence]):
-        """ Set the sequence of the bottom strand"""
+        """Set the sequence of the bottom strand"""
         new_seq = Sequence(new_seq, self[1].directionality)
         self.set_sequence(new_seq.reverse_complement())
 
@@ -685,7 +723,7 @@ class BranchedDimer(BranchedKissingLoop):
     Branched kissing loop dimer with top and bottom interactions.
     The motif consists of three strands:
     - 1) A 180°KL dimer strand
-    - 2) A branched kissing loop strand 
+    - 2) A branched kissing loop strand
     - 3) A connection strand for the branched kissing loop
 
     Parameters
@@ -702,28 +740,32 @@ class BranchedDimer(BranchedKissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords3 = Coords.load_from_file(CONFS_PATH / 'BranchedKissingLoop_3.dat')
-    
-    def __init__(self, 
-                 sequence: str = "", 
-                 pk_index: str|int = '0', 
-                 energy: float = -8.5, 
-                 energy_tolerance: float = 1.0, 
-                 **kwargs):
-        super().__init__(sequence=sequence, 
-                         pk_index=pk_index, 
-                         energy=energy, 
-                         energy_tolerance=energy_tolerance, 
-                         **kwargs)
+    _KL_coords3 = Coords.load_from_file(CONFS_PATH / "BranchedKissingLoop_3.dat")
 
-    ### 
+    def __init__(
+        self,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -8.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        super().__init__(
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
+
+    ###
     ### METHODS
     ###
 
     def _create_strands(self, sequence="", return_strand=False, pk_index=0):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
-        with the kissing loop structure and metadata. 
+        with the kissing loop structure and metadata.
 
         Parameters
         ----------
@@ -744,14 +786,14 @@ class BranchedDimer(BranchedKissingLoop):
         bottom_pk_index = self.complementary_pk_index(pk_index)
 
         if not sequence:
-            sequence = Sequence('N' * self._seq_len, directionality='53')
+            sequence = Sequence("N" * self._seq_len, directionality="53")
         elif not isinstance(sequence, Sequence):
-            sequence = Sequence(sequence, directionality='53')
+            sequence = Sequence(sequence, directionality="53")
 
         rev_comp = sequence.reverse_complement()
-        strands = super()._create_strands(rev_comp, 
-                                          return_strand=True, 
-                                          pk_index=bottom_pk_index)
+        strands = super()._create_strands(
+            rev_comp, return_strand=True, pk_index=bottom_pk_index
+        )
         # add the pk_index to override the pk_index of the bottom strand
         self._pk_index = self._check_pk_index(pk_index)
 
@@ -760,17 +802,19 @@ class BranchedDimer(BranchedKissingLoop):
         #     kl_index = [i for i, s in enumerate(self) if len(s.sequence) == 9][0]
         #     self._strands[kl_index].sequence = 'AA' + sequence + 'A'
         #     return self._strands
-        
+
         ### shift the bottom branched KL
         strands[0].start = (strands[0].start[0] + 3, strands[0].start[1] + 1)
         strands[1].start = (strands[1].start[0] + 3, strands[1].start[1] + 1)
 
         ### create the top strand
-        top_strand = KissingLoop180(open_left=True,
-                                    sequence=sequence, 
-                                    pk_index=self._pk_index, 
-                                    energy=self._energy, 
-                                    energy_tolerance=self._energy_tolerance)[0]
+        top_strand = KissingLoop180(
+            open_left=True,
+            sequence=sequence,
+            pk_index=self._pk_index,
+            energy=self._energy,
+            energy_tolerance=self._energy_tolerance,
+        )[0]
         top_strand._coords = self._KL_coords3.copy()
 
         strands.insert(0, top_strand)
@@ -781,10 +825,10 @@ class BranchedDimer(BranchedKissingLoop):
         self.replace_all_strands(strands, copy=False, join=False)
 
     def set_up_sequence(self, new_seq: Union[str, Sequence]):
-        """ Set the sequence of the top strand """
+        """Set the sequence of the top strand"""
         self.set_sequence(new_seq)
 
     def set_down_sequence(self, new_seq: Union[str, Sequence]):
-        """ Set the sequence of the bottom strand"""
+        """Set the sequence of the bottom strand"""
         new_seq = Sequence(new_seq, self[1].directionality)
         self.set_sequence(new_seq.reverse_complement())

@@ -8,6 +8,7 @@ import tempfile
 try:
     from oxDNA_analysis_tools.UTILS.oxview import oxdna_conf
     from oxDNA_analysis_tools.UTILS.RyeReader import describe, get_confs
+
     oat_installed = True
 except:
     oat_installed = False
@@ -18,20 +19,23 @@ from ..motifs import *
 from .motif_lib import *
 
 # A dictionary to convert angles to dovetail values
-ANGLES_DT_DICT = { 26: -6,
-                   58: -5,
-                   90: -4,
-                  122: -3,
-                  122: -3,
-                  154: -2,
-                  186: -1,
-                  218:  0,
-                  250:  1,
-                  282:  2,
-                  314:  3,
-                  346:  4,
-                  378:  5,
-                  410:  6}
+ANGLES_DT_DICT = {
+    26: -6,
+    58: -5,
+    90: -4,
+    122: -3,
+    122: -3,
+    154: -2,
+    186: -1,
+    218: 0,
+    250: 1,
+    282: 2,
+    314: 3,
+    346: 4,
+    378: 5,
+    410: 6,
+}
+
 
 def convert_angles_to_dt(angles_list: List[float]) -> List[int]:
     """
@@ -50,11 +54,12 @@ def convert_angles_to_dt(angles_list: List[float]) -> List[int]:
     """
     angles_sanitize = [ang % 360 for ang in angles_list]
     # get the closest angle in the dict
-    dt_list = [ANGLES_DT_DICT[min(ANGLES_DT_DICT, 
-                                key=lambda x:abs(x-ang))] 
-                                    for ang in angles_sanitize]
+    dt_list = [
+        ANGLES_DT_DICT[min(ANGLES_DT_DICT, key=lambda x: abs(x - ang))]
+        for ang in angles_sanitize
+    ]
     return dt_list
-    
+
 
 def simple_origami(
     dt_list: List[int],
@@ -67,10 +72,10 @@ def simple_origami(
     end_helix_len: int = 8,
     use_angles: bool = False,
     add_start_end: bool = True,
-    align: str = 'first'
-    ) -> Origami:
+    align: str = "first",
+) -> Origami:
     """
-    Construct an RNA origami object based on a sequence of dovetail values and 
+    Construct an RNA origami object based on a sequence of dovetail values and
     kissing loop parameters.
 
     Parameters
@@ -114,34 +119,38 @@ def simple_origami(
     # convert angles to dovetail values if needed
     if use_angles:
         dt_list = convert_angles_to_dt(dt_list)
-    
+
     # add the start and end helix to the dovetail list
     if add_terminal_helix:
         dt_list = [0] + dt_list + [0]
 
     ### ADJUST THE MAIN STEM MATRIX
 
-    if main_stem is None: # set it to the minimum value for each KL
+    if main_stem is None:  # set it to the minimum value for each KL
         max_dt = max([abs(dt) for dt in dt_list], default=0)
         main_stem = [[11 * ((max_dt + 17) // 11 + 1)] * kl_columns] * len(dt_list)
 
     elif type(main_stem) == int:
-        main_stem = [[main_stem for _ in range(kl_columns)] 
-                                    for _ in range(len(dt_list))]
+        main_stem = [
+            [main_stem for _ in range(kl_columns)] for _ in range(len(dt_list))
+        ]
 
-    elif (type(main_stem) == list 
-            and all(isinstance(x, int) for x in main_stem)):
+    elif type(main_stem) == list and all(isinstance(x, int) for x in main_stem):
         main_stem = [main_stem for _ in range(len(dt_list))]
 
-    elif (type(main_stem) == list 
-            and all(isinstance(x, (tuple, list)) for x in main_stem)):
-        
+    elif type(main_stem) == list and all(
+        isinstance(x, (tuple, list)) for x in main_stem
+    ):
+
         if not all(len(x) == kl_columns for x in main_stem):
-            raise ValueError("The main_stem list should have the same length"
-                             " as the kissing loops repeats")
+            raise ValueError(
+                "The main_stem list should have the same length"
+                " as the kissing loops repeats"
+            )
     else:
-        raise ValueError("The main_stem can be an int, a list of int or a"
-                         " matrix of int")
+        raise ValueError(
+            "The main_stem can be an int, a list of int or a" " matrix of int"
+        )
 
     ### ADJUST THE LEFT KL STEM MATRIX
 
@@ -149,23 +158,26 @@ def simple_origami(
         left_stem_kl = [[None] * kl_columns for _ in range(len(dt_list))]
 
     elif type(left_stem_kl) == int:
-        left_stem_kl = [[left_stem_kl for _ in range(kl_columns)] 
-                                            for _ in range(len(dt_list))]
+        left_stem_kl = [
+            [left_stem_kl for _ in range(kl_columns)] for _ in range(len(dt_list))
+        ]
 
-    elif (type(left_stem_kl) == list 
-            and all(isinstance(x, int) for x in left_stem_kl)):
-        left_stem_kl = [[left_stem_kl[i]] * kl_columns 
-                                        for i in range(len(dt_list))]
+    elif type(left_stem_kl) == list and all(isinstance(x, int) for x in left_stem_kl):
+        left_stem_kl = [[left_stem_kl[i]] * kl_columns for i in range(len(dt_list))]
 
-    elif (type(left_stem_kl) == list 
-            and all(isinstance(x, (tuple, list)) for x in left_stem_kl)):
-        
+    elif type(left_stem_kl) == list and all(
+        isinstance(x, (tuple, list)) for x in left_stem_kl
+    ):
+
         if not all(len(x) == kl_columns for x in left_stem_kl):
-            raise ValueError("The left_stem_kl list should have the same length "
-                             "as the kissing loops repeats")
+            raise ValueError(
+                "The left_stem_kl list should have the same length "
+                "as the kissing loops repeats"
+            )
     else:
-        raise ValueError("The left_stem_kl can be an int, a list of int or a "
-                         "matrix of int")
+        raise ValueError(
+            "The left_stem_kl can be an int, a list of int or a " "matrix of int"
+        )
 
     if stem_pos is None:
         stem_pos = [0 for _ in range(kl_columns)]
@@ -192,24 +204,27 @@ def simple_origami(
             if stem_pos[kl_index] == helix_in:
 
                 # add the start position in this stem
-                if kl_index == start and add_start_end: 
+                if kl_index == start and add_start_end:
                     half_l_stem = (stem_len - abs(dt)) // 2
                     half_r_stem = stem_len - abs(dt) - half_l_stem
-                    helix += [Stem(half_l_stem).shift((1,0), extend=True),
-                              start_end_stem(), 
-                              Stem(half_r_stem), 
-                              Dovetail(dt)]
+                    helix += [
+                        Stem(half_l_stem).shift((1, 0), extend=True),
+                        start_end_stem(),
+                        Stem(half_r_stem),
+                        Dovetail(dt),
+                    ]
                 else:
                     stem_len = main_stem[helix_in][kl_index] - abs(dt)
-                    helix += [Stem(stem_len).shift((6,0), extend=True),
-                              Dovetail(dt)]
-                    
+                    helix += [Stem(stem_len).shift((6, 0), extend=True), Dovetail(dt)]
+
             # normal kissing loop repeat
             else:
-                helix += [Stem(left_stem), 
-                          KissingDimer(), 
-                          Stem(right_stem), 
-                          Dovetail(dt)]
+                helix += [
+                    Stem(left_stem),
+                    KissingDimer(),
+                    Stem(right_stem),
+                    Dovetail(dt),
+                ]
 
         # add the end of the helix
         helix += [Stem(end_helix_len), TetraLoop(open_left=True)]
@@ -230,6 +245,7 @@ def simple_origami(
     # return the origami structure
     return origami
 
+
 def ipython_display_3D(origami: Origami, **kwargs: Any) -> None:
     """
     Display a 3D representation of an Origami structure within a J
@@ -240,7 +256,7 @@ def ipython_display_3D(origami: Origami, **kwargs: Any) -> None:
     origami : Origami
         The Origami structure to visualize.
     **kwargs : dict, optional
-        Additional keyword arguments passed to the `oxdna_conf` 
+        Additional keyword arguments passed to the `oxdna_conf`
         visualization function.
 
     Returns
@@ -248,18 +264,21 @@ def ipython_display_3D(origami: Origami, **kwargs: Any) -> None:
     None
     """
     if not oat_installed:
-        warnings.warn("The oxDNA_analysis_tools package is not installed, "
-                      "the 3D display is not available.")
+        warnings.warn(
+            "The oxDNA_analysis_tools package is not installed, "
+            "the 3D display is not available."
+        )
         return
     # Create a temporary directory
     with tempfile.TemporaryDirectory() as tmpdirname:
         file_path = f"{tmpdirname}/origami"
         origami.save_3d_model(file_path)
-        top_info, traj_info = describe(f'{file_path}.top', f'{file_path}.dat')
+        top_info, traj_info = describe(f"{file_path}.top", f"{file_path}.dat")
         conf = get_confs(top_info, traj_info, 0, 1)[0]
         oxdna_conf(top_info, conf, **kwargs)
 
-def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
+
+def ipython_display_txt(origami_text: str, max_height: str = "500") -> None:
     """
     Render plain text (e.g., a textual representation of an origami object) as a
     scrollable HTML block in Jupyter.
@@ -276,22 +295,27 @@ def ipython_display_txt(origami_text: str, max_height: str = '500') -> None:
     None
     """
     # Convert your text to scrollable HTML
-    ori_txt = str(origami_text).replace('\n', '<br>')
-    scrollable_html = (f'<div style="max-height: {max_height}px; white-space: nowrap;'
-                            f'overflow-x: auto; overflow-y: scroll;'
-                            f'font-family: monospace;'
-                            f'border: 1px solid #ccc; padding: 10px;">'
-                f"{ori_txt.replace(' ', '&nbsp;')}"
-                "</div>")
+    ori_txt = str(origami_text).replace("\n", "<br>")
+    scrollable_html = (
+        f'<div style="max-height: {max_height}px; white-space: nowrap;'
+        f"overflow-x: auto; overflow-y: scroll;"
+        f"font-family: monospace;"
+        f'border: 1px solid #ccc; padding: 10px;">'
+        f"{ori_txt.replace(' ', '&nbsp;')}"
+        "</div>"
+    )
     display(HTML(scrollable_html))
 
-def ipython_clickable_txt(origami: Origami,
-                          max_height: Union[str, int] = '500',
-                          barriers: Optional[Any] = None,
-                          gradient: Union[bool, str] = False,
-                          font_size: int = 12) -> str:
+
+def ipython_clickable_txt(
+    origami: Origami,
+    max_height: Union[str, int] = "500",
+    barriers: Optional[Any] = None,
+    gradient: Union[bool, str] = False,
+    font_size: int = 12,
+) -> str:
     """
-    Generate an interactive, scrollable HTML view of a RNA origami structure 
+    Generate an interactive, scrollable HTML view of a RNA origami structure
     with clickable motifs that display their indexes in a JavaScript alert.
 
     Parameters
@@ -303,7 +327,7 @@ def ipython_clickable_txt(origami: Origami,
     barriers : optional
         Optional barrier data to overlay on the origami representation.
     gradient : bool or str, optional
-        Whether to color motifs using a gradient. 
+        Whether to color motifs using a gradient.
         If str, interpreted as colormap name from matplotlib.
         Default is False.
     font_size : int, optional
@@ -319,9 +343,9 @@ def ipython_clickable_txt(origami: Origami,
     - This function uses inline CSS and JavaScript for visual styling and interaction.
     - Clicking a motif will trigger a JavaScript alert showing its position.
     """
-    barriers_colors ={'▂':'#FFBA08', '▄':'#FFBA08', '█':'#D00000'}
-    high_color = '#D00000'
-    normal_color = 'inherit'
+    barriers_colors = {"▂": "#FFBA08", "▄": "#FFBA08", "█": "#D00000"}
+    high_color = "#D00000"
+    normal_color = "inherit"
 
     motif = origami.assembled
     # create a dictionary from positions to index
@@ -331,9 +355,8 @@ def ipython_clickable_txt(origami: Origami,
         origami_lines = origami.barrier_repr(return_list=True)
     else:
         origami_str = str(origami)
-        origami_lines = origami_str.split('\n')
+        origami_lines = origami_str.split("\n")
 
-        
     # create color gradient
     if gradient:
         tot_len = 0
@@ -343,92 +366,101 @@ def ipython_clickable_txt(origami: Origami,
                 tot_len += len(protein)
         cmap = plt.get_cmap(gradient)
         c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len)]
-    
+
     # Prepare the string to add 5' and 3' symbols for the strands
-    motif_list = ([[' '] * (motif.num_char + 2)]  
-                + [[' '] + [char for char in line] 
-                + [' '] for line in origami_lines] 
-                + [[' '] * (motif.num_char + 2)
-                  ])
+    motif_list = (
+        [[" "] * (motif.num_char + 2)]
+        + [[" "] + [char for char in line] + [" "] for line in origami_lines]
+        + [[" "] * (motif.num_char + 2)]
+    )
 
     for s in motif:  # Add the 5' and 3' symbols to the motif as 1 and 2
         if not s.sequence:
             continue
-        if (s.sequence and s[0] not in '35' 
-                and motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] == ' '):
-            if s.directionality == '53':
-                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = '1'
+        if (
+            s.sequence
+            and s[0] not in "35"
+            and motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] == " "
+        ):
+            if s.directionality == "53":
+                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = "1"
             else:
-                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = '2'
-        if (s.sequence and s[-1] not in '35' 
-                and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == ' '):
-            if s.directionality == '53':
-                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '2'
+                motif_list[s.prec_pos[1] + 1][s.prec_pos[0] + 1] = "2"
+        if (
+            s.sequence
+            and s[-1] not in "35"
+            and motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] == " "
+        ):
+            if s.directionality == "53":
+                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = "2"
             else:
-                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = '1'
+                motif_list[s.next_pos[1] + 1][s.next_pos[0] + 1] = "1"
 
-    origami_list = [''.join(line) for line in motif_list]
+    origami_list = ["".join(line) for line in motif_list]
 
-    content = (f"<div style='font-family: monospace;"
-                        f"font-size: {font_size}px; "
-                        "white-space: nowrap; "
-                        "overflow-x: auto; "
-                        "overflow-y: scroll; "
-                        f"max-height: {max_height}px;'>")
+    content = (
+        f"<div style='font-family: monospace;"
+        f"font-size: {font_size}px; "
+        "white-space: nowrap; "
+        "overflow-x: auto; "
+        "overflow-y: scroll; "
+        f"max-height: {max_height}px;'>"
+    )
     span = '<span style="font-family: monospace; '
 
     for y, line in enumerate(origami_list):
-        
+
         for x, char in enumerate(line):
             ori_pos = (x - 1, y - 1)
             color = normal_color
             if barriers_colors and char in barriers_colors:
                 color = barriers_colors[char]
 
-            if char == ' ':
+            if char == " ":
                 content += span + 'line-height:1;">&nbsp;</span>'
-            elif char == '1':
+            elif char == "1":
                 content += span + f'color: {high_color}; line-height:1;">5</span>'
-            elif char == '2':
+            elif char == "2":
                 content += span + f'color: {high_color}; line-height:1;">3</span>'
 
             elif char in bp_symbols:  # do not highlight the base pair in red
-                content += span + f'color: {color}; line-height:1;">{char}</span>' 
-                
+                content += span + f'color: {color}; line-height:1;">{char}</span>'
+
             elif ori_pos in origami.pos_index_map:  # a motif symbol
                 sl = origami.pos_index_map[ori_pos]
                 index = pos_to_index.get(ori_pos)
                 msg_text = f"Line {sl[0]}, Motif {sl[1]}"
                 if index is not None:
                     msg_text = f"Base {index}, Line {sl[0]}, Motif {sl[1]}"
-                    if gradient: 
+                    if gradient:
                         color = c_map[index]
-                
 
-                content += (f'<a style="text-decoration: none;'
-                                        "font-family: monospace; "
-                                        f"color: {color}; "
-                                        'line-height:1;" '
-                                  f'href="#/" '
-                                  f"""onclick="alert('{msg_text}')" """
-                                  f'id="{sl[0]},{sl[1]},{x - 1},{y - 1}">'
-                                  f"{char}"
-                                "</a>"
-                                )
+                content += (
+                    f'<a style="text-decoration: none;'
+                    "font-family: monospace; "
+                    f"color: {color}; "
+                    'line-height:1;" '
+                    f'href="#/" '
+                    f"""onclick="alert('{msg_text}')" """
+                    f'id="{sl[0]},{sl[1]},{x - 1},{y - 1}">'
+                    f"{char}"
+                    "</a>"
+                )
 
-            else:  # is a junction symbol 
+            else:  # is a junction symbol
                 content += span + f'color: {color}; line-height:1;">{char}</span>'
-        content += '<br />'
-    content += '</div>'
+        content += "<br />"
+    content += "</div>"
 
     return display(HTML(content))
+
 
 def template_2_helix():
     """
     Generate the RNA origami template for a 2-helix structure.
     Reference:
-    1. Krissanaprasit, A. et al. A functional RNA-origami as direct thrombin 
-        inhibitor with fast-acting and specific single-molecule reversal agents in 
+    1. Krissanaprasit, A. et al. A functional RNA-origami as direct thrombin
+        inhibitor with fast-acting and specific single-molecule reversal agents in
         vivo model. Molecular Therapy 32, 2286-2298 (2024).
 
     Returns
@@ -437,36 +469,39 @@ def template_2_helix():
         An Origami object representing the 2-helix RNA structure.
     """
     import pyfurnace as pf
-    line_0 = [pf.TetraLoop(),
-              pf.Stem(11),
-              pf.Dovetail(0, up_cross=False),
-              pf.Stem(11),
-              pf.start_end_stem(),
-              pf.Stem(11),
-              pf.Dovetail(0, up_cross=False),
-              pf.Stem(11),
-              pf.TetraLoop(open_left=True)
-              ]
-    line_1 = [pf.TetraLoop(),
-              pf.Stem(11),
-              pf.Dovetail(0, down_cross=False),
-              pf.Stem(7),
-              pf.KissingDimer(),
-              pf.Stem(7),
-              pf.Dovetail(0, down_cross=False),
-              pf.Stem(11),
-              pf.TetraLoop(open_left=True)
-              ]
-    origami = pf.Origami([line_0, line_1], align='first')
+
+    line_0 = [
+        pf.TetraLoop(),
+        pf.Stem(11),
+        pf.Dovetail(0, up_cross=False),
+        pf.Stem(11),
+        pf.start_end_stem(),
+        pf.Stem(11),
+        pf.Dovetail(0, up_cross=False),
+        pf.Stem(11),
+        pf.TetraLoop(open_left=True),
+    ]
+    line_1 = [
+        pf.TetraLoop(),
+        pf.Stem(11),
+        pf.Dovetail(0, down_cross=False),
+        pf.Stem(7),
+        pf.KissingDimer(),
+        pf.Stem(7),
+        pf.Dovetail(0, down_cross=False),
+        pf.Stem(11),
+        pf.TetraLoop(open_left=True),
+    ]
+    origami = pf.Origami([line_0, line_1], align="first")
     return origami
 
 
 def template_rna_filament():
     """
     Generate the RNA origami template for an RNA filament structure.
-    
+
     Reference:
-    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami 
+    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami
         cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).
 
     Returns
@@ -475,34 +510,38 @@ def template_rna_filament():
         An Origami object representing the RNA filament structure.
     """
     import pyfurnace as pf
-    origami = pf.simple_origami(dt_list=[-3], 
-                                kl_columns=1,
-                                main_stem=[22], 
-                                align="first", ) 
-    
+
+    origami = pf.simple_origami(
+        dt_list=[-3],
+        kl_columns=1,
+        main_stem=[22],
+        align="first",
+    )
+
     # adjust middle helix terminal stem
-    origami[(1, 7)].length = 5 
-    origami[(1, 1)].length = 5 
+    origami[(1, 7)].length = 5
+    origami[(1, 1)].length = 5
 
     ### STEMS BEFORE THE EXTERNAL KL
-    origami[(0, 7)].length = 6 
-    origami[(2, 7)].length = 6 
-    origami[(2, 1)].length = 8 
-    origami[(0, 1)].length = 7 
+    origami[(0, 7)].length = 6
+    origami[(2, 7)].length = 6
+    origami[(2, 1)].length = 8
+    origami[(0, 1)].length = 7
 
-    origami[(0, 0)]   = pf.KissingLoop180(open_left = False, pk_index = "2")
-    origami[(-1, 0)]  = pf.KissingLoop180(open_left = False, pk_index = "1")
-    origami[(0, -1)]  = pf.KissingLoop180(open_left = True,  pk_index = "1'")
-    origami[(-1, -1)] = pf.KissingLoop180(open_left = True,  pk_index = "2'")
+    origami[(0, 0)] = pf.KissingLoop180(open_left=False, pk_index="2")
+    origami[(-1, 0)] = pf.KissingLoop180(open_left=False, pk_index="1")
+    origami[(0, -1)] = pf.KissingLoop180(open_left=True, pk_index="1'")
+    origami[(-1, -1)] = pf.KissingLoop180(open_left=True, pk_index="2'")
     return origami
+
 
 def template_rna_filament_ispinach():
     """
     Generate the RNA origami template for an RNA filament structure.
     The tiles contains an ispinach aptamer for fluorescence imaging.
-    
+
     Reference:
-    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami 
+    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami
         cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).
 
     Returns
@@ -511,51 +550,55 @@ def template_rna_filament_ispinach():
         An Origami object representing the RNA filament structure.
     """
     import pyfurnace as pf
-    origami = pf.simple_origami(dt_list=[-3], 
-                                kl_columns=1,
-                                main_stem=[22], 
-                                align="first", ) 
-    
+
+    origami = pf.simple_origami(
+        dt_list=[-3],
+        kl_columns=1,
+        main_stem=[22],
+        align="first",
+    )
+
     # adjust middle helix terminal stem
-    origami[(1, 7)].length = 5 
-    origami[(1, 1)].length = 5 
+    origami[(1, 7)].length = 5
+    origami[(1, 1)].length = 5
 
     ### STEMS BEFORE THE EXTERNAL KL
-    origami[(0, 7)].length = 6 
-    origami[(2, 7)].length = 6 
-    origami[(2, 1)].length = 8 
-    origami[(0, 1)].length = 7 
+    origami[(0, 7)].length = 6
+    origami[(2, 7)].length = 6
+    origami[(2, 1)].length = 8
+    origami[(0, 1)].length = 7
 
-    origami[(0, 0)]   = pf.KissingLoop180(open_left = False, pk_index = "2")
-    origami[(-1, 0)]  = pf.KissingLoop180(open_left = False, pk_index = "1")
-    origami[(0, -1)]  = pf.KissingLoop180(open_left = True,  pk_index = "1'")
-    origami[(-1, -1)] = pf.KissingLoop180(open_left = True,  pk_index = "2'")
+    origami[(0, 0)] = pf.KissingLoop180(open_left=False, pk_index="2")
+    origami[(-1, 0)] = pf.KissingLoop180(open_left=False, pk_index="1")
+    origami[(0, -1)] = pf.KissingLoop180(open_left=True, pk_index="1'")
+    origami[(-1, -1)] = pf.KissingLoop180(open_left=True, pk_index="2'")
 
-    
     # add connector for ispinach line
     origami.insert((0, 4), pf.Dovetail(0, down_cross=False))
 
     # add ispinach line
-    ispi_line = [pf.TetraLoop(),
-                 pf.Stem(3, strong_bases=False),
-                 pf.Ispinach().flip(),
-                 pf.Stem(3),
-                 pf.Motif.from_structure('...&', 'UUU&').flip(),
-                 pf.stem_cap_link(hflip=True),
-                 ]
+    ispi_line = [
+        pf.TetraLoop(),
+        pf.Stem(3, strong_bases=False),
+        pf.Ispinach().flip(),
+        pf.Stem(3),
+        pf.Motif.from_structure("...&", "UUU&").flip(),
+        pf.stem_cap_link(hflip=True),
+    ]
     origami.insert(0, ispi_line)
     return origami
+
 
 def template_3_arms_droplet():
     """
     Generate the RNA origami template for a 3-arms droplet structure.
-    
+
     References:
-    1. Stewart, J. M. et al. Modular RNA motifs for orthogonal phase separated 
+    1. Stewart, J. M. et al. Modular RNA motifs for orthogonal phase separated
         compartments. Nat Commun 15, (2024).
     2. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates
         and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).
-    3. Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated 
+    3. Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated
         design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.
 
     Returns
@@ -564,30 +607,34 @@ def template_3_arms_droplet():
         An Origami object representing the 3-arms droplet structure.
     """
     import pyfurnace as pf
-    palindr_kl = pf.KissingLoop(sequence='AUCGCGAAA')
-    line_0 = [palindr_kl.copy(),
-              pf.Stem(8),
-              pf.start_end_stem(),
-              pf.Stem(17),
-              pf.Motif.from_structure('.&', 'U&').flip(),
-              pf.Dovetail(0, up_cross=False),
-              pf.Motif.from_structure('.&.', 'U&U'),
-              pf.Stem(25),
-              palindr_kl.copy().flip()
-              ]
-    line_1 = [palindr_kl.copy(),
-              pf.Stem(5),
-              pf.Broccoli(),
-              pf.Stem(8),
-              pf.stem_cap_link().flip()
-              ]
-    origami = pf.Origami([line_0, line_1], align='first')
+
+    palindr_kl = pf.KissingLoop(sequence="AUCGCGAAA")
+    line_0 = [
+        palindr_kl.copy(),
+        pf.Stem(8),
+        pf.start_end_stem(),
+        pf.Stem(17),
+        pf.Motif.from_structure(".&", "U&").flip(),
+        pf.Dovetail(0, up_cross=False),
+        pf.Motif.from_structure(".&.", "U&U"),
+        pf.Stem(25),
+        palindr_kl.copy().flip(),
+    ]
+    line_1 = [
+        palindr_kl.copy(),
+        pf.Stem(5),
+        pf.Broccoli(),
+        pf.Stem(8),
+        pf.stem_cap_link().flip(),
+    ]
+    origami = pf.Origami([line_0, line_1], align="first")
     return origami
+
 
 def template_4_arms_droplet():
     """
     Generate the RNA origami template for a 4-arms droplet structure.
-    
+
     Reference:
     1. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates
         and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).
@@ -598,39 +645,43 @@ def template_4_arms_droplet():
         An Origami object representing the 4-arms droplet structure.
     """
     import pyfurnace as pf
-    uracil_connect = pf.Motif.from_structure('.&.', 'U&U')
-    palindr_kl = pf.KissingLoop(sequence='AUCGCGAAA')
 
-    line_0 = [palindr_kl.copy(),
-              pf.Stem(10),
-              pf.MalachiteGreenShort(),
-              pf.Stem(10),
-              uracil_connect.copy(),
-              pf.Dovetail(0, up_cross=False),
-              pf.Stem(25),
-              palindr_kl.copy().flip(),
-              ]
+    uracil_connect = pf.Motif.from_structure(".&.", "U&U")
+    palindr_kl = pf.KissingLoop(sequence="AUCGCGAAA")
 
-    line_1 = [palindr_kl.copy(),
-              pf.Stem(13),
-              pf.start_end_stem(),
-              pf.Stem(12),
-              pf.Dovetail(0, down_cross=False),
-              uracil_connect.copy(),
-              pf.Stem(25),
-              palindr_kl.copy().flip(),
-             ]
-    origami = pf.Origami([line_0, line_1], align='first')
+    line_0 = [
+        palindr_kl.copy(),
+        pf.Stem(10),
+        pf.MalachiteGreenShort(),
+        pf.Stem(10),
+        uracil_connect.copy(),
+        pf.Dovetail(0, up_cross=False),
+        pf.Stem(25),
+        palindr_kl.copy().flip(),
+    ]
+
+    line_1 = [
+        palindr_kl.copy(),
+        pf.Stem(13),
+        pf.start_end_stem(),
+        pf.Stem(12),
+        pf.Dovetail(0, down_cross=False),
+        uracil_connect.copy(),
+        pf.Stem(25),
+        palindr_kl.copy().flip(),
+    ]
+    origami = pf.Origami([line_0, line_1], align="first")
     return origami
+
 
 def template_pentagon_tile():
     """
     Generate the RNA origami template for a pentagon tile structure.
     This follows the 3H-4DT design from Geary et al. (2021).
-    
+
     Reference:
-    1. Geary, C., Grossi, G., McRae, E. K. S., Rothemund, P. W. K. & Andersen, E. S. 
-        RNA origami design tools enable cotranscriptional folding of kilobase-sized 
+    1. Geary, C., Grossi, G., McRae, E. K. S., Rothemund, P. W. K. & Andersen, E. S.
+        RNA origami design tools enable cotranscriptional folding of kilobase-sized
         nanoscaffolds. Nat. Chem. 13, 549-558 (2021).
 
     Returns
@@ -639,8 +690,9 @@ def template_pentagon_tile():
         An Origami object representing the pentagon tile structure.
     """
     import pyfurnace as pf
+
     origami = pf.simple_origami([-4], main_stem=33, end_helix_len=7)
-    
+
     # adjust start position
     origami[0, 3].length = 12
     origami[0, 5].length = 21
@@ -659,12 +711,13 @@ def template_pentagon_tile():
 
     return origami
 
+
 def template_rectangle_10H_3X():
     """
     Generate the RNA origami template for a rectangle 10H-3X structure.
-    
+
     References:
-    1. Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated 
+    1. Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated
         design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.
 
     Returns
@@ -673,17 +726,20 @@ def template_rectangle_10H_3X():
         An Origami object representing the rectangle 10H-3X structure.
     """
     import pyfurnace as pf
-    origami = pf.simple_origami(dt_list=[180] * 8, 
-                                kl_columns=3, 
-                                main_stem=33, 
-                                add_terminal_helix=True, 
-                                align="first", 
-                                use_angles=True) # Create a simple origami
+
+    origami = pf.simple_origami(
+        dt_list=[180] * 8,
+        kl_columns=3,
+        main_stem=33,
+        add_terminal_helix=True,
+        align="first",
+        use_angles=True,
+    )  # Create a simple origami
 
     origami = origami.improve_folding_pathway(kl_delay=150)
 
-    origami.insert((0, 11), pf.Broccoli().flip(1, 1)) # Add motif
+    origami.insert((0, 11), pf.Broccoli().flip(1, 1))  # Add motif
 
-    origami.insert((0, 12), pf.Stem(5)) # Add motif
+    origami.insert((0, 12), pf.Stem(5))  # Add motif
 
     return origami

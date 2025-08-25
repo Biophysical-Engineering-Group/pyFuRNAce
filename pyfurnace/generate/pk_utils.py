@@ -3,10 +3,12 @@ from typing import Dict, Optional
 import warnings
 from ..design import db_pairs, dot_bracket_to_pair_map, dot_bracket_to_stacks
 
-def parse_pseudoknots(input_string: str,
-                      default_energy: float = -9.0,
-                      default_energy_tolerance: float = 1.0
-                      ) -> Dict[str, Dict[str, object]]:
+
+def parse_pseudoknots(
+    input_string: str,
+    default_energy: float = -9.0,
+    default_energy_tolerance: float = 1.0,
+) -> Dict[str, Dict[str, object]]:
     """
     Parse a formatted string into a dictionary of pseudoknot metadata.
 
@@ -25,7 +27,7 @@ def parse_pseudoknots(input_string: str,
     Returns
     -------
     dict
-        A dictionary mapping pseudoknot IDs to metadata. Each value is a 
+        A dictionary mapping pseudoknot IDs to metadata. Each value is a
         dictionary with keys:
         - 'ind_fwd' : list of tuple of int
         - 'ind_rev' : list of tuple of int
@@ -35,7 +37,7 @@ def parse_pseudoknots(input_string: str,
     Raises
     ------
     ValueError
-        If any pseudoknot definition is missing a required `id` or contains 
+        If any pseudoknot definition is missing a required `id` or contains
         inconsistent index lengths.
 
     Warnings
@@ -44,16 +46,16 @@ def parse_pseudoknots(input_string: str,
     """
 
     # Split the input string into pseudoknot entries
-    all_pk_dicts = input_string.split(';')
+    all_pk_dicts = input_string.split(";")
     final_pk_dicts = dict()
-    
+
     for pk_idct in all_pk_dicts:
 
         stripped = pk_idct.strip()
         if not stripped:
             continue
 
-        attribute_list = pk_idct.split(',')
+        attribute_list = pk_idct.split(",")
         attr_fixed = []
 
         # adjust the atrribute: you may have lists there
@@ -72,24 +74,26 @@ def parse_pseudoknots(input_string: str,
         for k, v in attr_fixed:
 
             try:
-                if k == 'id':
+                if k == "id":
                     pk_id = v
-                elif k == 'ind_fwd':
+                elif k == "ind_fwd":
                     ind_fwd = ast.literal_eval(v)
-                elif k == 'ind_rev':
+                elif k == "ind_rev":
                     ind_rev = ast.literal_eval(v)
-                elif k == 'E':
+                elif k == "E":
                     pk_energy = float(v)
-                elif k == 'dE':
+                elif k == "dE":
                     pk_en_tolerance = float(v)
 
             except Exception as e:
-                print(f"Error in parsing pseudoknots with key "
-                      f"{k} and value {v}. Error: {e}")
+                print(
+                    f"Error in parsing pseudoknots with key "
+                    f"{k} and value {v}. Error: {e}"
+                )
 
         if not pk_id:
             raise ValueError("Pseudoknot id is missing")
-        
+
         if pk_energy is None:
             pk_energy = default_energy
 
@@ -97,8 +101,10 @@ def parse_pseudoknots(input_string: str,
             pk_en_tolerance = default_energy_tolerance
 
         if not ind_fwd or not ind_rev:
-            warnings.warn(f"Skipping pseudoknot with id {pk_id} due"
-                          f" to missing indices", stacklevel=3)
+            warnings.warn(
+                f"Skipping pseudoknot with id {pk_id} due" f" to missing indices",
+                stacklevel=3,
+            )
             continue
 
         try:
@@ -106,28 +112,38 @@ def parse_pseudoknots(input_string: str,
             pk_seq_len = all_ind[0][1] - all_ind[0][0]
             for ind in all_ind:
                 if ind[1] - ind[0] != pk_seq_len:
-                    raise ValueError(f"Invalid indices for pseudoknot {pk_id}. "
-                                "All indices should have the same sequence length")
+                    raise ValueError(
+                        f"Invalid indices for pseudoknot {pk_id}. "
+                        "All indices should have the same sequence length"
+                    )
         except Exception as e:
-            warnings.warn(f"Skipping pseudoknot with id {pk_id} due to invalid "
-                          f"indices. Exception: {e}", stacklevel=3)
+            warnings.warn(
+                f"Skipping pseudoknot with id {pk_id} due to invalid "
+                f"indices. Exception: {e}",
+                stacklevel=3,
+            )
             continue
-            
-        final_pk_dicts[pk_id] = {'ind_fwd': ind_fwd, 
-                                 'ind_rev': ind_rev, 
-                                 'E': pk_energy, 
-                                 'dE': pk_en_tolerance}
+
+        final_pk_dicts[pk_id] = {
+            "ind_fwd": ind_fwd,
+            "ind_rev": ind_rev,
+            "E": pk_energy,
+            "dE": pk_en_tolerance,
+        }
 
     return final_pk_dicts
 
+
 from typing import Optional
 
-def add_untracked_pseudoknots(pk_dict: Dict[str, Dict[str, object]],
-                              structure: str,
-                              energy: float = -9.0,
-                              energy_tolerance: float = 1.0,
-                              pair_map: Optional[Dict[int, Optional[int]]] = None
-                              ) -> Dict[str, Dict[str, object]]:
+
+def add_untracked_pseudoknots(
+    pk_dict: Dict[str, Dict[str, object]],
+    structure: str,
+    energy: float = -9.0,
+    energy_tolerance: float = 1.0,
+    pair_map: Optional[Dict[int, Optional[int]]] = None,
+) -> Dict[str, Dict[str, object]]:
     """
     Add pseudoknots present in the dot-bracket structure but missing from the given
     pseudoknot dictionary.
@@ -143,36 +159,41 @@ def add_untracked_pseudoknots(pk_dict: Dict[str, Dict[str, object]],
     energy_tolerance : float, optional
         Energy tolerance to assign to newly detected pseudoknots (default is 1.0).
     pair_map : dict, optional
-        Optional precomputed base pair map; if not provided, it will be computed 
+        Optional precomputed base pair map; if not provided, it will be computed
         from the structure.
 
     Returns
     -------
     dict
-        Updated pseudoknot dictionary, including added untracked pseudoknots 
+        Updated pseudoknot dictionary, including added untracked pseudoknots
         with unique IDs.
     """
 
     if pair_map is None:
         pair_map = dot_bracket_to_pair_map(structure)
 
-    reduced_db, stacks = dot_bracket_to_stacks(structure, only_opening = True)
+    reduced_db, stacks = dot_bracket_to_stacks(structure, only_opening=True)
     extra_pk_ind = 0
-    all_pk_indexes = {x for pk_info in pk_dict.values() 
-                            for x in pk_info['ind_fwd'] + pk_info['ind_rev']}
-    
+    all_pk_indexes = {
+        x
+        for pk_info in pk_dict.values()
+        for x in pk_info["ind_fwd"] + pk_info["ind_rev"]
+    }
+
     for sym, indexes in zip(reduced_db, stacks):
-        if sym not in '.(' and sym in db_pairs:
+        if sym not in ".(" and sym in db_pairs:
 
             # Check if the indexes are already in the pk_dict
             if indexes not in all_pk_indexes:
                 paired_indexes = [pair_map[x] for x in indexes[::-1]]
                 pk_id = f"extra_{extra_pk_ind}"
-                pk_dict[pk_id] = {  'id': pk_id,
-                                    'ind_fwd': [indexes], 
-                                    'ind_rev': [paired_indexes], 
-                                    'E': energy, 
-                                    'dE': energy_tolerance}
+                pk_dict[pk_id] = {
+                    "id": pk_id,
+                    "ind_fwd": [indexes],
+                    "ind_rev": [paired_indexes],
+                    "E": energy,
+                    "dE": energy_tolerance,
+                }
                 extra_pk_ind += 1
 
     return pk_dict

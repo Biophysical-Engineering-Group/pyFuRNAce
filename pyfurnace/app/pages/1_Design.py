@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 ### pyFuRNAce modules
 from utils import check_import_pyfurnace, load_logo, save_origami
+
 check_import_pyfurnace()
 import utils.design_functions as des_func
 from utils.st_fixed_container import sticky_container
@@ -15,46 +16,50 @@ if __name__ == "__main__":
     ### initiate the session state
     des_func.initiate_session_state()
 
-    st.header('Design', 
-              help='Design your RNA nanostructure and '
-                    'download it as textfile/python script.')
+    st.header(
+        "Design",
+        help="Design your RNA nanostructure and "
+        "download it as textfile/python script.",
+    )
 
     ### make the general options for the RNA origami
-    des_func.origami_general_options(st.session_state.origami, 
-                                     expanded=False)
+    des_func.origami_general_options(st.session_state.origami, expanded=False)
 
     ### make 3 common options for the RNA origami
-    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3], 
-                      vertical_alignment='center') 
-    
+    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3], vertical_alignment="center")
+
     # simple origami popover
-    with cols[0]:    
-        with st.popover("Make a simple origami",
-                        use_container_width=False,
-                        help='Start by creating a simple origami rather than '
-                            'starting from scratch'):
+    with cols[0]:
+        with st.popover(
+            "Make a simple origami",
+            use_container_width=False,
+            help="Start by creating a simple origami rather than "
+            "starting from scratch",
+        ):
             des_func.simple_origami()
 
     # colormap text
     with cols[2]:
-        st.write('OxView 3D colormap:')
+        st.write("OxView 3D colormap:")
     # colormap selection
     with cols[3]:
-        cmap = st.selectbox('OxView 3D colormap:', 
-                            ['Reds', None] + plt.colormaps(),
-                            key='colormap',
-                            label_visibility='collapsed', 
-                            help='Change the color of the OxView visualization.')
+        cmap = st.selectbox(
+            "OxView 3D colormap:",
+            ["Reds", None] + plt.colormaps(),
+            key="colormap",
+            label_visibility="collapsed",
+            help="Change the color of the OxView visualization.",
+        )
         st.session_state.oxview_colormap = cmap
-
 
     # gradient toggle
     with cols[5]:
-        grad = st.toggle('Color gradient path', 
-                          key='grad', 
-                          help='Toggle the gradient color scheme for the nucleotides')
+        grad = st.toggle(
+            "Color gradient path",
+            key="grad",
+            help="Toggle the gradient color scheme for the nucleotides",
+        )
         st.session_state.gradient = grad
-
 
     # motif menu function
     def motif_menu_expander():
@@ -72,17 +77,14 @@ if __name__ == "__main__":
 
     ### select the render mode
     if not st.session_state.origami:
-        st.success('The origami is empty, add a motif!')
+        st.success("The origami is empty, add a motif!")
         st.stop()
     else:
         des_func.origami_build_view(view_opt)
 
-    ### display dot-bracket structure, sequence constraints 
+    ### display dot-bracket structure, sequence constraints
     # and link to the Generate page
     des_func.display_structure_sequence()
 
     ### Download the RNA origami structure
     save_origami()
-
-    
-    

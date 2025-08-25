@@ -32,8 +32,8 @@ class Callback:
         if "callback" in kwargs:
             self._callbacks.append(kwargs["callback"])  # Single callback registration
 
-        if 'callbacks' in kwargs:
-            self._callbacks += kwargs['callbacks']  # Multiple callback registration
+        if "callbacks" in kwargs:
+            self._callbacks += kwargs["callbacks"]  # Multiple callback registration
 
     ###
     ### PROPERTIES
@@ -75,7 +75,7 @@ class Callback:
         - If no callbacks are registered, the method simply returns.
         - Each callback will be executed with the provided keyword arguments.
         """
-        if not hasattr(self, '_callbacks'):
+        if not hasattr(self, "_callbacks"):
             return
 
         for callback in self._callbacks:

@@ -6,6 +6,7 @@ from typing import Tuple, List, Union, Literal
 try:
     from oxDNA_analysis_tools.PDB_oxDNA import PDB_oxDNA
     from oxDNA_analysis_tools.UTILS.RyeReader import conf_to_str, get_top_string
+
     oat_installed = True
 except ImportError:
     oat_installed = False
@@ -23,7 +24,7 @@ class ProteinCoords:
         A NumPy array containing the 3D coordinates associated with the sequence.
     """
 
-    def __init__(self, sequence: str = '', coords: np.ndarray = np.array(())) -> None:
+    def __init__(self, sequence: str = "", coords: np.ndarray = np.array(())) -> None:
         """
         Initialize the ProteinCoords instance with a sequence and coordinates.
 
@@ -35,7 +36,7 @@ class ProteinCoords:
             A NumPy array of shape (N, 3) representing the 3D coordinates.
         """
         # Initialize the sequence as an empty string
-        self._sequence: str = ''
+        self._sequence: str = ""
         # Initialize the coordinates as an empty NumPy array
         self._coords: np.ndarray = np.array(())
 
@@ -45,11 +46,11 @@ class ProteinCoords:
 
     def __str__(self) -> str:
         """Return a string representation of the ProteinCoords instance."""
-        return f'ProteinCoords({self._sequence})'
+        return f"ProteinCoords({self._sequence})"
 
     def __repr__(self) -> str:
         """Return a string representation of the ProteinCoords instance."""
-        return f'ProteinCoords({self._sequence})'
+        return f"ProteinCoords({self._sequence})"
 
     def __getitem__(self, key: int) -> np.ndarray:
         """Retrieve coordinates by index."""
@@ -94,11 +95,16 @@ class ProteinCoords:
             coords = np.array(coords)
         if not isinstance(coords, np.ndarray):
             raise ValueError("The coords must be a numpy array")
-        if (self._sequence and self._coords.size > 0
-                and len(self.sequence) != len(coords)):
-            raise ValueError(f"The coords and the sequence must have the same length:"
-                             f" expected len{len(self.sequence)},"
-                             f"  got {len(coords)} coordinates")
+        if (
+            self._sequence
+            and self._coords.size > 0
+            and len(self.sequence) != len(coords)
+        ):
+            raise ValueError(
+                f"The coords and the sequence must have the same length:"
+                f" expected len{len(self.sequence)},"
+                f"  got {len(coords)} coordinates"
+            )
         self._coords = np.array(coords)
 
     @property
@@ -125,8 +131,11 @@ class ProteinCoords:
         """
         if not isinstance(sequence, str):
             raise ValueError("The sequence must be a string")
-        if (self._sequence and self._coords.size > 0 
-                and len(sequence) != len(self.coords)):
+        if (
+            self._sequence
+            and self._coords.size > 0
+            and len(sequence) != len(self.coords)
+        ):
             raise ValueError("The sequence must have the same length as the coords")
         self._sequence = sequence
 
@@ -134,8 +143,8 @@ class ProteinCoords:
     ### PUBLIC METHODS
     ###
 
-    def copy(self) -> 'ProteinCoords':
-        """ Create a copy of the ProteinCoords instance. """
+    def copy(self) -> "ProteinCoords":
+        """Create a copy of the ProteinCoords instance."""
         return ProteinCoords(self.sequence, self.coords)
 
     def transform(self, T_matrix: np.ndarray) -> None:
@@ -154,15 +163,15 @@ class Coords:
     """
     A class for representing and manipulating 3D molecular coordinates.
 
-    This class provides functionality to store, transform, and manipulate 
-    3D coordinates used in molecular structures. It supports transformations 
-    such as rotation and translation, as well as operations for combining 
+    This class provides functionality to store, transform, and manipulate
+    3D coordinates used in molecular structures. It supports transformations
+    such as rotation and translation, as well as operations for combining
     multiple coordinate sets.
 
     Parameters
     ----------
     input_array : Union[np.ndarray, List], optional
-        A NumPy array or list containing the 3D coordinates, where each element 
+        A NumPy array or list containing the 3D coordinates, where each element
         represents a nucleotide or molecular unit with associated vectors.
     dummy_ends : Tuple[np.ndarray, np.ndarray], optional
         A tuple containing two NumPy arrays representing dummy end coordinates.
@@ -192,14 +201,15 @@ class Coords:
 
     _CACHED_HELICES = dict()
 
-    def __init__(self, 
-                 input_array: Union[np.ndarray, List] = np.array(()), 
-                 dummy_ends: Tuple[np.ndarray, np.ndarray] = (np.array(()), 
-                                                              np.array(())), 
-                 proteins: List['ProteinCoords'] = None):
+    def __init__(
+        self,
+        input_array: Union[np.ndarray, List] = np.array(()),
+        dummy_ends: Tuple[np.ndarray, np.ndarray] = (np.array(()), np.array(())),
+        proteins: List["ProteinCoords"] = None,
+    ):
         """
         Initialize Coords object.
-        
+
         Parameters
         ----------
         input_array : Union[np.ndarray, List]
@@ -230,7 +240,7 @@ class Coords:
 
     def __str__(self) -> str:
         """Return a string representation of the coordinates."""
-        return f'Coords({self.array.tolist()})'
+        return f"Coords({self.array.tolist()})"
 
     def __len__(self) -> int:
         """Return the number of elements in the coordinates array."""
@@ -251,15 +261,17 @@ class Coords:
     def array(self, new_array: Union[np.ndarray, List, Tuple]) -> None:
         """
         Set the coordinates array.
-        
+
         Parameters
         ----------
         new_array : Union[np.ndarray, List, Tuple]
             The new array to be set.
         """
         if not isinstance(new_array, (np.ndarray, list, tuple)):
-            raise ValueError("The Coordinates array must be a numpy array or "
-                             "a list of coordinates")
+            raise ValueError(
+                "The Coordinates array must be a numpy array or "
+                "a list of coordinates"
+            )
         self._array = np.array(new_array)
 
     @property
@@ -273,39 +285,43 @@ class Coords:
     def dummy_ends(self, new_dummy: Tuple[np.ndarray, np.ndarray]) -> None:
         """
         Set the dummy ends.
-        
+
         Parameters
         ----------
         new_dummy : Tuple[np.ndarray, np.ndarray]
             A tuple of numpy arrays representing dummy ends.
         """
         if not isinstance(new_dummy, (list, tuple)) or len(new_dummy) != 2:
-            raise ValueError("The dummy_ends argument must be a tuple "
-                             "of two numpy arrays.")
-        
+            raise ValueError(
+                "The dummy_ends argument must be a tuple " "of two numpy arrays."
+            )
+
         self._dummy_ends = (np.array(new_dummy[0]), np.array(new_dummy[1]))
 
     @property
-    def proteins(self) -> List['ProteinCoords']:
+    def proteins(self) -> List["ProteinCoords"]:
         """
         Return the list of proteins.
         """
         return self._proteins
 
     @proteins.setter
-    def proteins(self, proteins: List['ProteinCoords']) -> None:
+    def proteins(self, proteins: List["ProteinCoords"]) -> None:
         """
         Set the proteins list.
-        
+
         Parameters
         ----------
         proteins : List[ProteinCoords]
             A list of ProteinCoords instances.
         """
-        if (not isinstance(proteins, list) 
-                    or any(not isinstance(p, ProteinCoords) for p in proteins)):
-            raise ValueError("The proteins argument must be a list of ProteinCoords "
-                             f"instances. Got: {proteins}")
+        if not isinstance(proteins, list) or any(
+            not isinstance(p, ProteinCoords) for p in proteins
+        ):
+            raise ValueError(
+                "The proteins argument must be a list of ProteinCoords "
+                f"instances. Got: {proteins}"
+            )
         self._proteins = proteins
 
     @property
@@ -327,12 +343,9 @@ class Coords:
     ###
 
     @staticmethod
-    def apply_transformation(T: np.ndarray, 
-                             p: np.ndarray, 
-                             b: np.ndarray, 
-                             n: np.ndarray, 
-                             local: bool = False
-                             ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def apply_transformation(
+        T: np.ndarray, p: np.ndarray, b: np.ndarray, n: np.ndarray, local: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Apply a transformation matrix to position, base, and normal vectors.
 
@@ -356,11 +369,11 @@ class Coords:
         """
         if local:
             p_local, b_local, n_local = p, b, n
-            p, b, n = np.array((0,0,0)), np.array((1,0,0)), np.array((0,1,0))
+            p, b, n = np.array((0, 0, 0)), np.array((1, 0, 0)), np.array((0, 1, 0))
 
         # Convert position to homogeneous coordinates
         p_homogeneous = np.append(p, 1)
-        
+
         # Apply the transformation to the position
         p_transformed_homogeneous = T @ p_homogeneous.T
         p_trans = p_transformed_homogeneous.T[:3]
@@ -375,23 +388,20 @@ class Coords:
 
         if local:
             # find the original reference system from the local one
-            p_trans, b_trans, n_trans = Coords.set_reference(p_local, 
-                                                             b_local, 
-                                                             n_local, 
-                                                             p_trans, 
-                                                             b_trans, 
-                                                             n_trans, 
-                                                             reverse=True)
-                                                 
+            p_trans, b_trans, n_trans = Coords.set_reference(
+                p_local, b_local, n_local, p_trans, b_trans, n_trans, reverse=True
+            )
+
         return p_trans, b_trans, n_trans
 
     @staticmethod
-    def combine_coords(strand1: "Strand", 
-                       strand2: "Strand", 
-                       ) -> "Coords":
+    def combine_coords(
+        strand1: "Strand",
+        strand2: "Strand",
+    ) -> "Coords":
         """
         Combine the coordinates of two strands by applying necessary transformations.
-        Use dependency injection (with strand1 and strand2 as arguments) to apply 
+        Use dependency injection (with strand1 and strand2 as arguments) to apply
         the transformation to a whole Strand Block. The second strand is transformed
         to match the first strand's orientation.
 
@@ -413,77 +423,77 @@ class Coords:
         seq2 = strand2.sequence
 
         ### HEDGE CASES
-        # there are no coordinates to combine 
-        if coords1.is_empty() and coords2.is_empty(): 
+        # there are no coordinates to combine
+        if coords1.is_empty() and coords2.is_empty():
             return Coords([])
         # the first strand has no coordinates and no nucleotides
-        elif coords1.is_empty(): 
+        elif coords1.is_empty():
             return coords2.copy()
         # the second strand has no coordinates and no nucleotides
-        elif coords2.is_empty(): 
+        elif coords2.is_empty():
             return coords1.copy()
-        
+
         ### TRANSFORM THE SECOND STRAND
         # transform them only if they are not in the same block os strands
-        if strand1.strands_block is not strand2.strands_block: 
-            
+        if strand1.strands_block is not strand2.strands_block:
+
             # create the coordinates for the first strand
-            if coords1.size == 0 and len(seq1): 
+            if coords1.size == 0 and len(seq1):
                 coords1 = Coords.compute_helix_from_nucl(
-                                    (0,0,0), # start position
-                                    (1,0,0), # base vector
-                                    (0,1,0), # normal vector
-                                    length=len(seq1),
-                                    directionality=seq1.directionality
-                                    )
-                
+                    (0, 0, 0),  # start position
+                    (1, 0, 0),  # base vector
+                    (0, 1, 0),  # normal vector
+                    length=len(seq1),
+                    directionality=seq1.directionality,
+                )
+
             # create the coordinates for the second strand
-            if coords2.size == 0 and len(seq2): 
+            if coords2.size == 0 and len(seq2):
                 coords2 = Coords.compute_helix_from_nucl(
-                                    (0,0,0), # start position
-                                    (1,0,0), # base vector
-                                    (0,1,0), # normal vector
-                                    length=len(seq2),
-                                    directionality=seq2.directionality
-                                    )
-                
+                    (0, 0, 0),  # start position
+                    (1, 0, 0),  # base vector
+                    (0, 1, 0),  # normal vector
+                    length=len(seq2),
+                    directionality=seq2.directionality,
+                )
+
             ### CHECK THE JOINING POINTS AND TRANSFORM THE ARRAY TWO
 
             # the first strand has no end dummy
-            if coords1.dummy_ends[1].size == 0: 
+            if coords1.dummy_ends[1].size == 0:
                 # the second strand has a start dummy
-                if coords2.dummy_ends[0].size > 0: 
+                if coords2.dummy_ends[0].size > 0:
                     # the dummy start translates to...
-                    pos1 = coords2.dummy_ends[0][0] 
+                    pos1 = coords2.dummy_ends[0][0]
                     bv1 = coords2.dummy_ends[0][1]
                     nv1 = coords2.dummy_ends[0][2]
                     # ...the last position of the first strand
-                    pos2 = coords1[-1][0] 
+                    pos2 = coords1[-1][0]
                     bv2 = coords1[-1][1]
                     nv2 = coords1[-1][2]
-                else: 
-                    # the second strand has no dummy: calulcate an helical join from 
+                else:
+                    # the second strand has no dummy: calulcate an helical join from
                     # the last nucleotide of the first strand
                     helix_coords = Coords.compute_helix_from_nucl(
-                                            coords1[-1][0], 
-                                            coords1[-1][1], 
-                                            coords1[-1][2], 
-                                            length=1, 
-                                            directionality=seq1.directionality
-                                            )
+                        coords1[-1][0],
+                        coords1[-1][1],
+                        coords1[-1][2],
+                        length=1,
+                        directionality=seq1.directionality,
+                    )
                     # the first position of the second strand translates to...
-                    pos1 = coords2[0][0] 
+                    pos1 = coords2[0][0]
                     bv1 = coords2[0][1]
                     nv1 = coords2[0][2]
                     # ...the first nucleotide of the helical join
                     pos2 = helix_coords[0][0]
                     bv2 = helix_coords[0][1]
                     nv2 = helix_coords[0][2]
-            
+
             # the first strand has an end dummy, use it
-            else: 
+            else:
                 # the array 2 has no coordinate, use the dummy instead
-                if coords2.size == 0: 
+                if coords2.size == 0:
                     # the dummy start translates to...
                     pos1 = coords2.dummy_ends[0][0]
                     bv1 = coords2.dummy_ends[0][1]
@@ -493,59 +503,58 @@ class Coords:
                     pos1 = coords2[0][0]
                     bv1 = coords2[0][1]
                     nv1 = coords2[0][2]
-                # ...the dummy end of the first strand 
-                pos2 = coords1.dummy_ends[1][0] 
+                # ...the dummy end of the first strand
+                pos2 = coords1.dummy_ends[1][0]
                 bv2 = coords1.dummy_ends[1][1]
                 nv2 = coords1.dummy_ends[1][2]
             # Calculate the transformation matrix
-            T_matrix = Coords.compute_transformation_matrix(pos1, 
-                                                            bv1, 
-                                                            nv1, 
-                                                            pos2, 
-                                                            bv2, 
-                                                            nv2)
+            T_matrix = Coords.compute_transformation_matrix(
+                pos1, bv1, nv1, pos2, bv2, nv2
+            )
 
             ### Apply the transformation to the second strand motif block
             strand2.strands_block.transform(T_matrix)
 
-        ### COMBINE THE COORDINATES, 
-        # the coordinates could be empty if there are dummies 
+        ### COMBINE THE COORDINATES,
+        # the coordinates could be empty if there are dummies
         combined_dummy = (coords1.dummy_ends[0], coords2.dummy_ends[1])
 
         # both strands have no coordinates
-        if coords1.size == 0 and coords2.size == 0: 
+        if coords1.size == 0 and coords2.size == 0:
             combined = Coords([], dummy_ends=combined_dummy)
 
         # the first strand has no coordinates
-        elif coords1.size == 0: 
+        elif coords1.size == 0:
             combined = Coords(coords2.array, dummy_ends=combined_dummy)
 
         # the second strand has no coordinates
-        elif coords2.size == 0: 
+        elif coords2.size == 0:
             combined = Coords(coords1.array, dummy_ends=combined_dummy)
 
         else:
-            combined = Coords(np.concatenate((coords1.array, coords2.array), axis=0), 
-                                              dummy_ends=combined_dummy)
+            combined = Coords(
+                np.concatenate((coords1.array, coords2.array), axis=0),
+                dummy_ends=combined_dummy,
+            )
 
         ### COMBINE THE PROTEINS
         combined.proteins = coords1.proteins + coords2.proteins
 
         return combined
 
-    
     @staticmethod
-    def compute_helix_from_nucl(pos: np.ndarray, 
-                                old_a1: np.ndarray, 
-                                old_a3: np.ndarray, 
-                                length: int, 
-                                directionality: Literal["53", "35"] = "53", 
-                                double: bool = False,
-                                use_cached: bool = True,
-                                ) -> "Coords":
+    def compute_helix_from_nucl(
+        pos: np.ndarray,
+        old_a1: np.ndarray,
+        old_a3: np.ndarray,
+        length: int,
+        directionality: Literal["53", "35"] = "53",
+        double: bool = False,
+        use_cached: bool = True,
+    ) -> "Coords":
         """
         Compute helical coordinates for nucleotides.
-        This function is based on the oxView implementation of the 
+        This function is based on the oxView implementation of the
         helix generation: https://doi.org/10.1093/nar/gkaa417
 
 
@@ -572,16 +581,18 @@ class Coords:
             Generated helical coordinates.
         """
         if use_cached:
-            info = (tuple(pos),
-                    tuple(old_a1), 
-                    tuple(old_a3),
-                    directionality,
-                    double,
-                    length)
+            info = (
+                tuple(pos),
+                tuple(old_a1),
+                tuple(old_a3),
+                directionality,
+                double,
+                length,
+            )
             if info in Coords._CACHED_HELICES:
                 return Coords._CACHED_HELICES[info]
-            
-        # Adjust arguments: Convert lists or tuples to numpy arrays 
+
+        # Adjust arguments: Convert lists or tuples to numpy arrays
         # for consistency in mathematical operations
         direction_35 = directionality == "35"
         if isinstance(pos, (list, tuple)):
@@ -599,16 +610,16 @@ class Coords:
         rot = 32.73 * np.pi / 180  # Rotation angle between next bases in radians
         cord = np.cos(inclination) * bp_backbone_distance  # Chord length
         # Distance from center to chord
-        center_to_cord = np.sqrt((diameter / 2) ** 2 - (cord / 2) ** 2)  
+        center_to_cord = np.sqrt((diameter / 2) ** 2 - (cord / 2) ** 2)
         fudge = 0.4  # Fudge factor for position adjustment
 
         # Calculate the axis perpendicular to the old A1 and A3 vectors
-        norm_a1_a3 = np.cross(old_a1, old_a3)  
+        norm_a1_a3 = np.cross(old_a1, old_a3)
         # Create the rotation matrix for the direction vector
-        R_dir = R.from_rotvec(norm_a1_a3 * inclination) 
-        # Calculate the direction vector, 
-        # rotating the old normal vector by the inclination angle 
-        dir_vector = - R_dir.apply(old_a3) 
+        R_dir = R.from_rotvec(norm_a1_a3 * inclination)
+        # Calculate the direction vector,
+        # rotating the old normal vector by the inclination angle
+        dir_vector = -R_dir.apply(old_a3)
 
         if direction_35:
             dir_vector *= -1  # Adjust direction if specified
@@ -616,24 +627,28 @@ class Coords:
         dir_vector /= np.linalg.norm(dir_vector)  # Normalize direction vector
 
         # Calculate the coordinates if the helix axis is the Z-axis
-        x1, y1, z1 = (center_to_cord, 
-                      -cord / 2, 
-                      -(bp_backbone_distance / 2) * np.sin(inclination))
-        x2, y2, z2 = (center_to_cord, 
-                      +cord / 2, 
-                      +(bp_backbone_distance / 2) * np.sin(inclination))
+        x1, y1, z1 = (
+            center_to_cord,
+            -cord / 2,
+            -(bp_backbone_distance / 2) * np.sin(inclination),
+        )
+        x2, y2, z2 = (
+            center_to_cord,
+            +cord / 2,
+            +(bp_backbone_distance / 2) * np.sin(inclination),
+        )
         r1 = np.array([x1, y1, z1])
         r2 = np.array([x2, y2, z2])
 
         ### Set the axis to the correct one
         ref_vector = np.array([0, 0, 1])  # Z-axis is the default axis
         # Calculate the cross product for rotation
-        cross_prod = np.cross(ref_vector, dir_vector)  
+        cross_prod = np.cross(ref_vector, dir_vector)
         # Calculate the dot product
-        dot_prod = np.dot(ref_vector, dir_vector)  
+        dot_prod = np.dot(ref_vector, dir_vector)
         # Calculate the quaternion components
         # * scalar component to normalize the quaternion
-        scalar = np.sqrt((1.0 + dot_prod) * 2.0)  
+        scalar = np.sqrt((1.0 + dot_prod) * 2.0)
 
         # The quaternion matrix transforms the ref_vector to the dir_vector
         q_matrix = np.append(cross_prod / scalar, scalar * 0.5)
@@ -645,21 +660,26 @@ class Coords:
         # Set a1 to the correct orientation
         r1_to_r2 = r2 - r1
         if direction_35:
-            r1_to_r2 = - r1_to_r2  # Adjust direction if specified
+            r1_to_r2 = -r1_to_r2  # Adjust direction if specified
         r1_to_r2 /= np.linalg.norm(r1_to_r2)  # Normalize the vector
 
         ### Rotate the helix axis to the correct orientation
         # Project r1_to_r2 onto dir_vector
-        r1_to_r2_proj = r1_to_r2 - np.dot(r1_to_r2, dir_vector) * dir_vector 
-        # Project old_a1 onto dir_vector 
-        old_a1_proj = old_a1 - np.dot(old_a1, dir_vector) * dir_vector  
+        r1_to_r2_proj = r1_to_r2 - np.dot(r1_to_r2, dir_vector) * dir_vector
+        # Project old_a1 onto dir_vector
+        old_a1_proj = old_a1 - np.dot(old_a1, dir_vector) * dir_vector
 
-        rotAngle2 = np.arccos(np.clip(np.dot(r1_to_r2_proj / 
-                                             np.linalg.norm(r1_to_r2_proj), 
-                                             old_a1_proj / 
-                                             np.linalg.norm(old_a1_proj)), 
-                                             -1.0, 1.0))
-        
+        rotAngle2 = np.arccos(
+            np.clip(
+                np.dot(
+                    r1_to_r2_proj / np.linalg.norm(r1_to_r2_proj),
+                    old_a1_proj / np.linalg.norm(old_a1_proj),
+                ),
+                -1.0,
+                1.0,
+            )
+        )
+
         if np.dot(np.cross(r1_to_r2, old_a1), dir_vector) < 0:
             rotAngle2 *= -1  # Adjust rotation angle based on the cross product
         q2 = R.from_rotvec(dir_vector * rotAngle2)  # Create the rotation matrix
@@ -696,10 +716,10 @@ class Coords:
 
             ### Calculate A3 orientation
             # Project a1 onto dir_vector
-            a1proj = a1 - np.dot(a1, dir_vector) * dir_vector 
+            a1proj = a1 - np.dot(a1, dir_vector) * dir_vector
             a1proj /= np.linalg.norm(a1proj)  # Normalize projection
             # Calculate a3
-            a3 = -np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj 
+            a3 = -np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj
             a3 /= np.linalg.norm(a3)  # Normalize a3
 
             # Calculate position
@@ -711,16 +731,16 @@ class Coords:
             RNA_fudge = a1 * fudge  # Apply fudge factor
             p = r + RNA_fudge + start_pos  # Calculate position
 
-            out[i] = [p, a1, a3] # Append nucleotide properties
+            out[i] = [p, a1, a3]  # Append nucleotide properties
 
             # Double helix case
             if double:
                 # Calculate a1 for double helix
-                a1 = -r1_to_r2 / np.linalg.norm(-r1_to_r2)  
+                a1 = -r1_to_r2 / np.linalg.norm(-r1_to_r2)
                 # Project a1 onto dir_vector
-                a1proj = a1 - np.dot(a1, -dir_vector) * -dir_vector  
-                 # Normalize projection
-                a1proj /= np.linalg.norm(a1proj) 
+                a1proj = a1 - np.dot(a1, -dir_vector) * -dir_vector
+                # Normalize projection
+                a1proj /= np.linalg.norm(a1proj)
                 # Calculate a3
                 a3 = np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj
                 a3 /= np.linalg.norm(a3)  # Normalize a3
@@ -731,29 +751,30 @@ class Coords:
                     a3 = -a3
                 RNA_fudge = a1 * fudge  # Apply fudge factor
                 p = r + RNA_fudge + start_pos  # Calculate position
-                 # Append nucleotide properties for double helix
-                out_double[i] = [p, a1, a3] 
-        
+                # Append nucleotide properties for double helix
+                out_double[i] = [p, a1, a3]
+
         # Combine results
         if double:
             combined = np.concatenate((out, out_double[::-1]), axis=0)
         else:
             combined = out
-        
+
         if use_cached:
             # Cache the helical coordinates for future use
             Coords._CACHED_HELICES[info] = Coords(combined)
         return Coords(combined)
 
     @staticmethod
-    def compute_transformation_matrix(p1: np.ndarray, 
-                                      b1: np.ndarray, 
-                                      n1: np.ndarray, 
-                                      p2: np.ndarray, 
-                                      b2: np.ndarray, 
-                                      n2: np.ndarray, 
-                                      local: bool = False
-                                      ) -> np.ndarray:
+    def compute_transformation_matrix(
+        p1: np.ndarray,
+        b1: np.ndarray,
+        n1: np.ndarray,
+        p2: np.ndarray,
+        b2: np.ndarray,
+        n2: np.ndarray,
+        local: bool = False,
+    ) -> np.ndarray:
         """
         Compute a transformation matrix to align one coordinate frame to another.
 
@@ -782,7 +803,7 @@ class Coords:
         # Calculate the third orthogonal vectors
         if local:
             p2, b2, n2 = Coords.set_reference(p1, b1, n1, p2, b2, n2)
-            p1, b1, n1 = np.array((0,0,0)), np.array((1,0,0)), np.array((0,1,0))
+            p1, b1, n1 = np.array((0, 0, 0)), np.array((1, 0, 0)), np.array((0, 1, 0))
 
         v1 = np.cross(b1, n1)
         v2 = np.cross(b2, n2)
@@ -804,13 +825,14 @@ class Coords:
         return T
 
     @staticmethod
-    def load_from_file(filename: str,
-                       dummy_ends: Tuple[bool, bool] = (False, False),
-                       extend: Tuple[int, int] = (0, 0), 
-                       topology_file: str = None,
-                       protein: bool = False,
-                       verbose: bool = False,
-                       ) -> "Coords":
+    def load_from_file(
+        filename: str,
+        dummy_ends: Tuple[bool, bool] = (False, False),
+        extend: Tuple[int, int] = (0, 0),
+        topology_file: str = None,
+        protein: bool = False,
+        verbose: bool = False,
+    ) -> "Coords":
         """
         Load and cleanup coordinates from an oxDNA configuration or PDB file.
 
@@ -819,7 +841,7 @@ class Coords:
         filename : str
             Path to the oxDNA configuration or PDB file.
         dummy_ends : Tuple[bool, bool], default is (False, False)
-            A tuple indicating whether the coordinates have dummy ends at the 
+            A tuple indicating whether the coordinates have dummy ends at the
             beginning or end.
         extend : Tuple[int, int], default is (0, 0)
             Number of nucleotides to extend the coordinates at the beginning and end.
@@ -837,45 +859,50 @@ class Coords:
         """
         # Check if the file is a pdb file
         pdb = False
-        top_text = None # initialize the topology text
+        top_text = None  # initialize the topology text
 
         # check the path
         if type(filename) != str:
             try:
                 filename = str(filename)
             except Exception as e:
-                raise ValueError("The filename must be a string or a path-like "
-                                 f"object, got type(filename)")
-            
+                raise ValueError(
+                    "The filename must be a string or a path-like "
+                    f"object, got type(filename)"
+                )
+
         # check the file extension
-        if filename.endswith('.pdb') or filename.endswith('.PDB'):
+        if filename.endswith(".pdb") or filename.endswith(".PDB"):
             pdb = True
-        
+
         # read the file
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             conf_text = f.read()
-            
+
         if not pdb and topology_file:
-            with open(topology_file, 'r') as f:
+            with open(topology_file, "r") as f:
                 top_text = f.read()
 
-        return Coords.load_from_text(conf_text, 
-                                     dummy_ends, 
-                                     extend, 
-                                     verbose, 
-                                     top_text=top_text, 
-                                     pdb_format=pdb,
-                                     protein=protein)
+        return Coords.load_from_text(
+            conf_text,
+            dummy_ends,
+            extend,
+            verbose,
+            top_text=top_text,
+            pdb_format=pdb,
+            protein=protein,
+        )
 
     @staticmethod
-    def load_from_text(conf_text: str,
-                       dummy_ends: Tuple[bool, bool] = (False, False), 
-                       extend: Tuple[int, int] = (0, 0), 
-                       verbose: bool = False,
-                       top_text: str = None,
-                       pdb_format: bool = False,
-                       protein: bool = False
-                       ) -> Union["Coords", None]:
+    def load_from_text(
+        conf_text: str,
+        dummy_ends: Tuple[bool, bool] = (False, False),
+        extend: Tuple[int, int] = (0, 0),
+        verbose: bool = False,
+        top_text: str = None,
+        pdb_format: bool = False,
+        protein: bool = False,
+    ) -> Union["Coords", None]:
         """
         Load and cleanup coordinates from an oxDNA or PDB configuration text.
 
@@ -884,10 +911,10 @@ class Coords:
         conf_text : str
             OxDNA configuration text.
         dummy_ends : Tuple[bool, bool], default is (False, False)
-            A tuple indicating whether the coordinates have dummy ends at the 
+            A tuple indicating whether the coordinates have dummy ends at the
             beginning or end.
         extend : Tuple[int, int], default is (0, 0)
-            Number of nucleotides to extend the coordinates at the beginning and end. 
+            Number of nucleotides to extend the coordinates at the beginning and end.
         verbose : bool, default False
             Whether to print the generated code for the coordinates.
         top_text : str, optional
@@ -900,44 +927,51 @@ class Coords:
         Returns
         -------
         Coords or None
-            A Coords object 
+            A Coords object
         """
         if pdb_format:
             if not oat_installed:
-                raise ValueError("oxDNA_analysis_tools not installed. "
-                                 "Please install it to use the pdb option")
+                raise ValueError(
+                    "oxDNA_analysis_tools not installed. "
+                    "Please install it to use the pdb option"
+                )
             confs, systems = PDB_oxDNA(conf_text)
             conf_text = conf_to_str(confs[0])
             top_text = get_top_string(systems[0])
-        
-        lines = conf_text.split('\n')
 
-        ### EXTRACT THE COORDINATES 
+        lines = conf_text.split("\n")
+
+        ### EXTRACT THE COORDINATES
         def extract_coords_from_line(line):
             splitted = line.strip().split()
-            return [[float(p) for p in splitted[0:3]], 
-                    [float(b) for b in splitted[3:6]], 
-                    [float(n) for n in splitted[6:9]]]
+            return [
+                [float(p) for p in splitted[0:3]],
+                [float(b) for b in splitted[3:6]],
+                [float(n) for n in splitted[6:9]],
+            ]
 
-        coords = np.array([extract_coords_from_line(line) for line in lines[3:] 
-                                                            if line.strip()])
+        coords = np.array(
+            [extract_coords_from_line(line) for line in lines[3:] if line.strip()]
+        )
 
-        ### LOAD PROTEINS 
+        ### LOAD PROTEINS
         all_prot_coords = []
         protein_coords = None
         if verbose:
-            protein_text = ''
-        if protein: 
-            
+            protein_text = ""
+        if protein:
+
             if top_text is None:
-                raise ValueError("A topology file path must be provided when loading"
-                                 " a structure with proteins")
-            
+                raise ValueError(
+                    "A topology file path must be provided when loading"
+                    " a structure with proteins"
+                )
+
             # initialize protein text
             if verbose:
-                protein_text = ',\n\tproteins=['
+                protein_text = ",\n\tproteins=["
             # Split the topology text into lines
-            lines = top_text.split('\n')[1:]
+            lines = top_text.split("\n")[1:]
             seq_start_ind = 0
             for line in lines:
                 if not line:
@@ -945,46 +979,52 @@ class Coords:
                 # get the sequence
                 seq = line.split()[0]
                 # Detect a protein sequence
-                if 'peptide' in line:
-                    
+                if "peptide" in line:
+
                     # load the protein coordinates
-                    protein_coords = coords[seq_start_ind: seq_start_ind + len(seq)]
+                    protein_coords = coords[seq_start_ind : seq_start_ind + len(seq)]
                     if verbose:
-                        protein_text += (f'ProteinCoords("{seq}", '
-                                         f'coords={protein_coords.tolist()}), ')
+                        protein_text += (
+                            f'ProteinCoords("{seq}", '
+                            f"coords={protein_coords.tolist()}), "
+                        )
                     all_prot_coords.append(ProteinCoords(seq, protein_coords))
 
                     # remove the protein coordinates from the main coordinates
-                    coords = np.delete(coords, 
-                                       np.s_[seq_start_ind: seq_start_ind + len(seq)], 
-                                       axis=0)
+                    coords = np.delete(
+                        coords, np.s_[seq_start_ind : seq_start_ind + len(seq)], axis=0
+                    )
                     seq_start_ind -= len(seq)
 
                 # update the coordinates index
                 seq_start_ind += len(seq)
-                
+
             if verbose:
-                protein_text += ']'
+                protein_text += "]"
 
         ### ENTEND THE COORDINATES
         if extend[0] > 0:
-            extend_first = Coords.compute_helix_from_nucl(coords[0][0], 
-                                                          coords[0][1], 
-                                                          coords[0][2], 
-                                                          extend[0], 
-                                                          directionality="35", 
-                                                          double=False,
-                                                          use_cached=False)[::-1]
+            extend_first = Coords.compute_helix_from_nucl(
+                coords[0][0],
+                coords[0][1],
+                coords[0][2],
+                extend[0],
+                directionality="35",
+                double=False,
+                use_cached=False,
+            )[::-1]
             coords = np.concatenate((extend_first, coords))
 
         if extend[1] > 0:
-            extend_last = Coords.compute_helix_from_nucl(coords[-1][0], 
-                                                         coords[-1][1], 
-                                                         coords[-1][2], 
-                                                         extend[1], 
-                                                         directionality="53", 
-                                                         double=False,
-                                                         use_cached=False)
+            extend_last = Coords.compute_helix_from_nucl(
+                coords[-1][0],
+                coords[-1][1],
+                coords[-1][2],
+                extend[1],
+                directionality="53",
+                double=False,
+                use_cached=False,
+            )
             coords = np.concatenate((coords, extend_last))
 
         ### CREATE DUMMIES
@@ -1000,27 +1040,27 @@ class Coords:
             coords = coords[:-1]
 
         if verbose:
-            dummy_text = f',\n\tdummy_ends=({dummy_0.tolist()}, {dummy_1.tolist()})'
+            dummy_text = f",\n\tdummy_ends=({dummy_0.tolist()}, {dummy_1.tolist()})"
             if not dummy_ends[0] and not dummy_ends[1]:
-                dummy_text = ''
+                dummy_text = ""
 
         ### RETURN OR PRINT
         if verbose:
-            print(f'Coords({coords.tolist()}{dummy_text}{protein_text})')
+            print(f"Coords({coords.tolist()}{dummy_text}{protein_text})")
         return Coords(coords, dummy_ends=(dummy_0, dummy_1), proteins=all_prot_coords)
-        
 
     @staticmethod
-    def set_reference(ref_p: np.ndarray, 
-                      ref_b: np.ndarray, 
-                      ref_n: np.ndarray, 
-                      p: np.ndarray, 
-                      b: np.ndarray, 
-                      n: np.ndarray, 
-                      reverse: bool = False
-                      ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def set_reference(
+        ref_p: np.ndarray,
+        ref_b: np.ndarray,
+        ref_n: np.ndarray,
+        p: np.ndarray,
+        b: np.ndarray,
+        n: np.ndarray,
+        reverse: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Transform coordinates to a new reference system defined by origin, base, 
+        Transform coordinates to a new reference system defined by origin, base,
         and normal vectors.
 
         Parameters
@@ -1062,7 +1102,7 @@ class Coords:
             rotation = R.from_matrix(rotation_matrix)
             # Apply the transformation to the new reference frame
             transformed_p = rotation.apply(p - ref_p)
-        
+
         # transform the base and normal vectors
         transformed_b = rotation.apply(b)
         transformed_n = rotation.apply(n)
@@ -1073,7 +1113,7 @@ class Coords:
     def transform_array(array: np.ndarray, T_matrix: np.ndarray) -> None:
         """
         Apply a transformation matrix to the coordinates inplace.
-        
+
         Parameters
         ----------
         array : np.ndarray
@@ -1083,21 +1123,20 @@ class Coords:
         """
         if array.size == 0:
             return
-        
+
         positions = array[:, 0]
         base_vectors = array[:, 1]
         normal_vectors = array[:, 2]
-        
-        positions_homogeneous = np.hstack((positions, 
-                                           np.ones((positions.shape[0], 1))))
+
+        positions_homogeneous = np.hstack((positions, np.ones((positions.shape[0], 1))))
         transformed_positions = (T_matrix @ positions_homogeneous.T).T[:, :3]
-        
+
         rotation_matrix = T_matrix[:3, :3]
         rotation = R.from_matrix(rotation_matrix)
-        
+
         transformed_base_vectors = rotation.apply(base_vectors)
         transformed_normal_vectors = rotation.apply(normal_vectors)
-        
+
         array[:, 0] = transformed_positions
         array[:, 1] = transformed_base_vectors
         array[:, 2] = transformed_normal_vectors
@@ -1128,9 +1167,11 @@ class Coords:
         Coords
             A new Coords object with the same attributes.
         """
-        return Coords(self.array, 
-                      (self._dummy_ends[0], self._dummy_ends[1]), 
-                      [protein.copy() for protein in self._proteins])
+        return Coords(
+            self.array,
+            (self._dummy_ends[0], self._dummy_ends[1]),
+            [protein.copy() for protein in self._proteins],
+        )
 
     def is_empty(self) -> bool:
         """
@@ -1141,9 +1182,11 @@ class Coords:
         bool
             True if the object is empty, otherwise False.
         """
-        return (self.size == 0 
-                    and self._dummy_ends[0].size == 0 
-                    and self._dummy_ends[1].size == 0)
+        return (
+            self.size == 0
+            and self._dummy_ends[0].size == 0
+            and self._dummy_ends[1].size == 0
+        )
 
     def reverse_in_place(self) -> None:
         """
@@ -1172,21 +1215,21 @@ class Coords:
 
         if self._dummy_ends[0].size > 0:
             new_pos, new_bv, new_nv = Coords.apply_transformation(
-                                                T, 
-                                                self._dummy_ends[0][0], 
-                                                self._dummy_ends[0][1], 
-                                                self._dummy_ends[0][2]
-                                                )
+                T,
+                self._dummy_ends[0][0],
+                self._dummy_ends[0][1],
+                self._dummy_ends[0][2],
+            )
             self._dummy_ends[0][0] = new_pos
             self._dummy_ends[0][1] = new_bv
             self._dummy_ends[0][2] = new_nv
         if self._dummy_ends[1].size > 0:
             new_pos, new_bv, new_nv = Coords.apply_transformation(
-                                                T, 
-                                                self._dummy_ends[1][0], 
-                                                self._dummy_ends[1][1], 
-                                                self._dummy_ends[1][2]
-                                                )
+                T,
+                self._dummy_ends[1][0],
+                self._dummy_ends[1][1],
+                self._dummy_ends[1][2],
+            )
             self._dummy_ends[1][0] = new_pos
             self._dummy_ends[1][1] = new_bv
             self._dummy_ends[1][2] = new_nv

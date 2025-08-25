@@ -1,20 +1,23 @@
 import sys
 import RNA
 
+
 def distance(seq1, seq2):
     print(RNA.bp_distance(seq1, seq2))
 
+
 def duplex(seq1, seq2):
     dot_bracket, energy = RNA.fold(f"{seq1}&{seq2}")
-    dot_bracket = dot_bracket[ :len(seq1)] + '&' + dot_bracket[len(seq1): ]
+    dot_bracket = dot_bracket[: len(seq1)] + "&" + dot_bracket[len(seq1) :]
     print(dot_bracket, round(energy, 2))
+
 
 def ensemble_diversity(seq):
     # create model details
-    md = RNA.md() 
+    md = RNA.md()
     # adjust the scaling factor for long sequences
     if len(seq) > 1000:
-        md.sfact = 1.01 
+        md.sfact = 1.01
     # create fold_compound data structure (required for all subsequently applied  algorithms)
     fc = RNA.fold_compound(seq, md)
     # compute MFE and MFE structure
@@ -25,10 +28,12 @@ def ensemble_diversity(seq):
     (pp, pf) = fc.pf()
     # calculate Boltzmann factors
     ensemble_diversity = fc.mean_bp_distance()
-    print(f'Ensemble diversity: {round(ensemble_diversity, 2)}')
+    print(f"Ensemble diversity: {round(ensemble_diversity, 2)}")
+
 
 def fold(seq):
     print(RNA.fold(seq)[0])
+
 
 if __name__ == "__main__":
     run_function = sys.argv[1]
@@ -41,4 +46,3 @@ if __name__ == "__main__":
             ensemble_diversity(sys.argv[2])
         case "fold":
             fold(sys.argv[2])
-

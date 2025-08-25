@@ -15,6 +15,7 @@ from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
 from .viennarna import fold_p
 
+
 @contextmanager
 def cwd(path: str):
     """Context manager to change the current working directory and revert it back."""
@@ -25,24 +26,25 @@ def cwd(path: str):
     finally:
         os.chdir(oldpwd)
 
-def generate_road(structure: str,
-                  sequence: str,
-                  pseudoknots: Union[str, dict] = '',
-                  name: str = 'origami',
-                  initial_sequence: Optional[str] = None,
-                  callback: Optional[Callable[[str, str, str, str, float], 
-                                              None]] = None,
-                  verbose: bool = False,
-                  timeout: int = 7200,
-                  directory: Optional[str] = None,
-                  zip_directory: bool = False,
-                  origami_code: Optional[str] = None
-                  ) -> Union[str, Tuple[str, str]]:
+
+def generate_road(
+    structure: str,
+    sequence: str,
+    pseudoknots: Union[str, dict] = "",
+    name: str = "origami",
+    initial_sequence: Optional[str] = None,
+    callback: Optional[Callable[[str, str, str, str, float], None]] = None,
+    verbose: bool = False,
+    timeout: int = 7200,
+    directory: Optional[str] = None,
+    zip_directory: bool = False,
+    origami_code: Optional[str] = None,
+) -> Union[str, Tuple[str, str]]:
     """
     Generate an RNA origami design using the ROAD Revolvr algorithm.
 
     This function orchestrates the structure processing, pseudoknot embedding,
-    and Perl-based design process for RNA origami, with optional support for 
+    and Perl-based design process for RNA origami, with optional support for
     real-time updates and zipped output.
 
     Parameters
@@ -56,7 +58,7 @@ def generate_road(structure: str,
     name : str, optional
         Base name for the design file (default is 'origami').
     initial_sequence : str, optional
-        Optional initial sequence to pre-fill as the starting point of the 
+        Optional initial sequence to pre-fill as the starting point of the
         optimization.
     callback : callable, optional
         A function called during ROAD execution with progress updates:
@@ -65,63 +67,66 @@ def generate_road(structure: str,
         If True, prints progress updates to the console.
         If `callback` is provided, this is ignored. Default is False.
     timeout : int, optional
-        Timeout in seconds for the ROAD optimization 
+        Timeout in seconds for the ROAD optimization
         (default is 7200 seconds = 2 hours).
     directory : str, optional
-        Directory where files should be written. If None, a temporary directory 
+        Directory where files should be written. If None, a temporary directory
         is used.
     zip_directory : bool, optional
         Whether to generate a `.zip` file with all intermediate and result files.
     origami_code : str, optional
-        Source code (e.g., Python) representing the origami design, to be saved 
+        Source code (e.g., Python) representing the origami design, to be saved
         and zipped.
 
     Returns
     -------
     str or tuple
         If `zip_directory` is False: returns the designed RNA sequence as a string.
-        If `zip_directory` is True: returns 
+        If `zip_directory` is True: returns
         the tuple `(designed_sequence, path_to_zip_file)`.
 
     Raises
     ------
     ValueError
-        If the structure and sequence lengths do not match, or if multistrand 
+        If the structure and sequence lengths do not match, or if multistrand
         '&' is used.
-    
+
     Warnings
     --------
     - If the working directory doesn't exist, it is created.
     - If the final design file is missing, a warning is issued.
     """
-    
-    road_dir = __file__.replace('road.py', 'road_bin')
-    
+
+    road_dir = __file__.replace("road.py", "road_bin")
+
     files_to_include = []
-        
+
     # Sanity check
-    if '&' in sequence or '&' in structure:
-        raise ValueError("The ROAD Revolvr algorithm does not support "
-                         f"multistranded structures.")
-    
+    if "&" in sequence or "&" in structure:
+        raise ValueError(
+            "The ROAD Revolvr algorithm does not support " f"multistranded structures."
+        )
+
     if len(sequence) != len(structure):
-        raise ValueError("The length of the sequence and structure must match."
-                         " Got {} and {}.".format(len(sequence), len(structure)))
-    
+        raise ValueError(
+            "The length of the sequence and structure must match."
+            " Got {} and {}.".format(len(sequence), len(structure))
+        )
 
     if verbose and callback is None:
+
         def callback(_, __, spool_line, stage_name, *args):
             print(f"{stage_name}: {spool_line.strip()}", flush=True)
-    
+
     ### Fix the short stems with '{' ROAD symbols
     struct_list = list(structure)
     pair_map = dot_bracket_to_pair_map(structure)
     for dt in find_stems_in_multiloop(structure):
         # force pairing in dovetails that are shorter than 3
-        if dt[-1] - dt[0] + 1 <= 2: 
+        if dt[-1] - dt[0] + 1 <= 2:
             for i in range(dt[0], dt[1] + 1):
-                struct_list[i] = '{'
-                struct_list[pair_map[i]] = '}'
+                struct_list[i] = "{"
+                struct_list[pair_map[i]] = "}"
 
     ### ADD THE PSEUDOKNOTS ROAD NOTATION
     if type(pseudoknots) == dict:
@@ -129,43 +134,56 @@ def generate_road(structure: str,
     else:
         pk_dict = parse_pseudoknots(pseudoknots)
 
-    road_pk_notation = {'A' : '1', 'B' : '2', 'C' : '3', 'D' : '4', 'E' : '5', 
-                        'F' : '6', 'G' : '7', 'H' : '8', 'I' : '9'}
+    road_pk_notation = {
+        "A": "1",
+        "B": "2",
+        "C": "3",
+        "D": "4",
+        "E": "5",
+        "F": "6",
+        "G": "7",
+        "H": "8",
+        "I": "9",
+    }
     external_pk_count = 0
     avg_pk_E = 0
     avg_pk_dE = 0
 
     # sort the pseudoknots by their index
-    pk_dict = {k: v for k, v in sorted(pk_dict.items(), 
-                                       key=lambda item: 
-                                            min(inds[0]
-                                                for inds in item[1]['ind_fwd'] + 
-                                                            item[1]['ind_rev']))}
+    pk_dict = {
+        k: v
+        for k, v in sorted(
+            pk_dict.items(),
+            key=lambda item: min(
+                inds[0] for inds in item[1]["ind_fwd"] + item[1]["ind_rev"]
+            ),
+        )
+    }
     # Calculate the average energy and dE of the pseudoknots
     for pk_info in pk_dict.values():
         used = False
-        avg_pk_E += pk_info['E']
-        avg_pk_dE += abs(pk_info['dE'])
+        avg_pk_E += pk_info["E"]
+        avg_pk_dE += abs(pk_info["dE"])
         pk_sym = list(road_pk_notation)[external_pk_count]
 
         # Find the pk with the lowest index, between fwd and rev
-        min_fwd = min([inds[0] for inds in pk_info['ind_fwd']], default=float('inf'))
-        min_rev = min([inds[0] for inds in pk_info['ind_rev']], default=float('inf'))
+        min_fwd = min([inds[0] for inds in pk_info["ind_fwd"]], default=float("inf"))
+        min_rev = min([inds[0] for inds in pk_info["ind_rev"]], default=float("inf"))
         if min_fwd < min_rev:
-            first_pk = pk_info['ind_fwd']
-            second_pk = pk_info['ind_rev']
+            first_pk = pk_info["ind_fwd"]
+            second_pk = pk_info["ind_rev"]
         else:
-            first_pk = pk_info['ind_rev']
-            second_pk = pk_info['ind_fwd']
+            first_pk = pk_info["ind_rev"]
+            second_pk = pk_info["ind_fwd"]
 
-        for (start, end) in first_pk:
-            if struct_list[start] not in '.()':
+        for start, end in first_pk:
+            if struct_list[start] not in ".()":
                 continue
             for i in range(start, end + 1):
                 struct_list[i] = pk_sym
             used = True
-        for (start, end) in second_pk:
-            if struct_list[start] not in '.()':
+        for start, end in second_pk:
+            if struct_list[start] not in ".()":
                 continue
             for j in range(start, end + 1):
                 struct_list[j] = road_pk_notation[pk_sym]
@@ -176,10 +194,10 @@ def generate_road(structure: str,
     if pk_dict:
         avg_pk_E /= len(pk_dict)
         avg_pk_dE /= len(pk_dict)
-    structure = ''.join(struct_list)
+    structure = "".join(struct_list)
 
     ### COPY THE PYTHON PATH AND ADD RNAfold
-    python_path = sys.executable # Get path to the current Python interpreter
+    python_path = sys.executable  # Get path to the current Python interpreter
     python_dir = os.path.dirname(python_path)
 
     # Prepend it to PATH, to make sure the correct Python is used
@@ -202,73 +220,75 @@ def generate_road(structure: str,
 
     # save the origami code
     if origami_code is not None:
-        origami_code_path = os.path.join(directory, f'{name}.py')
-        with open(origami_code_path, 'w') as f:
+        origami_code_path = os.path.join(directory, f"{name}.py")
+        with open(origami_code_path, "w") as f:
             f.write(origami_code)
         # include it in the zip
         files_to_include.append(origami_code_path)
-        
+
     # create the target input file
-    target_path = os.path.join(directory, 'target.txt')
-    with open(target_path, 'w') as f:
+    target_path = os.path.join(directory, "target.txt")
+    with open(target_path, "w") as f:
         f.write(f"{name}\n{structure}\n{sequence}\n")
-        
-        if (initial_sequence is not None 
-                and len(initial_sequence) == len(structure)):
+
+        if initial_sequence is not None and len(initial_sequence) == len(structure):
             f.write(f"{initial_sequence}\n")
 
     # include it in the zip
     files_to_include.append(target_path)
 
     # read the revolvr file
-    revolvr_local_path = os.path.join(road_dir, 'revolvr.pl')
-    with open(revolvr_local_path, 'r') as f:
+    revolvr_local_path = os.path.join(road_dir, "revolvr.pl")
+    with open(revolvr_local_path, "r") as f:
         revolvr_text = f.read()
-        
+
     # replace the KL energy parameters
-    revolvr_text = revolvr_text.replace('my $MinKL = -7.2;',
-                                        f'my $MinKL = {avg_pk_E + avg_pk_dE};')
-    revolvr_text = revolvr_text.replace('my $MaxKL = -10.8;',
-                                        f'my $MaxKL = {avg_pk_E - avg_pk_dE};')
-    revolvr_text = revolvr_text.replace('my $timeout_length = 7200;',
-                                        f'my $timeout_length = {int(timeout)};')
+    revolvr_text = revolvr_text.replace(
+        "my $MinKL = -7.2;", f"my $MinKL = {avg_pk_E + avg_pk_dE};"
+    )
+    revolvr_text = revolvr_text.replace(
+        "my $MaxKL = -10.8;", f"my $MaxKL = {avg_pk_E - avg_pk_dE};"
+    )
+    revolvr_text = revolvr_text.replace(
+        "my $timeout_length = 7200;", f"my $timeout_length = {int(timeout)};"
+    )
 
     # create the revolvr file with specific KL parameters
-    out_revolvr = os.path.join(directory, 'revolvr.pl')
-    with open(out_revolvr, 'w') as f:
+    out_revolvr = os.path.join(directory, "revolvr.pl")
+    with open(out_revolvr, "w") as f:
         f.write(revolvr_text)
     # include it in the zip
     files_to_include.append(out_revolvr)
 
-    vienna_out_path = os.path.join(directory, 'viennarna_funcs.py')
-    shutil.copyfile(os.path.join(road_dir, 'viennarna_funcs.py'),
-                    vienna_out_path
-                    )
+    vienna_out_path = os.path.join(directory, "viennarna_funcs.py")
+    shutil.copyfile(os.path.join(road_dir, "viennarna_funcs.py"), vienna_out_path)
     # include it in the zip
     files_to_include.append(vienna_out_path)
-    
 
     # move to the directory
     with cwd(directory):
         command = f'perl revolvr.pl "{directory}"'
-        process = subprocess.Popen(command,
-                                shell=True,
-                                cwd=directory,
-                                env=env,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT,
-                                text=True  #makes output strings
-                                )
+        process = subprocess.Popen(
+            command,
+            shell=True,
+            cwd=directory,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,  # makes output strings
+        )
 
         # Read output in real time
-        last_seq = '' 
-        last_struct = ''
-        prev_line = ''
+        last_seq = ""
+        last_struct = ""
+        prev_line = ""
         n_stage = 0
-        stages = ['Designing', 
-                'GC-Reduction & GC/UA-Rich Reduction', 
-                'Mapping Kissing Loops', 
-                'Optimization']
+        stages = [
+            "Designing",
+            "GC-Reduction & GC/UA-Rich Reduction",
+            "Mapping Kissing Loops",
+            "Optimization",
+        ]
 
         for line in process.stdout:
             line = line.strip()
@@ -280,15 +300,17 @@ def generate_road(structure: str,
             # update the last sequence and structure
             if prev_line and not prev_line.translate(nucl_to_none):
                 last_seq = prev_line
-                if line and any(s in line for s in '.()'):
+                if line and any(s in line for s in ".()"):
                     last_struct = line
-            
+
             if line and last_seq and last_struct and callback:
-                callback(last_struct, 
-                        last_seq, 
-                        line, 
-                        stages[n_stage - 1], 
-                        n_stage / len(stages))
+                callback(
+                    last_struct,
+                    last_seq,
+                    line,
+                    stages[n_stage - 1],
+                    n_stage / len(stages),
+                )
 
             prev_line = line
 
@@ -296,16 +318,18 @@ def generate_road(structure: str,
         process.wait()
 
     # spool file
-    files_to_include.append(os.path.join(directory, f'{name}_spool.txt'))
-    
+    files_to_include.append(os.path.join(directory, f"{name}_spool.txt"))
+
     # read the results
-    design_path = os.path.join(directory, f'{name}_design.txt')
+    design_path = os.path.join(directory, f"{name}_design.txt")
     if not os.path.exists(design_path):
         last_seq = ""
-        warnings.warn(f"Design file {design_path} not found. Optimization failed. "
-                       "Please check the ROAD algorithm output.")
+        warnings.warn(
+            f"Design file {design_path} not found. Optimization failed. "
+            "Please check the ROAD algorithm output."
+        )
     else:
-        with open(os.path.join(directory, f'{name}_design.txt'), 'r') as f:
+        with open(os.path.join(directory, f"{name}_design.txt"), "r") as f:
             lines = f.readlines()
             last_seq = lines[2].strip()
 
@@ -318,36 +342,39 @@ def generate_road(structure: str,
         temp_zip.close()  # Close so we can write to it
 
         # Create the zip and add selected files
-        with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        with zipfile.ZipFile(temp_zip.name, "w", zipfile.ZIP_DEFLATED) as zipf:
             for file in files_to_include:
                 try:
                     # Store relative to directory for cleaner archive structure
                     zipf.write(file, arcname=os.path.basename(file))
                 except Exception as e:
                     warnings.warn(f"Failed to add {file} to zip: {e}")
-        
+
     if tempdir is not None:
         # Close the temporary directory
         tempdir.cleanup()
-    
+
     # Return the path to the zip file
     if zip_directory:
         return last_seq, temp_zip.name
-    
+
     return last_seq
 
-def _worker_single_road(structure: str,
-                        sequence: str,
-                        pseudoknots,
-                        name: str,
-                        callback:callable = None,
-                        verbose: bool = False,
-                        timeout: int = 7200,
-                        zip_directory: bool = False,
-                        origami_code: Optional[str] = None,
-                        initial_sequence: Optional[str] = None,
-                        result_queue: multiprocessing.Queue = None,
-                        stop_event: 'multiprocessing.Event' = None,):
+
+def _worker_single_road(
+    structure: str,
+    sequence: str,
+    pseudoknots,
+    name: str,
+    callback: callable = None,
+    verbose: bool = False,
+    timeout: int = 7200,
+    zip_directory: bool = False,
+    origami_code: Optional[str] = None,
+    initial_sequence: Optional[str] = None,
+    result_queue: multiprocessing.Queue = None,
+    stop_event: "multiprocessing.Event" = None,
+):
     """
     Internal worker function that runs a single ROAD design trial.
 
@@ -407,24 +434,26 @@ def _worker_single_road(structure: str,
         print(f"Error in ROAD design process: {e}", file=sys.stderr)
 
 
-def parallel_road(structure: str,
-                  sequence: str,
-                  pseudoknots='',
-                  name: str = 'origami',
-                  callback=None,
-                  verbose=False,
-                  timeout: int = 7200,
-                  zip_directory: bool = True,
-                  origami_code: str = None,
-                  initial_sequence: str = None,
-                  n_trials: int = 8,
-                  save_to: Optional[str] = None,
-                  wait_for_all: bool = False) -> Union[str, Tuple[str, str]]:
+def parallel_road(
+    structure: str,
+    sequence: str,
+    pseudoknots="",
+    name: str = "origami",
+    callback=None,
+    verbose=False,
+    timeout: int = 7200,
+    zip_directory: bool = True,
+    origami_code: str = None,
+    initial_sequence: str = None,
+    n_trials: int = 8,
+    save_to: Optional[str] = None,
+    wait_for_all: bool = False,
+) -> Union[str, Tuple[str, str]]:
     """
     Run multiple ROAD optimization trials in parallel and return results.
 
     You can choose between returning early on the first successful result
-    or waiting for all trials to complete. Results can optionally be 
+    or waiting for all trials to complete. Results can optionally be
     ZIP-archived and saved. If the wait_for_all flag is set to True,
     the sequences are returned sorted by their MFE frequency in the ensemble
     (highest to lowest).
@@ -517,7 +546,7 @@ def parallel_road(structure: str,
             p.terminate()
         for p in processes:
             p.join()
-    
+
     if not results:
         raise RuntimeError("No successful ROAD design found in any trial.")
 
@@ -533,7 +562,7 @@ def parallel_road(structure: str,
             if isinstance(res, tuple):
                 final_zip_path = os.path.join(save_to, f"{name}_trial{i + 1}.zip")
                 shutil.move(res[1], final_zip_path)
-        
+
         if wait_for_all:
             # return all sequences in a list
             return [res[0] for res in results if isinstance(res, tuple)]

@@ -4,8 +4,14 @@ from typing import Optional, Union, Literal, List, Dict, Any, Set
 import numpy as np
 
 try:
-    from oxDNA_analysis_tools.UTILS.RyeReader import get_confs, describe, strand_describe, inbox
+    from oxDNA_analysis_tools.UTILS.RyeReader import (
+        get_confs,
+        describe,
+        strand_describe,
+        inbox,
+    )
     from oxDNA_analysis_tools.oxDNA_PDB import oxDNA_PDB
+
     oat_installed = True
 except ImportError:
     oat_installed = False
@@ -87,14 +93,16 @@ class Strand(Callback):
         The block of strands to which the strand belongs.
     """
 
-    def __init__(self, 
-                 strand: str = '', 
-                 directionality: Literal['53', '35'] = '53', 
-                 start: Optional[Union[Position, tuple, Literal['minimal']]] = None,
-                 direction: Optional[Direction] = None, 
-                 coords: Coords = None, 
-                 strands_block: Optional['StrandsBlock'] = None, 
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        strand: str = "",
+        directionality: Literal["53", "35"] = "53",
+        start: Optional[Union[Position, tuple, Literal["minimal"]]] = None,
+        direction: Optional[Direction] = None,
+        coords: Coords = None,
+        strands_block: Optional["StrandsBlock"] = None,
+        **kwargs,
+    ) -> None:
         """
         Initialize the Strand object with given properties.
 
@@ -102,7 +110,7 @@ class Strand(Callback):
         ----------
         strand : str, optional
             The characters strand representation (default is empty).
-        directionality : {'53', '35'}, 
+        directionality : {'53', '35'},
             The directionality of the strand (default is '53').
         start : Position, default Position.zero()
             The starting position of the strand in 2D space.
@@ -119,7 +127,7 @@ class Strand(Callback):
             Arbitrary keyword arguments passed to the Callback class.
         """
         # register the callback
-        super().__init__(**kwargs) 
+        super().__init__(**kwargs)
         self.pk_info = None
         self._coords = Coords()
         self._positions = None
@@ -136,7 +144,7 @@ class Strand(Callback):
         # Set the strand and sequence
         self._update_sequence_insertion(strand, directionality)
 
-        ### check the 2D direction 
+        ### check the 2D direction
         if direction is None:
             self._direction = Direction.RIGHT
         else:
@@ -145,7 +153,7 @@ class Strand(Callback):
         ### check the start position
         if start is None:
             self._start = Position.zero()
-        elif start == 'minimal':
+        elif start == "minimal":
             self._start = self.minimal_dimensions
         else:
             self._start = self._check_position(start)
@@ -163,47 +171,50 @@ class Strand(Callback):
             self.strands_block = StrandsBlock(self)
 
     def __str__(self) -> str:
-        """ Return a string representation of the Strand object. """
+        """Return a string representation of the Strand object."""
         return self.strand
 
     def __repr__(self) -> str:
-        """ Return a string representation of the Strand object. """
+        """Return a string representation of the Strand object."""
         return self.strand
 
     def __getitem__(self, idx) -> str:
-        """ Return the character at the given index. """
+        """Return the character at the given index."""
         return self.strand[idx]
 
     def __setitem__(self, idx: Union[int, slice], val: str) -> None:
-        """ Set the character at the given index in the strand. """
+        """Set the character at the given index in the strand."""
         val = val.upper()
         # convert to list to accept slice indexing and negative indexing
         new_strand_line = list(self.strand)
         new_strand_line[idx] = val
         new_strand_str = "".join(new_strand_line)
         ### update the strand
-        self.strand = new_strand_str 
+        self.strand = new_strand_str
 
-    def __add__(self, other: Union[str, Sequence, 'Strand']) -> 'Strand':
-        """ Add two strands together, check the directionality. """
+    def __add__(self, other: Union[str, Sequence, "Strand"]) -> "Strand":
+        """Add two strands together, check the directionality."""
         # check and copy the other strand
         other = self._check_addition(other)
         # combine the 3D coordinates
         coords = Coords.combine_coords(self, other)
         # create a new strand combined strand
-        new_strand = Strand(str(self)+ str(other), 
-                            self.sequence.directionality, 
-                            self.start, self.direction, 
-                            callbacks=self._callbacks,
-                            coords=coords)
-        
+        new_strand = Strand(
+            str(self) + str(other),
+            self.sequence.directionality,
+            self.start,
+            self.direction,
+            callbacks=self._callbacks,
+            coords=coords,
+        )
+
         # combine the pseudoknots information and add them
         new_strand.pk_info = self._combine_pk_info(other)
 
         return new_strand
 
-    def __iadd__(self, other: Union[str, Sequence, 'Strand']) -> 'Strand':
-        """ In place addition of two strands together. """
+    def __iadd__(self, other: Union[str, Sequence, "Strand"]) -> "Strand":
+        """In place addition of two strands together."""
         # check and copy the other strand
         other = self._check_addition(other)
         # add the strand to the current strand
@@ -218,28 +229,32 @@ class Strand(Callback):
         self._trigger_callbacks()
         return self
 
-    def __radd__(self, other: Union[str, Sequence]) -> 'Strand':
-        """ Right addition a Strand to a string or a Sequence. """
+    def __radd__(self, other: Union[str, Sequence]) -> "Strand":
+        """Right addition a Strand to a string or a Sequence."""
         if other == 0:
             return self
         self._check_addition(other, copy=False)
         # the only accepted options are str and Sequence
-        return Strand(str(other) + str(self), 
-                        directionality=self.directionality, 
-                        start=self.start, 
-                        direction=self.direction, 
-                        callbacks=self._callbacks)
+        return Strand(
+            str(other) + str(self),
+            directionality=self.directionality,
+            start=self.start,
+            direction=self.direction,
+            callbacks=self._callbacks,
+        )
 
     def __len__(self) -> int:
-        """ Return the length of the strand. """
+        """Return the length of the strand."""
         return len(self.strand)
 
     def __eq__(self, other) -> bool:
-        """ Check if two strands are equal, or if the strand is equal to a 
-        string or a Sequence. """
+        """Check if two strands are equal, or if the strand is equal to a
+        string or a Sequence."""
         if isinstance(other, Strand):
-            return (self.positions == other.positions 
-                    and self.directionality == other.directionality)
+            return (
+                self.positions == other.positions
+                and self.directionality == other.directionality
+            )
         elif isinstance(other, Sequence):
             return self.sequence == other
         elif isinstance(other, str):
@@ -247,11 +262,11 @@ class Strand(Callback):
         return False
 
     def __bool__(self):
-        """ Return true if the strand has strand characters. """
+        """Return true if the strand has strand characters."""
         return bool(self.strand)
 
     def __contains__(self, other):
-        """ Check if a position or a substrand is included in the strand. """
+        """Check if a position or a substrand is included in the strand."""
         # check a position (a tuple or list containing two integers)
         if isinstance(other, (Position, tuple, list)):
             return other in self.positions
@@ -270,22 +285,22 @@ class Strand(Callback):
             for i in range(len(full) - sub_len + 1):
                 if full[i : i + sub_len] == sub:
                     return True
-                
+
             # if not found, return False
             return False
-        
+
         return False
 
     def __hash__(self):
         return id(self)
 
-    ### 
+    ###
     ### PROPERTIES
     ###
 
     @property
     def coords(self) -> Coords:
-        """ 
+        """
         The oxDNA 3D coordinates of the strand.
         If the coordinates are not set, they are calculated for a strand in
         a perfect helix with the same length of the strand.
@@ -293,13 +308,13 @@ class Strand(Callback):
         if not self._sequence or not self._coords.is_empty():
             return self._coords
         coords = Coords.compute_helix_from_nucl(
-                            (0,0,0), # start position
-                            (1,0,0), # base vector
-                            (0,1,0), # normal vector
-                            length= len(self.sequence),
-                            directionality = self.directionality,
-                            double = False
-                            )
+            (0, 0, 0),  # start position
+            (1, 0, 0),  # base vector
+            (0, 1, 0),  # normal vector
+            length=len(self.sequence),
+            directionality=self.directionality,
+            double=False,
+        )
         self._coords = coords
         return coords
 
@@ -313,12 +328,14 @@ class Strand(Callback):
             self._coords = Coords()
 
         # sanity check
-        if (len(new_coords) != len(self.sequence)):
-            raise MotifStructureError(f"The number of oxDNA coordinates "
-                                      f"({len(new_coords)}) is different "
-                                      f"from the number of nucleotides "
-                                      f"({len(self.sequence)})")
-        
+        if len(new_coords) != len(self.sequence):
+            raise MotifStructureError(
+                f"The number of oxDNA coordinates "
+                f"({len(new_coords)}) is different "
+                f"from the number of nucleotides "
+                f"({len(self.sequence)})"
+            )
+
         if not isinstance(new_coords, Coords):
             new_coords = Coords(new_coords)
 
@@ -326,40 +343,39 @@ class Strand(Callback):
 
     @property
     def direction(self) -> Direction:
-        """ 
-        The starting (x, y) 2D direction to build the strand in 2D. 
+        """
+        The starting (x, y) 2D direction to build the strand in 2D.
         """
         return self._direction
 
     @direction.setter
-    def direction(self, new_direction: Union[Direction, Position, tuple, list]
-                  ) -> None:
-        """ 
+    def direction(self, new_direction: Union[Direction, Position, tuple, list]) -> None:
+        """
         The starting direction setter: a tuple of x,y coordinates in which one
-        coordinate is 0 and the other either 1 or -1. 
+        coordinate is 0 and the other either 1 or -1.
         """
         self._direction = self._check_position(new_direction, True)
         self._reset_positions()
         self._trigger_callbacks()
 
     @property
-    def directionality(self) -> Literal['53', '35']:
-        """ 
+    def directionality(self) -> Literal["53", "35"]:
+        """
         The directionality of the sequence ('53' or '35')
         """
         return self.sequence.directionality
 
     @directionality.setter
-    def directionality(self, new_directionality: Literal['53', '35']) -> None:
-        """ 
-        Set the directionality of the sequence ('53' or '35'). 
+    def directionality(self, new_directionality: Literal["53", "35"]) -> None:
+        """
+        Set the directionality of the sequence ('53' or '35').
         """
         self.sequence._directionality = new_directionality
         self._trigger_callbacks()
 
     @property
     def directions(self) -> Tuple[Direction]:
-        """ 
+        """
         A tuple of the directions of each character of the strand in 2D space
         (x,y coordinates).
         """
@@ -369,26 +385,26 @@ class Strand(Callback):
 
     @property
     def end(self) -> Position:
-        """ 
+        """
         The last position of the strand: it is the last element of the positions.
         """
         if not self._positions:
             self._calculate_positions()
-        return self._positions[-1] 
+        return self._positions[-1]
 
     @property
     def end_direction(self) -> Direction:
-        """ 
+        """
         The last direction of the strand.
         """
         if not self._positions:
             self._calculate_positions()
-        return self._directions[-1] 
+        return self._directions[-1]
 
     @property
     def max_pos(self) -> Position:
-        """ 
-        The maximum x, y coordinates of the strand in 2D space. 
+        """
+        The maximum x, y coordinates of the strand in 2D space.
         """
         if not self._positions:
             self._calculate_positions()
@@ -396,7 +412,7 @@ class Strand(Callback):
 
     @property
     def minimal_dimensions(self) -> Position:
-        """ 
+        """
         The minimum start Positions required to draw the strand in 2D
         without reaching negative positions.
         Calculating the minimal dimensions doesn't take into
@@ -408,9 +424,9 @@ class Strand(Callback):
         direction = self.direction
 
         for sym in self:
-            # check that the structure does not reach negative coordinates, 
+            # check that the structure does not reach negative coordinates,
             # in case add 1 to all negative positions
-            negative = Position((int(x<0) for x in pos))
+            negative = Position((int(x < 0) for x in pos))
 
             # add +1 to the element that is negative
             start += negative
@@ -434,8 +450,8 @@ class Strand(Callback):
 
     @property
     def min_pos(self) -> Position:
-        """ 
-        The minimum x, y coordinates of the strand in 2D space. 
+        """
+        The minimum x, y coordinates of the strand in 2D space.
         """
         if not self._positions:
             self._calculate_positions()
@@ -453,7 +469,7 @@ class Strand(Callback):
 
     @property
     def positions(self) -> Tuple[Position]:
-        """ 
+        """
         A tuple of the positions of each character of the strand in 2D space
         (x,y coordinates).
         """
@@ -463,7 +479,7 @@ class Strand(Callback):
 
     @property
     def prec_pos(self) -> Position:
-        """ 
+        """
         The preceding position of the strand: it is the start position
         minus the direction. Useful for joining two strands.
         """
@@ -475,18 +491,18 @@ class Strand(Callback):
 
     @property
     def sequence(self) -> Sequence:
-        """ 
-        The complete sequence of the strand. 
+        """
+        The complete sequence of the strand.
         """
         return self._sequence
 
     @sequence.setter
     def sequence(self, new_seq: Union[str, Sequence]) -> None:
-        """ 
-        Set the sequence of the strand. 
+        """
+        Set the sequence of the strand.
         If the sequence is a string, it is split into the sequences of the strand.
-        If the new sequence is longer than the current sequence, the sequence is 
-        added at the end of the strand. 
+        If the new sequence is longer than the current sequence, the sequence is
+        added at the end of the strand.
         The strands keeps the current directionality, indipendently from the
         directionality of the new sequence.
         """
@@ -495,24 +511,24 @@ class Strand(Callback):
 
     @property
     def sequence_list(self) -> List[Sequence]:
-        """ 
-        The list of consecutive sequences in the strand. 
+        """
+        The list of consecutive sequences in the strand.
         """
         seq_list = []
-        for sl in self._seq_slice: # iterate over the slices of the sequence
+        for sl in self._seq_slice:  # iterate over the slices of the sequence
             seq_list.append(Sequence(self.strand[sl], self.directionality))
         return seq_list
 
-    @property 
+    @property
     def sequence_slice(self) -> List[slice]:
-        """ 
-        The list of slices of the sequence in the strand. 
+        """
+        The list of slices of the sequence in the strand.
         """
         return self._seq_slice
 
     @property
     def seq_positions(self) -> Tuple[Position]:
-        """ 
+        """
         The positions of each nucleotide in the strand sequence (x,y coordinates).
         """
         if not self._positions:
@@ -521,15 +537,15 @@ class Strand(Callback):
 
     @property
     def strand(self) -> str:
-        """ 
-        The strand text characters. 
+        """
+        The strand text characters.
         """
         return self._strand
 
     @strand.setter
     def strand(self, new_strand: str) -> None:
-        """ 
-        Set the strand text characters. 
+        """
+        Set the strand text characters.
         """
         # check the strand
         new_strand = self._check_line(new_strand)
@@ -542,16 +558,16 @@ class Strand(Callback):
 
     @property
     def start(self):
-        """ 
-        Start position of the strand in the 2D representation. 
+        """
+        Start position of the strand in the 2D representation.
         """
         return self._start
 
     @start.setter
     def start(self, new_start: Union[Position, tuple, list]) -> None:
-        """ 
-        Start position setter: check that the input is 
-        a Position/tuple of x,y coordinates. 
+        """
+        Start position setter: check that the input is
+        a Position/tuple of x,y coordinates.
         """
         self._start = self._check_position(new_start)
         # reset the 2D maps
@@ -559,8 +575,8 @@ class Strand(Callback):
         self._trigger_callbacks()
 
     @property
-    def strands_block(self) -> 'StrandsBlock':
-        """ 
+    def strands_block(self) -> "StrandsBlock":
+        """
         The block of strands that has locked 3D coordinates
         transformation (their relative position in the 3D space
         doesn't change when joined to other strands).
@@ -568,7 +584,7 @@ class Strand(Callback):
         return self._strands_block
 
     @strands_block.setter
-    def strands_block(self, new_block: Optional['StrandsBlock'] = None) -> None:
+    def strands_block(self, new_block: Optional["StrandsBlock"] = None) -> None:
         """
         Assign a new strands block to the strand.
         """
@@ -576,30 +592,32 @@ class Strand(Callback):
         if new_block is None:
             self._strands_block = StrandsBlock(self)
             return
-        
+
         # check if the new block is a StrandsBlock
         if not isinstance(new_block, StrandsBlock):
-            raise ValueError(f"The strands block must be a StrandsBlock object. "
-                             f"Got {type(new_block)} instead.")
-        
+            raise ValueError(
+                f"The strands block must be a StrandsBlock object. "
+                f"Got {type(new_block)} instead."
+            )
+
         # assign the new block to the strand
         self._strands_block = new_block
         self._strands_block.add(self)
 
-    ### 
+    ###
     ### STATIC METHODS
     ###
 
     @staticmethod
-    def join_strands(strand1: 'Strand', strand2: 'Strand') -> Optional['Strand']:
+    def join_strands(strand1: "Strand", strand2: "Strand") -> Optional["Strand"]:
         """
         Join two strands together if they match in the right direction and have
         a compatible directionality. This also combines the pseudoknot information
         and the 3D coordinates of the strands (transforming the coordinates of the
-        second strand to match the first strand extension). The directionality of 
+        second strand to match the first strand extension). The directionality of
         the combined strand is taken from the first strand if it has a sequence,
-        otherwise it is taken from the second strand. The callbacks of the first 
-        strand are used for the new strand. The strands block of the joined strand 
+        otherwise it is taken from the second strand. The callbacks of the first
+        strand are used for the new strand. The strands block of the joined strand
         includes the strands blocks of both strands.
 
         Parameters
@@ -608,27 +626,29 @@ class Strand(Callback):
             The first strand to join.
         strand2 : Strand
             The second strand to join.
-        
+
         Returns
         -------
         Optional[Strand]
             The joined strand if possible, otherwise None.
         """
         if not isinstance(strand2, Strand) and not isinstance(strand1, Strand):
-            raise TypeError(f'The objects to join are not a Strand object, '
-                            f'got {type(strand2)}, {type(strand2)} instead.')
-        
-        ### LOAD THE STRAND EDGES 
+            raise TypeError(
+                f"The objects to join are not a Strand object, "
+                f"got {type(strand2)}, {type(strand2)} instead."
+            )
+
+        ### LOAD THE STRAND EDGES
         s1_start_prev = strand1.prec_pos
         s1_end_next = strand1.next_pos
         # check also strand2 or we could have problems if the strand has one symbol
         s2_start_prev = strand2.prec_pos
         s2_end_next = strand2.next_pos
 
-        ### There are 4 case: 
+        ### There are 4 case:
         #       in 2 case we have to invert the second strand
         #       in 2 case we can just add them
-        
+
         ### CHECK THE SECOND STRAND INVERSION
         s2_inverted = False
 
@@ -642,7 +662,6 @@ class Strand(Callback):
             strand2.invert()
             s2_inverted = True
 
-
         ### CHECK ADDITION AND JOINING
         join_order = None
         joined = None
@@ -654,11 +673,11 @@ class Strand(Callback):
         # case 4: <--(1),<--(2)
         elif s1_start_prev == strand2.end:
             join_order = -1
-        
+
         # join them in the order found
         if join_order is not None:
-            strand1._check_addition(strand2, copy=False) 
-            
+            strand1._check_addition(strand2, copy=False)
+
             if join_order == 1:
                 first, second = strand1, strand2
             else:
@@ -666,7 +685,7 @@ class Strand(Callback):
 
             # join the coordinates
             coords = Coords.combine_coords(first, second)
-            
+
             # set the directionality of the strand with the sequence
             # always priority to strand1
             directionality = strand1.directionality
@@ -674,14 +693,16 @@ class Strand(Callback):
                 directionality = strand2.directionality
 
             # create a new joined strand
-            joined = Strand(first.strand + second.strand, 
-                            directionality=directionality, 
-                            start=first.start, 
-                            direction=first.direction, 
-                            coords=coords, 
-                            # always priority to strand1 callbacks
-                            callbacks=strand1.callbacks)
-            
+            joined = Strand(
+                first.strand + second.strand,
+                directionality=directionality,
+                start=first.start,
+                direction=first.direction,
+                coords=coords,
+                # always priority to strand1 callbacks
+                callbacks=strand1.callbacks,
+            )
+
             # update the positional parameters
             if strand1._positions and strand2._positions:
                 joined._positions = first._positions + second._positions
@@ -689,11 +710,19 @@ class Strand(Callback):
                 joined._seq_positions = first._seq_positions + second._seq_positions
                 joined._prec_pos = first._prec_pos
                 joined._next_pos = second._next_pos
-                joined._max_pos = Position((max(first._max_pos[0], second._max_pos[0]),
-                                           max(first._max_pos[1], second._max_pos[1])))
-                joined._min_pos = Position((min(first._min_pos[0], second._min_pos[0]),
-                                           min(first._min_pos[1], second._min_pos[1])))
-            
+                joined._max_pos = Position(
+                    (
+                        max(first._max_pos[0], second._max_pos[0]),
+                        max(first._max_pos[1], second._max_pos[1]),
+                    )
+                )
+                joined._min_pos = Position(
+                    (
+                        min(first._min_pos[0], second._min_pos[0]),
+                        min(first._min_pos[1], second._min_pos[1]),
+                    )
+                )
+
             # update the pseudoknots information
             joined.pk_info = first._combine_pk_info(second)
 
@@ -704,17 +733,18 @@ class Strand(Callback):
         # check if the strand is empty
         if joined is None:
             return
-        
+
         # join the strands block of the combined and first strand
-        joined.strands_block.update(strand1.strands_block,
-                                    strand2.strands_block,
-                                    avoid_strands={strand1, strand2}
-                                    )
+        joined.strands_block.update(
+            strand1.strands_block,
+            strand2.strands_block,
+            avoid_strands={strand1, strand2},
+        )
         return joined
 
     @staticmethod
-    def _check_position(input_pos_dir, direction: bool =False) -> Position:
-        """ 
+    def _check_position(input_pos_dir, direction: bool = False) -> Position:
+        """
         Check that the input is a valid position or direction.
 
         Parameters
@@ -731,18 +761,24 @@ class Strand(Callback):
             The input position or direction as a Position object.
         """
         if isinstance(input_pos_dir, (Direction, Position)):
-            return input_pos_dir 
-        
-        if (not isinstance(input_pos_dir, (tuple, list)) 
-                or not isinstance(input_pos_dir[0], (int, np.int64))
-                or not isinstance(input_pos_dir[1], (int, np.int64))):
-            raise ValueError(f'The 2D coordinates must be a tuple/list of (x,y) '
-                             f'integer values. Got {input_pos_dir} instead.')
-        
+            return input_pos_dir
+
+        if (
+            not isinstance(input_pos_dir, (tuple, list))
+            or not isinstance(input_pos_dir[0], (int, np.int64))
+            or not isinstance(input_pos_dir[1], (int, np.int64))
+        ):
+            raise ValueError(
+                f"The 2D coordinates must be a tuple/list of (x,y) "
+                f"integer values. Got {input_pos_dir} instead."
+            )
+
         if direction and len(set(input_pos_dir) & {-1, 0, 1}) != 2:
-            raise ValueError(f'2D direction not allowed. The allowed values are:\n'
-                             f'RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).\n'
-                             f'Got {input_pos_dir} instead.')
+            raise ValueError(
+                f"2D direction not allowed. The allowed values are:\n"
+                f"RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).\n"
+                f"Got {input_pos_dir} instead."
+            )
 
         return Position(input_pos_dir)
 
@@ -751,9 +787,9 @@ class Strand(Callback):
     ###
 
     def _calculate_positions(self) -> None:
-        """ 
+        """
         Trace the strand in 2D space and create the 2D properties of the strand.
-        It cleans the symbols, replacing them with the corresponding nice ASCII 
+        It cleans the symbols, replacing them with the corresponding nice ASCII
         representation. It also checks for structural errors in the strand
         drawing.
         This function calculates the properties:
@@ -763,7 +799,7 @@ class Strand(Callback):
             - _next_pos
             - _max_pos
             - _min_pos
-            
+
         Raises
         ------
         MotifStructureError
@@ -781,37 +817,43 @@ class Strand(Callback):
         directions = [direction]
         seq_positions = []
         # Use list for efficient string concatenation
-        new_strand = [] 
+        new_strand = []
         # first conversion of the symbols that are easy to interpret
         translated = self.strand.translate(symb_to_road)
 
         # initialize the error message
-        xy_error_msg = ("The {xy_axis} direction of the strand (d{xy_axis}: {dir_xy})"
-                        " is not compatible with the next symbol ({cur_sym}).\n"
-                        "\tCurrent strand: {cur_strand}.\n"
-                        "\tFull strand: {full_strand}.")
+        xy_error_msg = (
+            "The {xy_axis} direction of the strand (d{xy_axis}: {dir_xy})"
+            " is not compatible with the next symbol ({cur_sym}).\n"
+            "\tCurrent strand: {cur_strand}.\n"
+            "\tFull strand: {full_strand}."
+        )
 
         # traverse the strand building the 2D map
         for i, sym in enumerate(translated):
 
             # Convert the turns to the corresponding symbols
-            if sym == '/':
+            if sym == "/":
                 if direction[0] == -1 or direction[1] == -1:
-                    sym = '╭'
+                    sym = "╭"
                 elif direction[0] == 1 or direction[1] == 1:
-                    sym = '╯'
-            elif sym == '\\':
+                    sym = "╯"
+            elif sym == "\\":
                 if direction[0] == 1 or direction[1] == -1:
-                    sym = '╮'
+                    sym = "╮"
                 elif direction[0] == -1 or direction[1] == 1:
-                    sym = '╰'
+                    sym = "╰"
             # conver the up and down symbols to match the directionality
-            elif sym in ('↑', '↓'):
-                if direction[1] == -1 and self.directionality == '53' or\
-                    direction[1] == 1 and self.directionality == '35':
-                    sym = '↑'
+            elif sym in ("↑", "↓"):
+                if (
+                    direction[1] == -1
+                    and self.directionality == "53"
+                    or direction[1] == 1
+                    and self.directionality == "35"
+                ):
+                    sym = "↑"
                 else:
-                    sym = '↓'
+                    sym = "↓"
             elif sym in nucleotides:
                 # add the base positions
                 seq_positions.append(pos)
@@ -821,48 +863,63 @@ class Strand(Callback):
 
             # Check for invalid positions and raise error early
             if any(c < 0 for c in pos):
-                raise MotifStructureError(f"The strand reaches negative coordinates: "
-                                          f"{pos}. The current positions are: "
-                                          f"{positions}."
-                                          f" The last direction is: {direction}. "
-                                          f"Current strand: {''.join(new_strand)}")
+                raise MotifStructureError(
+                    f"The strand reaches negative coordinates: "
+                    f"{pos}. The current positions are: "
+                    f"{positions}."
+                    f" The last direction is: {direction}. "
+                    f"Current strand: {''.join(new_strand)}"
+                )
 
-            
             # Check symbols and directions errors
-            elif (direction[0] 
-                    and any((sym == "│", 
-                             direction[0] == 1 and sym in "╰╭", 
-                             direction[0] == -1 and sym in "╮╯"))):
-                cur_strand = ''.join(new_strand)
-                raise MotifStructureError(xy_error_msg.format(xy_axis="x", 
-                                                              dir_xy=direction[0], 
-                                                              cur_sym=sym, 
-                                                              cur_strand=cur_strand,
-                                                              full_strand=self.strand
-                                                              )
-                                          )
-            
-            elif (direction[1] 
-                    and any((sym == "─", 
-                             direction[1] == 1 and sym in "╭╮", 
-                             direction[1] == -1 and sym in "╰╯"))):
-                cur_strand = ''.join(new_strand)
-                raise MotifStructureError(xy_error_msg.format(xy_axis="y", 
-                                                              dir_xy=direction[1], 
-                                                              cur_sym=sym, 
-                                                              cur_strand=cur_strand,
-                                                              full_strand=self.strand
-                                                              )
-                                          )
-            
+            elif direction[0] and any(
+                (
+                    sym == "│",
+                    direction[0] == 1 and sym in "╰╭",
+                    direction[0] == -1 and sym in "╮╯",
+                )
+            ):
+                cur_strand = "".join(new_strand)
+                raise MotifStructureError(
+                    xy_error_msg.format(
+                        xy_axis="x",
+                        dir_xy=direction[0],
+                        cur_sym=sym,
+                        cur_strand=cur_strand,
+                        full_strand=self.strand,
+                    )
+                )
+
+            elif direction[1] and any(
+                (
+                    sym == "─",
+                    direction[1] == 1 and sym in "╭╮",
+                    direction[1] == -1 and sym in "╰╯",
+                )
+            ):
+                cur_strand = "".join(new_strand)
+                raise MotifStructureError(
+                    xy_error_msg.format(
+                        xy_axis="y",
+                        dir_xy=direction[1],
+                        cur_sym=sym,
+                        cur_strand=cur_strand,
+                        full_strand=self.strand,
+                    )
+                )
+
             ### DON'T NAME THE CROSSINGS IF THEY WORKS
             # allowed crossing, signal it
             elif pos in positions and sym not in "┼":
-                warnings.warn(f"The strand is doing a crossing not allowed, "
-                              f"'{sym}' is trying to overwrite the symbol at position"
-                              f"'{pos}'. The symbol will be overwritten "
-                              f"with '┼'.", AmbiguosStructure, stacklevel=3)
-                sym = '┼'
+                warnings.warn(
+                    f"The strand is doing a crossing not allowed, "
+                    f"'{sym}' is trying to overwrite the symbol at position"
+                    f"'{pos}'. The symbol will be overwritten "
+                    f"with '┼'.",
+                    AmbiguosStructure,
+                    stacklevel=3,
+                )
+                sym = "┼"
                 new_strand[-1] = sym
 
             # Add symbol to the 2D map
@@ -894,10 +951,10 @@ class Strand(Callback):
             pos = pos + direction
 
         # Update the strand symbols
-        new_strand = ''.join(new_strand)
+        new_strand = "".join(new_strand)
         if self._strand != new_strand:
             self._strand = new_strand
-        
+
         # Update the 2D properties
         self._positions = tuple(positions)
         self._directions = tuple(directions)
@@ -906,10 +963,9 @@ class Strand(Callback):
         self._max_pos = Position(max_pos)
         self._min_pos = Position(min_pos)
 
-    def _check_addition(self, 
-                        other: Union[str, Sequence, 'Strand'], 
-                        copy: bool = True
-                        ) -> 'Strand':
+    def _check_addition(
+        self, other: Union[str, Sequence, "Strand"], copy: bool = True
+    ) -> "Strand":
         """
         Check a second object for addition to the strand.
         If the object is a string or Sequence, it is converted to a Strand object.
@@ -919,7 +975,7 @@ class Strand(Callback):
         other : Union[str, Sequence, Strand]
             The object to check for addition.
         copy : bool, default True
-            If True, return a copy of the object. 
+            If True, return a copy of the object.
             If False, return the object itself.
 
         Returns
@@ -938,47 +994,56 @@ class Strand(Callback):
         # + str
         if isinstance(other, str):
             return Strand(other, self.sequence.directionality)
-        
+
         # + Sequence error
-        elif (isinstance(other, Sequence) 
-                and self.sequence 
-                and self.sequence.directionality != other.directionality):
-            raise MotifStructureError(f'Cannot add a strand with a Sequence with '
-                                      f'different directionality.\n'
-                                      f'\tStrand: {self._strand}. \n'
-                                      f'\tStrand directionality: '
-                                      f'{self.directionality}\n'
-                                      f'\tSequence: {other}\n'
-                                      f'\tSequence directionality: '
-                                      f'{other.directionality}')
+        elif (
+            isinstance(other, Sequence)
+            and self.sequence
+            and self.sequence.directionality != other.directionality
+        ):
+            raise MotifStructureError(
+                f"Cannot add a strand with a Sequence with "
+                f"different directionality.\n"
+                f"\tStrand: {self._strand}. \n"
+                f"\tStrand directionality: "
+                f"{self.directionality}\n"
+                f"\tSequence: {other}\n"
+                f"\tSequence directionality: "
+                f"{other.directionality}"
+            )
         # + Sequence no error
         elif isinstance(other, Sequence):
             return Strand(Sequence, self.directionality)
-        
+
         # + Not a strand
         elif not isinstance(other, Strand):
-            raise TypeError(f'{other} is not a valid type for addition')
-        
+            raise TypeError(f"{other} is not a valid type for addition")
+
         # + Strand error
-        elif (self.sequence and other.sequence 
-                and self.directionality != other.directionality):
-            raise MotifStructureError(f'Cannot add two strands with different '
-                                      f'directionality. \n'
-                                      f'\tFirst strand: {self._strand} \n'
-                                      f'\tFirst strand directionality: '
-                                      f'{self.directionality}\n'
-                                      f'\tSecond strand {other._strand}\n'
-                                      f'\tSecond strand directionality: '
-                                      f'{other.directionality}')
-        
+        elif (
+            self.sequence
+            and other.sequence
+            and self.directionality != other.directionality
+        ):
+            raise MotifStructureError(
+                f"Cannot add two strands with different "
+                f"directionality. \n"
+                f"\tFirst strand: {self._strand} \n"
+                f"\tFirst strand directionality: "
+                f"{self.directionality}\n"
+                f"\tSecond strand {other._strand}\n"
+                f"\tSecond strand directionality: "
+                f"{other.directionality}"
+            )
+
         if copy:
             return other.copy()
-        
+
         return other
 
-    def _check_line(self, 
-                    line: Union[str, Sequence],
-                    translator: Dict = symb_to_none) -> str:
+    def _check_line(
+        self, line: Union[str, Sequence], translator: Dict = symb_to_none
+    ) -> str:
         """
         Check that the input is a valid strand or sequence.
         The translator is used to check the symbols in the line
@@ -1005,47 +1070,55 @@ class Strand(Callback):
         # all good for Sequences
         if isinstance(line, Sequence):
             return line._sequence
-        
-        line = line.upper() # convert to uppercase
+
+        line = line.upper()  # convert to uppercase
 
         # Not a string
         if not isinstance(line, str):
-            raise TypeError(f"The strand must be a string or a sequence object. "
-                             f"Got {type(line)} instead.")
-        
+            raise TypeError(
+                f"The strand must be a string or a sequence object. "
+                f"Got {type(line)} instead."
+            )
+
         # Check that the terminal symbols are not in the middle of the strand
         for term_sym in ("3", "5"):
             if term_sym not in line:
                 continue
             if line.count(term_sym) > 1:
-                raise MotifStructureError(f"The strand can have only one start and one"
-                                          f"end symbol ('5' and '3'). "
-                                          f"Got {line.count(term_sym)} "
-                                          f"'{term_sym}' symbols.")
-            
+                raise MotifStructureError(
+                    f"The strand can have only one start and one"
+                    f"end symbol ('5' and '3'). "
+                    f"Got {line.count(term_sym)} "
+                    f"'{term_sym}' symbols."
+                )
+
             if term_sym not in (line[0], line[-1]):
-                raise MotifStructureError(f"The '5' and '3' symbols are terminal "
-                                          f"symbols. Got '{term_sym}' end at index "
-                                          f"'{line.index(term_sym)}' instead.\n"
-                                          f"\tFull strand: {line}.")
-            
+                raise MotifStructureError(
+                    f"The '5' and '3' symbols are terminal "
+                    f"symbols. Got '{term_sym}' end at index "
+                    f"'{line.index(term_sym)}' instead.\n"
+                    f"\tFull strand: {line}."
+                )
+
         allowed_symbols = accept_symbol
         if translator == nucl_to_none:
             allowed_symbols = nucleotides
 
         if line.translate(translator):
-            raise ValueError(f"The string '{line}' contains symbols not allowed in "
-                             f"ROAD. The symbols allowed are: {allowed_symbols}.")
-        
+            raise ValueError(
+                f"The string '{line}' contains symbols not allowed in "
+                f"ROAD. The symbols allowed are: {allowed_symbols}."
+            )
+
         return line
 
-    def _combine_pk_info(self, other: 'Strand') -> Optional[Dict]:
+    def _combine_pk_info(self, other: "Strand") -> Optional[Dict]:
         """
         Combine the pseudoknot information of two strands.
         If the strands have no pseudoknot information, return None.
         The pk_info is a dictionary with:
             - id: list of pseudoknot ids (with hyphen for complementarity)
-            - ind_fwd: list of tuples with the first and last index 
+            - ind_fwd: list of tuples with the first and last index
                         of the pseudoknot in the sequence
             - E: list of energies of the pseudoknots
             - dE: list of dE values of the pseudoknots
@@ -1054,7 +1127,7 @@ class Strand(Callback):
         ----------
         other : Strand
             The other strand to combine with.
-        
+
         Returns
         -------
         Optional[Dict]
@@ -1063,21 +1136,22 @@ class Strand(Callback):
         # check if the strands have pseudoknot information
         if not self.pk_info and not other.pk_info:
             return None
-        
-        new_pk_info = {"id": [], 'ind_fwd': [], 'E': [], 'dE': []}
+
+        new_pk_info = {"id": [], "ind_fwd": [], "E": [], "dE": []}
         if self.pk_info:
             new_pk_info = copy.deepcopy(self.pk_info)
         if other.pk_info:
             offset = len(self.sequence)
-            new_pk_info['id'] += other.pk_info['id']
-            new_pk_info['ind_fwd'] += [(x[0] + offset, x[1] + offset) 
-                                            for x in other.pk_info['ind_fwd']]
-            new_pk_info['E'] += other.pk_info['E']
-            new_pk_info['dE'] += other.pk_info['dE']
+            new_pk_info["id"] += other.pk_info["id"]
+            new_pk_info["ind_fwd"] += [
+                (x[0] + offset, x[1] + offset) for x in other.pk_info["ind_fwd"]
+            ]
+            new_pk_info["E"] += other.pk_info["E"]
+            new_pk_info["dE"] += other.pk_info["dE"]
         return new_pk_info
 
     def _reset_positions(self) -> None:
-        """ 
+        """
         Reset the strand 2D properties: positions, directions and base positions.
         """
         # Main positional parameters
@@ -1085,10 +1159,10 @@ class Strand(Callback):
         self._seq_positions = None
         self._directions = None
 
-    def _updated_sequence(self, 
-                          new_sequence: Optional[Union[str, Sequence]] = None, 
-                          **kwargs) -> None:
-        """ 
+    def _updated_sequence(
+        self, new_sequence: Optional[Union[str, Sequence]] = None, **kwargs
+    ) -> None:
+        """
         Callback function to update the sequence of the strand.
         It updates the sequence properties and the strand string.
 
@@ -1101,15 +1175,17 @@ class Strand(Callback):
         """
         # cerate a new sequence object and register the callback
         if isinstance(new_sequence, str):
-            new_sequence = Sequence(new_sequence, 
-                                    self._sequence.directionality, 
-                                    callback=self._updated_sequence)
+            new_sequence = Sequence(
+                new_sequence,
+                self._sequence.directionality,
+                callback=self._updated_sequence,
+            )
 
         new_seq_str = new_sequence._sequence
-        
+
         # reset the coordinates and positions if the sequence changed length
         if len(new_seq_str) != len(self._sequence):
-            self._coords = Coords(()) # reset the oxDNA coordinates
+            self._coords = Coords(())  # reset the oxDNA coordinates
             self._reset_positions()
 
         # assign the new sequence
@@ -1117,14 +1193,15 @@ class Strand(Callback):
         build_strand = self._strand.translate(nucl_to_none)
         seq_ind = 0
         # iterate over the slices of the sequence
-        for sl in self._seq_slice: 
+        for sl in self._seq_slice:
             # the length of the sequence slice
-            subseq_len = sl.stop - sl.start 
+            subseq_len = sl.stop - sl.start
             # replace the sequence slice with the new sequence
-            build_strand = (build_strand[:sl.start] 
-                            + new_seq_str[seq_ind: seq_ind + subseq_len] 
-                            + build_strand[sl.start:]
-                            )
+            build_strand = (
+                build_strand[: sl.start]
+                + new_seq_str[seq_ind : seq_ind + subseq_len]
+                + build_strand[sl.start :]
+            )
             seq_ind += subseq_len
 
         # add the rest of the sequence if any
@@ -1135,9 +1212,9 @@ class Strand(Callback):
         self._strand = build_strand
         self._trigger_callbacks(**kwargs)
 
-    def _update_sequence_insertion(self, 
-                                   strand: str, 
-                                   directionality: str = None) -> None:
+    def _update_sequence_insertion(
+        self, strand: str, directionality: str = None
+    ) -> None:
         """
         This function takes a strands string and updates the properties of the strand,
         sequence and sequence slice.
@@ -1163,35 +1240,35 @@ class Strand(Callback):
                 current_sequence += sym
 
             else:
-                # if the current sequence is not empty 
-                # and the current symbol is not a nucleotide, 
+                # if the current sequence is not empty
+                # and the current symbol is not a nucleotide,
                 # add it to the sequence slice and reset the current sequence
                 if current_sequence:
                     new_sequence += current_sequence
                     seq_slice.append(slice(ind - len(current_sequence), ind))
-                    current_sequence = "" 
+                    current_sequence = ""
 
         # reset the oxDNA coordinates if the sequence is not the same
         if len(new_sequence) != len(self._coords):
-            self._coords = Coords(()) 
+            self._coords = Coords(())
 
         # pick the directionality
         if directionality is None:
             directionality = self._sequence.directionality
 
         # assign the new sequence
-        self._sequence = Sequence(new_sequence, 
-                                  directionality, 
-                                  callback=self._updated_sequence)
-        
+        self._sequence = Sequence(
+            new_sequence, directionality, callback=self._updated_sequence
+        )
+
         self._seq_slice = seq_slice
         self._strand = strand_str
 
-    ### 
+    ###
     ### METHODS
     ###
 
-    def copy(self, callback=None) -> 'Strand':
+    def copy(self, callback=None) -> "Strand":
         """
         Create a copy of the current strand, including coordinates and attributes.
 
@@ -1207,21 +1284,22 @@ class Strand(Callback):
         """
         ### Initialize a new strand object
         new_strand = Strand.__new__(Strand)
-        
+
         # attributes that are calculated fresh or immutable that
         # can be just reassigned
-        attr_to_copy = {'_strand',  # strand properties
-                        '_seq_slice',
-                        '_start', # 2D positions
-                        '_direction', 
-                        '_positions', 
-                        '_directions',
-                        '_seq_positions',
-                        '_prec_pos',
-                        '_next_pos',
-                        '_max_pos',
-                        '_min_pos',
-                        }
+        attr_to_copy = {
+            "_strand",  # strand properties
+            "_seq_slice",
+            "_start",  # 2D positions
+            "_direction",
+            "_positions",
+            "_directions",
+            "_seq_positions",
+            "_prec_pos",
+            "_next_pos",
+            "_max_pos",
+            "_min_pos",
+        }
         for attr in attr_to_copy:
             setattr(new_strand, attr, getattr(self, attr))
 
@@ -1237,13 +1315,12 @@ class Strand(Callback):
 
         ### pk_info
         new_strand.pk_info = copy.deepcopy(self.pk_info)
-        
+
         return new_strand
 
-    def draw(self, 
-             canvas: list = None, 
-             return_string: bool = True, 
-             plane: int = 0) -> Optional[str]:
+    def draw(
+        self, canvas: list = None, return_string: bool = True, plane: int = 0
+    ) -> Optional[str]:
         """
         Draw the strand in 2D space using a canvas.
         The canvas is a list of strings, where each string is a line of the canvas.
@@ -1256,8 +1333,8 @@ class Strand(Callback):
         return_string : bool, default True
             If True, return the drawn canvas as a string (for printing).
         plane : int, default 0
-            The plane to draw the strand on (experimental). If 0, the strand 
-            is drawn in the default plane. 
+            The plane to draw the strand on (experimental). If 0, the strand
+            is drawn in the default plane.
 
         Returns
         -------
@@ -1273,22 +1350,26 @@ class Strand(Callback):
         max_x = max([pos[0] for pos in self.positions], default=-1) + 1
         max_y = max([pos[1] for pos in self.positions], default=-1) + 1
 
-        ### CHECK THE CANVAS OR CREATE IT ACCORDING TO THE MAXIMUM POSITIONS 
+        ### CHECK THE CANVAS OR CREATE IT ACCORDING TO THE MAXIMUM POSITIONS
         if not canvas:
             canvas = [" " * (max_x)] * max_y
         elif len(canvas) < max_y:
-            raise MotifStructureError(f'Error while drawing the strands. The number '
-                                      f'of lines in the canvas ({len(canvas)}) is '
-                                      f'lower than the line required by the strand '
-                                      f'({max_y})')
+            raise MotifStructureError(
+                f"Error while drawing the strands. The number "
+                f"of lines in the canvas ({len(canvas)}) is "
+                f"lower than the line required by the strand "
+                f"({max_y})"
+            )
         elif any([len(line) < max_x for line in canvas]):
-            raise MotifStructureError(f'Error while drawing the strands. The number '
-                                      f'of line characters in the canvas '
-                                      f'({[len(line) for line in canvas]}) '
-                                      f'is lower than characters required by the '
-                                      f'strand ({max_x})')
-        
-        ### ADD A SYMBOL AND CHECK THE CANVAS 
+            raise MotifStructureError(
+                f"Error while drawing the strands. The number "
+                f"of line characters in the canvas "
+                f"({[len(line) for line in canvas]}) "
+                f"is lower than characters required by the "
+                f"strand ({max_x})"
+            )
+
+        ### ADD A SYMBOL AND CHECK THE CANVAS
         for pos, sym in zip(self.positions, self.strand):
 
             # experimental plane
@@ -1302,27 +1383,31 @@ class Strand(Callback):
                 continue
 
             # the strand is crossing a symbol in the canvas
-            if canv_sym != ' ' and canv_sym not in "┼+" and sym not in "┼+":
-                current_canvas = '\n'.join(canvas)
-                raise MotifStructureError(f"Error while drawing the strands. "
-                                          f"'{sym}' at position {pos} is trying"
-                                          f" to overwrite the symbol '{canv_sym}'. "
-                                          f"Current drawing: \n{current_canvas}.\n"
-                                          f"Current strand: {self.strand}")
-            
+            if canv_sym != " " and canv_sym not in "┼+" and sym not in "┼+":
+                current_canvas = "\n".join(canvas)
+                raise MotifStructureError(
+                    f"Error while drawing the strands. "
+                    f"'{sym}' at position {pos} is trying"
+                    f" to overwrite the symbol '{canv_sym}'. "
+                    f"Current drawing: \n{current_canvas}.\n"
+                    f"Current strand: {self.strand}"
+                )
+
             # the symbol replace the space in the canvas
             else:
-                canvas[pos[1]] = (canvas[pos[1]][:pos[0]] 
-                                 + sym 
-                                 + canvas[pos[1]][pos[0] + 1:])
-        
-        if return_string: 
-            return '\n'.join(canvas)
-        
-    def extend(self,
-               direction: Union[Position, Tuple[int, int]],
-               until: Union[Position, Tuple[int, int]] = None,
-               check: bool = True) -> None:
+                canvas[pos[1]] = (
+                    canvas[pos[1]][: pos[0]] + sym + canvas[pos[1]][pos[0] + 1 :]
+                )
+
+        if return_string:
+            return "\n".join(canvas)
+
+    def extend(
+        self,
+        direction: Union[Position, Tuple[int, int]],
+        until: Union[Position, Tuple[int, int]] = None,
+        check: bool = True,
+    ) -> None:
         """
         Extend the strand in the specified direction by a given length.
 
@@ -1333,7 +1418,7 @@ class Strand(Callback):
             a tuple of (x, y) coordinates. It must contain coordinates that are either
             1, -1 or 0, where 0 is the coordinate that does not change.
         until : Union[Position, Tuple[int, int]], default None
-            The position until which to extend the strand. If None, the strand is 
+            The position until which to extend the strand. If None, the strand is
             extended until the origin position (0, 0).
         check : bool, default True
             If True, check the direction and until position for validity.
@@ -1345,29 +1430,31 @@ class Strand(Callback):
         elif check:
             until = self._check_position(until)
 
-        dir_symb = ["─", "│", '•']
+        dir_symb = ["─", "│", "•"]
 
         # don't extend terminal symbols
         if self._strand[0] in "35":
             start_mask = Position.zero()
         else:
-            start_mask = Position(d1 if d1 == d2 else 0 
-                                    for d1, d2 in zip(direction, -self._direction))
+            start_mask = Position(
+                d1 if d1 == d2 else 0 for d1, d2 in zip(direction, -self._direction)
+            )
         if self._strand[-1] in "35":
             end_mask = Position.zero()
         else:
-            end_mask = Position(d1 if d1 == d2 else 0 
-                                for d1, d2 in zip(direction, self.end_direction))
-            
+            end_mask = Position(
+                d1 if d1 == d2 else 0 for d1, d2 in zip(direction, self.end_direction)
+            )
+
         # if 1 not in start_mask and 1 not in end_mask:
         #     return self
 
         # normalize the direction according to until
-        start_until = Position(u if u is not None else s 
-                                    for u, s in zip(until, self._start))
-        end_until = Position(u if u is not None else e 
-                                    for u, e in zip(until, self.end))
-        
+        start_until = Position(
+            u if u is not None else s for u, s in zip(until, self._start)
+        )
+        end_until = Position(u if u is not None else e for u, e in zip(until, self.end))
+
         # calculate the start and end amounts to extend
         start_amount = (start_until - self._start) * start_mask
         end_amount = (end_until - self.end) * end_mask
@@ -1388,12 +1475,14 @@ class Strand(Callback):
         # notify the upper class that the strand has changed
         self._trigger_callbacks()
 
-    def flip(self,
-             horizontally: bool = True,
-             vertically: bool = False,
-             flip_start: bool = True) -> None:
+    def flip(
+        self,
+        horizontally: bool = True,
+        vertically: bool = False,
+        flip_start: bool = True,
+    ) -> None:
         """
-        Flip the 2D structure of the strand. This affects the orientation on the 
+        Flip the 2D structure of the strand. This affects the orientation on the
         canvas but does not revert the sequence.
 
         Parameters
@@ -1421,18 +1510,20 @@ class Strand(Callback):
 
         # CALCULATE NEW DIRECTION and update the strand sybols
         if horizontally:
-            self._direction = self._direction.replace(x=-self._direction[0], 
-                                                      y=self._direction[1])
-            self._strand = self._strand.translate(horiz_flip) 
+            self._direction = self._direction.replace(
+                x=-self._direction[0], y=self._direction[1]
+            )
+            self._strand = self._strand.translate(horiz_flip)
 
         if vertically:
-            self._direction = self._direction.replace(x=self._direction[0], 
-                                                      y=-self._direction[1])
+            self._direction = self._direction.replace(
+                x=self._direction[0], y=-self._direction[1]
+            )
             self._strand = self._strand.translate(verti_flip)
-        
+
         self._reset_positions()
         # trigger the callbacks only once
-        self._trigger_callbacks() 
+        self._trigger_callbacks()
 
     def get_base_at_pos(self, pos: Union[Position, Tuple[int, int]]) -> str:
         """
@@ -1467,7 +1558,7 @@ class Strand(Callback):
         """
         pos = self._check_position(pos)
         return self.strand[self._positions.index(pos)]
-    
+
     def get_position_map(self) -> Dict[Tuple[int, int], str]:
         """
         Get a dictionary of positions as keys and the corresponding
@@ -1495,11 +1586,11 @@ class Strand(Callback):
         strand_line = list(self.strand)
         strand_line.insert(idx, val)
         # this trigger the callbacks
-        self.strand = "".join(strand_line) 
+        self.strand = "".join(strand_line)
 
-    def invert(self) -> 'Strand':
+    def invert(self) -> "Strand":
         """
-        Invert the start and end positions of the strand, 
+        Invert the start and end positions of the strand,
         effectively reversing the sequence directionalty
         and 3D coordinates orientation.
 
@@ -1514,16 +1605,18 @@ class Strand(Callback):
 
         # update the start positions and direction
         end = self.end
-        self._direction = - self.end_direction
+        self._direction = -self.end_direction
         self._start = end
 
         # update the strand and sequence
         self._strand = self._strand[::-1]
         self._sequence._directionality = self._sequence._directionality[::-1]
         self._sequence._sequence = self._sequence._sequence[::-1]
-        self._seq_slice = [slice(strand_len - sl.stop, strand_len - sl.start)
-                                for sl in self._seq_slice[::-1]]
-        
+        self._seq_slice = [
+            slice(strand_len - sl.stop, strand_len - sl.start)
+            for sl in self._seq_slice[::-1]
+        ]
+
         # invert the positions if already built
         if self._positions:
             self._positions = self._positions[::-1]
@@ -1535,21 +1628,22 @@ class Strand(Callback):
         # adjust the pseudoknots information
         if self.pk_info:
             new_ind_fwd = []
-            for start, end in self.pk_info['ind_fwd']:
+            for start, end in self.pk_info["ind_fwd"]:
                 new_ind_fwd.append((seq_len - end, seq_len - start))
-            self.pk_info['ind_fwd'] = new_ind_fwd
+            self.pk_info["ind_fwd"] = new_ind_fwd
 
         # update the 3D coordinates
         self._coords.reverse_in_place()
-                
+
         return self
 
-    def join(self, other: 'Strand', 
-             trigger_callbacks: bool = True) -> Optional['Strand']:
+    def join(
+        self, other: "Strand", trigger_callbacks: bool = True
+    ) -> Optional["Strand"]:
         """
-        Join this strand with another strand, aligning their start and end 
-        positions and direction. This behaves like the @staticmethod join_strands, 
-        but it modifies the current strand instead of creating a new one. 
+        Join this strand with another strand, aligning their start and end
+        positions and direction. This behaves like the @staticmethod join_strands,
+        but it modifies the current strand instead of creating a new one.
         Check the join_strands method for more details.
 
         Parameters
@@ -1565,8 +1659,10 @@ class Strand(Callback):
             The joined strand, or None if the strands cannot be joined.
         """
         if not isinstance(other, Strand):
-            raise ValueError(f'The object to join is not a Strand object,'
-                             f' got {type(other)} instead.')
+            raise ValueError(
+                f"The object to join is not a Strand object,"
+                f" got {type(other)} instead."
+            )
         # load the edges of the strands
         s1_start_prev = self.prec_pos
         s1_end_next = self.next_pos
@@ -1599,7 +1695,7 @@ class Strand(Callback):
             join_order = -1
 
         if join_order is not None:
-            self._check_addition(other, copy=False) 
+            self._check_addition(other, copy=False)
 
             if join_order == 1:
                 first, second = self, other
@@ -1618,27 +1714,34 @@ class Strand(Callback):
             self._update_sequence_insertion(first.strand + second.strand)
 
             if self.sequence:
-                self.strands_block.update(self.strands_block, 
-                                          other.strands_block, 
-                                          avoid_strands={other}
-                                          )
-            
+                self.strands_block.update(
+                    self.strands_block, other.strands_block, avoid_strands={other}
+                )
+
             if first._positions and second._positions:
                 self._positions = first._positions + second._positions
                 self._directions = first._directions + second._directions
                 self._seq_positions = first._seq_positions + second._seq_positions
                 self._prec_pos = first._prec_pos
                 self._next_pos = second._next_pos
-                self._max_pos = Position((max(first._max_pos[0], second._max_pos[0]),
-                                         max(first._max_pos[1], second._max_pos[1])))
-                self._min_pos = Position((min(first._min_pos[0], second._min_pos[0]),
-                                         min(first._min_pos[1], second._min_pos[1])))
+                self._max_pos = Position(
+                    (
+                        max(first._max_pos[0], second._max_pos[0]),
+                        max(first._max_pos[1], second._max_pos[1]),
+                    )
+                )
+                self._min_pos = Position(
+                    (
+                        min(first._min_pos[0], second._min_pos[0]),
+                        min(first._min_pos[1], second._min_pos[1]),
+                    )
+                )
 
             # calculte the new pseudoknots information
             self.pk_info = first._combine_pk_info(second)
-        
+
         # revert the strand to the original position
-        if s2_inverted: 
+        if s2_inverted:
             other.invert()
 
         if join_order is None:
@@ -1665,12 +1768,12 @@ class Strand(Callback):
         """
         strand_line = list(self.strand)
         popped_val = strand_line.pop(idx)
-        self.strand = "".join(strand_line) # this trigger the callbacks
+        self.strand = "".join(strand_line)  # this trigger the callbacks
         return popped_val
- 
-    def reverse(self) -> 'Strand':
+
+    def reverse(self) -> "Strand":
         """
-        Reverse the directionality of the strand sequence 
+        Reverse the directionality of the strand sequence
         (5' to 3' becomes 3' to 5' and vice versa).
 
         Returns
@@ -1682,11 +1785,13 @@ class Strand(Callback):
         self._sequence.reverse(inplace=True)
         return self
 
-    def save_3d_model(self, 
-                      filename: str = 'strand', 
-                      return_text: bool = False, 
-                      pdb: bool = False, **kwargs
-                      ) -> Optional[Tuple[str, str]]:
+    def save_3d_model(
+        self,
+        filename: str = "strand",
+        return_text: bool = False,
+        pdb: bool = False,
+        **kwargs,
+    ) -> Optional[Tuple[str, str]]:
         """
         Save the 3D structure of the strand in oxDNA format (.dat, .top)
         and optionally as PDB.
@@ -1696,10 +1801,10 @@ class Strand(Callback):
         filename : str, default='strand'
             The base name for the output files.
         return_text : bool, default=False
-            If True, returns the configuration and topology text instead 
+            If True, returns the configuration and topology text instead
             of saving to file (used for real-time visualization).
         pdb : bool, default=False
-            If True, exports the structure as a PDB file (requires 
+            If True, exports the structure as a PDB file (requires
             `oxDNA_analysis_tools`).
         **kwargs : dict
             Additional keyword arguments passed to the PDB export.
@@ -1710,7 +1815,7 @@ class Strand(Callback):
             Returns (conf_text, top_text) if `return_text` is True, otherwise None.
         """
         ### check for the sequence and directionality
-        if self.directionality == '53':
+        if self.directionality == "53":
             seq = str(self.sequence)
             coords = self.coords
         else:
@@ -1722,24 +1827,28 @@ class Strand(Callback):
         n_strands = 1
 
         ### initialize the configuration and topology text
-        conf_text = f't = 0\nb = 100 100 100\nE = 0 0 0\n'
-        top_text = seq + ' type=RNA circular=false \n'
+        conf_text = f"t = 0\nb = 100 100 100\nE = 0 0 0\n"
+        top_text = seq + " type=RNA circular=false \n"
 
         ### Buil the configuration text
         for pos, a1, a3 in coords:
-            conf_text += (f'{pos[0]} {pos[1]} {pos[2]} '
-                          f'{a1[0]} {a1[1]} {a1[2]} '
-                          f'{a3[0]} {a3[1]} {a3[2]}\n')
-            
+            conf_text += (
+                f"{pos[0]} {pos[1]} {pos[2]} "
+                f"{a1[0]} {a1[1]} {a1[2]} "
+                f"{a3[0]} {a3[1]} {a3[2]}\n"
+            )
+
         ### ADD THE PROTEINS
         for protein in coords.proteins:
             for pos, a1, a3 in protein.coords:
-                conf_text += (f'{pos[0]} {pos[1]} {pos[2]} '
-                              f'{a1[0]} {a1[1]} {a1[2]} '
-                              f'{a3[0]} {a3[1]} {a3[2]}\n')
-                
+                conf_text += (
+                    f"{pos[0]} {pos[1]} {pos[2]} "
+                    f"{a1[0]} {a1[1]} {a1[2]} "
+                    f"{a3[0]} {a3[1]} {a3[2]}\n"
+                )
+
             ### ADD THE PROTEIN TO THE TOPOLOGY
-            top_text += protein.sequence + ' type=peptide circular=false \n'
+            top_text += protein.sequence + " type=peptide circular=false \n"
             seq_len += len(protein)
             n_strands += 1
 
@@ -1747,24 +1856,25 @@ class Strand(Callback):
             return conf_text, top_text
 
         ### write the oxDNA file
-        filename = filename.split('.')[0] # remove the extension from the filename
-        conf_file = f'{filename}.dat'
-        with open(conf_file, 'w') as f:
+        filename = filename.split(".")[0]  # remove the extension from the filename
+        conf_file = f"{filename}.dat"
+        with open(conf_file, "w") as f:
             f.write(conf_text)
 
         ### write the top file
-        top_file = f'{filename}.top'
-        with open(top_file, 'w') as f:
-            f.write(f'{seq_len} {n_strands} 5->3\n' + top_text)
+        top_file = f"{filename}.top"
+        with open(top_file, "w") as f:
+            f.write(f"{seq_len} {n_strands} 5->3\n" + top_text)
 
         ### write the pdb file
         if pdb:
             if not oat_installed:
-                warnings.warn("oxDNA_analysis_tools is not installed. "
-                              "Skipping PDB export.", 
-                              UserWarning)
+                warnings.warn(
+                    "oxDNA_analysis_tools is not installed. " "Skipping PDB export.",
+                    UserWarning,
+                )
                 return
-            
+
             # Read oxDNA configuration
             system, _ = strand_describe(top_file)
             ti, di = describe(top_file, conf_file)
@@ -1773,10 +1883,11 @@ class Strand(Callback):
 
             oxDNA_PDB(conf, system, filename, **kwargs)
 
-    def shift(self, 
-              shift_position: Union['Position', 'Direction', Tuple[int, int]],
-              check: bool = True,
-              ) -> 'Strand':
+    def shift(
+        self,
+        shift_position: Union["Position", "Direction", Tuple[int, int]],
+        check: bool = True,
+    ) -> "Strand":
         """
         Shift the strand position in the 2D layout.
 
@@ -1802,13 +1913,14 @@ class Strand(Callback):
 
         # apply the shift to all the positions
         positions = tuple(pos + shift for pos in self._positions)
-        
+
         # check if the shift is valid
         if check and any(coor < 0 for pos in positions for coor in pos):
-            raise ValueError(f'The strand reaches negative coordinates: '
-                             f'The positions would be: {positions}.'
-                             )
-        
+            raise ValueError(
+                f"The strand reaches negative coordinates: "
+                f"The positions would be: {positions}."
+            )
+
         # directly update the positional attributes
         self._positions = positions
         self._seq_positions = tuple(pos + shift for pos in self._seq_positions)
@@ -1837,8 +1949,8 @@ class StrandsBlock(set):
     """
     A container class that holds a collection of Strand instances.
 
-    This class inherits from Python's built-in list and is designed to manage 
-    a group of Strand objects. It provides methods for adding, removing, 
+    This class inherits from Python's built-in list and is designed to manage
+    a group of Strand objects. It provides methods for adding, removing,
     joining, and transforming strands in the block.
     All the strands in the block have locked 3D coordinates respect to
     each other. This means that when a strand in the block is transformed,
@@ -1859,7 +1971,7 @@ class StrandsBlock(set):
         The list of Strand instances stored in the block.
     """
 
-    def __init__(self, *args: 'Strand') -> None:
+    def __init__(self, *args: "Strand") -> None:
         """
         Initialize a new StrandsBlock with Strand instances.
 
@@ -1867,7 +1979,7 @@ class StrandsBlock(set):
         ----------
         *args : Strand
             Strand instances to be added to the block.
-        
+
         Raises
         ------
         ValueError
@@ -1875,11 +1987,11 @@ class StrandsBlock(set):
         """
         for s in args:
             if not isinstance(s, Strand):
-                raise ValueError("The input arguments must be Strand instance")   
+                raise ValueError("The input arguments must be Strand instance")
             else:
                 self.add(s)
 
-    def __add__(self, other: 'StrandsBlock') -> 'StrandsBlock':
+    def __add__(self, other: "StrandsBlock") -> "StrandsBlock":
         """
         Concatenate two StrandsBlock instances.
 
@@ -1895,7 +2007,7 @@ class StrandsBlock(set):
         """
         return StrandsBlock(*(array for array in super().__add__(other)))
 
-    def add(self, item: 'Strand') -> None:
+    def add(self, item: "Strand") -> None:
         """
         Append a Strand instance to the StrandsBlock.
 
@@ -1911,13 +2023,13 @@ class StrandsBlock(set):
         """
         if not isinstance(item, Strand):
             raise ValueError(f"The item must be a Strand instance, got {type(item)}")
-        
+
         # append the strand to the block if it has coordinates
         if not item.coords.is_empty():
             super().add(item)
             item._strands_block = self
 
-    def remove(self, item: 'Strand') -> None:
+    def remove(self, item: "Strand") -> None:
         """
         Remove a Strand instance from the StrandsBlock.
 
@@ -1933,7 +2045,7 @@ class StrandsBlock(set):
         """
         if not isinstance(item, Strand):
             raise ValueError(f"The item must be a Strand instance, got {type(item)}")
-        
+
         super().remove(item)
         item.strands_block = None
 
@@ -1950,39 +2062,42 @@ class StrandsBlock(set):
 
         Notes
         -----
-        This method assumes that the transformation matrix is compatible 
+        This method assumes that the transformation matrix is compatible
         with the strand's coordinate system.
         """
         for strand in self:
             strand.transform(T)
 
-    def update(self, 
-               *others: List['StrandsBlock'],
-               avoid_strands: Optional[Set['Strand']] = None) -> None:
+    def update(
+        self,
+        *others: List["StrandsBlock"],
+        avoid_strands: Optional[Set["Strand"]] = None,
+    ) -> None:
         """
         Update the strands block with the strands in the input iterable.
         This method is similar to the add method, but it allows for
         adding multiple strands at once. It also allows for avoiding
         specific strands in the update process.
-        
+
         Parameters
         ----------
         *other : StrandsBlock
             The StrandsBlock instances to update with.
         avoid_strands : set of Strand, default None
             A set of strands to avoid in the update process.
-        
+
         Raises
         ValueError
-            If any of the input arguments is not a StrandsBlock, or 
+            If any of the input arguments is not a StrandsBlock, or
             if avoid_strand is not a Strand.
         """
         if not all(isinstance(s, StrandsBlock) for s in others):
             raise ValueError("The input arguments must be StrandsBlock instances")
-            
+
         # check if the avoid_strand is a Strand instance
-        if (avoid_strands is not None 
-                and any (not isinstance(s, Strand) for s in avoid_strands)):
+        if avoid_strands is not None and any(
+            not isinstance(s, Strand) for s in avoid_strands
+        ):
             raise ValueError("The avoid_strands must be a set of Strand instances")
 
         if avoid_strands is None:

@@ -1,13 +1,80 @@
 import streamlit as st
+from streamlit import session_state as st_state
 from streamlit_option_menu import option_menu
 import re
 from Bio.Seq import Seq
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio.SeqUtils import gc_fraction, molecular_weight
 import warnings
+import pyfurnace as pf
 from utils import load_logo, main_menu_style, copy_to_clipboard, write_format_text
-
 from utils.template_functions import symbols, check_dimer, sanitize_input, reference
+
+
+def initialize_session_state():
+    params_value = {"rna_origami_seq": "", "promoter": pf.T7_PROMOTER}
+    for key, value in params_value.items():
+        if key not in st_state:
+            st_state[key] = value
+
+
+def check_seq():
+    # take the input sequence and sanitize it
+    seq = sanitize_input(
+        st.text_input("Input sequence (DNA or RNA):", value=st_state["rna_origami_seq"])
+    )
+    # check the symbols in the sequence
+    if set(seq) - symbols:
+        st.warning(
+            "The sequence contains symbols not included in the "
+            "[IUPAC alphabet](https://www.bioinformatics.org/sms/iupac.html).",
+            icon="⚠️",
+        )
+
+    if seq != st_state["rna_origami_seq"]:
+        st_state["rna_origami_seq"] = seq
+        st.rerun()
+
+    seq = Seq(seq)
+    return seq
+
+
+def rna_to_template():
+    col1, col2 = st.columns([1, 5])
+    # st.write("#### DNA template:")
+    promoter = st.text_input(
+        "**Add a promoter** (default: T7 promoter)", value=st_state.promoter
+    )
+
+    # take a specific promoter sequence for the DNA template
+    # and check that the RNA sequence starts with G
+    if promoter == pf.T7_PROMOTER and seq[0] != "G":
+        st.warning("The RNA sequence doesn't start with G", icon="⚠️")
+    elif promoter != st_state.promoter:
+        st_state.promoter = promoter
+        st.rerun()
+
+    dna_template = Seq(promoter) + seq.back_transcribe()
+    non_coding = dna_template.reverse_complement()
+    col1, col2 = st.columns([1, 5])
+
+    # coding strand
+    col1, col2 = st.columns([1, 8], vertical_alignment="center")
+    with col1:
+        copy_to_clipboard(dna_template, "Coding strand:")
+        copy_to_clipboard(non_coding, "Non-coding strand:")
+    with col2:
+        write_format_text(dna_template)
+        write_format_text(non_coding)
+
+    # Save the DNA template in the session state and add a link to the primer page
+    st_state["dna_template"] = str(dna_template)
+    st_state.prepare_ind = 0
+    st.page_link(
+        "pages/4_Prepare.py",
+        label=":orange[Prepare the PCR primers]",
+        icon=":material/sync_alt:",
+    )
 
 
 def convert_tab(seq):
@@ -64,37 +131,12 @@ def convert_tab(seq):
         write_format_text(rev_complement)
 
     if seq_type == "DNA":
-        st.write("RNA transcribed:")
+        st.write("RNA:")
         write_format_text(seq.transcribe())
 
     # if the sequence is RNA, create a DNA template
     else:
-        col1, col2 = st.columns([1, 5])
-        # st.write("#### DNA template:")
-        promoter = st.text_input(
-            "**Select a promoter** (default: T7 promoter)", value="TAATACGACTCACTATA"
-        )
-        # take a specific promoter sequence for the DNA template and check that the RNA sequence starts with G
-        if promoter == "TAATACGACTCACTATA" and seq[0] != "G":
-            st.warning("The RNA sequence doesn't start with G", icon="⚠️")
-        dna_template = Seq(promoter) + seq.back_transcribe()
-        col1, col2 = st.columns([1, 5])
-
-        # coding strand
-        col1, col2 = st.columns([1, 9], vertical_alignment="center")
-        with col1:
-            copy_to_clipboard(dna_template, "Coding strand:")
-        with col2:
-            write_format_text(dna_template)
-
-        ### Save the DNA template in the session state and add a link to the primer page
-        st.session_state["dna_template"] = str(dna_template)
-        st.session_state.prepare_ind = 0
-        st.page_link(
-            "pages/4_Prepare.py",
-            label=":orange[Prepare the PCR primers]",
-            icon=":material/sync_alt:",
-        )
+        rna_to_template()
 
 
 def search_tab(seq):
@@ -128,7 +170,8 @@ def search_tab(seq):
 
 
 def dimer_tab(seq):
-    """Check the dimer between the main sequence and a list of subsequences and highlight the aligned bases"""
+    """Check the dimer between the main sequence and a list of subsequences
+    and highlight the aligned bases"""
     subseq_list = []
     i = 0
     # take a subsequence
@@ -176,41 +219,24 @@ if __name__ == "__main__":
     load_logo()
     warnings.filterwarnings("ignore")  # ignore warnings
 
-    if "rna_origami_seq" not in st.session_state:
-        st.session_state["rna_origami_seq"] = ""
+    initialize_session_state()
+
     st.header(
         "Convert",
-        help="Prepare the DNA template for you RNA Origami, align structures and search for dimers.",
+        help="Prepare the DNA template for you RNA Origami, "
+        "align structures and search for dimers.",
     )
-    # take the input sequence and sanitize it
-    seq = sanitize_input(
-        st.text_input(
-            "Input sequence (DNA or RNA):", value=st.session_state["rna_origami_seq"]
-        )
-    )
-    # check the symbols in the sequence
-    if set(seq) - symbols:
-        st.warning(
-            "The sequence contains symbols not included in the [IUPAC alphabet](https://www.bioinformatics.org/sms/iupac.html).",
-            icon="⚠️",
-        )
 
-    if seq != st.session_state["rna_origami_seq"]:
-        st.session_state["rna_origami_seq"] = seq
-        st.rerun()
+    seq = check_seq()
 
-    seq = Seq(seq)
-    seq_type = "DNA"
+    seq_type = "RNA"
     if "T" in seq and "U" in seq:
         st.error(
             "Both T and U found in the sequence", icon=":material/personal_injury:"
         )
-        # create a porper biopython symbol
     elif "T" in seq:
         seq_type = "DNA"
-    elif "U" in seq:
-        seq_type = "RNA"
-    elif seq:
+    elif "T" not in seq and "U" not in seq:
         seq_type = st.radio(
             "Choose the sequence type: (usually auto-detected)",
             ["DNA", "RNA"],
@@ -218,10 +244,9 @@ if __name__ == "__main__":
         )
 
     # according to the sequence type, create the basepair dictionary
+    basepair = str.maketrans("UACG", "AUGC")  # RNA basepair
     if seq_type == "DNA":
         basepair = str.maketrans("TACG", "ATGC")
-    elif seq_type == "RNA":
-        basepair = str.maketrans("UACG", "AUGC")
 
     # create the tabs with the functions
     st.write("\n")  # add space between initial menu and motif menu

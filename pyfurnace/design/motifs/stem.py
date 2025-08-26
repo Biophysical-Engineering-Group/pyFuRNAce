@@ -1,11 +1,10 @@
 from typing import Optional, List, Union, Literal
 import random
-from ..core.symbols import *
+from ..core.symbols import nucl_to_pair
 from ..core.sequence import Sequence
 from ..core.coordinates_3d import Coords
 from ..core.strand import Strand
 from ..core.motif import Motif
-from typing import Optional, List, Union
 
 
 class Stem(Motif):

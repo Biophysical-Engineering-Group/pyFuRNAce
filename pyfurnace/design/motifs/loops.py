@@ -1,5 +1,4 @@
 from . import CONFS_PATH
-from ..core.symbols import *
 from ..core.coordinates_3d import Coords
 from ..core.strand import Strand
 from ..core.motif import Motif
@@ -27,7 +26,8 @@ class Loop(Motif):
     strands : list of Strand
         The list of strands that make up the loop motif.
     flipped : bool
-        Whether the motif has been flipped horizontally/vertically (if `open_left=True`).
+        Whether the motif has been flipped horizontally/vertically
+        (if `open_left=True`).
     """
 
     def __init__(self, open_left: bool = False, sequence: str = "", **kwargs) -> None:

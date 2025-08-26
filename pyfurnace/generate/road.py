@@ -10,7 +10,7 @@ from typing import Callable, Optional, Tuple, Union
 import multiprocessing
 
 ### Local imports
-from ..design.core.symbols import *
+from ..design.core.symbols import dot_bracket_to_pair_map, nucl_to_none
 from .utils import find_stems_in_multiloop
 from .pk_utils import parse_pseudoknots
 from .viennarna import fold_p
@@ -104,7 +104,7 @@ def generate_road(
     # Sanity check
     if "&" in sequence or "&" in structure:
         raise ValueError(
-            "The ROAD Revolvr algorithm does not support " f"multistranded structures."
+            "The ROAD Revolvr algorithm does not support multistranded structures."
         )
 
     if len(sequence) != len(structure):
@@ -129,7 +129,7 @@ def generate_road(
                 struct_list[pair_map[i]] = "}"
 
     ### ADD THE PSEUDOKNOTS ROAD NOTATION
-    if type(pseudoknots) == dict:
+    if isinstance(pseudoknots, dict):
         pk_dict = pseudoknots
     else:
         pk_dict = parse_pseudoknots(pseudoknots)

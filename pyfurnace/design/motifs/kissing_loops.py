@@ -1,10 +1,10 @@
 import os
+from typing import Optional, Union, List
 
 # RNA used if a specific sequence is provided to calculate the energy
 
 # pyfurnace imports
 from . import CONFS_PATH
-from ..core.symbols import *
 from ..core.coordinates_3d import Coords
 from ..core.sequence import Sequence
 from ..core.strand import Strand
@@ -126,7 +126,7 @@ class KissingLoop(Loop):
             not isinstance(new_energy_tolerance, (float, int))
             or new_energy_tolerance < 0
         ):
-            raise ValueError(f"The energy tolerance should be a positive number.")
+            raise ValueError("The energy tolerance should be a positive number.")
         self._energy_tolerance = new_energy_tolerance
         for strand in self:
             if hasattr(strand, "pk_info"):
@@ -188,7 +188,7 @@ class KissingLoop(Loop):
         if pk_index is None:
             pk_index = "0"
         elif not isinstance(pk_index, (int, str)):
-            raise ValueError(f"The pk_index should be an integer or a string.")
+            raise ValueError("The pk_index should be an integer or a string.")
         elif isinstance(pk_index, int):
             pk_index = str(abs(pk_index)) + "'" * (pk_index < 0)
         return pk_index

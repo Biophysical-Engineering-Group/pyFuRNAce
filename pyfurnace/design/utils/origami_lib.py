@@ -10,7 +10,7 @@ try:
     from oxDNA_analysis_tools.UTILS.RyeReader import describe, get_confs
 
     oat_installed = True
-except:
+except ModuleNotFoundError:
     oat_installed = False
 
 # own imports
@@ -23,7 +23,6 @@ ANGLES_DT_DICT = {
     26: -6,
     58: -5,
     90: -4,
-    122: -3,
     122: -3,
     154: -2,
     186: -1,
@@ -130,15 +129,15 @@ def simple_origami(
         max_dt = max([abs(dt) for dt in dt_list], default=0)
         main_stem = [[11 * ((max_dt + 17) // 11 + 1)] * kl_columns] * len(dt_list)
 
-    elif type(main_stem) == int:
+    elif isinstance(main_stem, int):
         main_stem = [
             [main_stem for _ in range(kl_columns)] for _ in range(len(dt_list))
         ]
 
-    elif type(main_stem) == list and all(isinstance(x, int) for x in main_stem):
+    elif isinstance(main_stem, list) and all(isinstance(x, int) for x in main_stem):
         main_stem = [main_stem for _ in range(len(dt_list))]
 
-    elif type(main_stem) == list and all(
+    elif isinstance(main_stem, list) and all(
         isinstance(x, (tuple, list)) for x in main_stem
     ):
 
@@ -157,15 +156,17 @@ def simple_origami(
     if left_stem_kl is None:
         left_stem_kl = [[None] * kl_columns for _ in range(len(dt_list))]
 
-    elif type(left_stem_kl) == int:
+    elif isinstance(left_stem_kl, int):
         left_stem_kl = [
             [left_stem_kl for _ in range(kl_columns)] for _ in range(len(dt_list))
         ]
 
-    elif type(left_stem_kl) == list and all(isinstance(x, int) for x in left_stem_kl):
+    elif isinstance(left_stem_kl, list) and all(
+        isinstance(x, int) for x in left_stem_kl
+    ):
         left_stem_kl = [[left_stem_kl[i]] * kl_columns for i in range(len(dt_list))]
 
-    elif type(left_stem_kl) == list and all(
+    elif isinstance(left_stem_kl, list) and all(
         isinstance(x, (tuple, list)) for x in left_stem_kl
     ):
 
@@ -181,7 +182,7 @@ def simple_origami(
 
     if stem_pos is None:
         stem_pos = [0 for _ in range(kl_columns)]
-    elif type(stem_pos) == int:
+    elif isinstance(stem_pos, int):
         stem_pos = [stem_pos for _ in range(kl_columns)]
 
     ### BUILD THE ORIGAMI STRUCTURE, helix by helix
@@ -234,12 +235,12 @@ def simple_origami(
 
     # remove the top cross from the dovetails of the first helix
     for motif in origami[0]:
-        if type(motif) == Dovetail:
+        if isinstance(motif, Dovetail):
             motif.up_cross = False
 
     # remove the bottom cross from the dovetails of the last helix
     for motif in origami[-1]:
-        if type(motif) == Dovetail:
+        if isinstance(motif, Dovetail):
             motif.down_cross = False
 
     # return the origami structure

@@ -2,9 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 ### pyFuRNAce modules
-from utils import check_import_pyfurnace, load_logo, save_origami
-
-check_import_pyfurnace()
+from utils import load_logo, save_origami
 import utils.design_functions as des_func
 from utils.st_fixed_container import sticky_container
 

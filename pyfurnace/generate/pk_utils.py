@@ -134,9 +134,6 @@ def parse_pseudoknots(
     return final_pk_dicts
 
 
-from typing import Optional
-
-
 def add_untracked_pseudoknots(
     pk_dict: Dict[str, Dict[str, object]],
     structure: str,

@@ -2,9 +2,18 @@ import warnings
 import copy
 from functools import wraps
 from inspect import signature
-from math import copysign
 from collections.abc import Iterable
-from typing import Any, List, Dict, Tuple, Union, Optional, Literal, Callable
+from typing import (
+    Any,
+    List,
+    Dict,
+    Tuple,
+    Union,
+    Optional,
+    Literal,
+    Callable,
+    TYPE_CHECKING,
+)
 
 # OAT IMPORTS
 try:
@@ -23,13 +32,27 @@ except ImportError:
     oat_installed = False
 
 # pyFuRNAce IMPORTS
-from .symbols import folding_barriers as fold_bar
-from .symbols import *
+from .symbols import (
+    pair_map_to_dot_bracket,
+    dot_bracket_to_pair_map,
+    Node,
+    tree_to_dot_bracket,
+    dot_bracket_to_tree,
+    accept_symbol,
+    base_pairing,
+    bp_symbols,
+    rotate_90,
+    MotifStructureError,
+    folding_barriers as fold_bar,
+)
 from .callback import Callback
 from .sequence import Sequence
 from .strand import Strand, StrandsBlock
 from .basepair import BasePair
 from .position import Position, Direction
+
+if TYPE_CHECKING:  # only for type checkers / linters, not at runtime
+    from .origami import Origami
 
 
 class Motif(Callback):
@@ -421,13 +444,13 @@ class Motif(Callback):
 
     def __contains__(self, other: Union["Strand", "Sequence", str, "BasePair"]) -> bool:
         """Check if the motif contains a strand, sequence, or base pair."""
-        if type(other) == Strand:
+        if isinstance(other, Strand):
             return other in self._strands
-        elif type(other) == Sequence:
+        elif isinstance(other, Sequence):
             return other in self.sequence
-        elif type(other) == str:
+        elif isinstance(other, str):
             return any(other in s for s in self._strands)
-        elif type(other) == BasePair:
+        elif isinstance(other, BasePair):
             return other in self.basepair
         return False
 
@@ -1143,7 +1166,7 @@ class Motif(Callback):
             )
 
         # input dot-bracket notation
-        if type(structure) == str:
+        if isinstance(structure, str):
             node = dot_bracket_to_tree(structure, sequence=sequence)
             pair_map = dot_bracket_to_pair_map(structure)
         # input pair map
@@ -2185,7 +2208,6 @@ class Motif(Callback):
         MotifStructureError
             If there is an error in extending the junction
         """
-        axis = [d for d in Direction]
         if skip_directions is None:
             skip_directions = []
 
@@ -2226,6 +2248,7 @@ class Motif(Callback):
         # but it's hard to maintain, doesn't keep directionality check and understand.
         # So better using the simpler version above.
         # Here the previous code:
+        # axis = [d for d in Direction]
         # for axis, sym in ((1, '─'), (0, '│')): # consider the two axis
         #     naxis = int(not axis)
         #     neg_direction = Position((- axis, - naxis))
@@ -2631,12 +2654,10 @@ class Motif(Callback):
         ### ADD THE STRANDS TO THE CONFORMATION AND TOPOLOGY TEXTS ###
         for s in strands:
             # check for the sequence direction
-            if s.directionality == "53":
-                seq = str(s.sequence)
-                coord_array = s.coords.array
-            else:
-                seq = str(s.sequence[::-1])
-                coord_array = s.coords[::-1]
+            dir = 1 - 2 * (s.directionality == "35")
+            seq = str(s.sequence[::dir])
+            coord_array = s.coords[::dir]
+
             # add the coordinates to the conformations text
             if config:
                 for pos, a1, a3 in coord_array:
@@ -2879,7 +2900,8 @@ class Motif(Callback):
         """
         if not key:
             # sort the strand according to the lowest start position
-            key = lambda s: (-int("5" in s.strand), *s.start[::-1])
+            def key(s):
+                return (-int("5" in s.strand), *s.start[::-1])
 
         self._strands.sort(key=key, reverse=reverse)
         return self

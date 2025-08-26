@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
 
@@ -8,8 +8,26 @@ repos:
     rev: 7.1.1
     hooks:
       - id: flake8
+        additional_dependencies: [flake8-pyproject]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
     hooks:
-      - id: mypy
+    - id: end-of-file-fixer      # Ensure existence of newline characters at file ends
+    - id: check-yaml      # Make sure that contained YAML files are well-formed
+    - id: trailing-whitespace      # Trim trailing whitespace of all sorts
+    - id: check-added-large-files      # Apply a file size limit of 500kB
+    - id: check-toml      # Simple parser validation of e.g. pyproject.toml
+    - id: requirements-txt-fixer      # Sort lines in requirements files
+    - id: check-json      # Check validity of JSON files
+    - id: pretty-format-json      # Format JSON files consistently
+      exclude_types:
+      - jupyter
+      args:
+      - --autofix
+    - id: mixed-line-ending      # Ensure consistent line endings
+
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+    - id: validate-pyproject      # Validate the contents of pyproject.toml

@@ -2,7 +2,6 @@ from collections.abc import MutableMapping
 from typing import Any, Dict, Iterator
 
 # pyFuRNAce IMPORTS
-from .symbols import *
 from .callback import Callback
 
 

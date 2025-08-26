@@ -1,6 +1,6 @@
 import warnings
 import copy
-from typing import Optional, Union, Literal, List, Dict, Any, Set
+from typing import Optional, Union, Literal, List, Dict, Tuple, Any, Set
 import numpy as np
 
 try:
@@ -16,7 +16,17 @@ try:
 except ImportError:
     oat_installed = False
 
-from .symbols import *
+from .symbols import (
+    nucleotides,
+    symb_to_road,
+    nucl_to_none,
+    symb_to_none,
+    accept_symbol,
+    horiz_flip,
+    verti_flip,
+    MotifStructureError,
+    AmbiguosStructure,
+)
 from .callback import Callback
 from .position import Position, Direction
 from .sequence import Sequence
@@ -1827,7 +1837,7 @@ class Strand(Callback):
         n_strands = 1
 
         ### initialize the configuration and topology text
-        conf_text = f"t = 0\nb = 100 100 100\nE = 0 0 0\n"
+        conf_text = "t = 0\nb = 100 100 100\nE = 0 0 0\n"
         top_text = seq + " type=RNA circular=false \n"
 
         ### Buil the configuration text

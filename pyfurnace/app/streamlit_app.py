@@ -1,5 +1,11 @@
 import streamlit as st
 
+### pyFuRNAce modules
+from utils import check_import_pyfurnace
+
+# IMPORTANT: to import pyfurnace before anything else
+check_import_pyfurnace()  # since streamlit doesn't run in the package
+
 if __name__ == "__main__":
 
     pg = st.navigation(

@@ -1,8 +1,8 @@
 """
 This module contains general utility functions and constants for the pyfurnace package.
 
-It includes: 
-functions for manipulating RNA strands and sequences, 
+It includes:
+functions for manipulating RNA strands and sequences,
 utilities for RNA structures (dot-bracket notation, pair maps, trees)
 folding barriers calculation for canonical co-transcriptional RNA Origami
 """
@@ -238,6 +238,9 @@ accept_symbol = (
 
 #: Set of symbols representing base pairs.
 bp_symbols = {"┊", "=", ":", "!", "*"}
+
+#: Sequence representing the T7 promoter.
+T7_PROMOTER = "TAATACGACTCACTATA"
 
 ###
 ### STRING TRANSLATORS
@@ -553,8 +556,8 @@ def pair_map_to_dot_bracket(
 
         if bracket_count >= 30:
             warnings.warn(
-                f"Warning: Too many bracket types needed in to write the "
-                f"structure. Stopping at 30, 'Z' to 'z'.",
+                "Warning: Too many bracket types needed in to write the "
+                "structure. Stopping at 30, 'Z' to 'z'.",
                 stacklevel=3,
             )
             break

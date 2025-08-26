@@ -34,7 +34,7 @@ class KissingLoopsCommand(MotifCommand):
             )
             flip, seq, energy, tolerance, pk_index = data
             if flip:
-                st_state.modified_motif_text += f"\nmotif.flip()"
+                st_state.modified_motif_text += "\nmotif.flip()"
                 motif.flip()
 
             if seq and motif.get_kissing_sequence() != seq:

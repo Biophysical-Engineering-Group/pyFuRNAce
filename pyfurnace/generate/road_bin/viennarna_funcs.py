@@ -18,7 +18,8 @@ def ensemble_diversity(seq):
     # adjust the scaling factor for long sequences
     if len(seq) > 1000:
         md.sfact = 1.01
-    # create fold_compound data structure (required for all subsequently applied  algorithms)
+    # create fold_compound data structure
+    # (required for all subsequently applied  algorithms)
     fc = RNA.fold_compound(seq, md)
     # compute MFE and MFE structure
     (mfe_struct, mfe) = fc.mfe()

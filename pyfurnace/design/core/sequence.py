@@ -1,7 +1,15 @@
 import warnings
 import random
 from typing import Literal, Union, List, Optional, Set
-from .symbols import *
+from .symbols import (
+    iupac_code,
+    only_nucl,
+    nucl_to_none,
+    nucleotides,
+    nucl_to_pair,
+    dot_bracket_to_pair_map,
+    AmbiguosStructure,
+)
 from .callback import Callback
 
 
@@ -198,7 +206,7 @@ class Sequence(Callback):
             raise ValueError(f"{other} is not a valid type for addition")
 
         elif self.directionality != other.directionality:
-            raise ValueError(f"Cannot add two sequences with different directionality")
+            raise ValueError("Cannot add two sequences with different directionality")
         return True
 
     def _check_line(self, line: Union[str, "Sequence"]) -> bool:

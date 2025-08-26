@@ -2,11 +2,22 @@ import copy
 from pathlib import Path
 from functools import wraps
 from typing import List, Tuple, Union, Literal, Callable, Optional
-from .symbols import *
+from .symbols import (
+    iupac_code,
+    rotate_dot_bracket,
+    pair_map_to_dot_bracket,
+    dot_bracket_to_pair_map,
+    Node,
+    tree_to_dot_bracket,
+    dot_bracket_to_tree,
+    dot_bracket_to_stacks,
+    folding_barriers,
+)
 from .position import Position, Direction
 from .callback import Callback
 from .sequence import Sequence
 from .strand import Strand
+from .basepair import BasePair
 from .motif import Motif
 
 
@@ -156,7 +167,7 @@ class Origami(Callback):
         ]
 
         # input dot-bracket notation
-        if type(structure) == str:
+        if isinstance(structure, str):
             node = dot_bracket_to_tree(structure, sequence=sequence)
             pair_map = dot_bracket_to_pair_map(structure)
 
@@ -561,7 +572,7 @@ class Origami(Callback):
                 matrix.extend(args)
                 # the args contains only motifs, so it's a line
             elif all(isinstance(item, Motif) for item in args):
-                matrix[-1].extend(args)  ### add the motifs to the last line
+                matrix[-1].extend(args)  # add the motifs to the last line
             else:
                 raise ValueError(
                     f"The args variable may only contain lists of"
@@ -872,7 +883,7 @@ class Origami(Callback):
 
         if not isinstance(other, Origami):
             raise TypeError(
-                f"Unsupported operand type(s) for +: "
+                "Unsupported operand type(s) for +: "
                 "'Origami' and '{type(other).__name__}'"
             )
 
@@ -1014,7 +1025,8 @@ class Origami(Callback):
     def pseudoknots(self) -> dict:
         """
         A dictionary with the pseudoknot information.
-        The dictionary has pseudoknot IDs as keys and the pseudoknot information as values.
+        The dictionary has pseudoknot IDs as keys and the pseudoknot information as
+        values.
         The pseudoknot information is a dictionary with the following keys:
             - ind_fwd: a list of tuples (start, end) with the indices of the forward
                        sequences of the pseudoknot
@@ -1706,7 +1718,7 @@ class Origami(Callback):
         List[Motif]
             All motifs of the specified type.
         """
-        return [m for line in self._matrix for m in line if type(m) == motif_type]
+        return [m for line in self._matrix for m in line if isinstance(m, motif_type)]
 
     def get_slice_at_seq_index(self, index: int) -> Tuple[int, int]:
         """
@@ -1848,7 +1860,9 @@ class Origami(Callback):
         """
         if isinstance(condition, Motif):
             motif = condition
-            condition = lambda x: x == motif
+
+            def condition(m: Motif) -> bool:
+                return m == motif
 
         # if we submit a function, return the matrix filtered by the function
         elif not hasattr(condition, "__call__"):

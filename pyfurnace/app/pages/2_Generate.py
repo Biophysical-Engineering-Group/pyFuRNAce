@@ -7,15 +7,37 @@ import warnings
 
 ### My modules
 from utils import (
-    check_import_pyfurnace,
     load_logo,
     save_origami,
     copy_to_clipboard,
     write_format_text,
 )
 
-check_import_pyfurnace()
 from pyfurnace.generate import generate_road, fold_p
+
+
+def initiate_session_state():
+    labels_value = {
+        ### Forna options
+        "zoomable": True,
+        "animation": False,
+        "editable": False,
+        "labels": True,
+        "height": 300,
+        "label_interval": 10,
+        "color_scheme": "structure",
+        "color_text": "",
+        ### RNA origami options
+        "generate_structure": "",
+        "generate_sequence": "",
+        "generate_pseudoknots": "",
+        "rna_origami_seq": "",
+        "rna_origami_folds": (),
+    }
+    for key, value in labels_value.items():
+        if key not in st_state:
+            st_state[key] = value
+        st_state.editable = False
 
 
 def forna_options(lenght):
@@ -104,6 +126,80 @@ def forna_options(lenght):
         st_state.color_text = None
 
 
+def initialize_forna():
+    col1, col2, _ = st.columns([1, 1.3, 2])
+    partial_forna = None
+    with col1:
+        use_forna = st.toggle(
+            "Forna display",
+            key="forna_display",
+            value=len(structure) < 2000,
+        )
+        try:
+            from st_forna_component import forna_component
+        except ImportError:
+            use_forna = False
+            st.error(
+                "st-forna-component is not installed. "
+                "Please install it with `pip install st-forna-component` "
+                "to use the Forna display."
+            )
+    if use_forna:
+        with col2:
+            with st.popover("Forna options", use_container_width=True):
+                forna_options(len(structure))
+
+        partial_forna = partial(
+            forna_component,
+            height=st_state.height,
+            animation=st_state.animation,
+            zoomable=st_state.zoomable,
+            label_interval=st_state.label_interval,
+            node_label=st_state.node_label,
+            editable=st_state.editable,
+            color_scheme=st_state.color_scheme,
+            colors=st_state.color_text,
+        )
+    return use_forna, partial_forna
+
+
+def adjust_sequence_start(sequence_constraint):
+    if sequence_constraint and sequence_constraint[0] != "G":
+        col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
+        with col1:
+            st.warning("The RNA sequence doens't start with G.")
+        with col2:
+            new_start = st.text_input(
+                "Start the sequence with",
+                value="GGGA",
+                help="The transcription of the RNA sequence often "
+                "often requires at least one G at the start of the "
+                "sequence.",
+            )
+        with col3:
+            if st.button("Apply the sequence start"):
+
+                seq_list = list(sequence_constraint)
+                # pair_map = pf.dot_bracket_to_pair_map(structure) # unnecessary
+
+                for i in range(len(new_start)):
+                    seq_list[i] = new_start[i]
+                    ### NOT NECESSARY
+                    # paired = pair_map[i]
+                    # if paired is not None:
+                    #     paired_nucl = new_start[i].translate(pf.nucl_to_pair)
+                    #     seq_list[paired] = paired_nucl
+
+                st_state.generate_sequence = "".join(seq_list)
+                st.rerun()
+
+
+def cleanup_old_zip():
+    if "zip_path" in st_state:
+        if os.path.exists(st_state.zip_path):
+            os.remove(st_state.zip_path)
+
+
 def generate_sequence():
     if not structure:
         st.error("No structure input given")
@@ -145,7 +241,7 @@ def generate_sequence():
     )
 
     # Clear the progress bar
-    progress_bar.progress(1.0, text=f"Generation finished")
+    progress_bar.progress(1.0, text="Generation finished")
     output_status.empty()
 
     if not opti_sequence:
@@ -164,9 +260,7 @@ def generate_sequence():
         return
 
     # if there was already a zip file, remove it
-    if "zip_path" in st_state:
-        if os.path.exists(st_state.zip_path):
-            os.remove(st_state.zip_path)
+    cleanup_old_zip()
     st_state.rna_origami_seq = opti_sequence
     st_state.rna_origami_folds = fold_p(opti_sequence)
     # save the new zip file
@@ -191,157 +285,7 @@ def generate_sequence():
             )
 
 
-if __name__ == "__main__":
-    # somehow st components cause `Thread 'MainThread': missing ScriptRunContext!`
-    # warning when using multiprocessing
-
-    load_logo()
-
-    ### ignore warnings
-    warnings.filterwarnings("ignore")
-
-    ### initialize the session state
-
-    ### Forna options
-    if "zoomable" not in st_state:
-        st_state.zoomable = True
-    if "animation" not in st_state:
-        st_state.animation = False
-    if "editable" not in st_state:
-        st_state.editable = False
-    if "labels" not in st_state:
-        st_state.node_label = True
-    if "height" not in st_state:
-        st_state.height = 300
-    if "label_interval" not in st_state:
-        st_state.label_interval = 10
-    if "color_scheme" not in st_state:
-        st_state.color_scheme = "structure"
-    if "color_text" not in st_state:
-        st_state.color_text = ""
-
-    ### RNA origami options
-    if "generate_structure" not in st_state:
-        st_state.generate_structure = ""
-    if "generate_sequence" not in st_state:
-        st_state.generate_sequence = ""
-    if "generate_pseudoknots" not in st_state:
-        st_state.generate_pseudoknots = ""
-    if "rna_origami_seq" not in st_state:
-        st_state.rna_origami_seq = ""
-    if "rna_origami_folds" not in st_state:
-        st_state.rna_origami_folds = ()
-
-    st.header(
-        "Generate",
-        help="Generate the RNA sequence that matches the desired dot-bracket "
-        "notation (and sequence constraints) for the nanostructure.",
-    )
-
-    # RNA INPUTS
-    structure = st.text_input(
-        "RNA strucutre (dot-bracket notation)", value=st_state.generate_structure
-    )
-    sequence_constraint = st.text_input(
-        "Sequence constraints", value=st_state.generate_sequence
-    )
-    pseudoknot_info = st.text_input(
-        "Pseudoknot constraints (semicolon-separated)",
-        value=st_state.generate_pseudoknots,
-    )
-
-    if not sequence_constraint:
-        sequence_constraint = "N" * len(structure.replace("&", ""))
-
-    # check if the dot-bracket notation contains multiple strands
-    if "&" in structure:
-        st.warning("Experimental: the dot-bracket notation contains multiple strands")
-
-    ### INITIALIZE FORNA
-    col1, col2, _ = st.columns([1, 1.3, 2])
-    with col1:
-        use_forna = st.toggle(
-            "Forna display",
-            key="forna_display",
-            value=len(structure) < 2000,
-        )
-        try:
-            from st_forna_component import forna_component
-        except ImportError:
-            use_forna = False
-            st.error(
-                "st-forna-component is not installed. "
-                "Please install it with `pip install st-forna-component` "
-                "to use the Forna display."
-            )
-    if use_forna:
-        with col2:
-            with st.popover("Forna options", use_container_width=True):
-                forna_options(len(structure))
-
-        partial_forna = partial(
-            forna_component,
-            height=st_state.height,
-            animation=st_state.animation,
-            zoomable=st_state.zoomable,
-            label_interval=st_state.label_interval,
-            node_label=st_state.node_label,
-            editable=st_state.editable,
-            color_scheme=st_state.color_scheme,
-            colors=st_state.color_text,
-        )
-
-    # # Initialize the FORNA link for the target structure
-    if structure and use_forna:
-        #     st.markdown("#### Target Structure")
-        #     st.markdown(write_format_text(structure))
-        edited = partial_forna(
-            structure=structure, sequence=sequence_constraint, key="target_forna"
-        )
-
-    if sequence_constraint and sequence_constraint[0] != "G":
-        col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
-        with col1:
-            st.warning("The RNA sequence doens't start with G.")
-        with col2:
-            new_start = st.text_input(
-                "Start the sequence with",
-                value="GGGA",
-                help="The transcription of the RNA sequence often "
-                "often requires at least one G at the start of the "
-                "sequence.",
-            )
-        with col3:
-            if st.button("Apply the sequence start"):
-
-                seq_list = list(sequence_constraint)
-                # pair_map = pf.dot_bracket_to_pair_map(structure) # unnecessary
-
-                for i in range(len(new_start)):
-                    seq_list[i] = new_start[i]
-                    ### NOT NECESSARY
-                    # paired = pair_map[i]
-                    # if paired is not None:
-                    #     paired_nucl = new_start[i].translate(pf.nucl_to_pair)
-                    #     seq_list[paired] = paired_nucl
-
-                st_state.generate_sequence = "".join(seq_list)
-                st.rerun()
-
-    col1, col2 = st.columns(2, vertical_alignment="bottom")
-    with col1:
-        filename = st.text_input("Name of RNA origami", value="Origami")
-    with col2:
-        generate = False
-        if st.button("Generate RNA sequence"):
-            generate = True
-    if generate:
-        generate_sequence()
-
-    if not st_state.rna_origami_seq:
-        st.stop()
-
-    st.divider()
+def show_vienna_params():
     sequence = st_state.rna_origami_seq
     folds = st_state.rna_origami_folds
 
@@ -353,7 +297,6 @@ if __name__ == "__main__":
     else:
         diversity_text = f":red[high {diversity}]"
 
-    cols = st.columns(4, vertical_alignment="bottom")
     st.markdown(
         "### Last Optimized sequence " f"(ensemble diversity: {diversity_text})",
         help="The ensemble diversity is the average distance between the "
@@ -414,30 +357,10 @@ if __name__ == "__main__":
         else:
             st.markdown(write_format_text(folds[3]))
 
-    st.divider()
+    return folds[0], sequence
 
-    st.markdown(write_format_text(st_state.rna_origami_seq))
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.page_link(
-            "pages/3_Convert.py",
-            label=":orange[Convert RNA to DNA]",
-            icon=":material/genetics:",
-        )
-    with col2:
-        copy_to_clipboard(folds[0], "Structure")
-    with col3:
-        copy_to_clipboard(sequence, "Sequence")
-    with col4:
-        with open(st_state.zip_path, "rb") as fp:
-            st.download_button(
-                "Download optimization files",
-                data=fp,
-                file_name=f"{filename}.zip",
-                mime="application/zip",
-                on_click="ignore",
-            )
 
+def link_to_template():
     if (
         "origami" in st_state
         and st_state.origami
@@ -451,4 +374,97 @@ if __name__ == "__main__":
             icon=":material/sync_alt:",
         )
 
-        save_origami(filename)
+
+if __name__ == "__main__":
+    # somehow st components cause `Thread 'MainThread': missing ScriptRunContext!`
+    # warning when using multiprocessing
+
+    load_logo()
+
+    ### ignore warnings
+    warnings.filterwarnings("ignore")
+
+    initiate_session_state()
+
+    st.header(
+        "Generate",
+        help="Generate the RNA sequence that matches the desired dot-bracket "
+        "notation (and sequence constraints) for the nanostructure.",
+    )
+
+    # RNA INPUTS
+    structure = st.text_input(
+        "RNA strucutre (dot-bracket notation)", value=st_state.generate_structure
+    )
+    sequence_constraint = st.text_input(
+        "Sequence constraints", value=st_state.generate_sequence
+    )
+    pseudoknot_info = st.text_input(
+        "Pseudoknot constraints (semicolon-separated)",
+        value=st_state.generate_pseudoknots,
+    )
+
+    if not sequence_constraint:
+        sequence_constraint = "N" * len(structure.replace("&", ""))
+
+    # check if the dot-bracket notation contains multiple strands
+    if "&" in structure:
+        st.warning("Experimental: the dot-bracket notation contains multiple strands")
+
+    ### INITIALIZE FORNA
+    use_forna, partial_forna = initialize_forna()
+
+    # # Initialize the FORNA link for the target structure
+    if structure and use_forna:
+        #     st.markdown("#### Target Structure")
+        #     st.markdown(write_format_text(structure))
+        edited = partial_forna(
+            structure=structure, sequence=sequence_constraint, key="target_forna"
+        )
+
+    adjust_sequence_start(sequence_constraint)
+
+    col1, col2 = st.columns(2, vertical_alignment="bottom")
+    with col1:
+        filename = st.text_input("Name of RNA origami", value="Origami")
+    with col2:
+        generate = False
+        if st.button("Generate RNA sequence"):
+            generate = True
+
+    if generate:
+        generate_sequence()
+
+    if not st_state.rna_origami_seq:
+        st.stop()
+
+    st.divider()
+
+    structure, sequence = show_vienna_params()
+
+    st.divider()
+
+    st.markdown(write_format_text(st_state.rna_origami_seq))
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.page_link(
+            "pages/3_Convert.py",
+            label=":orange[Convert RNA to DNA]",
+            icon=":material/genetics:",
+        )
+    with col2:
+        copy_to_clipboard(structure, "Structure")
+    with col3:
+        copy_to_clipboard(sequence, "Sequence")
+    with col4:
+        with open(st_state.zip_path, "rb") as fp:
+            st.download_button(
+                "Download optimization files",
+                data=fp,
+                file_name=f"{filename}.zip",
+                mime="application/zip",
+                on_click="ignore",
+            )
+
+    link_to_template()
+    save_origami(filename)

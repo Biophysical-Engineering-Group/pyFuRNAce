@@ -14,7 +14,7 @@ class TetraLoopCommand(MotifCommand):
                 st_state.modified_motif_text += f"\nmotif.set_sequence('{seq}')"
                 motif.set_sequence(seq)
             elif flip:
-                st_state.modified_motif_text += f"\nmotif.flip()"
+                st_state.modified_motif_text += "\nmotif.flip()"
                 motif.flip()
 
         ### Create a new motif

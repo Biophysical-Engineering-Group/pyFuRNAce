@@ -36,7 +36,7 @@ class DovetailCommand(MotifCommand):
                     f"\nmotif.set_up_sequence('" f"{top_seq}', sign = str({sign})"
                 )
                 motif.set_up_sequence(top_seq, sign)
-            elif type(seq_length) == int and motif.length != seq_length:
+            elif isinstance(seq_length, int) and motif.length != seq_length:
                 st_state.modified_motif_text += f"\nmotif.length = " f"{seq_length}"
                 motif.length = seq_length
 

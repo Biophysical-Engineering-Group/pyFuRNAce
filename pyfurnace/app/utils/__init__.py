@@ -45,7 +45,7 @@ def check_import_pyfurnace():
     ### Last chance, try to import the module from the local path
     pyfurnace_path = app_path.parent.parent
     sys.path.insert(0, str(pyfurnace_path))
-    import pyfurnace
+    import pyfurnace  # noqa: F401, F811
 
 
 def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.png")):
@@ -77,7 +77,7 @@ def copy_to_clipboard(text_to_copy, button_text=""):
         copied_text = ""
     st.components.v1.html(
         f"""
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" 
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
         rel="stylesheet" />
 
         <script>
@@ -87,7 +87,7 @@ def copy_to_clipboard(text_to_copy, button_text=""):
                 button.innerHTML = '<span class="material-symbols-outlined">\\
                                     done</span>{copied_text}';
                 setTimeout(() => {{
-                     button.style.backgroundColor = 'white';  // Change label after copying
+                     button.style.backgroundColor = 'white';  // Change label when copy
                      button.innerHTML = '<span class="material-symbols-outlined">\\
                                         content_copy</span>{button_text}';
                 }}, 1000);
@@ -99,7 +99,7 @@ def copy_to_clipboard(text_to_copy, button_text=""):
                 margin: 0;
                 padding: 0;
             }}
-            
+
             .copy_button {{
                 display: inline-flex;
                 background-color: inherit;
@@ -130,6 +130,66 @@ def copy_to_clipboard(text_to_copy, button_text=""):
     )
 
 
+def save_pdb(origami, ori_name="Origami"):
+    sequence = origami.sequence
+    if any(nucl not in "AUCG&" for nucl in origami.sequence):
+        st.warning(
+            "The sequence contains non-standard nucleotides " "(only AUCG are allowed)."
+        )
+        st.warning("The PDB will be filled with a random sequence!")
+        sequence = sequence.get_random_sequence(structure=origami.structure)
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        file_path = f"{tmpdirname}/origami"
+        origami.save_3d_model(file_path, sequence=sequence, pdb=True)
+        try:
+            with open(f"{file_path}.pdb", "r") as f:
+                pdb_text = f.read()
+        except Exception as e:
+            st.warning(f"No PDB file found. Error: {e}")
+            pdb_text = None
+    if pdb_text:
+        st.download_button(
+            "Download PDB", pdb_text, f"{ori_name}.pdb", on_click="ignore"
+        )
+
+
+def save_oxdna(origami, ori_name="Origami"):
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        file_path = f"{tmpdirname}/{ori_name}"
+        origami.save_3d_model(file_path, forces=True)
+        with open(f"{file_path}.dat", "r") as f:
+            conf_text = f.read()
+        with open(f"{file_path}.top", "r") as f:
+            topo_text = f.read()
+        try:
+            with open(f"{file_path}_forces.txt", "r") as f:
+                forces = f.read()
+        except Exception as e:
+            forces = None
+            st.warning(f"No forces file found. Error: {e}")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.download_button(
+            "Download Configuration",
+            conf_text,
+            f"{ori_name}.dat",
+            on_click="ignore",
+        )
+    with col2:
+        st.download_button(
+            "Download Topology", topo_text, f"{ori_name}.top", on_click="ignore"
+        )
+    with col3:
+        if forces:
+            st.download_button(
+                "Download Forces",
+                forces,
+                f"{ori_name}_forces.txt",
+                on_click="ignore",
+            )
+
+
 def save_origami(origami_name="Origami"):
     if not st.session_state.origami:
         return
@@ -149,63 +209,10 @@ def save_origami(origami_name="Origami"):
             st.stop()
 
         if file_type == "PDB":
-            sequence = origami.sequence
-            if any(nucl not in "AUCG&" for nucl in origami.sequence):
-                st.warning(
-                    "The sequence contains non-standard nucleotides "
-                    "(only AUCG are allowed)."
-                )
-                st.warning("The PDB will be filled with a random sequence!")
-                sequence = sequence.get_random_sequence(structure=origami.structure)
-
-            with tempfile.TemporaryDirectory() as tmpdirname:
-                file_path = f"{tmpdirname}/origami"
-                origami.save_3d_model(file_path, sequence=sequence, pdb=True)
-                try:
-                    with open(f"{file_path}.pdb", "r") as f:
-                        pdb_text = f.read()
-                except:
-                    st.warning("No PDB file found")
-                    pdb_text = None
-            if pdb_text:
-                st.download_button(
-                    "Download PDB", pdb_text, f"{ori_name}.pdb", on_click="ignore"
-                )
+            save_pdb(origami, ori_name=ori_name)
 
         elif file_type == "oxDNA":
-            with tempfile.TemporaryDirectory() as tmpdirname:
-                file_path = f"{tmpdirname}/{ori_name}"
-                origami.save_3d_model(file_path, forces=True)
-                with open(f"{file_path}.dat", "r") as f:
-                    conf_text = f.read()
-                with open(f"{file_path}.top", "r") as f:
-                    topo_text = f.read()
-                try:
-                    with open(f"{file_path}_forces.txt", "r") as f:
-                        forces = f.read()
-                except:
-                    forces = None
-                    st.warning("No forces file found")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.download_button(
-                    "Download Configuration",
-                    conf_text,
-                    f"{ori_name}.dat",
-                    on_click="ignore",
-                )
-            with col2:
-                st.download_button(
-                    "Download Topology", topo_text, f"{ori_name}.top", on_click="ignore"
-                )
-            with col3:
-                if forces:
-                    st.download_button(
-                        "Download Forces",
-                        forces,
-                        f"{ori_name}_forces.txt",
-                        on_click="ignore",
-                    )
+            save_oxdna(origami, ori_name=ori_name)
 
         else:
 

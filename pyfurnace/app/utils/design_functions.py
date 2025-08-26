@@ -16,7 +16,17 @@ from code_editor import code_editor
 ### pyFuRNAce modules
 from . import main_menu_style, second_menu_style, copy_to_clipboard
 import pyfurnace as pf
-from utils.commands import *
+from utils.commands import (  # noqa: F401
+    AptamersCommand,
+    ConnectionsCommand,
+    start_end_stemCommand,
+    DovetailCommand,
+    GeneralEditCommand,
+    KissingLoopsCommand,
+    StemCommand,
+    StructuralCommand,
+    TetraLoopCommand,
+)
 
 code_editor_buttons = (
     {
@@ -220,59 +230,39 @@ def motif_text_format(motif: pf.Motif) -> str:
 
 
 def initiate_session_state():
-    if "origami" not in st_state:
-        st_state.origami = pf.Origami()
-    if "code" not in st_state:
-        st_state.code = ["import pyfurnace as pf", "origami = pf.Origami()"]
-        st_state.motif_buffer = ""
-        st_state.mod_motif_buffer = ""
-    if "motif" not in st_state:
-        st_state.motif = pf.Motif()
-    # if "redo" not in st_state:
-    #     st_state.redo = []
-    if "motif_menu_sticky" not in st_state:
-        st_state.motif_menu_sticky = False
-    if "copied_motif" not in st_state:
-        st_state.copied_motif = None
-    if "copied_motif_text" not in st_state:
-        st_state.copied_motif_text = ""
-    if "modified_motif_text" not in st_state:
-        st_state.modified_motif_text = ""
-    if "upload_key" not in st_state:
-        st_state.upload_key = 0
-    ### Initialize the session state variables for the custom motif
-    if "custom_strands" not in st_state:
-        st_state.custom_strands = []
-    if "custom_motifs" not in st_state:
-        st_state.custom_motifs = [("Custom Motif", "dpad", pf.Motif(lock_coords=False))]
-    if "custom_key" not in st_state:
-        st_state.custom_key = 0
-    if "custom_edit" not in st_state:
-        st_state["custom_edit"] = True
-    if "last_clicked_position" not in st_state:
-        st_state["last_clicked_position"] = ""
-    if "line_index" not in st_state:
-        st_state.line_index = 0
-    if "motif_index" not in st_state:
-        st_state.motif_index = 0
-    if "current_line_occupied" not in st_state:
-        st_state.current_line_occupied = False
-    if "ori_click_count" not in st_state:
-        st_state.ori_click_count = 0
-    if "max_pk_index" not in st_state:
-        st_state.max_pk_index = 1
-    if "oxview_selected" not in st_state:
-        st_state.oxview_selected = ()
-    if "selected_motif" not in st_state:
-        st_state.selected_motif = "Connections"
-    if "gradient" not in st_state:
-        st_state.gradient = False
-    if "oxview_colormap" not in st_state:
-        st_state.oxview_colormap = "Reds"
-    if "origami_font_size" not in st_state:
-        st_state.origami_font_size = 14
-    if "oxview_frame_size" not in st_state:
-        st_state.oxview_frame_size = 500
+    default_state = {
+        "origami": pf.Origami(),
+        "code": ["import pyfurnace as pf", "origami = pf.Origami()"],
+        "motif_buffer": "",
+        "mod_motif_buffer": "",
+        "motif": pf.Motif(),
+        #   "redo": [],
+        "motif_menu_sticky": False,
+        "copied_motif": None,
+        "copied_motif_text": "",
+        "modified_motif_text": "",
+        "upload_key": 0,
+        # Custom motif parameters:
+        "custom_strands": [],
+        "custom_motifs": [("Custom Motif", "dpad", pf.Motif(lock_coords=False))],
+        "custom_key": 0,
+        "custom_edit": True,
+        "last_clicked_position": "",
+        "line_index": 0,
+        "motif_index": 0,
+        "current_line_occupied": False,
+        "ori_click_count": 0,
+        "max_pk_index": 1,
+        "oxview_selected": (),
+        "selected_motif": "Connections",
+        "gradient": False,
+        "oxview_colormap": "Reds",
+        "origami_font_size": 14,
+        "oxview_frame_size": 500,
+    }
+    for key, value in default_state.items():
+        if key not in st_state:
+            st_state[key] = value
 
 
 def update_file_uploader():
@@ -342,8 +332,8 @@ def make_motif_menu(origami):
         with col1:
             motif_selected = option_menu(
                 None,
-                [l[0] for l in st_state.custom_motifs],
-                icons=[f"bi bi-{l[1]}" for l in st_state.custom_motifs],
+                [nam_ico[0] for nam_ico in st_state.custom_motifs],
+                icons=[f"bi bi-{nam_ico[1]}" for nam_ico in st_state.custom_motifs],
                 menu_icon="cast",
                 orientation="horizontal",
                 styles=second_menu_style,
@@ -608,7 +598,7 @@ def add_motif(origami):
                 st_state.motif_buffer + f"\norigami.insert(({st_state.line_index}, "
                 f"{st_state.motif_index}), motif) # Add motif"
             )
-            st_state.motif_buffer = ""  ### clear the buffer
+            st_state.motif_buffer = ""  # clear the buffer
             # st_state.redo = [] # clear the redo buffer
             st_state.motif_index += 1
             st.rerun()
@@ -785,11 +775,11 @@ def upload_3d_interface(strand, strand_num, current_custom_motif):
 
     with dummy_cols[0]:
         dummy_start = st.toggle(
-            "Start dummy nucleotide", key=f"dummy_start_custom", help=dummy_help
+            "Start dummy nucleotide", key="dummy_start_custom", help=dummy_help
         )
     with dummy_cols[1]:
         dummy_end = st.toggle(
-            "End dummy nucleotide", key=f"dummy_end_custom", help=dummy_help
+            "End dummy nucleotide", key="dummy_end_custom", help=dummy_help
         )
 
     if file_3d:
@@ -1024,11 +1014,11 @@ def custom(current_custom_motif):
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
     with col1:
         start_x = st.number_input(
-            "Start x:", min_value=0, value=strand.start[0], key=f"start_x_custom"
+            "Start x:", min_value=0, value=strand.start[0], key="start_x_custom"
         )
     with col2:
         start_y = st.number_input(
-            "Start y:", min_value=0, value=strand.start[1], key=f"start_y_custom"
+            "Start y:", min_value=0, value=strand.start[1], key="start_y_custom"
         )
     with col3:
         strand_direction_ind = [d for d in pf.Direction].index(strand.direction)
@@ -1036,7 +1026,7 @@ def custom(current_custom_motif):
             "Start direction:",
             direction_list,
             index=strand_direction_ind,
-            key=f"dir_custom",
+            key="dir_custom",
         )
         new_dir_tuple = pf.Direction[new_dir]
     with col4:
@@ -1044,13 +1034,13 @@ def custom(current_custom_motif):
             "Directionality:",
             ["35", "53"],
             index=["35", "53"].index(strand.directionality),
-            key=f"seq_dir_custom",
+            key="seq_dir_custom",
         )
     with col5:
         new_strand = st.text_input(
             f"New strand (strand directionality: " f"{strand.directionality}) ",
             value=str(strand),
-            key=f"strand_custom",
+            key="strand_custom",
         )
 
     ### update the strand
@@ -1072,7 +1062,7 @@ def custom(current_custom_motif):
     new_db = st.text_input(
         "Add dot-bracket notation:",
         value=current_structure,
-        key=f"structure_custom",
+        key="structure_custom",
         help="Add the dot-bracket notation of the motif for each "
         'strand, separated by a "&". If the paired bases are '
         'more than one position apart, the pairing symbol "┊"'
@@ -1592,7 +1582,7 @@ def clicked_options(clicked):
             return  # this is a problem with updating the keys
 
         motif_class_name = motif.__class__.__name__
-        if motif_class_name == "Motif":  ### is custom Motif
+        if motif_class_name == "Motif":  # is custom Motif
             motif_class_name = "Custom " + motif_class_name
 
         nucl_text = ""
@@ -1712,7 +1702,7 @@ def edit(x, y):
     except KeyError:
         return  # this is a problem with updating the keys
     motif_class_name = motif.__class__.__name__
-    if motif_class_name == "Motif":  ### is custom Motif
+    if motif_class_name == "Motif":  # is custom Motif
         motif_class_name = "Custom " + motif_class_name
     elif isinstance(motif, pf.KissingLoop):
         motif_class_name = "KissingLoops"
@@ -1756,7 +1746,7 @@ def advaced_edit(motif_slice):
             flip_h = st.toggle("Flip horizontally", value=True, key="adv_flip_h")
         with cols[2]:
             if flip_vert or flip_h:
-                flip = st.button("Flip", key=f"adv_flip")
+                flip = st.button("Flip", key="adv_flip")
                 flip_vert &= flip
                 flip_h &= flip
 
@@ -1871,7 +1861,7 @@ def advaced_edit(motif_slice):
         if new_db != current_structure:
             if not new_db:
                 st_state.mot_adv_edit.autopairing = True
-                st_state.modified_motif_text += f"\nmotif.autopairing = True"
+                st_state.modified_motif_text += "\nmotif.autopairing = True"
             else:
                 st_state.mot_adv_edit.structure = new_db
                 st_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'

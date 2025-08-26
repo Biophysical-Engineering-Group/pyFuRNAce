@@ -10,12 +10,9 @@ from utils import (
     main_menu_style,
     copy_to_clipboard,
     write_format_text,
-    check_import_pyfurnace,
 )
 from utils.template_functions import symbols, reference, sanitize_input
 from utils.design_functions import origami_build_view
-
-check_import_pyfurnace()
 from pyfurnace import prepare as prep
 
 # Melting and primer logic
@@ -78,12 +75,12 @@ def calculate_annealing(seq, mts, c_primer, nc_primer, tm_kwargs):
     with st.expander("Dimerization preview"):
         st.markdown(
             f'<div style="text-align: center;"><span style="color: #D00000">'
-            f"{c_primer}</span>{seq[c_bases]}[...]{seq[-nc_bases-1:]}</div>",
+            f"{c_primer}</span>{seq[c_bases]}[...]{seq[-nc_bases - 1:]}</div>",
             unsafe_allow_html=True,
         )
         st.markdown(
             f'<div style="text-align: center;">'
-            f"{prep.Seq(seq[:c_bases+1]).complement()}"
+            f"{prep.Seq(seq[:c_bases + 1]).complement()}"
             f"[...]"
             f"{prep.Seq(seq[-nc_bases - 1]).complement()}"
             f'<span style="color: #D00000">'
@@ -298,7 +295,7 @@ def tm_parameters():
         session_dict = {key: st.session_state[key] for key in default_values}
         json.dump(session_dict, settings)
     with open("energy_parameters.json", "rb") as file:
-        btn = st.download_button(
+        st.download_button(
             label="Download energy parameters",
             data=file,
             file_name="energy_parameters.json",
@@ -405,7 +402,7 @@ def primers_setup():
                     st.session_state.prim_rev_len = len(primers[1])
 
                 status.success(
-                    f"Primer designed!", icon=":material/precision_manufacturing:"
+                    "Primer designed!", icon=":material/precision_manufacturing:"
                 )
 
     seq = restric_site_1 + seq + str(prep.Seq(restric_site_2).reverse_complement())

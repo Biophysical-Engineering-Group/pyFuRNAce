@@ -3,9 +3,7 @@ import streamlit as st
 from streamlit import session_state as st_state
 
 ### pyFuRNAce modules
-from utils import load_logo, check_import_pyfurnace
-
-check_import_pyfurnace()  # important to import pyfurnace before anything else
+from utils import load_logo
 from utils.template_functions import sanitize_input
 from utils.design_functions import update_code, initiate_session_state
 import pyfurnace as pf
@@ -109,9 +107,7 @@ def load_template():
     st_state.qs_origami = templ_funcs[template]()
     st_state.qs_text = f"{func_code.strip()}\n"
 
-    st.success(
-        f"Template {template} loaded successfully!", icon=":material/check_circle:"
-    )
+    st.success(f"{template} loaded successfully!", icon=":material/check_circle:")
 
     load_origami_button()
 
@@ -170,53 +166,7 @@ def load_file():
     load_origami_button()
 
 
-if __name__ == "__main__":
-    load_logo()
-    check_import_pyfurnace()
-    st_state.qs_text = None
-    st_state.qs_origami = None
-    st_state.setdefault("new_comer", False)
-    initiate_session_state()
-
-    st.write("# Hello and Welcome to pyFuRNAce!")
-
-    st.write("Design and generate RNA nanostructures in few simple steps.")
-
-    st.page_link("pages/1_Design.py", label=":orange[Design:]", icon=":material/draw:")
-
-    st.markdown(
-        "- Design your RNA nanostructure and download it as " "textfile/python script."
-    )
-
-    st.page_link(
-        "pages/2_Generate.py",
-        label=":orange[Generate:]",
-        icon=":material/network_node:",
-    )
-
-    st.markdown(
-        "- Generate the RNA sequence that matches the desired dot-bracket"
-        " notation for the nanostructure."
-    )
-
-    st.page_link(
-        "pages/3_Convert.py", label=":orange[Convert:]", icon=":material/genetics:"
-    )
-
-    st.markdown(
-        "- Prepare the DNA template for you RNA Origami, search subsequences"
-        " and search for dimers."
-    )
-
-    st.page_link(
-        "pages/4_Prepare.py", label=":orange[Prepare:]", icon=":material/sync_alt:"
-    )
-
-    st.markdown(
-        "- Design primers for your DNA template or prepare the Origami for "
-        "OxDNA simulation."
-    )
-
+def newcomer_flow():
     cols_ratio = [1.7, 2.1, 1, 4]
     col1, col2, col3, _ = st.columns(cols_ratio, vertical_alignment="bottom")
     sequence_type = "secondary"
@@ -283,6 +233,55 @@ if __name__ == "__main__":
     with col3:
         if st.button("Load a file", icon=":material/upload:", type=file_type):
             load_file()
+
+
+if __name__ == "__main__":
+    load_logo()
+    st_state.qs_text = None
+    st_state.qs_origami = None
+    st_state.setdefault("new_comer", False)
+    initiate_session_state()
+
+    st.write("# Hello and Welcome to pyFuRNAce!")
+
+    st.write("Design and generate RNA nanostructures in few simple steps.")
+
+    st.page_link("pages/1_Design.py", label=":orange[Design:]", icon=":material/draw:")
+
+    st.markdown(
+        "- Design your RNA nanostructure and download it as " "textfile/python script."
+    )
+
+    st.page_link(
+        "pages/2_Generate.py",
+        label=":orange[Generate:]",
+        icon=":material/network_node:",
+    )
+
+    st.markdown(
+        "- Generate the RNA sequence that matches the desired dot-bracket"
+        " notation for the nanostructure."
+    )
+
+    st.page_link(
+        "pages/3_Convert.py", label=":orange[Convert:]", icon=":material/genetics:"
+    )
+
+    st.markdown(
+        "- Prepare the DNA template for you RNA Origami, search subsequences"
+        " and search for dimers."
+    )
+
+    st.page_link(
+        "pages/4_Prepare.py", label=":orange[Prepare:]", icon=":material/sync_alt:"
+    )
+
+    st.markdown(
+        "- Design primers for your DNA template or prepare the Origami for "
+        "OxDNA simulation."
+    )
+
+    newcomer_flow()
 
     st.divider()
 

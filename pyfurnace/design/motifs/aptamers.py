@@ -1,5 +1,4 @@
 from . import CONFS_PATH
-from ..core.symbols import *
 from ..core.coordinates_3d import Coords
 from ..core.strand import Strand
 from ..core.motif import Motif

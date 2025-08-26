@@ -3,7 +3,6 @@ from pyfurnace.design import utils, start_end_stem
 
 import streamlit as st
 from streamlit_option_menu import option_menu
-from streamlit_option_menu import option_menu
 from .motif_command import MotifCommand
 from .general_edit_command import GeneralEditCommand
 from .tetraloop_command import TetraLoopCommand

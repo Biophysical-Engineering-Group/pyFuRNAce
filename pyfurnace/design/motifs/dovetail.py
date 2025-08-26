@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 import numpy as np
-from ..core.symbols import *
+from ..core.symbols import nucl_to_pair
 from ..core.coordinates_3d import Coords
 from ..core.sequence import Sequence
 from ..core.strand import Strand
@@ -334,7 +334,8 @@ class Dovetail(Stem):
         #        |           |
         #   bot_strand1; bot_strand2
 
-        if pos:  ### the dovetail is positive
+        ### the dovetail is positive
+        if pos:
             # top strand 1
             top_coord1 = Coords(coords[1 : seq_len + 1])
             if up_cross:
@@ -399,7 +400,8 @@ class Dovetail(Stem):
                     ),
                 )
 
-        else:  ### the dovetail is negative
+        ### the dovetail is negative
+        else:
             # top strand 1
             top_coord1 = Coords(np.array(()))
             if up_cross:

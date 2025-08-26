@@ -732,7 +732,10 @@ def structure_converter(current_custom_motif):
     with col2:
         default_seq = str(current_custom_motif.sequence)
         if len(structure) > len(default_seq):
-            default_seq += "N" * (len(structure) - len(default_seq))
+            default_seq += "".join(
+                "N" if sym != "&" else "&"
+                for sym in structure[len(default_seq) : len(structure) + 1]
+            )
         sequence = st.text_input(
             "Sequence:",
             value=default_seq,
@@ -743,9 +746,9 @@ def structure_converter(current_custom_motif):
             sequence = None
     if (
         structure
-        and structure != current_custom_motif.structure
+        and structure.strip("& ") != current_custom_motif.structure
         or sequence
-        and sequence != current_custom_motif.sequence
+        and sequence.strip("& ") != current_custom_motif.sequence
     ):
         try:
             new_motif = pf.Motif.from_structure(structure, sequence=sequence)
@@ -923,7 +926,7 @@ def custom(current_custom_motif):
             st.error(str(e))
 
     def move_strand(clicked, add_nucl=None):
-        nonlocal strand
+        # nonlocal strand
         pos = tuple([int(i) for i in clicked.split(",")])
 
         ### if the strand is empty, add the first position

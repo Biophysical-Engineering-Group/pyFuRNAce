@@ -1155,7 +1155,8 @@ class Motif(Callback):
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
         if not sequence:
-            sequence = "N" * len(structure)
+            print("making sequence")
+            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
         else:
             sequence = str(sequence).replace("T", "U").upper()
 
@@ -1192,7 +1193,7 @@ class Motif(Callback):
             """
             Recursively build the origami from the tree representation.
             """
-            nonlocal current_index
+            # nonlocal current_index
 
             # initialize the variables
             if insert_at is None:

@@ -132,7 +132,7 @@ class Origami(Callback):
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
         if not sequence:
-            sequence = "N" * len(structure)
+            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
         else:
             sequence = str(sequence).replace("T", "U").upper()
 
@@ -147,7 +147,9 @@ class Origami(Callback):
         else:
             motif_list = []
         motif_list.extend([aptamers.__dict__[name]() for name in aptamers_list])
-        motif_list.extend([m.copy().flip(reorder=True) for m in motif_list])
+        motif_list.extend(
+            [m.copy().flip(reorder=True) for m in motif_list if len(m.strands) > 1]
+        )
 
         ### Idea in principle: if the structure is folded with ViennaRNA,
         #  fold the aptamers with ViennaRNA too, so you can find them in the tree.
@@ -163,7 +165,6 @@ class Origami(Callback):
         mot_trees = [
             dot_bracket_to_tree(m.structure, sequence=str(m.sequence))
             for m in motif_list
-            if len(m.strands) > 1
         ]
 
         # input dot-bracket notation
@@ -272,7 +273,7 @@ class Origami(Callback):
                 where the next motif should be inserted.
             """
 
-            nonlocal current_index, m_seq
+            nonlocal m_seq  # , current_index
 
             # initialize the variables
             if insert_at is None:

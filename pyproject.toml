@@ -62,7 +62,7 @@ max-line-length = 88
 ignore = ["E266", "W503", "E203"] # Compatible with `black`
 # Ignore specific errors for specific files
 per-file-ignores = [
-    "pyfurnace/*/__init__.py:F401,F403,F405",
+    "pyfurnace/*/__init__.py:E402,F401,F403,F405",
     "pyfurnace/design/utils/origami_lib.py:F401,F403,F405",
 ]
 extend-ignore = ["C408"]  # Optional: Ignore dict literal linting

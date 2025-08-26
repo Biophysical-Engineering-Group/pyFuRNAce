@@ -1,6 +1,9 @@
 from pathlib import Path
 import inspect
 
+# The configurations are needed to build the motifs
+CONFS_PATH = Path(__file__).parent / "conf_files"
+
 # Pyfurnace module import
 from ..core.motif import Motif
 from .stem import *
@@ -9,8 +12,6 @@ from .kissing_loops import *
 from .loops import TetraLoop
 from .aptamers import *
 from .structural import *
-
-CONFS_PATH = Path(__file__).parent / "conf_files"
 
 TL = TetraLoop
 KD = KissingDimer

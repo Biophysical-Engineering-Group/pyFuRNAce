@@ -628,8 +628,8 @@ class Coords:
         # rotating the old normal vector by the inclination angle
         dir_vector = -R_dir.apply(old_a3)
 
-        # flip the sign if it's reverse directionality
-        dir_vector *= 1 - 2 * direction_35
+        if direction_35:
+            dir_vector *= -1  # Adjust direction if specified
 
         dir_vector /= np.linalg.norm(dir_vector)  # Normalize direction vector
 
@@ -666,8 +666,8 @@ class Coords:
 
         # Set a1 to the correct orientation
         r1_to_r2 = r2 - r1
-        # flip the sign if it's reverse directionality
-        r1_to_r2 *= 1 - 2 * direction_35
+        if direction_35:
+            r1_to_r2 = -r1_to_r2  # Adjust direction if specified
         r1_to_r2 /= np.linalg.norm(r1_to_r2)  # Normalize the vector
 
         ### Rotate the helix axis to the correct orientation
@@ -687,16 +687,16 @@ class Coords:
             )
         )
 
-        # if np.dot(np.cross(r1_to_r2, old_a1), dir_vector) < 0:
-        #     rotAngle2 *= -1
-        # Adjust rotation angle based on the cross product
-        rotAngle2 *= 1 - 2 * (np.dot(np.cross(r1_to_r2, old_a1), dir_vector) < 0)
+        if np.dot(np.cross(r1_to_r2, old_a1), dir_vector) < 0:
+            rotAngle2 *= -1  # Adjust rotation angle based on the cross product
         q2 = R.from_rotvec(dir_vector * rotAngle2)  # Create the rotation matrix
         r1 = q2.apply(r1)  # Apply rotation to r1
         r2 = q2.apply(r2)  # Apply rotation to r2
 
         # Center point of the helix axis
-        r = r2 if direction_35 else r1
+        r = r1
+        if direction_35:
+            r = r2  # Adjust direction if specified
         start_pos = pos - r - old_a1 * fudge  # Calculate the starting position
 
         # Create per-step rotation matrix
@@ -729,11 +729,12 @@ class Coords:
             a3 = -np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj
             a3 /= np.linalg.norm(a3)  # Normalize a3
 
-            # Calculate position, keep in mind the direction
-            r = r2 if direction_35 else r1
-            a1 *= -1 if direction_35 else 1
-            a3 *= -1 if direction_35 else 1
-
+            # Calculate position
+            r = r1
+            if direction_35:
+                r = r2  # Adjust direction if specified
+                a1 = -a1
+                a3 = -a3
             RNA_fudge = a1 * fudge  # Apply fudge factor
             p = r + RNA_fudge + start_pos  # Calculate position
 
@@ -750,12 +751,11 @@ class Coords:
                 # Calculate a3
                 a3 = np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj
                 a3 /= np.linalg.norm(a3)  # Normalize a3
-
-                # compute coordinates, keep in mind the direction
-                r = r1 if direction_35 else r2
-                a1 *= -1 if direction_35 else 1
-                a3 *= -1 if direction_35 else 1
-
+                r = r2
+                if direction_35:
+                    r = r1  # Adjust direction if specified
+                    a1 = -a1
+                    a3 = -a3
                 RNA_fudge = a1 * fudge  # Apply fudge factor
                 p = r + RNA_fudge + start_pos  # Calculate position
                 # Append nucleotide properties for double helix
@@ -964,8 +964,8 @@ class Coords:
         ### LOAD PROTEINS
         all_prot_coords = []
         protein_coords = None
-        protein_text = ""
-
+        if verbose:
+            protein_text = ""
         if protein:
 
             if top_text is None:
@@ -975,34 +975,39 @@ class Coords:
                 )
 
             # initialize protein text
-            # if verbose:
-            protein_text = ",\n\tproteins=["
+            if verbose:
+                protein_text = ",\n\tproteins=["
             # Split the topology text into lines
             lines = top_text.split("\n")[1:]
-            pept_lines = [line for line in lines if "peptide" in line.strip()]
             seq_start_ind = 0
-            for line in pept_lines:
+            for line in lines:
+                if not line:
+                    continue
                 # get the sequence
                 seq = line.split()[0]
-                # load the protein coordinates
-                protein_coords = coords[seq_start_ind : seq_start_ind + len(seq)]
-                # if verbose:
-                protein_text += (
-                    f'ProteinCoords("{seq}", ' f"coords={protein_coords.tolist()}), "
-                )
-                all_prot_coords.append(ProteinCoords(seq, protein_coords))
+                # Detect a protein sequence
+                if "peptide" in line:
 
-                # remove the protein coordinates from the main coordinates
-                coords = np.delete(
-                    coords, np.s_[seq_start_ind : seq_start_ind + len(seq)], axis=0
-                )
-                seq_start_ind -= len(seq)
+                    # load the protein coordinates
+                    protein_coords = coords[seq_start_ind : seq_start_ind + len(seq)]
+                    if verbose:
+                        protein_text += (
+                            f'ProteinCoords("{seq}", '
+                            f"coords={protein_coords.tolist()}), "
+                        )
+                    all_prot_coords.append(ProteinCoords(seq, protein_coords))
 
-            # update the coordinates index
-            seq_start_ind += len(seq)
+                    # remove the protein coordinates from the main coordinates
+                    coords = np.delete(
+                        coords, np.s_[seq_start_ind : seq_start_ind + len(seq)], axis=0
+                    )
+                    seq_start_ind -= len(seq)
 
-            # if verbose:
-            protein_text += "]"
+                # update the coordinates index
+                seq_start_ind += len(seq)
+
+            if verbose:
+                protein_text += "]"
 
         ### ENTEND THE COORDINATES
         if extend[0] > 0:
@@ -1045,6 +1050,8 @@ class Coords:
         if verbose:
             dummy_text = f",\n\tdummy_ends=({dummy_0.tolist()}, {dummy_1.tolist()})"
 
+        ### RETURN OR PRINT
+        if verbose:
             print(f"Coords({coords.tolist()}{dummy_text}{protein_text})")
 
         return Coords(coords, dummy_ends=(dummy_0, dummy_1), proteins=all_prot_coords)

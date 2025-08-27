@@ -125,7 +125,7 @@ class Origami(Callback):
             The Origami object created from the structure representation.
         """
         from RNA import fold
-        from ..motifs import Stem, aptamers, aptamers_list
+        from ..motifs import Stem, aptamers, aptamers_list, Loop
         from ..utils import vertical_double_link, stem_cap_link
 
         if not structure:
@@ -146,10 +146,23 @@ class Origami(Callback):
             raise ValueError("The motif_list must contain only Motif objects.")
         else:
             motif_list = []
-        motif_list.extend([aptamers.__dict__[name]() for name in aptamers_list])
-        motif_list.extend(
-            [m.copy().flip(reorder=True) for m in motif_list if len(m.strands) > 1]
-        )
+
+        for name in aptamers_list:
+            motif = aptamers.__dict__[name]()
+            # the motif is made of multiple strands,
+            #  the flipped version has a different tree and should be checked
+            if len(motif.strands) > 1:
+                motif_list.append(motif)
+                motif_list.append(motif.copy().flip(reorder=True))
+
+            # if the motif is a loop, so for the loop convention is opened
+            # on the right side, but the origami is built with the left side open
+            elif isinstance(motif, Loop):
+                motif_list.append(motif.flip())
+
+            # just add the motif
+            else:
+                motif_list.append(motif)
 
         ### Idea in principle: if the structure is folded with ViennaRNA,
         #  fold the aptamers with ViennaRNA too, so you can find them in the tree.

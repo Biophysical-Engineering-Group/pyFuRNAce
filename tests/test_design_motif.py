@@ -1,14 +1,15 @@
 import pytest
-from pyfurnace.design.motifs import *
+from pyfurnace.design.motifs import Motif
 from pyfurnace.design.core.strand import Strand
+from pyfurnace.design.core.basepair import BasePair
 from pyfurnace.design.core import RIGHT
 
 
 # Test Fixtures
 @pytest.fixture
 def m_two_strands():
-    a = Strand('AGGGAUAAUAAUAUAUAU/U/-\\A\\G', start=(0, 2))
-    b = Strand('UGCGUAUUAUUAUAUAUA\\AA\\U/GG/U', start=(0, 4), directionality='35')
+    a = Strand("AGGGAUAAUAAUAUAUAU/U/-\\A\\G", start=(0, 2))
+    b = Strand("UGCGUAUUAUUAUAUAUA\\AA\\U/GG/U", start=(0, 4), directionality="35")
     return Motif([a, b])
 
 
@@ -23,33 +24,36 @@ def test_motif_creation():
     assert motif is not None
     assert len(motif) == 0
 
+
 def test_motif_creation_from_text(m_two_strands):
 
     # Using this weird string format because since the variable
     # 'text1' is indented, the string has a bad indentation
-    # in the top and bottom lines. There are no problem with 
+    # in the top and bottom lines. There are no problem with
     # triple quotes, if the variable is not indented.
-    text1 = \
-"                   ╭─╮   \n"\
-"                   U=A   \n"\
-"5AGGGAUAAUAAUAUAUAU╯ ╰G  \n"\
-" ┊ ┊ ┊┊┊┊┊┊┊┊┊┊┊┊┊┊   ┊  \n"\
-" UGCGUAUUAUUAUAUAUA╮ ╭U5 \n"\
-"                   A G   \n"\
-"                   A G   \n"\
-"                   ╰U╯   \n"\
-"                         \n"
+    text1 = (
+        "                   ╭─╮   \n"
+        "                   U=A   \n"
+        "5AGGGAUAAUAAUAUAUAU╯ ╰G  \n"
+        " ┊ ┊ ┊┊┊┊┊┊┊┊┊┊┊┊┊┊   ┊  \n"
+        " UGCGUAUUAUUAUAUAUA╮ ╭U5 \n"
+        "                   A G   \n"
+        "                   A G   \n"
+        "                   ╰U╯   \n"
+        "                         \n"
+    )
 
-    text2 = \
-"                   ╭─╮   \n"\
-"                   U=A   \n"\
-">AGGGAUAAUAAUAUAUAU╯ ╰G  \n"\
-" ┊ ┊ ┊┊┊┊┊┊┊┊┊┊┊┊┊┊   ┊  \n"\
-" UGCGUAUUAUUAUAUAUA╮ ╭U< \n"\
-"                   A G   \n"\
-"                   A G   \n"\
-"                   ╰U╯   \n"\
-"                         \n"
+    text2 = (
+        "                   ╭─╮   \n"
+        "                   U=A   \n"
+        ">AGGGAUAAUAAUAUAUAU╯ ╰G  \n"
+        " ┊ ┊ ┊┊┊┊┊┊┊┊┊┊┊┊┊┊   ┊  \n"
+        " UGCGUAUUAUUAUAUAUA╮ ╭U< \n"
+        "                   A G   \n"
+        "                   A G   \n"
+        "                   ╰U╯   \n"
+        "                         \n"
+    )
 
     motif1 = Motif.from_text(text1)
     motif2 = Motif.from_text(text2)
@@ -75,8 +79,15 @@ def test_motif_addition(m_two_strands):
     motif2 = m_two_strands.copy()
     combined = motif1 + motif2
     assert len(combined) == 2
-    assert combined.structure == '(.(.((((((((((((((()((.(.((((((((((((((()(&).....)))))))))))))).).)).....)))))))))))))).).)'
-    expect_seq = str(m_two_strands[0].sequence) * 2 + '&' + str(m_two_strands[1].sequence[::-1]) * 2
+    assert combined.structure == (
+        "(.(.((((((((((((((()((.(.((((((((((((((()(&).."
+        "...)))))))))))))).).)).....)))))))))))))).).)"
+    )
+    expect_seq = (
+        str(m_two_strands[0].sequence) * 2
+        + "&"
+        + str(m_two_strands[1].sequence[::-1]) * 2
+    )
     assert combined.sequence == expect_seq
 
 
@@ -84,8 +95,12 @@ def test_motif_in_place_addition(m_two_strands):
     """Test in-place addition of motifs."""
     motif1 = m_two_strands.copy()
     motif1 += m_two_strands.copy()
-    assert len(motif1) == len(m_two_strands) 
-    expect_seq = str(m_two_strands[0].sequence) * 2 + '&' + str(m_two_strands[1].sequence[::-1]) * 2
+    assert len(motif1) == len(m_two_strands)
+    expect_seq = (
+        str(m_two_strands[0].sequence) * 2
+        + "&"
+        + str(m_two_strands[1].sequence[::-1]) * 2
+    )
     assert motif1.sequence == expect_seq
 
 
@@ -93,7 +108,7 @@ def test_motif_rotation(m_two_strands):
     """Test rotating motifs."""
     motif = m_two_strands.copy()
     motif.rotate(times=1)
-    assert motif.max_pos[0] == m_two_strands.max_pos[1] 
+    assert motif.max_pos[0] == m_two_strands.max_pos[1]
     assert motif.max_pos[1] == m_two_strands.max_pos[0]
 
 
@@ -136,23 +151,24 @@ def test_motif_dot_bracket(m_two_strands):
     dot_bracket = motif.structure
     assert isinstance(dot_bracket, str)
     assert len(dot_bracket) > 0
-    text = \
-"      ╭────A───╮                                       \n"\
-" 5SSSA╯╭─NNNNNN╯╭─ASSS──────GGG──────CCC──────UUU───╮  \n"\
-"  ┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊      ┊┊┊      ┊┊┊      ┊┊┊   │  \n"\
-"  SSSA─╯╭NNNNNN─╯╭ASSS─5   ╭CCC╮    ╭GGG╮  3──AAA╮  │  \n"\
-"        ╰───A────╯         │   │    │   │        │  │  \n"\
-"                           ╰───┼────┼───╯        │  │  \n"\
-"                               │    ╰────────────╯  │  \n"\
-"                               ╰────────────────────╯  \n"
+    text = (
+        "      ╭────A───╮                                       \n"
+        " 5SSSA╯╭─NNNNNN╯╭─ASSS──────GGG──────CCC──────UUU───╮  \n"
+        "  ┊┊┊  │ ┊┊┊┊┊┊ │  ┊┊┊      ┊┊┊      ┊┊┊      ┊┊┊   │  \n"
+        "  SSSA─╯╭NNNNNN─╯╭ASSS─5   ╭CCC╮    ╭GGG╮  3──AAA╮  │  \n"
+        "        ╰───A────╯         │   │    │   │        │  │  \n"
+        "                           ╰───┼────┼───╯        │  │  \n"
+        "                               │    ╰────────────╯  │  \n"
+        "                               ╰────────────────────╯  \n"
+    )
     motif = Motif.from_text(text)
-    assert motif.structure == '(((..[[[[[[.)))&(((..]]]]]].)))((([[[{{{)))]]]}}}'
-    assert motif.sequence == 'SSSAANNNNNNASSS&SSSAANNNNNNASSSGGGCCCUUUCCCGGGAAA'
+    assert motif.structure == "(((..[[[[[[.)))&(((..]]]]]].)))((([[[{{{)))]]]}}}"
+    assert motif.sequence == "SSSAANNNNNNASSS&SSSAANNNNNNASSSGGGCCCUUUCCCGGGAAA"
 
 
 def test_motif_append_and_pop(m_two_strands):
     """Test appending and popping strands in a motif."""
-    strand = Strand('A\\U|G/C', directionality='53', start=(0, 0), direction=RIGHT)
+    strand = Strand("A\\U|G/C", directionality="53", start=(0, 0), direction=RIGHT)
     motif = m_two_strands.copy()
     initial_len = len(motif)
     initial_structure = motif.structure
@@ -167,9 +183,9 @@ def test_motif_append_and_pop(m_two_strands):
 def test_motif_sequence_assignment(m_two_strands):
     """Test assigning sequences to a motif."""
     motif = m_two_strands.copy()
-    sequences = ['AUCG', 'GCGA']
+    sequences = ["AUCG", "GCGA"]
     motif.sequence = sequences
-    assert motif.sequence == '&'.join(sequences)
+    assert motif.sequence == "&".join(sequences)
 
 
 def test_motif_concat(m_two_strands):
@@ -186,8 +202,8 @@ def test_motif_save_oxdna(m_two_strands, tmp_path):
     motif = m_two_strands.copy()
     filepath = tmp_path / "motif"
     motif.save_3d_model(str(filepath))
-    assert filepath.with_suffix('.dat').exists()
-    assert filepath.with_suffix('.top').exists()
+    assert filepath.with_suffix(".dat").exists()
+    assert filepath.with_suffix(".top").exists()
 
 
 def test_motif_save_text(m_two_strands, tmp_path):
@@ -195,7 +211,7 @@ def test_motif_save_text(m_two_strands, tmp_path):
     motif = m_two_strands.copy()
     filepath = tmp_path / "motif"
     motif.save_text(str(filepath))
-    assert filepath.with_suffix('.txt').exists()
+    assert filepath.with_suffix(".txt").exists()
 
 
 def test_motif_copy(m_two_strands):
@@ -210,10 +226,10 @@ def test_motif_structure_manipulation(m_two_strands):
     """Test manually setting and getting structure."""
     motif = m_two_strands.copy()
     # set all bases to unpaired
-    structure = ''.join(['.' if sym != '&' else sym for sym in m_two_strands.sequence])
+    structure = "".join(["." if sym != "&" else sym for sym in m_two_strands.sequence])
     motif.structure = structure  # Reassigning should not cause an error
-    assert motif.structure == structure # Structure should be set correctly
-    assert motif.basepair == BasePair() # No basepairs should be present
+    assert motif.structure == structure  # Structure should be set correctly
+    assert motif.basepair == BasePair()  # No basepairs should be present
 
 
 def test_motif_strip(simple_motif):

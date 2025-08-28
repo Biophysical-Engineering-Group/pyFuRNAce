@@ -1485,6 +1485,8 @@ class Strand(Callback):
         # notify the upper class that the strand has changed
         self._trigger_callbacks()
 
+        return self
+
     def flip(
         self,
         horizontally: bool = True,

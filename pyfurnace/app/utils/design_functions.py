@@ -1316,6 +1316,7 @@ def display3d():
         colormap=st_state.oxview_colormap,  # colormap for the viewer
         height=st_state.oxview_frame_size,  # height of the viewer frame
         index_colors=index_colors,  # color the bases in the viewer
+        frame_id=1,
         key="display_nano",
     )
 

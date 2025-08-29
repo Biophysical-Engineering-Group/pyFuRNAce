@@ -155,7 +155,7 @@ Code is licensed under the GNU General Public License v3.0 ([GPL-3.0](https://ww
 ## 🧠 Citation
 
 If you use pyFuRNAce in your research, please cite:
-Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami. (2025) [doi:10.1101/2025.04.17.647389](https://doi.org/10.1101/2025.04.17.647389).
+Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami (2025) [doi:10.1101/2025.04.17.647389](https://doi.org/10.1101/2025.04.17.647389).
 
 ## 🙏 Acknowledgements
 

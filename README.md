@@ -2,7 +2,7 @@
 
 **pyFuRNAce** is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.
 
-[![Downloads/MONTH](https://static.pepy.tech/personalized-badge/pyfurnace?period=month&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads/Month)](https://pepy.tech/projects/pyfurnace) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pyfurnace?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads)](https://pepy.tech/projects/pyfurnace)
+[![Downloads/MONTH](https://static.pepy.tech/personalized-badge/pyfurnace?period=month&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads/Month)](https://pepy.tech/projects/pyfurnace) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pyfurnace?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=RED&left_text=Downloads)](https://pepy.tech/projects/pyfurnace)
 
 
 <!-- **Documentation & Source:** _Coming Soon_\ -->

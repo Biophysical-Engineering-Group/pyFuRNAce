@@ -107,7 +107,7 @@ def oxdna_simulations(
                 steps = md_prod_steps
         text = text.replace("STEPS", str(int(steps)))
 
-        with open(os.path.join(directory, file), "w") as f:
+        with open(os.path.join(directory, file), "w", encoding="utf-8") as f:
             f.write(text)
 
     files_to_include = [

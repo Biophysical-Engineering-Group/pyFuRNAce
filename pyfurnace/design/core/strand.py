@@ -1870,12 +1870,12 @@ class Strand(Callback):
         ### write the oxDNA file
         filename = filename.split(".")[0]  # remove the extension from the filename
         conf_file = f"{filename}.dat"
-        with open(conf_file, "w") as f:
+        with open(conf_file, "w", encoding="utf-8") as f:
             f.write(conf_text)
 
         ### write the top file
         top_file = f"{filename}.top"
-        with open(top_file, "w") as f:
+        with open(top_file, "w", encoding="utf-8") as f:
             f.write(f"{seq_len} {n_strands} 5->3\n" + top_text)
 
         ### write the pdb file

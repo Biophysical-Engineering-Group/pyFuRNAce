@@ -867,7 +867,10 @@ class Motif(Callback):
         if extend:
             # Extend the junctions
             extend_until = [list(m.max_pos) for m in aligned]
-            max_extend = max(extend_until, key=lambda x: x[axis])[axis]
+            print(extend_until)
+            max_extend = max(extend_until, key=lambda x: x[axis], default=[0, 0, 0])[
+                axis
+            ]
             for extend_to in extend_until:
                 extend_to[axis] = max_extend
             aligned = [

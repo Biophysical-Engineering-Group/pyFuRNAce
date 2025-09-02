@@ -70,11 +70,13 @@ To run sequence generation, a `Perl` interpreter is required by the Revolvr scri
 
 ## 🖥️ Running the Web Application
 
-To run the web application locally, clone the repository and install the required dependencies:
+To run the web application locally after installation, use the following command:
 
 ```bash
-python -m pyfurnace
+pyfurnace
 ```
+
+Or alternatively `python -m pyfurnace`.
 
 This will lunch the GUI in your default web browser.
 You can also use the hosted version at [pyfurnace.de](http://pyfurnace.de).

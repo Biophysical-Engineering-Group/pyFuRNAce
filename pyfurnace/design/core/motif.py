@@ -866,10 +866,14 @@ class Motif(Callback):
 
         if extend:
             # Extend the junctions
-            max_extend = max([m.max_pos[axis] for m in aligned], default=0)
-            extend_until = [None, None, None]
-            extend_until[axis] = max_extend
-            aligned = [m.extend_junctions(until=extend_until) for m in aligned]
+            extend_until = [list(m.max_pos) for m in aligned]
+            max_extend = max(extend_until, key=lambda x: x[axis])[axis]
+            for extend_to in extend_until:
+                extend_to[axis] = max_extend
+            aligned = [
+                m.extend_junctions(until=extend_to)
+                for m, extend_to in zip(aligned, extend_until)
+            ]
 
         # prepare the motif shifting them two by two
         for ind, m1 in enumerate(aligned[:-1]):

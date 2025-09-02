@@ -2,6 +2,9 @@
 
 **pyFuRNAce** is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.
 
+[![Downloads/MONTH](https://static.pepy.tech/personalized-badge/pyfurnace?period=month&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads/Month)](https://pepy.tech/projects/pyfurnace) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pyfurnace?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=RED&left_text=Downloads)](https://pepy.tech/projects/pyfurnace)
+
+
 <!-- **Documentation & Source:** _Coming Soon_\ -->
 **WebApp:** [pyfurnace.de](http://pyfurnace.de)\
 **GitHub:** [Biophysical-Engineering-Group/pyFuRNAce](https://github.com/Biophysical-Engineering-Group/pyFuRNAce)\
@@ -34,11 +37,11 @@
 
 Typical installation time: 5 minutes
 
-### Pyfurnace 
+### Pyfurnace
 
 Note: pyFuRNAce requires Python 3.10 or later, and the local installation always includes the GUI via Streamlit.
 
-#### Install from PyPI 
+#### Install from PyPI
 Install the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):
 
 ```bash
@@ -54,9 +57,9 @@ pip install "git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git"
 
 ### Extra Dependencies
 
-**Note**: The **pyFuRNAce installation does not include the oxDNA analysis tools (OAT)**. 
+**Note**: The **pyFuRNAce installation does not include the oxDNA analysis tools (OAT)**.
 
-The OAT package is used to convert 3D structures from/to PDB files and write oxDNA force files. 
+The OAT package is used to convert 3D structures from/to PDB files and write oxDNA force files.
 To install the OAT package, you can use the following command (the **git** command is required, you can install it via anaconda with `conda install git`):
 
 ```bash
@@ -73,9 +76,9 @@ To run the web application locally, clone the repository and install the require
 python -m pyfurnace
 ```
 
-This will lunch the GUI in your default web browser. 
+This will lunch the GUI in your default web browser.
 You can also use the hosted version at [pyfurnace.de](http://pyfurnace.de).
-The WebApp is built using Streamlit and can be run locally or on a server. You can access the webapp directly at 
+The WebApp is built using Streamlit and can be run locally or on a server. You can access the webapp directly at
 [pyfurnace.streamlit.app](https://pyfurnace.streamlit.app).
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pyfurnace.streamlit.app/)
@@ -152,7 +155,7 @@ Code is licensed under the GNU General Public License v3.0 ([GPL-3.0](https://ww
 ## 🧠 Citation
 
 If you use pyFuRNAce in your research, please cite:
-Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami. (2025) [doi:10.1101/2025.04.17.647389](https://doi.org/10.1101/2025.04.17.647389).
+Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami (2025) [doi:10.1101/2025.04.17.647389](https://doi.org/10.1101/2025.04.17.647389).
 
 ## 🙏 Acknowledgements
 

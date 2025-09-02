@@ -311,6 +311,14 @@ if __name__ == "__main__":
         "-Group/pyFuRNAce/discussions)."
     )
 
+    st.markdown("If you use pyFuRNAce in your research, please cite:")
+    st.markdown(
+        "Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: "
+        "An integrated design engine for RNA origami (2025) "
+        "[doi:10.1101/2025.04.17.647389]"
+        "(https://doi.org/10.1101/2025.04.17.647389)."
+    )
+
     st.divider()
 
     st.write("#### Check out the 1-min demo video:")

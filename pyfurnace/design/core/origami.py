@@ -2060,7 +2060,7 @@ class Origami(Callback):
         if return_text:
             return text
 
-        with open(str(path), "w") as f:
+        with open(str(path), "w", encoding="utf-8") as f:
             f.write(text)
 
     def save_text(
@@ -2098,7 +2098,7 @@ class Origami(Callback):
 
         if return_text:
             return text
-        with open(str(path), "w") as f:
+        with open(str(path), "w", encoding="utf-8") as f:
             f.write(text)
 
     def to_road(self) -> str:

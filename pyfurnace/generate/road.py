@@ -221,14 +221,14 @@ def generate_road(
     # save the origami code
     if origami_code is not None:
         origami_code_path = os.path.join(directory, f"{name}.py")
-        with open(origami_code_path, "w") as f:
+        with open(origami_code_path, "w", encoding="utf-8") as f:
             f.write(origami_code)
         # include it in the zip
         files_to_include.append(origami_code_path)
 
     # create the target input file
     target_path = os.path.join(directory, "target.txt")
-    with open(target_path, "w") as f:
+    with open(target_path, "w", encoding="utf-8") as f:
         f.write(f"{name}\n{structure}\n{sequence}\n")
 
         if initial_sequence is not None and len(initial_sequence) == len(structure):
@@ -255,7 +255,7 @@ def generate_road(
 
     # create the revolvr file with specific KL parameters
     out_revolvr = os.path.join(directory, "revolvr.pl")
-    with open(out_revolvr, "w") as f:
+    with open(out_revolvr, "w", encoding="utf-8") as f:
         f.write(revolvr_text)
     # include it in the zip
     files_to_include.append(out_revolvr)

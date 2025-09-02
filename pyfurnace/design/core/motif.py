@@ -866,10 +866,14 @@ class Motif(Callback):
 
         if extend:
             # Extend the junctions
-            max_extend = max([m.max_pos[axis] for m in aligned], default=0)
-            extend_until = [None, None, None]
-            extend_until[axis] = max_extend
-            aligned = [m.extend_junctions(until=extend_until) for m in aligned]
+            extend_until = [list(m.max_pos) for m in aligned]
+            max_extend = max(extend_until, key=lambda x: x[axis])[axis]
+            for extend_to in extend_until:
+                extend_to[axis] = max_extend
+            aligned = [
+                m.extend_junctions(until=extend_to)
+                for m, extend_to in zip(aligned, extend_until)
+            ]
 
         # prepare the motif shifting them two by two
         for ind, m1 in enumerate(aligned[:-1]):
@@ -967,7 +971,7 @@ class Motif(Callback):
         Motif
             The constructed Motif object.
         """
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             motif_text = f.read()
         return cls.from_text(motif_text, **kwargs)
 
@@ -2710,11 +2714,11 @@ class Motif(Callback):
         # save the files
         conf_file = f"{filename}.dat"
         if config:
-            with open(conf_file, "w") as f:
+            with open(conf_file, "w", encoding="utf-8") as f:
                 f.write(conf_text)
         top_file = f"{filename}.top"
         if topology:
-            with open(top_file, "w") as f:
+            with open(top_file, "w", encoding="utf-8") as f:
                 f.write(topology_text)
 
         ### save the external forces
@@ -2800,7 +2804,7 @@ class Motif(Callback):
         """
         seqs = self.sequence.split("&")
         dotb = self.structure.split("&")
-        with open(f"{filename}.fasta", "w") as f:
+        with open(f"{filename}.fasta", "w", encoding="utf-8") as f:
             for i, seq in enumerate(seqs):
                 f.write(f">strand_{i}\n")
                 f.write(f"{seq}\n")
@@ -2817,7 +2821,7 @@ class Motif(Callback):
         """
         path = filename_path.split(".")[0]
         name = path.split("/")[-1].split("\\")[-1]
-        with open(f"{path}.txt", "w") as f:
+        with open(f"{path}.txt", "w", encoding="utf-8") as f:
             f.write(f">{str(name)}\n")
             f.write(f"{self.sequence}\n")
             f.write(f"{self.structure}\n\n")

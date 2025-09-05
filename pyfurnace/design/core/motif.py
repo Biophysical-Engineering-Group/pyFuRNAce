@@ -867,7 +867,6 @@ class Motif(Callback):
         if extend:
             # Extend the junctions
             extend_until = [list(m.max_pos) for m in aligned]
-            print(extend_until)
             max_extend = max(extend_until, key=lambda x: x[axis], default=[0, 0, 0])[
                 axis
             ]
@@ -1162,7 +1161,6 @@ class Motif(Callback):
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
         if not sequence:
-            print("making sequence")
             sequence = "".join("N" if sym != "&" else "&" for sym in structure)
         else:
             sequence = str(sequence).replace("T", "U").upper()

@@ -3,6 +3,7 @@ from copy import deepcopy
 import tempfile
 import sys
 import streamlit as st
+import streamlit.components.v1 as components
 import importlib.util
 
 app_path = Path(__file__).resolve().parent.parent
@@ -62,6 +63,8 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.
         # link='https://pyfurnace.streamlit.app',
         size="large",
     )
+
+    inject_ga4()
     # st.html("""
     #     <style>
     #       [alt=Logo] {
@@ -243,3 +246,57 @@ def save_origami(origami_name="Origami"):
 def write_format_text(text):
     """Format text in a code block"""
     st.markdown(f"```\n{text}\n```")
+
+
+def inject_ga4():
+    MEASUREMENT_ID = "G-M1PJP8JM1T"
+    """
+    Loads GA4 once and sends a page_view with correct URL.
+    Uses a tiny HTML component (0px) to run the JS.
+    """
+    if st.session_state.get("_ga4_injected"):
+        # Still send a page_view on re-renders / page changes
+        components.html(
+            """
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('event', 'page_view', {
+                page_title: document.title,
+                page_location: window.location.href,
+                page_path: window.location.pathname + window.location.search
+              });
+            </script>
+        """,
+            height=0,
+            width=0,
+        )
+        return
+
+    components.html(
+        f"""
+        <script async src="https://www.googletagmanager.com/\
+gtag/js?id={MEASUREMENT_ID}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){{dataLayer.push(arguments);}}
+          // Load GA4 only once per tab
+          if (!window._ga4Loaded) {{
+            gtag('js', new Date());
+            // Turn off page_view to avoid duplicates; we’ll send ours manually.
+            gtag('config', '{MEASUREMENT_ID}', {{ send_page_view: false }});
+            window._ga4Loaded = true;
+          }}
+          // Send an explicit page_view on each render / page switch
+          gtag('event', 'page_view', {{
+            page_title: document.title,
+            page_location: window.location.href,
+            page_path: window.location.pathname + window.location.search
+          }});
+        </script>
+    """,
+        height=0,
+        width=0,
+    )
+
+    st.session_state["_ga4_injected"] = True

@@ -42,7 +42,7 @@ Typical installation time: 5 minutes
 Note: pyFuRNAce requires Python 3.10 or later, and the local installation always includes the GUI via Streamlit.
 
 #### Install from PyPI
-Install the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):
+Install or upgrade the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):
 
 ```bash
 pip install --upgrade pyfurnace

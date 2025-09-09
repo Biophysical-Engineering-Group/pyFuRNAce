@@ -1,3 +1,4 @@
+-r https://raw.githubusercontent.com/Biophysical-Engineering-Group/Streamlit_pyFuRNAce_GA/main/latest.txt
 biopython
 colour
 git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
@@ -8,8 +9,6 @@ scipy
 st-click-detector
 st-oxview
 st_forna_component
-streamlit>=1.44.0
-streamlit @ git+https://github.com/Biophysical-Engineering-Group/Streamlit_pyFuRNAce_GA@ga
 streamlit_code_editor
 streamlit_option_menu
 ViennaRNA

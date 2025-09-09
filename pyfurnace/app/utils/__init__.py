@@ -249,25 +249,22 @@ def write_format_text(text):
 
 
 def inject_ga4():
-    placeholder = st.empty()
-    with placeholder:
-        # """Inject Google Analytics 4 tracking code into the Streamlit app."""
-        # with open(app_path / "utils" / "google_analytics.html", "r") as f:
-        #     ga_html = f.read()
-        # components.html(ga_html, height=0, width=0)
-        st.markdown(
-            """
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-M1PJP8JM1T"\
-            ></script>
-        <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+    # """Inject Google Analytics 4 tracking code into the Streamlit app."""
+    # with open(app_path / "utils" / "google_analytics.html", "r") as f:
+    #     ga_html = f.read()
+    # components.html(ga_html, height=0, width=0)
+    st.markdown(
+        """
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M1PJP8JM1T"\
+        ></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-        gtag('config', 'G-M1PJP8JM1T');
-        </script>
-            """,
-            unsafe_allow_html=True,
-        )
-    placeholder.empty()  # Remove the placeholder after injection
+    gtag('config', 'G-M1PJP8JM1T');
+    </script>
+        """,
+        unsafe_allow_html=True,
+    )

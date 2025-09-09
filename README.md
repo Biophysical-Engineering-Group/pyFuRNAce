@@ -45,7 +45,7 @@ Note: pyFuRNAce requires Python 3.10 or later, and the local installation always
 Install the latest stable version of pyFuRNAce from PyPI using pip (and OAT from GitHub):
 
 ```bash
-pip install pyfurnace
+pip install --upgrade pyfurnace
 ```
 
 #### Install from GitHub

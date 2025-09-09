@@ -62,6 +62,7 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.
         # link='https://pyfurnace.streamlit.app',
         size="large",
     )
+    # Old way to resize the logo, could be useful in the future
     # st.html("""
     #     <style>
     #       [alt=Logo] {

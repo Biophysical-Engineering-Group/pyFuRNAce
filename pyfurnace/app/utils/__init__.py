@@ -64,7 +64,6 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.
         size="large",
     )
 
-    inject_ga4()
     # st.html("""
     #     <style>
     #       [alt=Logo] {
@@ -246,60 +245,3 @@ def save_origami(origami_name="Origami"):
 def write_format_text(text):
     """Format text in a code block"""
     st.markdown(f"```\n{text}\n```")
-
-
-# def inject_ga4():
-#     # """Inject Google Analytics 4 tracking code into the Streamlit app."""
-#     # with open(app_path / "utils" / "google_analytics.html", "r") as f:
-#     #     ga_html = f.read()
-#     # components.html(ga_html, height=0, width=0)
-#     st.markdown(
-#         """
-#     <!-- Google tag (gtag.js) -->
-#     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M1PJP8JM1T"\
-#         ></script>
-#     <script>
-#     window.dataLayer = window.dataLayer || [];
-#     function gtag(){dataLayer.push(arguments);}
-#     gtag('js', new Date());
-
-#     gtag('config', 'G-M1PJP8JM1T');
-#     </script>
-#         """,
-#         unsafe_allow_html=True,
-#     )
-
-
-def inject_ga4():
-    import logging
-    import pathlib
-    import shutil
-    from bs4 import BeautifulSoup
-
-    GA_ID = "google_analytics"
-
-    GA_JS = """
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M1PJP8JM1T">\
-        </script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M1PJP8JM1T');
-    </script>
-    """
-
-    # Insert the script in the head tag of the static template inside your virtual
-    index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
-    logging.info(f"editing {index_path}")
-    soup = BeautifulSoup(index_path.read_text(), features="html.parser")
-    if not soup.find(id=GA_ID):  # if cannot find tag
-        bck_index = index_path.with_suffix(".bck")
-        if bck_index.exists():
-            shutil.copy(bck_index, index_path)  # recover from backup
-        else:
-            shutil.copy(index_path, bck_index)  # keep a backup
-        html = str(soup)
-        new_html = html.replace("<head>", "<head>\n" + GA_JS)
-        index_path.write_text(new_html)

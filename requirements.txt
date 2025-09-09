@@ -1,4 +1,3 @@
-beautifulsoup4
 biopython
 colour
 git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis

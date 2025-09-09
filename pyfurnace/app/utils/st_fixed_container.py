@@ -27,8 +27,8 @@ count = 0
 
 def sticky_container(
     *,
-    height: int | None = None,
-    border: bool | None = None,
+    # height: str = 'content',
+    border: bool = False,
     mode: Literal["top", "bottom"] = "top",
     margin: str | None = None,
 ):
@@ -39,7 +39,9 @@ def sticky_container(
     html_code = STICKY_CONTAINER_HTML.format(position=mode, margin=margin, i=count)
     count += 1
 
-    container = st.container(height=height, border=border)
+    # I never use the height option, so commented out for now
+    # it could be added later if needed, but changes in streamlit versions
+    container = st.container(border=border)  # height=height,
     container.markdown(html_code, unsafe_allow_html=True)
     return container
 

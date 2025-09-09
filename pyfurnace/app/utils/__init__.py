@@ -3,7 +3,6 @@ from copy import deepcopy
 import tempfile
 import sys
 import streamlit as st
-import streamlit.components.v1 as components
 import importlib.util
 
 app_path = Path(__file__).resolve().parent.parent
@@ -63,7 +62,7 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.
         # link='https://pyfurnace.streamlit.app',
         size="large",
     )
-
+    # Old way to resize the logo, could be useful in the future
     # st.html("""
     #     <style>
     #       [alt=Logo] {

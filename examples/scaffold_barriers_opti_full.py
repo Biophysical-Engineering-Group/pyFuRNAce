@@ -4,15 +4,15 @@ import pyfurnace as pf
 ### ORIGAMI PARAMETERS
 dovetails_list = [-3, -3]
 kl_columns = 3
-kl_delay = 150 # nucleotides delay to claculate the folding barrier
+kl_delay = 150  # nucleotides delay to claculate the folding barrier
 
 # collection of best configurations
 # a configuration is a tuple of the form (stem_pos, best_start_position)
 best_confs = []
-total_min = float('inf')
+total_min = float("inf")
 n_helix = len(dovetails_list) + 2
 
-starts = list(product(range(0, n_helix - 1), repeat=n_helix-1))[::-1]
+starts = list(product(range(0, n_helix), repeat=kl_columns))[::-1]
 
 ### Find the best start position
 for stem_pos in starts:
@@ -31,27 +31,27 @@ for stem_pos in starts:
     #     continue
     ### END OF FILTERING
 
-    print('Stem pos:', stem_pos)
+    print("Stem pos:", stem_pos)
 
     # Create the origami with the given stem positions
     # and no start/end stem
-    origami = pf.simple_origami(dovetails_list, 
-                                kl_columns=kl_columns,
-                                main_stem=33, 
-                                stem_pos=stem_pos, 
-                                align='first',
-                                add_start_end=False)
-
+    origami = pf.simple_origami(
+        dovetails_list,
+        kl_columns=kl_columns,
+        main_stem=33,
+        stem_pos=stem_pos,
+        align="first",
+        add_start_end=False,
+    )
 
     start_barrier = origami.assembled.folding_barriers(kl_delay=kl_delay)[1]
-    print('Start barrier:', start_barrier)
-    
+    print("Start barrier:", start_barrier)
 
     db, stacks = pf.dot_bracket_to_stacks(origami.structure)
     min = start_barrier
     best_middle = 0
     for db, (start, end) in zip(db, stacks):
-        if db not in '()':
+        if db not in "()":
             continue
         pos = (start + end) // 2
         new_strucutre = pf.rotate_dot_bracket(origami.structure, pos)
@@ -66,24 +66,26 @@ for stem_pos in starts:
         elif new_bar == total_min:
             best_confs.append((stem_pos, pos))
 
-    print('Best start:', best_middle, 'Barrier:', min)
+    print("Best start:", best_middle, "Barrier:", min)
 
     print()
 
-print('Best min penalty:', total_min)
-print('Best confs:')
+print("Best min penalty:", total_min)
+print("Best confs:")
 for conf in best_confs:
-    print('Main stem positions:', conf[0], 'Best start position:', conf[1])
+    print("Main stem positions:", conf[0], "Best start position:", conf[1])
 
 # Make the origami with the best configuration
 best_stem_pos = best_confs[0][0]
 best_start_pos = best_confs[0][1]
-origami = pf.simple_origami(dovetails_list, 
-                            kl_columns=kl_columns,
-                            main_stem=33, 
-                            stem_pos=best_stem_pos, 
-                            align='first',
-                            add_start_end=False)
+origami = pf.simple_origami(
+    dovetails_list,
+    kl_columns=kl_columns,
+    main_stem=33,
+    stem_pos=best_stem_pos,
+    align="first",
+    add_start_end=False,
+)
 
 # Add the start/end stem, but check the orientation
 for flip in range(2):
@@ -107,5 +109,5 @@ for flip in range(2):
         origami = ori_copy
         break
 
-print('Example origami:')
+print("Example origami:")
 print(origami)

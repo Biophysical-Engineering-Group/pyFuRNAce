@@ -64,7 +64,6 @@ def load_seq_dot():
                 structure=structure, sequence=sequence
             )
             st_state.qs_text = (
-                f"import pyfurnace as pf\n"
                 f"origami = pf.Origami.from_structure("
                 f'structure="{structure}", '
                 f'sequence="{sequence}")'
@@ -103,6 +102,8 @@ def load_template():
     # remove one layer of indentation
     only_code = func_code.split('"""')[2].split("return")[0]
     func_code = "\n".join([line[4:] for line in only_code.splitlines()])
+    # remove the pyfurnace import if present
+    func_code = func_code.replace("import pyfurnace as pf", "").strip()
 
     st_state.qs_origami = templ_funcs[template]()
     st_state.qs_text = f"{func_code.strip()}\n"
@@ -141,7 +142,6 @@ def load_file():
                 structure=structure, sequence=sequence
             )
             st_state.qs_text = (
-                f"import pyfurnace as pf\n"
                 f"origami = pf.Origami.from_structure("
                 f'structure="{structure}", '
                 f'sequence="{sequence}")'
@@ -167,7 +167,7 @@ def load_file():
 
 
 def newcomer_flow():
-    cols_ratio = [1.7, 2.1, 1, 4]
+    cols_ratio = [1.7, 2.1, 2, 4]
     col1, col2, col3, _ = st.columns(cols_ratio, vertical_alignment="bottom")
     sequence_type = "secondary"
     template_type = "secondary"

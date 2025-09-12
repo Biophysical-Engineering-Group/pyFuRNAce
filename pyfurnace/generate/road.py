@@ -129,6 +129,12 @@ def generate_road(
                 struct_list[pair_map[i]] = "}"
 
     ### ADD THE PSEUDOKNOTS ROAD NOTATION
+    avg_pk_E = 0
+    avg_pk_dE = 0
+    if not pseudoknots:
+        avg_pk_E = -9.0
+        avg_pk_dE = 1.81
+
     if isinstance(pseudoknots, dict):
         pk_dict = pseudoknots
     else:
@@ -146,8 +152,6 @@ def generate_road(
         "I": "9",
     }
     external_pk_count = 0
-    avg_pk_E = 0
-    avg_pk_dE = 0
 
     # sort the pseudoknots by their index
     pk_dict = {

@@ -136,10 +136,13 @@ class Origami(Callback):
         else:
             sequence = str(sequence).replace("T", "U").upper()
 
-        if isinstance(structure, str) and len(structure) != len(sequence):
+        if isinstance(structure, str) and len(structure.strip("& ")) != len(
+            sequence.strip("& ")
+        ):
             raise ValueError(
                 f"The sequence length must be equal to the structure "
-                f"length. Got {len(sequence)} for {len(structure)}"
+                f"length. Got sequence len {len(sequence)} for structure"
+                f" len {len(structure)}."
             )
 
         if motif_list and not all(isinstance(m, Motif) for m in motif_list):

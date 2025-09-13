@@ -538,12 +538,15 @@ def parallel_road(
                 try:
                     result = result_queue.get(timeout=timeout)
                     results.append(result)
-                except Exception:
+                except Exception:  # likely empty queue error
                     pass  # skip failed or timed-out results
         else:
             # Wait for the first successful result
-            result = result_queue.get(timeout=timeout)
-            results.append(result)
+            try:
+                result = result_queue.get(timeout=timeout)
+                results.append(result)
+            except Exception:  # likely empty queue error
+                pass  # no result within timeout
             stop_event.set()
     finally:
         for p in processes:

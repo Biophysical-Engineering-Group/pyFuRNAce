@@ -2,7 +2,7 @@ import pytest
 from pyfurnace.design.motifs import Motif
 from pyfurnace.design.core.strand import Strand
 from pyfurnace.design.core.basepair import BasePair
-from pyfurnace.design.core import RIGHT
+from pyfurnace.design.core import RIGHT, LEFT, MotifStructureError
 
 
 # Test Fixtures
@@ -126,6 +126,9 @@ def test_motif_shift(m_two_strands):
     motif = m_two_strands.copy()
     motif.shift((3, 4))
     assert motif.min_pos == (3, 4)
+    motif = m_two_strands.copy()
+    motif.shift((3, 4), extend=True)
+    assert motif.min_pos == (0, 4)
 
 
 def test_motif_extend_junctions(m_two_strands):
@@ -201,7 +204,9 @@ def test_motif_save_oxdna(m_two_strands, tmp_path):
     """Test saving motif in oxDNA format."""
     motif = m_two_strands.copy()
     filepath = tmp_path / "motif"
-    motif.save_3d_model(str(filepath))
+    motif.save_3d_model(
+        str(filepath), forces="True", pk_forces=True, sequence=motif.sequence, pdb=True
+    )
     assert filepath.with_suffix(".dat").exists()
     assert filepath.with_suffix(".top").exists()
 
@@ -211,7 +216,9 @@ def test_motif_save_text(m_two_strands, tmp_path):
     motif = m_two_strands.copy()
     filepath = tmp_path / "motif"
     motif.save_text(str(filepath))
+    motif.save_fasta(str(filepath))
     assert filepath.with_suffix(".txt").exists()
+    assert filepath.with_suffix(".fasta").exists()
 
 
 def test_motif_copy(m_two_strands):
@@ -237,3 +244,51 @@ def test_motif_strip(simple_motif):
     motif = simple_motif.copy()
     stripped = motif.strip()
     assert stripped.min_pos == (0, 0)
+
+
+def test_motif_bad_shift(simple_motif):
+    """Test shifting motifs to negative positions."""
+    motif = simple_motif.copy()
+    with pytest.raises(MotifStructureError, match="The motif cannot be shifted."):
+        motif.shift((-10, -10))  # Invalid shift tuple length
+
+
+def test_strand_sorting():
+    """Test sorting strands within a motif."""
+    strand1 = Strand("AUGC", directionality="53", start=(0, 0), direction=RIGHT)
+    strand2 = Strand("GAUG", directionality="35", start=(6, 2), direction=LEFT)
+    strand3 = Strand("C\\|AU", directionality="53", start=(8, 3), direction=RIGHT)
+    motif = Motif([strand1, strand2, strand3])
+    motif.sort()
+    assert motif[0] == strand1
+    assert motif[1] == strand2
+    assert motif[2] == strand3
+    motif.sort(key=lambda s: 2 * (s[0] == "C") + 1 * (s[0] == "A"), reverse=True)
+    assert motif[0] == strand3
+    assert motif[1] == strand1
+    assert motif[2] == strand2
+
+
+def test_setitem_getitem(simple_motif):
+    """Test __getitem__ and __setitem__ for Motif."""
+    motif = simple_motif.copy()
+    assert motif[0] == simple_motif[0], "__getitem__ did not return the correct strand."
+    new_strand = Strand("AUGC", directionality="53", start=(0, 0), direction=RIGHT)
+    motif[0] = new_strand
+    assert motif[0] == new_strand, "__setitem__ did not set the strand correctly."
+    with pytest.raises(ValueError, match="is not a Strand object."):
+        motif[0] = "not_a_strand"  # Invalid type
+
+
+def test_motif_from_structure():
+    """Test creating a motif from structure."""
+    structure = "....(((...)))..((..)).&..(((...)))"
+    sequence = "AUAUGCCUUUGGCAACCUUGGA&AAGCGUAUCGC"
+    motif = Motif.from_structure(sequence=sequence, structure=structure)
+    assert len(motif) == 2
+    assert motif.structure == structure
+    assert motif.sequence == sequence
+    motif = Motif.from_structure(sequence="GGGGUUCGCCCC")
+    assert len(motif) == 1
+    assert motif.structure == "((((....))))"
+    assert motif.sequence == "GGGGUUCGCCCC"

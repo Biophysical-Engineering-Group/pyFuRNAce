@@ -2860,8 +2860,8 @@ class Motif(Callback):
         # check if the shift will bring the strands to negative positions
         if min_pos[0] + shift[0] < 0 or min_pos[1] + shift[1] < 0:
             raise MotifStructureError(
-                f"The motif cannot be shifed. The strands cannot be drawn"
-                f" at negative positons. Attempt to draw the motif at "
+                f"The motif cannot be shifted. The strands cannot be drawn"
+                f" at negative positions. Attempt to draw the motif at "
                 f"position ({min_pos[0] + shift_vect[0]}, "
                 f"{min_pos[1] + shift_vect[1]})"
             )

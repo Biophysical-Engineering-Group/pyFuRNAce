@@ -11,7 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=bbaf98b3"></script>
@@ -22,17 +22,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -80,7 +80,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <section id="module-pyfurnace.design.core">
 <span id="pyfurnace-design-core-package"></span><h1>pyfurnace.design.core package<a class="headerlink" href="#module-pyfurnace.design.core" title="Link to this heading"></a></h1>
 <section id="submodules">
@@ -1118,7 +1118,7 @@ of each strand, with 5’ to 3’ directionality.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.extend_junctions" title="pyfurnace.design.core.motif.Motif.extend_junctions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend_junctions</span></code></a>([skip_axis, ...])</p></td>
 <td><p>Extend the junctions of the motif in the direction of the junctions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.flip" title="pyfurnace.design.core.motif.Motif.flip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip</span></code></a>([horizontally, vertically, strand_index])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.flip" title="pyfurnace.design.core.motif.Motif.flip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip</span></code></a>([horizontally, vertically, ...])</p></td>
 <td><p>Flip the strands of the motif horizontally and/or vertically inplace.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.folding_barriers" title="pyfurnace.design.core.motif.Motif.folding_barriers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">folding_barriers</span></code></a>([kl_delay])</p></td>
@@ -1130,8 +1130,8 @@ of each strand, with 5’ to 3’ directionality.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_list" title="pyfurnace.design.core.motif.Motif.from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_list</span></code></a>(motif_list, **kwargs)</p></td>
 <td><p>Create a Motif object from a list of strings representing a motif sketch.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_structure" title="pyfurnace.design.core.motif.Motif.from_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code></a>(structure[, sequence, ...])</p></td>
-<td><p>Convert a structure representation to a Motif object.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_structure" title="pyfurnace.design.core.motif.Motif.from_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code></a>([structure, sequence, ...])</p></td>
+<td><p>Parse a structure or sequence representation to a Motif object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.motif.Motif.from_text" title="pyfurnace.design.core.motif.Motif.from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_text</span></code></a>(motif_text, **kwargs)</p></td>
 <td><p>Create a Motif object from a text string representing a motif sketch.</p></td>
@@ -1345,15 +1345,20 @@ callback functions.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyfurnace.design.core.motif.Motif.extend_junctions">
-<span class="sig-name descname"><span class="pre">extend_junctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_directions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">until</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/motif.html#Motif.extend_junctions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.motif.Motif.extend_junctions" title="Link to this definition"></a></dt>
-<dd><p>Extend the junctions of the motif in the direction of the junctions.</p>
+<span class="sig-name descname"><span class="pre">extend_junctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_directions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">until</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/motif.html#Motif.extend_junctions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.motif.Motif.extend_junctions" title="Link to this definition"></a></dt>
+<dd><p>Extend the junctions of the motif in the direction of the junctions.
+Unless the skip_axis is specified, the junctions are extended
+in all directions. The until parameter allows to specify
+the position until which to extend the junctions in the positive direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>skip_axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The numpy axis to skip when extending the junctions
 (1 for horizontal, 0 for vertical).</p></li>
 <li><p><strong>skip_directions</strong> (<em>List</em><em>[</em><a class="reference internal" href="#pyfurnace.design.core.position.Direction" title="pyfurnace.design.core.position.Direction"><em>Direction</em></a><em>]</em><em>, </em><em>optional</em>) – The list of directions to skip when extending the junctions.</p></li>
-<li><p><strong>until</strong> (<em>tuple</em><em>, </em><em>default</em><em> (</em><em>None</em><em>, </em><em>None</em><em>)</em>) – The position until which to extend the junctions.</p></li>
+<li><p><strong>until</strong> (<a class="reference internal" href="#pyfurnace.design.core.position.Position" title="pyfurnace.design.core.position.Position"><em>Position</em></a><em>, </em><em>optional</em>) – The position until which to extend the junctions
+If None, extend until the end of the motif in all directions
+(to the origin and to the maximum position).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1373,7 +1378,7 @@ callback functions.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyfurnace.design.core.motif.Motif.flip">
-<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizontally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertically</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/motif.html#Motif.flip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.motif.Motif.flip" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">flip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizontally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertically</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/motif.html#Motif.flip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.motif.Motif.flip" title="Link to this definition"></a></dt>
 <dd><p>Flip the strands of the motif horizontally and/or vertically inplace.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1382,6 +1387,10 @@ callback functions.</p></li>
 <li><p><strong>vertically</strong> (<em>bool</em><em>, </em><em>default True</em>) – If True, flip the strands vertically.</p></li>
 <li><p><strong>strand_index</strong> (<em>list</em><em>, </em><em>default None</em>) – The list of indices of the strands to flip.
 If None, all the strands are flipped.</p></li>
+<li><p><strong>reorder</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, reorder the strands after flipping,
+so that the first strand is the one with the 5’ end,
+then the strand with the lowest y start position,
+and finally the strand with the lowest x start position.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1485,8 +1494,11 @@ multiple symbols next to the start symbol.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyfurnace.design.core.motif.Motif.from_structure">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk_energy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-8.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk_denergy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/motif.html#Motif.from_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.motif.Motif.from_structure" title="Link to this definition"></a></dt>
-<dd><p>Convert a structure representation to a Motif object.</p>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk_energy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-8.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk_denergy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/motif.html#Motif.from_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.motif.Motif.from_structure" title="Link to this definition"></a></dt>
+<dd><p>Parse a structure or sequence representation to a Motif object.
+If a structure is not provided, it is calculated from the sequence
+with RNAfold. If a sequence is not provided, it is assumed to be
+a sequence of ‘N’s of the same length as the structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2097,7 +2109,7 @@ corresponding index in the original matrix (y, x).</p>
 <dt class="sig sig-object py" id="pyfurnace.design.core.origami.Origami.seq_positions">
 <span class="sig-name descname"><span class="pre">seq_positions</span></span><a class="headerlink" href="#pyfurnace.design.core.origami.Origami.seq_positions" title="Link to this definition"></a></dt>
 <dd><p>The positions of each nucleotide in the origami sequence (x,y coordinates).
-Same as calling origami.motif.seq_positions. Always 5’ to 3’.</p>
+Same as calling origami.assembled.seq_positions. Always 5’ to 3’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Tuple[<a class="reference internal" href="#pyfurnace.design.core.position.Position" title="pyfurnace.design.core.position.Position">Position</a>]</p>
@@ -2199,49 +2211,52 @@ the coordinates of the motifs.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.folding_barriers" title="pyfurnace.design.core.origami.Origami.folding_barriers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">folding_barriers</span></code></a>([kl_delay])</p></td>
 <td><p>Compute the folding barriers for a given RNA secondary structure.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_at_position" title="pyfurnace.design.core.origami.Origami.get_motif_at_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motif_at_position</span></code></a>(position)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.from_structure" title="pyfurnace.design.core.origami.Origami.from_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code></a>([structure, sequence, ...])</p></td>
+<td><p>Parse a structure or sequence representation to an Origami object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_at_position" title="pyfurnace.design.core.origami.Origami.get_motif_at_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motif_at_position</span></code></a>(position)</p></td>
 <td><p>Get a motif from its position in 2D coordinates.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_at_seq_index" title="pyfurnace.design.core.origami.Origami.get_motif_at_seq_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motif_at_seq_index</span></code></a>(index)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_at_seq_index" title="pyfurnace.design.core.origami.Origami.get_motif_at_seq_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motif_at_seq_index</span></code></a>(index)</p></td>
 <td><p>Get the motif that contains the given sequence index.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_type" title="pyfurnace.design.core.origami.Origami.get_motif_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motif_type</span></code></a>(motif_type)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_motif_type" title="pyfurnace.design.core.origami.Origami.get_motif_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motif_type</span></code></a>(motif_type)</p></td>
 <td><p>Get all motifs in the Origami that match the given type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_slice_at_seq_index" title="pyfurnace.design.core.origami.Origami.get_slice_at_seq_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_slice_at_seq_index</span></code></a>(index)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.get_slice_at_seq_index" title="pyfurnace.design.core.origami.Origami.get_slice_at_seq_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_slice_at_seq_index</span></code></a>(index)</p></td>
 <td><p>Get matrix coordinates of the motif containing the given sequence index.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.improve_folding_pathway" title="pyfurnace.design.core.origami.Origami.improve_folding_pathway"><code class="xref py py-obj docutils literal notranslate"><span class="pre">improve_folding_pathway</span></code></a>([kl_delay])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.improve_folding_pathway" title="pyfurnace.design.core.origami.Origami.improve_folding_pathway"><code class="xref py py-obj docutils literal notranslate"><span class="pre">improve_folding_pathway</span></code></a>([kl_delay])</p></td>
 <td><p>Suggest a better folding pathway by circularly shifting the structure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.index" title="pyfurnace.design.core.origami.Origami.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a>(condition)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.index" title="pyfurnace.design.core.origami.Origami.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a>(condition)</p></td>
 <td><p>Find the matrix coordinates of motifs that satisfy a given condition.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.insert" title="pyfurnace.design.core.origami.Origami.insert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code></a>(idx, item[, copy])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.insert" title="pyfurnace.design.core.origami.Origami.insert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code></a>(idx, item[, copy])</p></td>
 <td><p>Insert a Motif or list of Motifs at a specific position.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.pop" title="pyfurnace.design.core.origami.Origami.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(idx)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.pop" title="pyfurnace.design.core.origami.Origami.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(idx)</p></td>
 <td><p>Remove and return a motif or line of motifs at the given index.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_callback</span></code>(callback)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_callback</span></code>(callback)</p></td>
 <td><p>Register a new callback function to be executed when an event occurs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.reload" title="pyfurnace.design.core.origami.Origami.reload"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reload</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.reload" title="pyfurnace.design.core.origami.Origami.reload"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reload</span></code></a>()</p></td>
 <td><p>Recompute the internal structure and regenerate the assembled motif.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.remove" title="pyfurnace.design.core.origami.Origami.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a>(motif)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.remove" title="pyfurnace.design.core.origami.Origami.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a>(motif)</p></td>
 <td><p>Remove a specific motif from the matrix.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_3d_model" title="pyfurnace.design.core.origami.Origami.save_3d_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_3d_model</span></code></a>([filename, config, topology, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_3d_model" title="pyfurnace.design.core.origami.Origami.save_3d_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_3d_model</span></code></a>([filename, config, topology, ...])</p></td>
 <td><p>Save the motif 3D structure in a file for structural 3D modeling.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_fasta" title="pyfurnace.design.core.origami.Origami.save_fasta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fasta</span></code></a>(filename_path[, return_text])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_fasta" title="pyfurnace.design.core.origami.Origami.save_fasta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fasta</span></code></a>(filename_path[, return_text])</p></td>
 <td><p>Save the sequence of the Origami to a FASTA file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_text" title="pyfurnace.design.core.origami.Origami.save_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_text</span></code></a>(filename_path[, to_road, return_text])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.save_text" title="pyfurnace.design.core.origami.Origami.save_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_text</span></code></a>(filename_path[, to_road, return_text])</p></td>
 <td><p>Save only the structure part of the Origami to a text file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.to_road" title="pyfurnace.design.core.origami.Origami.to_road"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_road</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami.to_road" title="pyfurnace.design.core.origami.Origami.to_road"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_road</span></code></a>()</p></td>
 <td><p>Try to convert the Origami's text representation into ROAD-compatible format.</p></td>
 </tr>
 </tbody>
@@ -2374,6 +2389,34 @@ more conservative  setting is 150 by default.</p></li>
 <p class="rubric">Notes</p>
 <p>The function assigns barrier strengths based on the topology of base pairs
 and kinetic constraints, ensuring proper folding predictions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyfurnace.design.core.origami.Origami.from_structure">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk_energy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-8.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk_denergy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motif_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/origami.html#Origami.from_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.origami.Origami.from_structure" title="Link to this definition"></a></dt>
+<dd><p>Parse a structure or sequence representation to an Origami object.
+If a structure is not provided, it is calculated from the sequence
+with RNAfold. If a sequence is not provided, it is assumed to be
+a sequence of ‘N’s of the same length as the structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>, </em><a class="reference internal" href="#pyfurnace.design.core.basepair.BasePair" title="pyfurnace.design.core.basepair.BasePair"><em>BasePair</em></a><em>, </em><a class="reference internal" href="#pyfurnace.design.core.symbols.Node" title="pyfurnace.design.core.symbols.Node"><em>Node</em></a><em>]</em>) – The structure representation to convert.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em><em>, </em><em>optional</em>) – The sequence or sequence constraints of the motif.</p></li>
+<li><p><strong>pk_energy</strong> (<em>float</em><em>, </em><em>optional</em>) – The energy of the pseudoknots (if present).</p></li>
+<li><p><strong>pk_denergy</strong> (<em>float</em><em>, </em><em>optional</em>) – The energy tolerance of the pseudoknots (if present).</p></li>
+<li><p><strong>motif_list</strong> (<em>List</em><em>[</em><a class="reference internal" href="#pyfurnace.design.core.motif.Motif" title="pyfurnace.design.core.motif.Motif"><em>Motif</em></a><em>]</em><em>, </em><em>optional</em>) – A list of specific motifs to parse the structure.
+By default, the motifs are stems and aptamers.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional arguments to pass to the Motif constructor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Origami object created from the structure representation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -2585,7 +2628,8 @@ calling the assembled.motif.positions.</p>
 <dt class="sig sig-object py" id="id29">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pseudoknots</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#id29" title="Link to this definition"></a></dt>
 <dd><p>A dictionary with the pseudoknot information.
-The dictionary has pseudoknot IDs as keys and the pseudoknot information as values.
+The dictionary has pseudoknot IDs as keys and the pseudoknot information as
+values.
 The pseudoknot information is a dictionary with the following keys:</p>
 <blockquote>
 <div><ul class="simple">
@@ -3078,14 +3122,20 @@ and integration with structure-aware tools.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.distance" title="pyfurnace.design.core.sequence.Sequence.distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distance</span></code></a>(other)</p></td>
 <td><p>Compute the number of mismatched bases between this sequence and another.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence" title="pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_repeated_subsequence</span></code></a>([min_length])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.find" title="pyfurnace.design.core.sequence.Sequence.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a>(sub)</p></td>
+<td><p>Find the first occurrence of a subsequence in the sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence" title="pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_repeated_subsequence</span></code></a>([min_length])</p></td>
 <td><p>Find all subsequences of minimum length that appear more than once.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.gc_content" title="pyfurnace.design.core.sequence.Sequence.gc_content"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gc_content</span></code></a>([extended_alphabet])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.gc_content" title="pyfurnace.design.core.sequence.Sequence.gc_content"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gc_content</span></code></a>([extended_alphabet])</p></td>
 <td><p>Calculate the GC content of the sequence.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.get_random_sequence" title="pyfurnace.design.core.sequence.Sequence.get_random_sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_random_sequence</span></code></a>([structure])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.get_random_sequence" title="pyfurnace.design.core.sequence.Sequence.get_random_sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_random_sequence</span></code></a>([structure])</p></td>
 <td><p>Generate a randomized sequence compatible with the IUPAC symbols and optionally a dot-bracket structure to be respected.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.lower" title="pyfurnace.design.core.sequence.Sequence.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a>()</p></td>
+<td><p>Convert sequence to lowercase.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.sequence.Sequence.molecular_weight" title="pyfurnace.design.core.sequence.Sequence.molecular_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">molecular_weight</span></code></a>()</p></td>
 <td><p>Calculate the molecular weight of the sequence.</p></td>
@@ -3171,6 +3221,23 @@ and integration with structure-aware tools.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyfurnace.design.core.sequence.Sequence.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/sequence.html#Sequence.find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.sequence.Sequence.find" title="Link to this definition"></a></dt>
+<dd><p>Find the first occurrence of a subsequence in the sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sub</strong> (<em>str</em>) – Subsequence to find.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index of the first occurrence of the subsequence, or -1 if not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence">
 <span class="sig-name descname"><span class="pre">find_repeated_subsequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/sequence.html#Sequence.find_repeated_subsequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence" title="Link to this definition"></a></dt>
 <dd><p>Find all subsequences of minimum length that appear more than once.</p>
@@ -3218,6 +3285,20 @@ optionally a dot-bracket structure to be respected.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyfurnace.design.core.sequence.Sequence.lower">
+<span class="sig-name descname"><span class="pre">lower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/sequence.html#Sequence.lower"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.sequence.Sequence.lower" title="Link to this definition"></a></dt>
+<dd><p>Convert sequence to lowercase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lowercase sequence string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3658,46 +3739,49 @@ acount structural errors.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.draw" title="pyfurnace.design.core.strand.Strand.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a>([canvas, return_string, plane])</p></td>
 <td><p>Draw the strand in 2D space using a canvas.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.flip" title="pyfurnace.design.core.strand.Strand.flip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip</span></code></a>([horizontally, vertically, flip_start])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.extend" title="pyfurnace.design.core.strand.Strand.extend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code></a>(direction[, until, check])</p></td>
+<td><p>Extend the strand in the specified direction by a given length.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.flip" title="pyfurnace.design.core.strand.Strand.flip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip</span></code></a>([horizontally, vertically, flip_start])</p></td>
 <td><p>Flip the 2D structure of the strand.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_base_at_pos" title="pyfurnace.design.core.strand.Strand.get_base_at_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_base_at_pos</span></code></a>(pos)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_base_at_pos" title="pyfurnace.design.core.strand.Strand.get_base_at_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_base_at_pos</span></code></a>(pos)</p></td>
 <td><p>Get the base at the specified 2D position in the strand.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_char_at_pos" title="pyfurnace.design.core.strand.Strand.get_char_at_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_char_at_pos</span></code></a>(pos)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_char_at_pos" title="pyfurnace.design.core.strand.Strand.get_char_at_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_char_at_pos</span></code></a>(pos)</p></td>
 <td><p>Get the character at the specified 2D position in the strand.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_position_map" title="pyfurnace.design.core.strand.Strand.get_position_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_position_map</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.get_position_map" title="pyfurnace.design.core.strand.Strand.get_position_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_position_map</span></code></a>()</p></td>
 <td><p>Get a dictionary of positions as keys and the corresponding characters as values.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.insert" title="pyfurnace.design.core.strand.Strand.insert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code></a>(idx, val)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.insert" title="pyfurnace.design.core.strand.Strand.insert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code></a>(idx, val)</p></td>
 <td><p>Insert a character into the strand at the specified index.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.invert" title="pyfurnace.design.core.strand.Strand.invert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invert</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.invert" title="pyfurnace.design.core.strand.Strand.invert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invert</span></code></a>()</p></td>
 <td><p>Invert the start and end positions of the strand, effectively reversing the sequence directionalty and 3D coordinates orientation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.join" title="pyfurnace.design.core.strand.Strand.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code></a>(other[, trigger_callbacks])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.join" title="pyfurnace.design.core.strand.Strand.join"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code></a>(other[, trigger_callbacks])</p></td>
 <td><p>Join this strand with another strand, aligning their start and end positions and direction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.join_strands" title="pyfurnace.design.core.strand.Strand.join_strands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_strands</span></code></a>(strand1, strand2)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.join_strands" title="pyfurnace.design.core.strand.Strand.join_strands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_strands</span></code></a>(strand1, strand2)</p></td>
 <td><p>Join two strands together if they match in the right direction and have a compatible directionality.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.pop" title="pyfurnace.design.core.strand.Strand.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(idx)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.pop" title="pyfurnace.design.core.strand.Strand.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(idx)</p></td>
 <td><p>Remove and return a character from the strand at the specified index.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_callback</span></code>(callback)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_callback</span></code>(callback)</p></td>
 <td><p>Register a new callback function to be executed when an event occurs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.reverse" title="pyfurnace.design.core.strand.Strand.reverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.reverse" title="pyfurnace.design.core.strand.Strand.reverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code></a>()</p></td>
 <td><p>Reverse the directionality of the strand sequence (5' to 3' becomes 3' to 5' and vice versa).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.save_3d_model" title="pyfurnace.design.core.strand.Strand.save_3d_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_3d_model</span></code></a>([filename, return_text, pdb])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.save_3d_model" title="pyfurnace.design.core.strand.Strand.save_3d_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_3d_model</span></code></a>([filename, return_text, pdb])</p></td>
 <td><p>Save the 3D structure of the strand in oxDNA format (.dat, .top) and optionally as PDB.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.shift" title="pyfurnace.design.core.strand.Strand.shift"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code></a>(shift_position[, check])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.shift" title="pyfurnace.design.core.strand.Strand.shift"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code></a>(shift_position[, check])</p></td>
 <td><p>Shift the strand position in the 2D layout.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.transform" title="pyfurnace.design.core.strand.Strand.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(transformation_matrix)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyfurnace.design.core.strand.Strand.transform" title="pyfurnace.design.core.strand.Strand.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(transformation_matrix)</p></td>
 <td><p>Apply a transformation matrix to the strand's 3D coordinates.</p></td>
 </tr>
 </tbody>
@@ -3789,6 +3873,27 @@ trying to overwrite a symbol in the canvas.</p>
 <dt class="sig sig-object py" id="id45">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">end_direction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pyfurnace.design.core.position.Direction" title="pyfurnace.design.core.position.Direction"><span class="pre">Direction</span></a></em><a class="headerlink" href="#id45" title="Link to this definition"></a></dt>
 <dd><p>The last direction of the strand.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyfurnace.design.core.strand.Strand.extend">
+<span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">until</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/core/strand.html#Strand.extend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.core.strand.Strand.extend" title="Link to this definition"></a></dt>
+<dd><p>Extend the strand in the specified direction by a given length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>direction</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#pyfurnace.design.core.position.Position" title="pyfurnace.design.core.position.Position"><em>Position</em></a><em>, </em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em><em>, </em><em>default</em><em> (</em><em>1</em><em>, </em><em>0</em><em>)</em>) – The direction to extend the strand in. It can be a Position object or
+a tuple of (x, y) coordinates. It must contain coordinates that are either
+1, -1 or 0, where 0 is the coordinate that does not change.</p></li>
+<li><p><strong>until</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#pyfurnace.design.core.position.Position" title="pyfurnace.design.core.position.Position"><em>Position</em></a><em>, </em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em><em>, </em><em>default None</em>) – The position until which to extend the strand. If None, the strand is
+extended until the origin position (0, 0).</p></li>
+<li><p><strong>check</strong> (<em>bool</em><em>, </em><em>default True</em>) – If True, check the direction and until position for validity.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4436,8 +4541,14 @@ folding barriers calculation for canonical co-transcriptional RNA Origami</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="pyfurnace.design.core.symbols.T7_PROMOTER">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">T7_PROMOTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TAATACGACTCACTATA'</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.T7_PROMOTER" title="Link to this definition"></a></dt>
+<dd><p>Sequence representing the T7 promoter.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="pyfurnace.design.core.symbols.accept_symbol">
-<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">accept_symbol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'</span> <span class="pre">',</span> <span class="pre">'!',</span> <span class="pre">'&amp;',</span> <span class="pre">')',</span> <span class="pre">'*',</span> <span class="pre">'+',</span> <span class="pre">'-',</span> <span class="pre">'.(',</span> <span class="pre">'/',</span> <span class="pre">'3',</span> <span class="pre">'5',</span> <span class="pre">':',</span> <span class="pre">'&lt;',</span> <span class="pre">'=',</span> <span class="pre">'&gt;',</span> <span class="pre">'A',</span> <span class="pre">'B',</span> <span class="pre">'C',</span> <span class="pre">'D',</span> <span class="pre">'E',</span> <span class="pre">'F',</span> <span class="pre">'G',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'J',</span> <span class="pre">'K',</span> <span class="pre">'L',</span> <span class="pre">'M',</span> <span class="pre">'N',</span> <span class="pre">'O',</span> <span class="pre">'P',</span> <span class="pre">'Q',</span> <span class="pre">'R',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'U',</span> <span class="pre">'V',</span> <span class="pre">'W',</span> <span class="pre">'X',</span> <span class="pre">'Y',</span> <span class="pre">'Z',</span> <span class="pre">'[',</span> <span class="pre">'\\',</span> <span class="pre">']',</span> <span class="pre">'^',</span> <span class="pre">'a',</span> <span class="pre">'b',</span> <span class="pre">'c',</span> <span class="pre">'d',</span> <span class="pre">'e',</span> <span class="pre">'f',</span> <span class="pre">'g',</span> <span class="pre">'h',</span> <span class="pre">'i',</span> <span class="pre">'j',</span> <span class="pre">'k',</span> <span class="pre">'l',</span> <span class="pre">'m',</span> <span class="pre">'n',</span> <span class="pre">'o',</span> <span class="pre">'p',</span> <span class="pre">'q',</span> <span class="pre">'r',</span> <span class="pre">'s',</span> <span class="pre">'t',</span> <span class="pre">'u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'x',</span> <span class="pre">'y',</span> <span class="pre">'z',</span> <span class="pre">'{',</span> <span class="pre">'|',</span> <span class="pre">'}',</span> <span class="pre">'~',</span> <span class="pre">'↑',</span> <span class="pre">'↓',</span> <span class="pre">'⊗',</span> <span class="pre">'⊙',</span> <span class="pre">'─',</span> <span class="pre">'│',</span> <span class="pre">'┊',</span> <span class="pre">'┼',</span> <span class="pre">'╭',</span> <span class="pre">'╮',</span> <span class="pre">'╯',</span> <span class="pre">'╰',</span> <span class="pre">'▂',</span> <span class="pre">'▄',</span> <span class="pre">'█',</span> <span class="pre">'◦'}</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.accept_symbol" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">accept_symbol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'</span> <span class="pre">',</span> <span class="pre">'!',</span> <span class="pre">'&amp;',</span> <span class="pre">')',</span> <span class="pre">'*',</span> <span class="pre">'+',</span> <span class="pre">'-',</span> <span class="pre">'.(',</span> <span class="pre">'/',</span> <span class="pre">'3',</span> <span class="pre">'5',</span> <span class="pre">':',</span> <span class="pre">'&lt;',</span> <span class="pre">'=',</span> <span class="pre">'&gt;',</span> <span class="pre">'A',</span> <span class="pre">'B',</span> <span class="pre">'C',</span> <span class="pre">'D',</span> <span class="pre">'E',</span> <span class="pre">'F',</span> <span class="pre">'G',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'J',</span> <span class="pre">'K',</span> <span class="pre">'L',</span> <span class="pre">'M',</span> <span class="pre">'N',</span> <span class="pre">'O',</span> <span class="pre">'P',</span> <span class="pre">'Q',</span> <span class="pre">'R',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'U',</span> <span class="pre">'V',</span> <span class="pre">'W',</span> <span class="pre">'X',</span> <span class="pre">'Y',</span> <span class="pre">'Z',</span> <span class="pre">'[',</span> <span class="pre">'\\',</span> <span class="pre">']',</span> <span class="pre">'^',</span> <span class="pre">'a',</span> <span class="pre">'b',</span> <span class="pre">'c',</span> <span class="pre">'d',</span> <span class="pre">'e',</span> <span class="pre">'f',</span> <span class="pre">'g',</span> <span class="pre">'h',</span> <span class="pre">'i',</span> <span class="pre">'j',</span> <span class="pre">'k',</span> <span class="pre">'l',</span> <span class="pre">'m',</span> <span class="pre">'n',</span> <span class="pre">'o',</span> <span class="pre">'p',</span> <span class="pre">'q',</span> <span class="pre">'r',</span> <span class="pre">'s',</span> <span class="pre">'t',</span> <span class="pre">'u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'x',</span> <span class="pre">'y',</span> <span class="pre">'z',</span> <span class="pre">'{',</span> <span class="pre">'|',</span> <span class="pre">'}',</span> <span class="pre">'~',</span> <span class="pre">'•',</span> <span class="pre">'↑',</span> <span class="pre">'↓',</span> <span class="pre">'⊗',</span> <span class="pre">'⊙',</span> <span class="pre">'─',</span> <span class="pre">'│',</span> <span class="pre">'┊',</span> <span class="pre">'┼',</span> <span class="pre">'╭',</span> <span class="pre">'╮',</span> <span class="pre">'╯',</span> <span class="pre">'╰',</span> <span class="pre">'▂',</span> <span class="pre">'▄',</span> <span class="pre">'█',</span> <span class="pre">'◦'}</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.accept_symbol" title="Link to this definition"></a></dt>
 <dd><p>Set of all accepted symbols including nucleotides, dots, brackets, and special ROAD
 symbols.</p>
 </dd></dl>
@@ -4728,7 +4839,7 @@ complementary base.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="pyfurnace.design.core.symbols.only_nucl">
-<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">only_nucl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{32:</span> <span class="pre">None,</span> <span class="pre">33:</span> <span class="pre">None,</span> <span class="pre">40:</span> <span class="pre">None,</span> <span class="pre">41:</span> <span class="pre">None,</span> <span class="pre">42:</span> <span class="pre">None,</span> <span class="pre">43:</span> <span class="pre">None,</span> <span class="pre">45:</span> <span class="pre">None,</span> <span class="pre">46:</span> <span class="pre">None,</span> <span class="pre">47:</span> <span class="pre">None,</span> <span class="pre">51:</span> <span class="pre">None,</span> <span class="pre">53:</span> <span class="pre">None,</span> <span class="pre">58:</span> <span class="pre">None,</span> <span class="pre">60:</span> <span class="pre">None,</span> <span class="pre">61:</span> <span class="pre">None,</span> <span class="pre">62:</span> <span class="pre">None,</span> <span class="pre">69:</span> <span class="pre">None,</span> <span class="pre">70:</span> <span class="pre">None,</span> <span class="pre">73:</span> <span class="pre">None,</span> <span class="pre">74:</span> <span class="pre">None,</span> <span class="pre">76:</span> <span class="pre">None,</span> <span class="pre">79:</span> <span class="pre">None,</span> <span class="pre">80:</span> <span class="pre">None,</span> <span class="pre">81:</span> <span class="pre">None,</span> <span class="pre">84:</span> <span class="pre">None,</span> <span class="pre">90:</span> <span class="pre">None,</span> <span class="pre">91:</span> <span class="pre">None,</span> <span class="pre">92:</span> <span class="pre">None,</span> <span class="pre">93:</span> <span class="pre">None,</span> <span class="pre">94:</span> <span class="pre">None,</span> <span class="pre">97:</span> <span class="pre">None,</span> <span class="pre">98:</span> <span class="pre">None,</span> <span class="pre">99:</span> <span class="pre">None,</span> <span class="pre">100:</span> <span class="pre">None,</span> <span class="pre">101:</span> <span class="pre">None,</span> <span class="pre">102:</span> <span class="pre">None,</span> <span class="pre">103:</span> <span class="pre">None,</span> <span class="pre">104:</span> <span class="pre">None,</span> <span class="pre">105:</span> <span class="pre">None,</span> <span class="pre">106:</span> <span class="pre">None,</span> <span class="pre">107:</span> <span class="pre">None,</span> <span class="pre">108:</span> <span class="pre">None,</span> <span class="pre">109:</span> <span class="pre">None,</span> <span class="pre">110:</span> <span class="pre">None,</span> <span class="pre">111:</span> <span class="pre">None,</span> <span class="pre">112:</span> <span class="pre">None,</span> <span class="pre">113:</span> <span class="pre">None,</span> <span class="pre">114:</span> <span class="pre">None,</span> <span class="pre">115:</span> <span class="pre">None,</span> <span class="pre">116:</span> <span class="pre">None,</span> <span class="pre">117:</span> <span class="pre">None,</span> <span class="pre">118:</span> <span class="pre">None,</span> <span class="pre">119:</span> <span class="pre">None,</span> <span class="pre">120:</span> <span class="pre">None,</span> <span class="pre">121:</span> <span class="pre">None,</span> <span class="pre">122:</span> <span class="pre">None,</span> <span class="pre">123:</span> <span class="pre">None,</span> <span class="pre">124:</span> <span class="pre">None,</span> <span class="pre">125:</span> <span class="pre">None,</span> <span class="pre">126:</span> <span class="pre">None,</span> <span class="pre">8593:</span> <span class="pre">None,</span> <span class="pre">8595:</span> <span class="pre">None,</span> <span class="pre">8855:</span> <span class="pre">None,</span> <span class="pre">8857:</span> <span class="pre">None,</span> <span class="pre">9472:</span> <span class="pre">None,</span> <span class="pre">9474:</span> <span class="pre">None,</span> <span class="pre">9482:</span> <span class="pre">None,</span> <span class="pre">9532:</span> <span class="pre">None,</span> <span class="pre">9581:</span> <span class="pre">None,</span> <span class="pre">9582:</span> <span class="pre">None,</span> <span class="pre">9583:</span> <span class="pre">None,</span> <span class="pre">9584:</span> <span class="pre">None,</span> <span class="pre">9602:</span> <span class="pre">None,</span> <span class="pre">9604:</span> <span class="pre">None,</span> <span class="pre">9608:</span> <span class="pre">None,</span> <span class="pre">9702:</span> <span class="pre">None}</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.only_nucl" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">only_nucl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{32:</span> <span class="pre">None,</span> <span class="pre">33:</span> <span class="pre">None,</span> <span class="pre">40:</span> <span class="pre">None,</span> <span class="pre">41:</span> <span class="pre">None,</span> <span class="pre">42:</span> <span class="pre">None,</span> <span class="pre">43:</span> <span class="pre">None,</span> <span class="pre">45:</span> <span class="pre">None,</span> <span class="pre">46:</span> <span class="pre">None,</span> <span class="pre">47:</span> <span class="pre">None,</span> <span class="pre">51:</span> <span class="pre">None,</span> <span class="pre">53:</span> <span class="pre">None,</span> <span class="pre">58:</span> <span class="pre">None,</span> <span class="pre">60:</span> <span class="pre">None,</span> <span class="pre">61:</span> <span class="pre">None,</span> <span class="pre">62:</span> <span class="pre">None,</span> <span class="pre">69:</span> <span class="pre">None,</span> <span class="pre">70:</span> <span class="pre">None,</span> <span class="pre">73:</span> <span class="pre">None,</span> <span class="pre">74:</span> <span class="pre">None,</span> <span class="pre">76:</span> <span class="pre">None,</span> <span class="pre">79:</span> <span class="pre">None,</span> <span class="pre">80:</span> <span class="pre">None,</span> <span class="pre">81:</span> <span class="pre">None,</span> <span class="pre">84:</span> <span class="pre">None,</span> <span class="pre">90:</span> <span class="pre">None,</span> <span class="pre">91:</span> <span class="pre">None,</span> <span class="pre">92:</span> <span class="pre">None,</span> <span class="pre">93:</span> <span class="pre">None,</span> <span class="pre">94:</span> <span class="pre">None,</span> <span class="pre">97:</span> <span class="pre">None,</span> <span class="pre">98:</span> <span class="pre">None,</span> <span class="pre">99:</span> <span class="pre">None,</span> <span class="pre">100:</span> <span class="pre">None,</span> <span class="pre">101:</span> <span class="pre">None,</span> <span class="pre">102:</span> <span class="pre">None,</span> <span class="pre">103:</span> <span class="pre">None,</span> <span class="pre">104:</span> <span class="pre">None,</span> <span class="pre">105:</span> <span class="pre">None,</span> <span class="pre">106:</span> <span class="pre">None,</span> <span class="pre">107:</span> <span class="pre">None,</span> <span class="pre">108:</span> <span class="pre">None,</span> <span class="pre">109:</span> <span class="pre">None,</span> <span class="pre">110:</span> <span class="pre">None,</span> <span class="pre">111:</span> <span class="pre">None,</span> <span class="pre">112:</span> <span class="pre">None,</span> <span class="pre">113:</span> <span class="pre">None,</span> <span class="pre">114:</span> <span class="pre">None,</span> <span class="pre">115:</span> <span class="pre">None,</span> <span class="pre">116:</span> <span class="pre">None,</span> <span class="pre">117:</span> <span class="pre">None,</span> <span class="pre">118:</span> <span class="pre">None,</span> <span class="pre">119:</span> <span class="pre">None,</span> <span class="pre">120:</span> <span class="pre">None,</span> <span class="pre">121:</span> <span class="pre">None,</span> <span class="pre">122:</span> <span class="pre">None,</span> <span class="pre">123:</span> <span class="pre">None,</span> <span class="pre">124:</span> <span class="pre">None,</span> <span class="pre">125:</span> <span class="pre">None,</span> <span class="pre">126:</span> <span class="pre">None,</span> <span class="pre">8226:</span> <span class="pre">None,</span> <span class="pre">8593:</span> <span class="pre">None,</span> <span class="pre">8595:</span> <span class="pre">None,</span> <span class="pre">8855:</span> <span class="pre">None,</span> <span class="pre">8857:</span> <span class="pre">None,</span> <span class="pre">9472:</span> <span class="pre">None,</span> <span class="pre">9474:</span> <span class="pre">None,</span> <span class="pre">9482:</span> <span class="pre">None,</span> <span class="pre">9532:</span> <span class="pre">None,</span> <span class="pre">9581:</span> <span class="pre">None,</span> <span class="pre">9582:</span> <span class="pre">None,</span> <span class="pre">9583:</span> <span class="pre">None,</span> <span class="pre">9584:</span> <span class="pre">None,</span> <span class="pre">9602:</span> <span class="pre">None,</span> <span class="pre">9604:</span> <span class="pre">None,</span> <span class="pre">9608:</span> <span class="pre">None,</span> <span class="pre">9702:</span> <span class="pre">None}</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.only_nucl" title="Link to this definition"></a></dt>
 <dd><p>String translator that removes all non-nucleotide symbols from a string.</p>
 </dd></dl>
 
@@ -4831,7 +4942,7 @@ constrained by an IUPAC symbol.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="pyfurnace.design.core.symbols.symb_to_none">
-<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">symb_to_none</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{32:</span> <span class="pre">None,</span> <span class="pre">33:</span> <span class="pre">None,</span> <span class="pre">38:</span> <span class="pre">None,</span> <span class="pre">40:</span> <span class="pre">None,</span> <span class="pre">41:</span> <span class="pre">None,</span> <span class="pre">42:</span> <span class="pre">None,</span> <span class="pre">43:</span> <span class="pre">None,</span> <span class="pre">45:</span> <span class="pre">None,</span> <span class="pre">46:</span> <span class="pre">None,</span> <span class="pre">47:</span> <span class="pre">None,</span> <span class="pre">51:</span> <span class="pre">None,</span> <span class="pre">53:</span> <span class="pre">None,</span> <span class="pre">58:</span> <span class="pre">None,</span> <span class="pre">60:</span> <span class="pre">None,</span> <span class="pre">61:</span> <span class="pre">None,</span> <span class="pre">62:</span> <span class="pre">None,</span> <span class="pre">65:</span> <span class="pre">None,</span> <span class="pre">66:</span> <span class="pre">None,</span> <span class="pre">67:</span> <span class="pre">None,</span> <span class="pre">68:</span> <span class="pre">None,</span> <span class="pre">69:</span> <span class="pre">None,</span> <span class="pre">70:</span> <span class="pre">None,</span> <span class="pre">71:</span> <span class="pre">None,</span> <span class="pre">72:</span> <span class="pre">None,</span> <span class="pre">73:</span> <span class="pre">None,</span> <span class="pre">74:</span> <span class="pre">None,</span> <span class="pre">75:</span> <span class="pre">None,</span> <span class="pre">76:</span> <span class="pre">None,</span> <span class="pre">77:</span> <span class="pre">None,</span> <span class="pre">78:</span> <span class="pre">None,</span> <span class="pre">79:</span> <span class="pre">None,</span> <span class="pre">80:</span> <span class="pre">None,</span> <span class="pre">81:</span> <span class="pre">None,</span> <span class="pre">82:</span> <span class="pre">None,</span> <span class="pre">83:</span> <span class="pre">None,</span> <span class="pre">84:</span> <span class="pre">None,</span> <span class="pre">85:</span> <span class="pre">None,</span> <span class="pre">86:</span> <span class="pre">None,</span> <span class="pre">87:</span> <span class="pre">None,</span> <span class="pre">88:</span> <span class="pre">None,</span> <span class="pre">89:</span> <span class="pre">None,</span> <span class="pre">90:</span> <span class="pre">None,</span> <span class="pre">91:</span> <span class="pre">None,</span> <span class="pre">92:</span> <span class="pre">None,</span> <span class="pre">93:</span> <span class="pre">None,</span> <span class="pre">94:</span> <span class="pre">None,</span> <span class="pre">97:</span> <span class="pre">None,</span> <span class="pre">98:</span> <span class="pre">None,</span> <span class="pre">99:</span> <span class="pre">None,</span> <span class="pre">100:</span> <span class="pre">None,</span> <span class="pre">101:</span> <span class="pre">None,</span> <span class="pre">102:</span> <span class="pre">None,</span> <span class="pre">103:</span> <span class="pre">None,</span> <span class="pre">104:</span> <span class="pre">None,</span> <span class="pre">105:</span> <span class="pre">None,</span> <span class="pre">106:</span> <span class="pre">None,</span> <span class="pre">107:</span> <span class="pre">None,</span> <span class="pre">108:</span> <span class="pre">None,</span> <span class="pre">109:</span> <span class="pre">None,</span> <span class="pre">110:</span> <span class="pre">None,</span> <span class="pre">111:</span> <span class="pre">None,</span> <span class="pre">112:</span> <span class="pre">None,</span> <span class="pre">113:</span> <span class="pre">None,</span> <span class="pre">114:</span> <span class="pre">None,</span> <span class="pre">115:</span> <span class="pre">None,</span> <span class="pre">116:</span> <span class="pre">None,</span> <span class="pre">117:</span> <span class="pre">None,</span> <span class="pre">118:</span> <span class="pre">None,</span> <span class="pre">119:</span> <span class="pre">None,</span> <span class="pre">120:</span> <span class="pre">None,</span> <span class="pre">121:</span> <span class="pre">None,</span> <span class="pre">122:</span> <span class="pre">None,</span> <span class="pre">123:</span> <span class="pre">None,</span> <span class="pre">124:</span> <span class="pre">None,</span> <span class="pre">125:</span> <span class="pre">None,</span> <span class="pre">126:</span> <span class="pre">None,</span> <span class="pre">8593:</span> <span class="pre">None,</span> <span class="pre">8595:</span> <span class="pre">None,</span> <span class="pre">8855:</span> <span class="pre">None,</span> <span class="pre">8857:</span> <span class="pre">None,</span> <span class="pre">9472:</span> <span class="pre">None,</span> <span class="pre">9474:</span> <span class="pre">None,</span> <span class="pre">9482:</span> <span class="pre">None,</span> <span class="pre">9532:</span> <span class="pre">None,</span> <span class="pre">9581:</span> <span class="pre">None,</span> <span class="pre">9582:</span> <span class="pre">None,</span> <span class="pre">9583:</span> <span class="pre">None,</span> <span class="pre">9584:</span> <span class="pre">None,</span> <span class="pre">9602:</span> <span class="pre">None,</span> <span class="pre">9604:</span> <span class="pre">None,</span> <span class="pre">9608:</span> <span class="pre">None,</span> <span class="pre">9702:</span> <span class="pre">None}</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.symb_to_none" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.core.symbols.</span></span><span class="sig-name descname"><span class="pre">symb_to_none</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{32:</span> <span class="pre">None,</span> <span class="pre">33:</span> <span class="pre">None,</span> <span class="pre">38:</span> <span class="pre">None,</span> <span class="pre">40:</span> <span class="pre">None,</span> <span class="pre">41:</span> <span class="pre">None,</span> <span class="pre">42:</span> <span class="pre">None,</span> <span class="pre">43:</span> <span class="pre">None,</span> <span class="pre">45:</span> <span class="pre">None,</span> <span class="pre">46:</span> <span class="pre">None,</span> <span class="pre">47:</span> <span class="pre">None,</span> <span class="pre">51:</span> <span class="pre">None,</span> <span class="pre">53:</span> <span class="pre">None,</span> <span class="pre">58:</span> <span class="pre">None,</span> <span class="pre">60:</span> <span class="pre">None,</span> <span class="pre">61:</span> <span class="pre">None,</span> <span class="pre">62:</span> <span class="pre">None,</span> <span class="pre">65:</span> <span class="pre">None,</span> <span class="pre">66:</span> <span class="pre">None,</span> <span class="pre">67:</span> <span class="pre">None,</span> <span class="pre">68:</span> <span class="pre">None,</span> <span class="pre">69:</span> <span class="pre">None,</span> <span class="pre">70:</span> <span class="pre">None,</span> <span class="pre">71:</span> <span class="pre">None,</span> <span class="pre">72:</span> <span class="pre">None,</span> <span class="pre">73:</span> <span class="pre">None,</span> <span class="pre">74:</span> <span class="pre">None,</span> <span class="pre">75:</span> <span class="pre">None,</span> <span class="pre">76:</span> <span class="pre">None,</span> <span class="pre">77:</span> <span class="pre">None,</span> <span class="pre">78:</span> <span class="pre">None,</span> <span class="pre">79:</span> <span class="pre">None,</span> <span class="pre">80:</span> <span class="pre">None,</span> <span class="pre">81:</span> <span class="pre">None,</span> <span class="pre">82:</span> <span class="pre">None,</span> <span class="pre">83:</span> <span class="pre">None,</span> <span class="pre">84:</span> <span class="pre">None,</span> <span class="pre">85:</span> <span class="pre">None,</span> <span class="pre">86:</span> <span class="pre">None,</span> <span class="pre">87:</span> <span class="pre">None,</span> <span class="pre">88:</span> <span class="pre">None,</span> <span class="pre">89:</span> <span class="pre">None,</span> <span class="pre">90:</span> <span class="pre">None,</span> <span class="pre">91:</span> <span class="pre">None,</span> <span class="pre">92:</span> <span class="pre">None,</span> <span class="pre">93:</span> <span class="pre">None,</span> <span class="pre">94:</span> <span class="pre">None,</span> <span class="pre">97:</span> <span class="pre">None,</span> <span class="pre">98:</span> <span class="pre">None,</span> <span class="pre">99:</span> <span class="pre">None,</span> <span class="pre">100:</span> <span class="pre">None,</span> <span class="pre">101:</span> <span class="pre">None,</span> <span class="pre">102:</span> <span class="pre">None,</span> <span class="pre">103:</span> <span class="pre">None,</span> <span class="pre">104:</span> <span class="pre">None,</span> <span class="pre">105:</span> <span class="pre">None,</span> <span class="pre">106:</span> <span class="pre">None,</span> <span class="pre">107:</span> <span class="pre">None,</span> <span class="pre">108:</span> <span class="pre">None,</span> <span class="pre">109:</span> <span class="pre">None,</span> <span class="pre">110:</span> <span class="pre">None,</span> <span class="pre">111:</span> <span class="pre">None,</span> <span class="pre">112:</span> <span class="pre">None,</span> <span class="pre">113:</span> <span class="pre">None,</span> <span class="pre">114:</span> <span class="pre">None,</span> <span class="pre">115:</span> <span class="pre">None,</span> <span class="pre">116:</span> <span class="pre">None,</span> <span class="pre">117:</span> <span class="pre">None,</span> <span class="pre">118:</span> <span class="pre">None,</span> <span class="pre">119:</span> <span class="pre">None,</span> <span class="pre">120:</span> <span class="pre">None,</span> <span class="pre">121:</span> <span class="pre">None,</span> <span class="pre">122:</span> <span class="pre">None,</span> <span class="pre">123:</span> <span class="pre">None,</span> <span class="pre">124:</span> <span class="pre">None,</span> <span class="pre">125:</span> <span class="pre">None,</span> <span class="pre">126:</span> <span class="pre">None,</span> <span class="pre">8226:</span> <span class="pre">None,</span> <span class="pre">8593:</span> <span class="pre">None,</span> <span class="pre">8595:</span> <span class="pre">None,</span> <span class="pre">8855:</span> <span class="pre">None,</span> <span class="pre">8857:</span> <span class="pre">None,</span> <span class="pre">9472:</span> <span class="pre">None,</span> <span class="pre">9474:</span> <span class="pre">None,</span> <span class="pre">9482:</span> <span class="pre">None,</span> <span class="pre">9532:</span> <span class="pre">None,</span> <span class="pre">9581:</span> <span class="pre">None,</span> <span class="pre">9582:</span> <span class="pre">None,</span> <span class="pre">9583:</span> <span class="pre">None,</span> <span class="pre">9584:</span> <span class="pre">None,</span> <span class="pre">9602:</span> <span class="pre">None,</span> <span class="pre">9604:</span> <span class="pre">None,</span> <span class="pre">9608:</span> <span class="pre">None,</span> <span class="pre">9702:</span> <span class="pre">None}</span></em><a class="headerlink" href="#pyfurnace.design.core.symbols.symb_to_none" title="Link to this definition"></a></dt>
 <dd><p>String translator that removes all accepted symbols from a string.</p>
 </dd></dl>
 
@@ -4886,7 +4997,7 @@ constraints.</p>
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -4897,7 +5008,7 @@ constraints.</p>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

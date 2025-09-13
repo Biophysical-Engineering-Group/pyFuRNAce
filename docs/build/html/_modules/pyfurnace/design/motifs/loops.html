@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyfurnace.design.motifs.loops &mdash; pyFuRNAce 0.0.6 documentation</title>
+  <title>pyfurnace.design.motifs.loops &mdash; pyFuRNAce 0.0.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,10 +79,9 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.design.motifs.loops</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">CONFS_PATH</span>
-<span class="kn">from</span> <span class="nn">..core.symbols</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">..core.coordinates_3d</span> <span class="kn">import</span> <span class="n">Coords</span>
 <span class="kn">from</span> <span class="nn">..core.strand</span> <span class="kn">import</span> <span class="n">Strand</span>
 <span class="kn">from</span> <span class="nn">..core.motif</span> <span class="kn">import</span> <span class="n">Motif</span>
@@ -91,21 +90,45 @@
 <div class="viewcode-block" id="Loop">
 <a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.Loop">[docs]</a>
 <span class="k">class</span> <span class="nc">Loop</span><span class="p">(</span><span class="n">Motif</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a generic unpaired loop motif in an RNA structure.</span>
+<span class="sd">    Optionally it can be initialized with a sequence or be oriented</span>
+<span class="sd">    to the left.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    open_left : bool, optional</span>
+<span class="sd">        Whether to flip the loop horizontally and vertically to open to the left.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    sequence : str, optional</span>
+<span class="sd">        Nucleotide sequence to include in the loop. If provided, creates a strand</span>
+<span class="sd">        with the sequence and loop symbols. Default is &quot;&quot;.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments passed to the parent `Motif` class.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    strands : list of Strand</span>
+<span class="sd">        The list of strands that make up the loop motif.</span>
+<span class="sd">    flipped : bool</span>
+<span class="sd">        Whether the motif has been flipped horizontally/vertically</span>
+<span class="sd">        (if `open_left=True`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_left</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a loop motif, optionally with a given sequence and orientation.</span>
 
-<span class="sd">        If a sequence is provided, a single strand is created for it, flanked by </span>
+<span class="sd">        If a sequence is provided, a single strand is created for it, flanked by</span>
 <span class="sd">        loop symbols.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        open_left : bool, optional</span>
-<span class="sd">            Whether to flip the loop horizontally and vertically to open to the </span>
+<span class="sd">            Whether to flip the loop horizontally and vertically to open to the</span>
 <span class="sd">            left (default is False).</span>
 <span class="sd">        sequence : str, optional</span>
-<span class="sd">            Nucleotide sequence to insert into the loop. If provided, a strand will </span>
+<span class="sd">            Nucleotide sequence to insert into the loop. If provided, a strand will</span>
 <span class="sd">            be created (default is &quot;&quot;).</span>
 <span class="sd">        **kwargs : dict, optional</span>
 <span class="sd">            Additional keyword arguments passed to the `Motif` superclass.</span>
@@ -118,11 +141,13 @@
         <span class="k">if</span> <span class="n">sequence</span><span class="p">:</span>
             <span class="n">seq_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
             <span class="c1">### create the strand</span>
-            <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="s1">&#39;╰│╭&#39;</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span>
+                <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="s2">&quot;╰│╭&quot;</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="c1"># Add the strand to the list of strands</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;strands&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;strands&#39;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">strand</span><span class="p">]</span>
-        
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;join&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;strands&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;strands&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">strand</span><span class="p">]</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;join&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">open_left</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">horizontally</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vertically</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -132,8 +157,35 @@
 <div class="viewcode-block" id="TetraLoop">
 <a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.loops.TetraLoop">[docs]</a>
 <span class="k">class</span> <span class="nc">TetraLoop</span><span class="p">(</span><span class="n">Loop</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a specific 4-nucleotide tetraloop RNA motif.</span>
+<span class="sd">    This class implements a canonical tetraloop structure (e.g., UUCG) with a</span>
+<span class="sd">    predefined folding pattern and 3D coordinates.</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">open_left</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;UUCG&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    open_left : bool, optional</span>
+<span class="sd">        Whether to flip the loop to open to the left. Default is False.</span>
+<span class="sd">    sequence : str, optional</span>
+<span class="sd">        4-nucleotide RNA sequence for the tetraloop. Default is &quot;UUCG&quot;.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments passed to the `Loop` superclass. You can</span>
+<span class="sd">        override the default strand using the `strands` argument.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    strands : list of Strand</span>
+<span class="sd">        The single-stranded representation of the tetraloop, including symbolic</span>
+<span class="sd">        structure markers.</span>
+<span class="sd">    sequence : str</span>
+<span class="sd">        The 4-nucleotide sequence used to define the tetraloop.</span>
+<span class="sd">    _coords : Coords</span>
+<span class="sd">        3D coordinate data loaded from template structure (e.g., from PDB 2KOC).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">open_left</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;UUCG&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a tetraloop motif with a specific 4-nucleotide sequence.</span>
 
@@ -147,8 +199,8 @@
 <span class="sd">        sequence : str, optional</span>
 <span class="sd">            4-nucleotide sequence to assign to the tetraloop (default is &quot;UUCG&quot;).</span>
 <span class="sd">        **kwargs : dict, optional</span>
-<span class="sd">            Additional keyword arguments passed to the `Loop` superclass. You can override</span>
-<span class="sd">            default strand(s) using `strands`.</span>
+<span class="sd">            Additional keyword arguments passed to the `Loop` superclass.</span>
+<span class="sd">            You can override default strand(s) using `strands`.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -161,26 +213,32 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Attributes of the class Cap_UUCG, which is a daugther class of the class Motif.</span>
-<span class="sd">        -----------------------------------------------------------------------------------</span>
+<span class="sd">        -------------------------------------------------------------------------------</span>
 <span class="sd">        UUCG_bool: bool (default= False)</span>
 <span class="sd">            indicates if a UUCG sequence should be added into the cap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1">#create strands deascribing tetraloop</span>
+        <span class="c1"># create strands deascribing tetraloop</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The sequence length doesn&#39;t match the length required for a tetraloop, which is 4.&quot;</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The sequence length doesn&#39;t match the length required &quot;</span>
+                <span class="s2">&quot;for a tetraloop, which is 4.&quot;</span>
+            <span class="p">)</span>
+
         <span class="c1"># Create new strands if the strand is not provided</span>
-        <span class="k">if</span> <span class="s1">&#39;strands&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">strands</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;strands&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;strands&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">strands</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;strands&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="n">sequence</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;╰│╭&quot;</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">strand</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span>
+                <span class="n">sequence</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;╰│╭&quot;</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="c1">### PDB: 2KOC</span>
-            <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s1">&#39;TetraLoop.dat&#39;</span><span class="p">,</span> 
-                                                   <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="n">strand</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span>
+                <span class="n">CONFS_PATH</span> <span class="o">/</span> <span class="s2">&quot;TetraLoop.dat&quot;</span><span class="p">,</span> <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">strand</span><span class="p">]</span>
 
         <span class="c1"># create motif of Cap without basepairs by turing autobasepairing of</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;autopairing&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;autopairing&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">strands</span><span class="o">=</span><span class="n">strands</span><span class="p">,</span> <span class="n">open_left</span><span class="o">=</span><span class="n">open_left</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -205,11 +263,12 @@
 <span class="sd">        None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The sequence length doesn&#39;t match the length required for a tetraloop, which is 4.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The sequence length doesn&#39;t match the length required &quot;</span>
+                <span class="s2">&quot;for a tetraloop, which is 4.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">new_sequence</span></div>
 </div>
-
-                    
 
 </pre></div>
 
@@ -226,7 +285,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -237,7 +296,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

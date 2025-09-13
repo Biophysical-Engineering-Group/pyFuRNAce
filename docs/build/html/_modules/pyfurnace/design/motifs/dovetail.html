@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,11 +79,11 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.design.motifs.dovetail</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">..core.symbols</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..core.symbols</span> <span class="kn">import</span> <span class="n">nucl_to_pair</span>
 <span class="kn">from</span> <span class="nn">..core.coordinates_3d</span> <span class="kn">import</span> <span class="n">Coords</span>
 <span class="kn">from</span> <span class="nn">..core.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">..core.strand</span> <span class="kn">import</span> <span class="n">Strand</span>
@@ -101,32 +101,87 @@
 <span class="c1">#                     [ 0.        ,  0.        ,  0.        ,  1.        ],])</span>
 
 <span class="c1">### DAE PARALLEL FROM PDB MEAN refined for ss-assembly</span>
-<span class="n">DAE_T_53</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.82936192</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.04732277</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.55670411</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.60615603</span><span class="p">],</span>
-                     <span class="p">[</span><span class="o">-</span><span class="mf">0.0473231</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.98687633</span><span class="p">,</span>  <span class="mf">0.15438835</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.23843062</span><span class="p">],</span>
-                     <span class="p">[</span><span class="o">-</span><span class="mf">0.55670399</span><span class="p">,</span>  <span class="mf">0.15438806</span><span class="p">,</span>  <span class="mf">0.81623819</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.84790395</span><span class="p">],</span>
-                     <span class="p">[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">1.</span>        <span class="p">],])</span>
-<span class="n">DAE_T_35</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.82936221</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.04732235</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.55670361</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.98603719</span><span class="p">],</span>
-                     <span class="p">[</span><span class="o">-</span><span class="mf">0.04732238</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.98687625</span><span class="p">,</span>  <span class="mf">0.15438865</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.13307951</span><span class="p">],</span>
-                     <span class="p">[</span><span class="o">-</span><span class="mf">0.55670361</span><span class="p">,</span>  <span class="mf">0.15438867</span><span class="p">,</span>  <span class="mf">0.81623846</span><span class="p">,</span>  <span class="mf">0.39145356</span><span class="p">],</span>
-                     <span class="p">[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">1.</span>        <span class="p">],])</span>
+<span class="n">DAE_T_53</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.82936192</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.04732277</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.55670411</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.60615603</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.0473231</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.98687633</span><span class="p">,</span> <span class="mf">0.15438835</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.23843062</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.55670399</span><span class="p">,</span> <span class="mf">0.15438806</span><span class="p">,</span> <span class="mf">0.81623819</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.84790395</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">DAE_T_35</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.82936221</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.04732235</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.55670361</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.98603719</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.04732238</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.98687625</span><span class="p">,</span> <span class="mf">0.15438865</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.13307951</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.55670361</span><span class="p">,</span> <span class="mf">0.15438867</span><span class="p">,</span> <span class="mf">0.81623846</span><span class="p">,</span> <span class="mf">0.39145356</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
 
 <div class="viewcode-block" id="Dovetail">
 <a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail">[docs]</a>
 <span class="k">class</span> <span class="nc">Dovetail</span><span class="p">(</span><span class="n">Stem</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                 <span class="n">up_cross</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">down_cross</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                 <span class="n">sign</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">wobble_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-                 <span class="n">wobble_tolerance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-                 <span class="n">wobble_insert</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;middle&quot;</span><span class="p">,</span>
-                 <span class="n">strong_bases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span>
-                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a double helix RNA stem with junction crossovers before and after</span>
+<span class="sd">    the stem.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    length : int, optional</span>
+<span class="sd">        Number of base pairs in the stem. The sign determines dovetail direction.</span>
+<span class="sd">        Ignored if `sequence` is provided.</span>
+<span class="sd">    sequence : str, optional</span>
+<span class="sd">        RNA sequence to assign to the top strand. Overrides `length`.</span>
+<span class="sd">    up_cross : bool, optional</span>
+<span class="sd">        If True, includes a top dovetail crossover motif. Default is True.</span>
+<span class="sd">    down_cross : bool, optional</span>
+<span class="sd">        If True, includes a bottom dovetail crossover motif. Default is True.</span>
+<span class="sd">    sign : int, optional</span>
+<span class="sd">        Direction of the dovetail: +1 (positive/right) or -1 (negative/left).</span>
+<span class="sd">        If 0 or unspecified, inferred from `length` or `sequence`. Default is 1.</span>
+<span class="sd">    wobble_interval : int, optional</span>
+<span class="sd">        Periodicity of wobble base pairs in the stem. Default is 5.</span>
+<span class="sd">    wobble_tolerance : int, optional</span>
+<span class="sd">        Allowed deviation in wobble periodicity. Default is 2.</span>
+<span class="sd">    wobble_insert : str, optional</span>
+<span class="sd">        Position of wobble insertions. Must be &quot;start&quot;, &quot;middle&quot;, or &quot;end&quot;.</span>
+<span class="sd">        Default is &quot;middle&quot;.</span>
+<span class="sd">    strong_bases : bool, optional</span>
+<span class="sd">        Whether to enforce GC-rich base pairs. If None, it defaults to True only</span>
+<span class="sd">        when both `up_cross` and `down_cross` are True.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Additional keyword arguments passed to the parent `Stem` class.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    up_cross : bool</span>
+<span class="sd">        Whether the stem includes a top dovetail crossover motif.</span>
+<span class="sd">    down_cross : bool</span>
+<span class="sd">        Whether the stem includes a bottom dovetail crossover motif.</span>
+<span class="sd">    sign : int</span>
+<span class="sd">        Direction of the dovetail: +1 (right/positive), -1 (left/negative).</span>
+<span class="sd">    length : int</span>
+<span class="sd">        Effective number of nucleotides in the stem, signed based on orientation.</span>
+<span class="sd">    sequence : str</span>
+<span class="sd">        Nucleotide sequence of the top strand, if provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">up_cross</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">down_cross</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sign</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">wobble_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">wobble_tolerance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">wobble_insert</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+        <span class="n">strong_bases</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a Dovetail motif, which is a helical stem with configurable </span>
+<span class="sd">        Initialize a Dovetail motif, which is a helical stem with configurable</span>
 <span class="sd">        entry/exit junctions.</span>
 
 <span class="sd">        Parameters</span>
@@ -148,7 +203,7 @@
 <span class="sd">        wobble_insert : str, default=&quot;middle&quot;</span>
 <span class="sd">            Position of wobble insertion: &quot;middle&quot;, &quot;start&quot;, or &quot;end&quot;.</span>
 <span class="sd">        strong_bases : bool, optional</span>
-<span class="sd">            If True, use strong base pairing; if None strong bases are set only if </span>
+<span class="sd">            If True, use strong base pairing; if None strong bases are set only if</span>
 <span class="sd">            `up_cross` and `down_cross` are both True.</span>
 <span class="sd">        **kwargs : dict</span>
 <span class="sd">            Additional keyword arguments passed to `Stem`.</span>
@@ -160,7 +215,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The length parameter must be an integer.&quot;</span><span class="p">)</span>
-        
+
         <span class="c1"># initialize the attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_up_cross</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">up_cross</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_down_cross</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">down_cross</span><span class="p">)</span>
@@ -172,16 +227,18 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span> <span class="k">if</span> <span class="n">length</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;join&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> 
-                         <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> 
-                         <span class="n">wobble_interval</span><span class="o">=</span><span class="n">wobble_interval</span><span class="p">,</span> 
-                         <span class="n">wobble_tolerance</span><span class="o">=</span><span class="n">wobble_tolerance</span><span class="p">,</span> 
-                         <span class="n">wobble_insert</span><span class="o">=</span><span class="n">wobble_insert</span><span class="p">,</span>
-                         <span class="n">strong_bases</span><span class="o">=</span><span class="n">strong_bases</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;join&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
+            <span class="n">wobble_interval</span><span class="o">=</span><span class="n">wobble_interval</span><span class="p">,</span>
+            <span class="n">wobble_tolerance</span><span class="o">=</span><span class="n">wobble_tolerance</span><span class="p">,</span>
+            <span class="n">wobble_insert</span><span class="o">=</span><span class="n">wobble_insert</span><span class="p">,</span>
+            <span class="n">strong_bases</span><span class="o">=</span><span class="n">strong_bases</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="c1">### </span>
+    <span class="c1">###</span>
     <span class="c1">### PROPERTIES</span>
     <span class="c1">###</span>
 
@@ -189,10 +246,10 @@
     <span class="k">def</span> <span class="nf">up_cross</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns boolian describing wether the dovetail has a top crossing&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_up_cross</span>
-    
+
     <span class="nd">@up_cross</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">up_cross</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bool</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set boolian describing wether the dovetail has a top crossing&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set boolian describing wether the dovetail has a top crossing&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_up_cross</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">new_bool</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
 
@@ -200,51 +257,57 @@
     <span class="k">def</span> <span class="nf">down_cross</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns boolian describing wether the dovetail has a bottom crossing&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_down_cross</span>
-    
+
     <span class="nd">@down_cross</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">down_cross</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bool</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set boolian describing wether the dovetail has a bottom crossing&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_down_cross</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">new_bool</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
 
-<div class="viewcode-block" id="Dovetail.set_top_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_top_sequence">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_top_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the top strand &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Dovetail.set_up_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_up_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_up_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the top strand&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The sequence of a stem must be a string, got </span><span class="si">{</span><span class="n">new_seq</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The sequence of a stem must be a &quot;</span> <span class="sa">f</span><span class="s2">&quot;string, got </span><span class="si">{</span><span class="n">new_seq</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">sign</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The sign of the dovetail must be -1, 0 or 1, got </span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The sign of the dovetail must be -1,&quot;</span> <span class="sa">f</span><span class="s2">&quot; 0 or 1, got </span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="n">sign</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sign</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">new_seq</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Dovetail.set_bottom_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_bottom_sequence">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_bottom_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the sequence of the bottom strand &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_top_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">new_seq</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sign</span><span class="o">=</span><span class="n">sign</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Dovetail.set_down_sequence">
+<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_down_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_down_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the bottom strand&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_up_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">new_seq</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sign</span><span class="o">=</span><span class="n">sign</span><span class="p">)</span></div>
 
 
     <span class="c1">###</span>
     <span class="c1">### Protected METHODS</span>
     <span class="c1">###</span>
 
-    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                        <span class="n">sequence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-                        <span class="n">return_strands</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">kwargs</span>
-                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Strand</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">_create_strands</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sequence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">return_strands</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Strand</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Internal method to generate top and bottom strands with dovetail crossover features.</span>
+<span class="sd">        Internal method to generate top and bottom strands with dovetail crossover</span>
+<span class="sd">        features.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -274,28 +337,41 @@
         <span class="n">up_cross</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_up_cross</span>
         <span class="n">down_cross</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_down_cross</span>
 
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;strong_bases&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;strong_bases&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">up_cross</span> <span class="ow">and</span> <span class="n">down_cross</span>
-        <span class="c1">### Create the top and bottom strands (according to wobble_insert and wobble_interval)</span>
-        <span class="n">top_strand</span><span class="p">,</span> <span class="n">bot_strand</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> 
-                                                         <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> 
-                                                         <span class="n">compute_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                                                         <span class="n">return_strands</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                                                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;strong_bases&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;strong_bases&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">up_cross</span> <span class="ow">and</span> <span class="n">down_cross</span>
+
+        <span class="c1">### Create stem strands</span>
+        <span class="n">top_strand</span><span class="p">,</span> <span class="n">bot_strand</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span>
+            <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">compute_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">return_strands</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1">### Positive dovetail</span>
         <span class="k">if</span> <span class="n">pos</span><span class="p">:</span>
             <span class="c1">### Top strands</span>
-            <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;──&#39;</span> <span class="o">+</span> <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s1">&#39;╯&#39;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">)</span>
+            <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;──&quot;</span> <span class="o">+</span> <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s2">&quot;╯&quot;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">top_strand1</span> <span class="o">=</span> <span class="n">top_strand</span>
-            <span class="n">top_strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;╰&#39;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span> 
-                                 <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">top_strand1</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
-                                 <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">up_cross</span><span class="p">)))</span>
+            <span class="n">top_strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span>
+                <span class="s2">&quot;╰&quot;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span>
+                <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">top_strand1</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">up_cross</span><span class="p">)),</span>
+            <span class="p">)</span>
 
             <span class="c1">### Bottom strands</span>
-            <span class="n">bot_strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;╮&#39;</span> <span class="o">*</span> <span class="n">down_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">),</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">down_cross</span><span class="p">)))</span>
+            <span class="n">bot_strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span>
+                <span class="s2">&quot;╮&quot;</span> <span class="o">*</span> <span class="n">down_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">),</span>
+                <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">),</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">down_cross</span><span class="p">)),</span>
+            <span class="p">)</span>
             <span class="c1"># adjust the stem start position, strand and direction</span>
-            <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;──&#39;</span> <span class="o">+</span> <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s1">&#39;╭&#39;</span> <span class="o">*</span> <span class="n">down_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">)</span>
+            <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;──&quot;</span> <span class="o">+</span> <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s2">&quot;╭&quot;</span> <span class="o">*</span> <span class="n">down_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">bot_strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">bot_strand</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">bot_strand</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">bot_strand2</span> <span class="o">=</span> <span class="n">bot_strand</span>
@@ -303,26 +379,38 @@
         <span class="c1">### Negative dovetail</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">### Top strands</span>
-            <span class="n">top_strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;╯&#39;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">top_strand1</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span>
+                <span class="s2">&quot;╯&quot;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="c1"># adjust the stem start position, strand and direction</span>
-            <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;╰&#39;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">)</span> <span class="o">+</span> <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s1">&#39;──&#39;</span>
+            <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;╰&quot;</span> <span class="o">*</span> <span class="n">up_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">)</span> <span class="o">+</span> <span class="n">top_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s2">&quot;──&quot;</span>
+            <span class="p">)</span>
             <span class="n">top_strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">top_strand</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">up_cross</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">up_cross</span><span class="p">))</span>
             <span class="n">top_strand2</span> <span class="o">=</span> <span class="n">top_strand</span>
 
             <span class="c1">### Bottom strands</span>
-            <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;╮&#39;</span> <span class="o">*</span> <span class="n">down_cross</span> <span class="o">+</span> <span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">)</span> <span class="o">+</span> <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s1">&#39;──&#39;</span>
+            <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;╮&quot;</span> <span class="o">*</span> <span class="n">down_cross</span> <span class="o">+</span> <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">)</span> <span class="o">+</span> <span class="n">bot_strand</span><span class="o">.</span><span class="n">strand</span> <span class="o">+</span> <span class="s2">&quot;──&quot;</span>
+            <span class="p">)</span>
             <span class="n">bot_strand</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">bot_strand</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="n">bot_strand</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">),</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">down_cross</span><span class="p">))</span>
+            <span class="n">bot_strand</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">),</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">down_cross</span><span class="p">))</span>
             <span class="n">bot_strand1</span> <span class="o">=</span> <span class="n">bot_strand</span>
-            <span class="n">bot_strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span><span class="s1">&#39;─&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;╭&#39;</span> <span class="o">*</span> <span class="n">down_cross</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">bot_strand1</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">bot_strand2</span> <span class="o">=</span> <span class="n">Strand</span><span class="p">(</span>
+                <span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="ow">not</span> <span class="n">down_cross</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;╭&quot;</span> <span class="o">*</span> <span class="n">down_cross</span><span class="p">,</span>
+                <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">bot_strand1</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">)</span>
 
-        <span class="c1">### set up the coordinates</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># start position</span>
-                                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># base vector</span>
-                                            <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># normal vector</span>
-                                            <span class="n">length</span><span class="o">=</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="c1"># length of the helix + dummy ends</span>
-                                            <span class="n">double</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1">### set up the coordinates (helix length + dummy ends)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># start position</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># base vector</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># normal vector</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">double</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="c1"># leave out the first and last nucleotide to add the dummy ends</span>
         <span class="c1"># Here a schematic of the coordinates indexes:</span>
         <span class="c1">#   top_strand1; top_strand2</span>
@@ -337,50 +425,137 @@
         <span class="c1">#        |           |</span>
         <span class="c1">#   bot_strand1; bot_strand2</span>
 
-
-        <span class="k">if</span> <span class="n">pos</span><span class="p">:</span> <span class="c1">### the dovetail is positive</span>
+        <span class="c1">### the dovetail is positive</span>
+        <span class="k">if</span> <span class="n">pos</span><span class="p">:</span>
             <span class="c1"># top strand 1</span>
-            <span class="n">top_coord1</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">top_coord1</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">up_cross</span><span class="p">:</span>
-                <span class="n">top_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># necessary dummy for 0 DT</span>
-                                         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_53</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+                <span class="n">top_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># necessary dummy for 0 DT</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_53</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
             <span class="c1"># top strand 2</span>
             <span class="n">top_coord2</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()))</span>
             <span class="k">if</span> <span class="n">up_cross</span><span class="p">:</span>
-                <span class="n">top_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_35</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
-                                         <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">top_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_35</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="p">)</span>
+
             <span class="c1"># bot strand 1</span>
             <span class="n">bot_coord1</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()))</span>
             <span class="k">if</span> <span class="n">down_cross</span><span class="p">:</span>
-                <span class="n">bot_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_35</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
-                                         <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">bot_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_35</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="p">)</span>
+
             <span class="c1"># bot strand 2</span>
-            <span class="n">bot_coord2</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span> <span class="n">seq_len</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">])</span>
+            <span class="n">bot_coord2</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span> <span class="p">:</span> <span class="n">seq_len</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">down_cross</span><span class="p">:</span>
-                <span class="n">bot_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="c1"># necessary dummy for 0 DT</span>
-                                         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_53</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1">### the dovetail is negative</span>
+                <span class="n">bot_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># necessary dummy for 0 DT</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_53</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
+        <span class="c1">### the dovetail is negative</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="c1"># top strand 1</span>
             <span class="n">top_coord1</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()))</span>
             <span class="k">if</span> <span class="n">up_cross</span><span class="p">:</span>
-                <span class="n">top_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_53</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+                <span class="n">top_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_53</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
             <span class="c1"># top strand 2</span>
-            <span class="n">top_coord2</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">top_coord2</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">up_cross</span><span class="p">:</span>
-                <span class="n">top_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_35</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
-                                         <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="c1"># coords[seq_len + 1], useful for Origami ss_assembly</span>
+                <span class="n">top_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_35</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># coords[seq_len + 1], useful for ss_assembly</span>
+                <span class="p">)</span>
+
             <span class="c1"># bot strand 1</span>
-            <span class="n">bot_coord1</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">bot_coord1</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">down_cross</span><span class="p">:</span>
-                <span class="n">bot_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_35</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
-                                         <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#coords[-1], useful for Origami ss_assembly</span>
-                
+                <span class="n">bot_coord1</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_35</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># coords[-1], useful for Origami ss_assembly</span>
+                <span class="p">)</span>
+
             <span class="c1"># bot strand 2</span>
             <span class="n">bot_coord2</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()))</span>
             <span class="k">if</span> <span class="n">down_cross</span><span class="p">:</span>
-                <span class="n">bot_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]),</span>
-                                         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">DAE_T_53</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+                <span class="n">bot_coord2</span><span class="o">.</span><span class="n">dummy_ends</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
+                            <span class="n">DAE_T_53</span><span class="p">,</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">coords</span><span class="p">[</span><span class="n">seq_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
 
         <span class="n">top_strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">top_coord1</span>
         <span class="n">top_strand2</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">top_coord2</span>
@@ -388,11 +563,13 @@
         <span class="n">bot_strand1</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">bot_coord1</span>
 
         <span class="k">if</span> <span class="n">return_strands</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_strands</span><span class="p">([</span><span class="n">top_strand1</span><span class="p">,</span> <span class="n">top_strand2</span><span class="p">,</span> <span class="n">bot_strand1</span><span class="p">,</span> <span class="n">bot_strand2</span><span class="p">])</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_strands</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">top_strand1</span><span class="p">,</span> <span class="n">top_strand2</span><span class="p">,</span> <span class="n">bot_strand1</span><span class="p">,</span> <span class="n">bot_strand2</span><span class="p">]</span>
+            <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">([</span><span class="n">top_strand1</span><span class="p">,</span> <span class="n">top_strand2</span><span class="p">,</span> <span class="n">bot_strand1</span><span class="p">,</span> <span class="n">bot_strand2</span><span class="p">],</span> 
-                                 <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                                 <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">top_strand1</span><span class="p">,</span> <span class="n">top_strand2</span><span class="p">,</span> <span class="n">bot_strand1</span><span class="p">,</span> <span class="n">bot_strand2</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 
@@ -409,7 +586,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -420,7 +597,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

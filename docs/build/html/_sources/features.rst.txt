@@ -18,11 +18,11 @@ Installation
 
 **Note**: pyFuRNAce requires Python 3.10 or later. Local installation includes the GUI via Streamlit.
 
-Install from PyPI:
+Install and/or upgrade from PyPI:
 
 .. code-block:: bash
 
-   pip install pyfurnace
+   pip install --upgrade pyfurnace
 
 Install the latest development version from GitHub:
 
@@ -30,17 +30,18 @@ Install the latest development version from GitHub:
 
    pip install "git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git"
 
+Perl (**required by Revolvr for sequence optimisation**). Assuming you have an anaconda environment, you can install Perl via conda:
+
+.. code-block:: bash
+
+   conda install bioconda-legacy::perl
+
+
 Install OAT for oxDNA structure conversion:
 
 .. code-block:: bash
 
    pip install "git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis"
-
-Perl (required by Revolvr):
-
-.. code-block:: bash
-
-   conda install bioconda-legacy::perl
 
 
 .. _webapp:
@@ -48,13 +49,17 @@ Perl (required by Revolvr):
 Web Application
 ===============
 
-To run locally:
+To run locally, use the command in the terminal:
+
+.. code-block:: bash
+
+   pyfurnace
+
+This launches the GUI in your browser. Or alternatively, run the Streamlit app with:
 
 .. code-block:: bash
 
    python -m pyfurnace
-
-This launches the GUI in your browser.
 
 Or use the hosted version: `pyfurnace.de <http://pyfurnace.de>`_ or `pyfurnace.streamlit.app <https://pyfurnace.streamlit.app>`_
 
@@ -67,10 +72,10 @@ Or use the hosted version: `pyfurnace.de <http://pyfurnace.de>`_ or `pyfurnace.s
 Modules
 ^^^^^^^
 
-1. **Design:** Create and edit RNA blueprints. Visualize in 3D.
-2. **Generate:** Use inverse folding to produce target-matching sequences.
-3. **Convert:** Convert to DNA templates, add promoters, analyze properties.
-4. **Prepare:** Design primers and generate oxDNA simulation inputs.
+- **Design:** Create and edit RNA blueprints. Visualize in 3D.
+- **Generate:** Use inverse folding to produce target-matching sequences.
+- **Convert:** Convert to DNA templates, add promoters, analyze properties.
+- **Prepare:** Design primers and generate oxDNA simulation inputs.
 
 
 .. _api_usage:
@@ -142,4 +147,3 @@ gemeinschaft (DFG, German Research Foundation) under CRC 392 and CRC 1638. K.G. 
 funding from the Human Science Frontier Programme (HFSP). The authors thank the Max Planck Society
 for access to computational resources and the Alfried Krupp Foundation. We thank C. Geary for his valuable
 input on the manuscript and insightful feedback on the user interface design.
-

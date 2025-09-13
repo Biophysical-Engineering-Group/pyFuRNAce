@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,12 +79,20 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.design.core.sequence</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
-<span class="kn">from</span> <span class="nn">.symbols</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.symbols</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">iupac_code</span><span class="p">,</span>
+    <span class="n">only_nucl</span><span class="p">,</span>
+    <span class="n">nucl_to_none</span><span class="p">,</span>
+    <span class="n">nucleotides</span><span class="p">,</span>
+    <span class="n">nucl_to_pair</span><span class="p">,</span>
+    <span class="n">dot_bracket_to_pair_map</span><span class="p">,</span>
+    <span class="n">AmbiguosStructure</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.callback</span> <span class="kn">import</span> <span class="n">Callback</span>
 
 
@@ -113,10 +121,9 @@
 <span class="sd">        Direction of the sequence (&#39;53&#39; or &#39;35&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                 <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> 
-                 <span class="n">directionality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;53&#39;</span><span class="p">,</span> <span class="s1">&#39;35&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;53&#39;</span><span class="p">,</span> 
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">directionality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a Sequence object.</span>
 
@@ -136,39 +143,41 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">directionality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;53&#39;</span><span class="p">,</span> <span class="s1">&#39;35&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sequence directionality not allowed. &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;It must be either &#39;53&#39; or &#39;35&#39;, &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">directionality</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
-        
+        <span class="k">if</span> <span class="n">directionality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Sequence directionality not allowed. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;It must be either &#39;53&#39; or &#39;35&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">directionality</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span> <span class="o">=</span> <span class="n">directionality</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">only_nucl</span><span class="p">)</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">only_nucl</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the string representation of the sequence.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the string representation of the sequence.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a string representation of the sequence object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of the sequence object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a subsequence of the sequence.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a subsequence of the sequence.&quot;&quot;&quot;</span>
         <span class="n">dir_slice</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">idx</span><span class="o">.</span><span class="n">step</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">dir_slice</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> 
-                        <span class="n">directionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">[::</span><span class="n">dir_slice</span><span class="p">],</span>
-                        <span class="n">callbacks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+            <span class="n">directionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">[::</span><span class="n">dir_slice</span><span class="p">],</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                    <span class="n">idx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">],</span>
-                    <span class="n">val</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set a subsequence of the sequence.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">],</span> <span class="n">val</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a subsequence of the sequence.&quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="n">seq_line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
             <span class="n">seq_line</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
@@ -176,62 +185,65 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">idx</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[:</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the length of the sequence.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the length of the sequence.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Concatenate two sequences or a sequence and a string&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate two sequences or a sequence and a string&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_addition</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Concatenate a sequence or a string to the current sequence&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate a sequence or a string to the current sequence&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_addition</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Concatenate two sequences or a sequence and a string&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate two sequences or a sequence and a string&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">other</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Multiply the sequence by an integer.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Multiply the sequence by an integer.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Can only multiply sequence by an integer, &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s1"> instead&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Can only multiply sequence by an integer, &quot;</span> <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead&quot;</span>
+        <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Multiply the sequence by an integer.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Multiply the sequence by an integer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if the sequence is not empty.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the sequence is not empty.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a subsequence is included in the sequence&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)):</span>
             <span class="n">str_seq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> 
-                    <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">directionality</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">directionality</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span>
+            <span class="p">):</span>
                 <span class="n">str_seq</span> <span class="o">=</span> <span class="n">str_seq</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">str_seq</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return an iterator over the sequence.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterator over the sequence.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check that the two sequence have same string and directionality&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the two sequence have same string and directionality&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="n">other</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
@@ -242,68 +254,80 @@
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a hash of the sequence.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a hash of the sequence.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
 
-    <span class="c1">### </span>
+    <span class="c1">###</span>
     <span class="c1">### PROPERTIES</span>
     <span class="c1">###</span>
- 
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">directionality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; directionality of the sequence (either &#39;53&#39; or &#39;35&#39;) &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;directionality of the sequence (either &#39;53&#39; or &#39;35&#39;)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span>
 
     <span class="nd">@directionality</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">directionality</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_directionality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;53&#39;</span><span class="p">,</span> <span class="s1">&#39;35&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the directionality of the sequence.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">new_directionality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;53&#39;</span><span class="p">,</span> <span class="s1">&#39;35&#39;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sequence directionality not allowed. &quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot;It must be either &#39;53&#39; or &#39;35&#39;, got &quot;</span> 
-                                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_directionality</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">directionality</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_directionality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the directionality of the sequence.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">new_directionality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Sequence directionality not allowed. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;It must be either &#39;53&#39; or &#39;35&#39;, got &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_directionality</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span> <span class="o">=</span> <span class="n">new_directionality</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
 
-    <span class="c1">### </span>
+    <span class="c1">###</span>
     <span class="c1">### PRETECTED METHODS</span>
     <span class="c1">###</span>
 
-    <span class="k">def</span> <span class="nf">_check_addition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check that the sequence is valid and have same directionality&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_check_addition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the sequence is valid and have same directionality&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s1"> is not a valid type for addition&#39;</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2"> is not a valid type for addition&quot;</span><span class="p">)</span>
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">directionality</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot add two sequences with different directionality&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot add two sequences with different directionality&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_check_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check that the sequence is valid and contains only allowed nucleotides.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_check_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the sequence is valid and contains only allowed nucleotides.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The sequence must be a string or a sequence object. &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_none</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: The string &#39;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&#39; contains nucleotides not &quot;</span>
-                          <span class="sa">f</span><span class="s2">&quot;allowed in ROAD that will be removed. The allowed &quot;</span>
-                          <span class="sa">f</span><span class="s2">&quot;nucleotides are: </span><span class="si">{</span><span class="n">nucleotides</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> 
-                          <span class="n">AmbiguosStructure</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The sequence must be a string or a sequence object. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_none</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Warning: The string &#39;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&#39; contains nucleotides not&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; allowed in ROAD that will be removed. The allowed &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;nucleotides are: </span><span class="si">{</span><span class="n">nucleotides</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                    <span class="n">AmbiguosStructure</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The start/end symbols &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;are not at the end of the sequence: &#39;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span> 
-        <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The start/end symbols &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;are not at the end of the sequence: &#39;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
 
-    <span class="c1">### </span>
+        <span class="k">return</span> <span class="n">line</span>
+
+    <span class="c1">###</span>
     <span class="c1">### METHODS</span>
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Sequence.complement">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.complement">[docs]</a>
-    <span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the complement of the sequence.</span>
 
@@ -312,13 +336,12 @@
 <span class="sd">        Sequence</span>
 <span class="sd">            Complementary sequence.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">),</span> 
-                        <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sequence.copy">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a copy of the sequence.</span>
 
@@ -326,13 +349,13 @@
 <span class="sd">        -------</span>
 <span class="sd">        Sequence</span>
 <span class="sd">            A new Sequence instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>     
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sequence.distance">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.distance">[docs]</a>
-    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the number of mismatched bases between this sequence and another.</span>
 
@@ -351,18 +374,37 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If the input is invalid or lengths do not match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sequences must have the same length.&quot;</span><span class="p">)</span>
-        
-        <span class="n">distance</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Initialize the distance</span>
+
+        <span class="n">distance</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Initialize the distance</span>
         <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="p">(</span><span class="n">nt1</span><span class="p">,</span> <span class="n">nt2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)):</span>
             <span class="c1"># the symbols are not compatible</span>
             <span class="k">if</span> <span class="n">nt2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">iupac_code</span><span class="p">[</span><span class="n">nt1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">nt1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">iupac_code</span><span class="p">[</span><span class="n">nt2</span><span class="p">]:</span>
                 <span class="n">distance</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">return</span> <span class="n">distance</span></div>
+
+
+<div class="viewcode-block" id="Sequence.find">
+<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.find">[docs]</a>
+    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the first occurrence of a subsequence in the sequence.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sub : str</span>
+<span class="sd">            Subsequence to find.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Index of the first occurrence of the subsequence, or -1 if not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sequence.find_repeated_subsequence">
@@ -380,11 +422,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        set of str</span>
 <span class="sd">            Repeated subsequences.</span>
-<span class="sd">        &quot;&quot;&quot;</span>     
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">repeated_subsequences</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">min_length</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">min_length</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
 
                 <span class="n">subsequence</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span>
 
@@ -414,23 +456,24 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">total_count</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span>
-        <span class="n">gc_count</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">)</span> 
+        <span class="n">gc_count</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">extended_alphabet</span><span class="p">:</span>
-            <span class="n">gc_count</span> <span class="o">+=</span> <span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">)</span> 
-                         <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">2</span> 
-                         <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">3</span> 
-                         <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span> 
-                         <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">]))</span>  <span class="o">/</span> <span class="mi">4</span>
-                        <span class="p">)</span>
+            <span class="n">gc_count</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">)</span>
+                <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">3</span>
+                <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span>
+                <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">4</span>
+            <span class="p">)</span>
         <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">gc_count</span> <span class="o">/</span> <span class="n">total_count</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
         <span class="k">return</span> <span class="n">percentage</span></div>
 
 
 <div class="viewcode-block" id="Sequence.get_random_sequence">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.get_random_sequence">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_random_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_random_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a randomized sequence compatible with the IUPAC symbols and </span>
+<span class="sd">        Generate a randomized sequence compatible with the IUPAC symbols and</span>
 <span class="sd">        optionally a dot-bracket structure to be respected.</span>
 
 <span class="sd">        Parameters</span>
@@ -444,19 +487,22 @@
 <span class="sd">            A new randomized sequence.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># make a first random sequence</span>
-        <span class="n">seq</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">iupac_code</span><span class="p">[</span><span class="n">nucleotide</span><span class="p">]))</span> 
-                         <span class="k">for</span> <span class="n">nucleotide</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">]</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">iupac_code</span><span class="p">[</span><span class="n">nucleotide</span><span class="p">]))</span> <span class="k">for</span> <span class="n">nucleotide</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span>
+        <span class="p">]</span>
 
         <span class="c1"># fully random sequence</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">structure</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
-        
+
         <span class="c1"># small sanity check of the structure</span>
         <span class="k">elif</span> <span class="n">structure</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The target dot-bracket must have the same length as &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;the sequence. Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The target dot-bracket must have the same length as &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the sequence. Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
         <span class="c1"># build the pair map</span>
         <span class="n">pair_map</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
 
@@ -469,13 +515,15 @@
 
             <span class="c1"># the paired nucleotide has the symbol for wobble pairings</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">seq</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="n">seq</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;U&quot;</span>
-                <span class="k">elif</span> <span class="n">seq</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="n">seq</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;G&quot;</span>
+                <span class="k">if</span> <span class="n">seq</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span>
+                    <span class="n">seq</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;U&quot;</span>
+                <span class="k">elif</span> <span class="n">seq</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span>
+                    <span class="n">seq</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;G&quot;</span>
 
             <span class="c1"># normal pairing</span>
-            <span class="k">else</span><span class="p">:</span> 
+            <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># the iupac code that pairs the nucleotides</span>
-                <span class="n">pair_sym</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)</span> 
+                <span class="n">pair_sym</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)</span>
                 <span class="c1"># the iupac code of the nucleotide at position v</span>
                 <span class="n">sym_at_pos</span> <span class="o">=</span> <span class="n">iupac_code</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="n">v</span><span class="p">]]</span>
                 <span class="c1"># take the nucleotides that are allowed by both</span>
@@ -484,6 +532,20 @@
                     <span class="n">seq</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">possible_paired_nucleotides</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sequence.lower">
+<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.lower">[docs]</a>
+    <span class="k">def</span> <span class="nf">lower</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert sequence to lowercase.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Lowercase sequence string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Sequence.molecular_weight">
@@ -497,11 +559,7 @@
 <span class="sd">        float</span>
 <span class="sd">            Total molecular weight in Daltons.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">molecular_weight_table</span> <span class="o">=</span> <span class="p">{</span>
-                                <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="mf">347.2</span><span class="p">,</span>
-                                <span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="mf">363.2</span><span class="p">,</span>
-                                <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mf">323.2</span><span class="p">,</span>
-                                <span class="s1">&#39;U&#39;</span><span class="p">:</span> <span class="mf">324.2</span><span class="p">}</span>
+        <span class="n">molecular_weight_table</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mf">347.2</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="mf">363.2</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">323.2</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="mf">324.2</span><span class="p">}</span>
         <span class="n">total_weight</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">nucleotide</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">:</span>
             <span class="n">total_weight</span> <span class="o">+=</span> <span class="n">molecular_weight_table</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">nucleotide</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -523,17 +581,17 @@
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            The removed character.</span>
-<span class="sd">        &quot;&quot;&quot;</span>    
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seq_line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
         <span class="n">popped_val</span> <span class="o">=</span> <span class="n">seq_line</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq_line</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">popped_val</span></div>
 
 
 <div class="viewcode-block" id="Sequence.replace">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.replace">[docs]</a>
-    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace all occurrences of `old` with `new` in the sequence.</span>
 
@@ -548,16 +606,16 @@
 <span class="sd">        -------</span>
 <span class="sd">        Sequence</span>
 <span class="sd">            Updated sequence.</span>
-<span class="sd">        &quot;&quot;&quot;</span>      
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
 <div class="viewcode-block" id="Sequence.reverse">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.reverse">[docs]</a>
-    <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reverse the directionality of the sequence.</span>
 
@@ -572,18 +630,20 @@
 <span class="sd">            Reversed sequence.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">,</span> 
-                            <span class="n">directionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> 
-                            <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">)</span>
-        
+            <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">,</span>
+                <span class="n">directionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directionality</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
 <div class="viewcode-block" id="Sequence.reverse_complement">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.reverse_complement">[docs]</a>
-    <span class="k">def</span> <span class="nf">reverse_complement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">reverse_complement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the reverse complement of the sequence.</span>
 
@@ -592,13 +652,14 @@
 <span class="sd">        Sequence</span>
 <span class="sd">            Reverse-complemented sequence.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> 
-                        <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sequence.split">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.split">[docs]</a>
-    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;Sequence&#39;</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Sequence&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split the sequence by a separator.</span>
 
@@ -611,13 +672,13 @@
 <span class="sd">        -------</span>
 <span class="sd">        list of Sequence</span>
 <span class="sd">            List of subsequences.</span>
-<span class="sd">        &quot;&quot;&quot;</span>      
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">Sequence</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="p">)]</span></div>
 
 
 <div class="viewcode-block" id="Sequence.translate">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.translate">[docs]</a>
-    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Sequence&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Translate the sequence using a mapping dictionary.</span>
 
@@ -636,13 +697,14 @@
         <span class="n">dictionary</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">dictionary</span><span class="p">),</span> 
-                            <span class="n">directionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
-        
+            <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">dictionary</span><span class="p">),</span> <span class="n">directionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">directionality</span>
+            <span class="p">)</span>
+
         <span class="n">new_sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">dictionary</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">new_sequence</span><span class="p">)</span>
+        <span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_line</span><span class="p">(</span><span class="n">new_sequence</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="n">new_sequence</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_callbacks</span><span class="p">(</span><span class="n">new_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
@@ -656,7 +718,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            Uppercase sequence string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>     
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span></div>
 </div>
 
@@ -675,7 +737,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -686,7 +748,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

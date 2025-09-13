@@ -11,7 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=bbaf98b3"></script>
@@ -24,17 +24,17 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Script API Reference" href="api.html" />
-    <link rel="prev" title="Welcome to pyFuRNAce’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to pyFuRNAce’s documentation!" href="index.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -85,7 +85,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <section id="features">
 <span id="id1"></span><h1>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h1>
 <ul class="simple">
@@ -100,41 +100,44 @@
 <section id="installation">
 <span id="id2"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <p><strong>Note</strong>: pyFuRNAce requires Python 3.10 or later. Local installation includes the GUI via Streamlit.</p>
-<p>Install from PyPI:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyfurnace
+<p>Install and/or upgrade from PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pyfurnace
 </pre></div>
 </div>
 <p>Install the latest development version from GitHub:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/Biophysical-Engineering-Group/pyFuRNAce.git&quot;</span>
 </pre></div>
 </div>
-<p>Install OAT for oxDNA structure conversion:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis&quot;</span>
+<p>Perl (<strong>required by Revolvr for sequence optimisation</strong>). Assuming you have an anaconda environment, you can install Perl via conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>bioconda-legacy::perl
 </pre></div>
 </div>
-<p>Perl (required by Revolvr):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>bioconda-legacy::perl
+<p>Install OAT for oxDNA structure conversion:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis&quot;</span>
 </pre></div>
 </div>
 </section>
 <section id="web-application">
 <span id="webapp"></span><h1>Web Application<a class="headerlink" href="#web-application" title="Link to this heading"></a></h1>
-<p>To run locally:</p>
+<p>To run locally, use the command in the terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyfurnace
+</pre></div>
+</div>
+<p>This launches the GUI in your browser. Or alternatively, run the Streamlit app with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pyfurnace
 </pre></div>
 </div>
-<p>This launches the GUI in your browser.</p>
 <p>Or use the hosted version: <a class="reference external" href="http://pyfurnace.de">pyfurnace.de</a> or <a class="reference external" href="https://pyfurnace.streamlit.app">pyfurnace.streamlit.app</a></p>
 <a class="reference external image-reference" href="https://pyfurnace.streamlit.app"><img alt="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" />
 </a>
 <section id="modules">
 <span id="id3"></span><h2>Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h2>
-<ol class="arabic simple">
+<ul class="simple">
 <li><p><strong>Design:</strong> Create and edit RNA blueprints. Visualize in 3D.</p></li>
 <li><p><strong>Generate:</strong> Use inverse folding to produce target-matching sequences.</p></li>
 <li><p><strong>Convert:</strong> Convert to DNA templates, add promoters, analyze properties.</p></li>
 <li><p><strong>Prepare:</strong> Design primers and generate oxDNA simulation inputs.</p></li>
-</ol>
+</ul>
 </section>
 </section>
 <section id="using-the-python-api">
@@ -208,7 +211,7 @@ input on the manuscript and insightful feedback on the user interface design.</p
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -219,7 +222,7 @@ input on the manuscript and insightful feedback on the user interface design.</p
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

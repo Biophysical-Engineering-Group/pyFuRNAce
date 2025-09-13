@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,19 +79,23 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.design.core.coordinates_3d</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span> <span class="k">as</span> <span class="n">R</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="c1">### OAT IMPORTS</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">oxDNA_analysis_tools.PDB_oxDNA</span> <span class="kn">import</span> <span class="n">PDB_oxDNA</span>
     <span class="kn">from</span> <span class="nn">oxDNA_analysis_tools.UTILS.RyeReader</span> <span class="kn">import</span> <span class="n">conf_to_str</span><span class="p">,</span> <span class="n">get_top_string</span>
+
     <span class="n">oat_installed</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">oat_installed</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># only for type checkers / linters, not at runtime</span>
+    <span class="kn">from</span> <span class="nn">.strand</span> <span class="kn">import</span> <span class="n">Strand</span>
 
 
 <div class="viewcode-block" id="ProteinCoords">
@@ -108,7 +112,7 @@
 <span class="sd">        A NumPy array containing the 3D coordinates associated with the sequence.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the ProteinCoords instance with a sequence and coordinates.</span>
 
@@ -120,7 +124,7 @@
 <span class="sd">            A NumPy array of shape (N, 3) representing the 3D coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize the sequence as an empty string</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="c1"># Initialize the coordinates as an empty NumPy array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(())</span>
 
@@ -130,11 +134,11 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of the ProteinCoords instance.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;ProteinCoords(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ProteinCoords(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of the ProteinCoords instance.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;ProteinCoords(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ProteinCoords(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve coordinates by index.&quot;&quot;&quot;</span>
@@ -179,11 +183,16 @@
             <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The coords must be a numpy array&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The coords and the sequence must have the same length:&quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot; expected len</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span><span class="si">}</span><span class="s2">,&quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;  got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span><span class="si">}</span><span class="s2"> coordinates&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The coords and the sequence must have the same length:&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; expected len</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span><span class="si">}</span><span class="s2">,&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;  got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span><span class="si">}</span><span class="s2"> coordinates&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -210,8 +219,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The sequence must be a string&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span> 
-                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The sequence must have the same length as the coords&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span> <span class="o">=</span> <span class="n">sequence</span>
 
@@ -221,8 +233,8 @@
 
 <div class="viewcode-block" id="ProteinCoords.copy">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.ProteinCoords.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ProteinCoords&#39;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create a copy of the ProteinCoords instance. &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ProteinCoords&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a copy of the ProteinCoords instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ProteinCoords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span></div>
 
 
@@ -248,15 +260,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for representing and manipulating 3D molecular coordinates.</span>
 
-<span class="sd">    This class provides functionality to store, transform, and manipulate </span>
-<span class="sd">    3D coordinates used in molecular structures. It supports transformations </span>
-<span class="sd">    such as rotation and translation, as well as operations for combining </span>
+<span class="sd">    This class provides functionality to store, transform, and manipulate</span>
+<span class="sd">    3D coordinates used in molecular structures. It supports transformations</span>
+<span class="sd">    such as rotation and translation, as well as operations for combining</span>
 <span class="sd">    multiple coordinate sets.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    input_array : Union[np.ndarray, List], optional</span>
-<span class="sd">        A NumPy array or list containing the 3D coordinates, where each element </span>
+<span class="sd">        A NumPy array or list containing the 3D coordinates, where each element</span>
 <span class="sd">        represents a nucleotide or molecular unit with associated vectors.</span>
 <span class="sd">    dummy_ends : Tuple[np.ndarray, np.ndarray], optional</span>
 <span class="sd">        A tuple containing two NumPy arrays representing dummy end coordinates.</span>
@@ -286,14 +298,15 @@
 
     <span class="n">_CACHED_HELICES</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
-                 <span class="n">input_array</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()),</span> 
-                 <span class="n">dummy_ends</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()),</span> 
-                                                              <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(())),</span> 
-                 <span class="n">proteins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;ProteinCoords&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_array</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()),</span>
+        <span class="n">dummy_ends</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(()),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(())),</span>
+        <span class="n">proteins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ProteinCoords&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize Coords object.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        input_array : Union[np.ndarray, List]</span>
@@ -324,7 +337,7 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of the coordinates.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Coords(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Coords(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of elements in the coordinates array.&quot;&quot;&quot;</span>
@@ -345,15 +358,17 @@
     <span class="k">def</span> <span class="nf">array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_array</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the coordinates array.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        new_array : Union[np.ndarray, List, Tuple]</span>
 <span class="sd">            The new array to be set.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_array</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The Coordinates array must be a numpy array or &quot;</span>
-                             <span class="s2">&quot;a list of coordinates&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The Coordinates array must be a numpy array or &quot;</span>
+                <span class="s2">&quot;a list of coordinates&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_array</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -367,39 +382,43 @@
     <span class="k">def</span> <span class="nf">dummy_ends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_dummy</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the dummy ends.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        new_dummy : Tuple[np.ndarray, np.ndarray]</span>
 <span class="sd">            A tuple of numpy arrays representing dummy ends.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_dummy</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_dummy</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The dummy_ends argument must be a tuple &quot;</span>
-                             <span class="s2">&quot;of two numpy arrays.&quot;</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The dummy_ends argument must be a tuple &quot;</span> <span class="s2">&quot;of two numpy arrays.&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_dummy</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_dummy</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;ProteinCoords&#39;</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ProteinCoords&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the list of proteins.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proteins</span>
 
     <span class="nd">@proteins</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proteins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;ProteinCoords&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proteins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ProteinCoords&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the proteins list.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        proteins : List[ProteinCoords]</span>
 <span class="sd">            A list of ProteinCoords instances.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proteins</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> 
-                    <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ProteinCoords</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proteins</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The proteins argument must be a list of ProteinCoords &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;instances. Got: </span><span class="si">{</span><span class="n">proteins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proteins</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ProteinCoords</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proteins</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The proteins argument must be a list of ProteinCoords &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;instances. Got: </span><span class="si">{</span><span class="n">proteins</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_proteins</span> <span class="o">=</span> <span class="n">proteins</span>
 
     <span class="nd">@property</span>
@@ -423,12 +442,9 @@
 <div class="viewcode-block" id="Coords.apply_transformation">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.apply_transformation">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">apply_transformation</span><span class="p">(</span><span class="n">T</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                             <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                             <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                             <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                             <span class="n">local</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-                             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">apply_transformation</span><span class="p">(</span>
+        <span class="n">T</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a transformation matrix to position, base, and normal vectors.</span>
 
@@ -452,11 +468,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
             <span class="n">p_local</span><span class="p">,</span> <span class="n">b_local</span><span class="p">,</span> <span class="n">n_local</span> <span class="o">=</span> <span class="n">p</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span>
-            <span class="n">p</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">p</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
         <span class="c1"># Convert position to homogeneous coordinates</span>
         <span class="n">p_homogeneous</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        
+
         <span class="c1"># Apply the transformation to the position</span>
         <span class="n">p_transformed_homogeneous</span> <span class="o">=</span> <span class="n">T</span> <span class="o">@</span> <span class="n">p_homogeneous</span><span class="o">.</span><span class="n">T</span>
         <span class="n">p_trans</span> <span class="o">=</span> <span class="n">p_transformed_homogeneous</span><span class="o">.</span><span class="n">T</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
@@ -471,26 +487,23 @@
 
         <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
             <span class="c1"># find the original reference system from the local one</span>
-            <span class="n">p_trans</span><span class="p">,</span> <span class="n">b_trans</span><span class="p">,</span> <span class="n">n_trans</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">set_reference</span><span class="p">(</span><span class="n">p_local</span><span class="p">,</span> 
-                                                             <span class="n">b_local</span><span class="p">,</span> 
-                                                             <span class="n">n_local</span><span class="p">,</span> 
-                                                             <span class="n">p_trans</span><span class="p">,</span> 
-                                                             <span class="n">b_trans</span><span class="p">,</span> 
-                                                             <span class="n">n_trans</span><span class="p">,</span> 
-                                                             <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                                                 
+            <span class="n">p_trans</span><span class="p">,</span> <span class="n">b_trans</span><span class="p">,</span> <span class="n">n_trans</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">set_reference</span><span class="p">(</span>
+                <span class="n">p_local</span><span class="p">,</span> <span class="n">b_local</span><span class="p">,</span> <span class="n">n_local</span><span class="p">,</span> <span class="n">p_trans</span><span class="p">,</span> <span class="n">b_trans</span><span class="p">,</span> <span class="n">n_trans</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">p_trans</span><span class="p">,</span> <span class="n">b_trans</span><span class="p">,</span> <span class="n">n_trans</span></div>
 
 
 <div class="viewcode-block" id="Coords.combine_coords">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.combine_coords">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">combine_coords</span><span class="p">(</span><span class="n">strand1</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span> 
-                       <span class="n">strand2</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span> 
-                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Coords&quot;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">combine_coords</span><span class="p">(</span>
+        <span class="n">strand1</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span>
+        <span class="n">strand2</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Coords&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine the coordinates of two strands by applying necessary transformations.</span>
-<span class="sd">        Use dependency injection (with strand1 and strand2 as arguments) to apply </span>
+<span class="sd">        Use dependency injection (with strand1 and strand2 as arguments) to apply</span>
 <span class="sd">        the transformation to a whole Strand Block. The second strand is transformed</span>
 <span class="sd">        to match the first strand&#39;s orientation.</span>
 
@@ -507,82 +520,86 @@
 <span class="sd">            Combined coordinate object with the transformed coordinates of the strands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">coords1</span> <span class="o">=</span> <span class="n">strand1</span><span class="o">.</span><span class="n">coords</span>
-        <span class="n">seq1</span> <span class="o">=</span> <span class="n">strand1</span><span class="o">.</span><span class="n">sequence</span>
         <span class="n">coords2</span> <span class="o">=</span> <span class="n">strand2</span><span class="o">.</span><span class="n">coords</span>
-        <span class="n">seq2</span> <span class="o">=</span> <span class="n">strand2</span><span class="o">.</span><span class="n">sequence</span>
 
         <span class="c1">### HEDGE CASES</span>
-        <span class="c1"># there are no coordinates to combine </span>
-        <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">is_empty</span><span class="p">()</span> <span class="ow">and</span> <span class="n">coords2</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span> 
+        <span class="c1"># there are no coordinates to combine</span>
+        <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">is_empty</span><span class="p">()</span> <span class="ow">and</span> <span class="n">coords2</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">Coords</span><span class="p">([])</span>
         <span class="c1"># the first strand has no coordinates and no nucleotides</span>
-        <span class="k">elif</span> <span class="n">coords1</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span> 
+        <span class="k">elif</span> <span class="n">coords1</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">coords2</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># the second strand has no coordinates and no nucleotides</span>
-        <span class="k">elif</span> <span class="n">coords2</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span> 
+        <span class="k">elif</span> <span class="n">coords2</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">coords1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
+
         <span class="c1">### TRANSFORM THE SECOND STRAND</span>
         <span class="c1"># transform them only if they are not in the same block os strands</span>
-        <span class="k">if</span> <span class="n">strand1</span><span class="o">.</span><span class="n">strands_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">strand2</span><span class="o">.</span><span class="n">strands_block</span><span class="p">:</span> 
-            
-            <span class="c1"># create the coordinates for the first strand</span>
-            <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">):</span> 
-                <span class="n">coords1</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span>
-                                    <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># start position</span>
-                                    <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># base vector</span>
-                                    <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># normal vector</span>
-                                    <span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">),</span>
-                                    <span class="n">directionality</span><span class="o">=</span><span class="n">seq1</span><span class="o">.</span><span class="n">directionality</span>
-                                    <span class="p">)</span>
-                
-            <span class="c1"># create the coordinates for the second strand</span>
-            <span class="k">if</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">):</span> 
-                <span class="n">coords2</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span>
-                                    <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># start position</span>
-                                    <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># base vector</span>
-                                    <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># normal vector</span>
-                                    <span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">),</span>
-                                    <span class="n">directionality</span><span class="o">=</span><span class="n">seq2</span><span class="o">.</span><span class="n">directionality</span>
-                                    <span class="p">)</span>
-                
+        <span class="k">if</span> <span class="n">strand1</span><span class="o">.</span><span class="n">strands_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">strand2</span><span class="o">.</span><span class="n">strands_block</span><span class="p">:</span>
+
+            <span class="c1">### technically, `strand1.coords will create the coordinates</span>
+            <span class="c1">### if they are not present, so this code block is not</span>
+            <span class="c1">### needed anymore</span>
+
+            <span class="c1">### -&gt; Start obsolete code</span>
+            <span class="c1"># # create the coordinates for the first strand</span>
+            <span class="c1"># if coords1.size == 0 and len(strand1.sequence):</span>
+            <span class="c1">#     coords1 = Coords.compute_helix_from_nucl(</span>
+            <span class="c1">#         (0, 0, 0),  # start position</span>
+            <span class="c1">#         (1, 0, 0),  # base vector</span>
+            <span class="c1">#         (0, 1, 0),  # normal vector</span>
+            <span class="c1">#         length=len(strand1.sequence),</span>
+            <span class="c1">#         directionality=strand1.directionality,</span>
+            <span class="c1">#     )</span>
+
+            <span class="c1"># # create the coordinates for the second strand</span>
+            <span class="c1"># if coords2.size == 0 and len(strand2.sequence):</span>
+            <span class="c1">#     coords2 = Coords.compute_helix_from_nucl(</span>
+            <span class="c1">#         (0, 0, 0),  # start position</span>
+            <span class="c1">#         (1, 0, 0),  # base vector</span>
+            <span class="c1">#         (0, 1, 0),  # normal vector</span>
+            <span class="c1">#         length=len(strand2.sequence),</span>
+            <span class="c1">#         directionality=strand2.directionality,</span>
+            <span class="c1">#     )</span>
+            <span class="c1">### -&gt; End obsolete code</span>
+
             <span class="c1">### CHECK THE JOINING POINTS AND TRANSFORM THE ARRAY TWO</span>
 
             <span class="c1"># the first strand has no end dummy</span>
-            <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># the second strand has a start dummy</span>
-                <span class="k">if</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># the dummy start translates to...</span>
-                    <span class="n">pos1</span> <span class="o">=</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+                    <span class="n">pos1</span> <span class="o">=</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">bv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">nv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
                     <span class="c1"># ...the last position of the first strand</span>
-                    <span class="n">pos2</span> <span class="o">=</span> <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+                    <span class="n">pos2</span> <span class="o">=</span> <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">bv2</span> <span class="o">=</span> <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">nv2</span> <span class="o">=</span> <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span> 
-                    <span class="c1"># the second strand has no dummy: calulcate an helical join from </span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># the second strand has no dummy: calulcate an helical join from</span>
                     <span class="c1"># the last nucleotide of the first strand</span>
                     <span class="n">helix_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span>
-                                            <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
-                                            <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> 
-                                            <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> 
-                                            <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-                                            <span class="n">directionality</span><span class="o">=</span><span class="n">seq1</span><span class="o">.</span><span class="n">directionality</span>
-                                            <span class="p">)</span>
+                        <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="n">coords1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">directionality</span><span class="o">=</span><span class="n">strand1</span><span class="o">.</span><span class="n">directionality</span><span class="p">,</span>
+                    <span class="p">)</span>
                     <span class="c1"># the first position of the second strand translates to...</span>
-                    <span class="n">pos1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+                    <span class="n">pos1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">bv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">nv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
                     <span class="c1"># ...the first nucleotide of the helical join</span>
                     <span class="n">pos2</span> <span class="o">=</span> <span class="n">helix_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">bv2</span> <span class="o">=</span> <span class="n">helix_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">nv2</span> <span class="o">=</span> <span class="n">helix_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-            
+
             <span class="c1"># the first strand has an end dummy, use it</span>
-            <span class="k">else</span><span class="p">:</span> 
+            <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># the array 2 has no coordinate, use the dummy instead</span>
-                <span class="k">if</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># the dummy start translates to...</span>
                     <span class="n">pos1</span> <span class="o">=</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">bv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -592,40 +609,39 @@
                     <span class="n">pos1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">bv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">nv1</span> <span class="o">=</span> <span class="n">coords2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                <span class="c1"># ...the dummy end of the first strand </span>
-                <span class="n">pos2</span> <span class="o">=</span> <span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+                <span class="c1"># ...the dummy end of the first strand</span>
+                <span class="n">pos2</span> <span class="o">=</span> <span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">bv2</span> <span class="o">=</span> <span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">nv2</span> <span class="o">=</span> <span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
             <span class="c1"># Calculate the transformation matrix</span>
-            <span class="n">T_matrix</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_transformation_matrix</span><span class="p">(</span><span class="n">pos1</span><span class="p">,</span> 
-                                                            <span class="n">bv1</span><span class="p">,</span> 
-                                                            <span class="n">nv1</span><span class="p">,</span> 
-                                                            <span class="n">pos2</span><span class="p">,</span> 
-                                                            <span class="n">bv2</span><span class="p">,</span> 
-                                                            <span class="n">nv2</span><span class="p">)</span>
+            <span class="n">T_matrix</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_transformation_matrix</span><span class="p">(</span>
+                <span class="n">pos1</span><span class="p">,</span> <span class="n">bv1</span><span class="p">,</span> <span class="n">nv1</span><span class="p">,</span> <span class="n">pos2</span><span class="p">,</span> <span class="n">bv2</span><span class="p">,</span> <span class="n">nv2</span>
+            <span class="p">)</span>
 
             <span class="c1">### Apply the transformation to the second strand motif block</span>
             <span class="n">strand2</span><span class="o">.</span><span class="n">strands_block</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">T_matrix</span><span class="p">)</span>
 
-        <span class="c1">### COMBINE THE COORDINATES, </span>
-        <span class="c1"># the coordinates could be empty if there are dummies </span>
+        <span class="c1">### COMBINE THE COORDINATES,</span>
+        <span class="c1"># the coordinates could be empty if there are dummies</span>
         <span class="n">combined_dummy</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords1</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords2</span><span class="o">.</span><span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># both strands have no coordinates</span>
-        <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">coords1</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">([],</span> <span class="n">dummy_ends</span><span class="o">=</span><span class="n">combined_dummy</span><span class="p">)</span>
 
         <span class="c1"># the first strand has no coordinates</span>
-        <span class="k">elif</span> <span class="n">coords1</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="k">elif</span> <span class="n">coords1</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords2</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dummy_ends</span><span class="o">=</span><span class="n">combined_dummy</span><span class="p">)</span>
 
         <span class="c1"># the second strand has no coordinates</span>
-        <span class="k">elif</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="k">elif</span> <span class="n">coords2</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords1</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dummy_ends</span><span class="o">=</span><span class="n">combined_dummy</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">combined</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">coords1</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">coords2</span><span class="o">.</span><span class="n">array</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> 
-                                              <span class="n">dummy_ends</span><span class="o">=</span><span class="n">combined_dummy</span><span class="p">)</span>
+            <span class="n">combined</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">coords1</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">coords2</span><span class="o">.</span><span class="n">array</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">dummy_ends</span><span class="o">=</span><span class="n">combined_dummy</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="c1">### COMBINE THE PROTEINS</span>
         <span class="n">combined</span><span class="o">.</span><span class="n">proteins</span> <span class="o">=</span> <span class="n">coords1</span><span class="o">.</span><span class="n">proteins</span> <span class="o">+</span> <span class="n">coords2</span><span class="o">.</span><span class="n">proteins</span>
@@ -633,21 +649,21 @@
         <span class="k">return</span> <span class="n">combined</span></div>
 
 
-    
 <div class="viewcode-block" id="Coords.compute_helix_from_nucl">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.compute_helix_from_nucl">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">compute_helix_from_nucl</span><span class="p">(</span><span class="n">pos</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                <span class="n">old_a1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                <span class="n">old_a3</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
-                                <span class="n">directionality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;53&quot;</span><span class="p">,</span> 
-                                <span class="n">double</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                                <span class="n">use_cached</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                                <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Coords&quot;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">compute_helix_from_nucl</span><span class="p">(</span>
+        <span class="n">pos</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">old_a1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">old_a3</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">directionality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;53&quot;</span><span class="p">,</span>
+        <span class="n">double</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_cached</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Coords&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute helical coordinates for nucleotides.</span>
-<span class="sd">        This function is based on the oxView implementation of the </span>
+<span class="sd">        This function is based on the oxView implementation of the</span>
 <span class="sd">        helix generation: https://doi.org/10.1093/nar/gkaa417</span>
 
 
@@ -674,16 +690,18 @@
 <span class="sd">            Generated helical coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">use_cached</span><span class="p">:</span>
-            <span class="n">info</span> <span class="o">=</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pos</span><span class="p">),</span>
-                    <span class="nb">tuple</span><span class="p">(</span><span class="n">old_a1</span><span class="p">),</span> 
-                    <span class="nb">tuple</span><span class="p">(</span><span class="n">old_a3</span><span class="p">),</span>
-                    <span class="n">directionality</span><span class="p">,</span>
-                    <span class="n">double</span><span class="p">,</span>
-                    <span class="n">length</span><span class="p">)</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">pos</span><span class="p">),</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">old_a1</span><span class="p">),</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">old_a3</span><span class="p">),</span>
+                <span class="n">directionality</span><span class="p">,</span>
+                <span class="n">double</span><span class="p">,</span>
+                <span class="n">length</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">Coords</span><span class="o">.</span><span class="n">_CACHED_HELICES</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">Coords</span><span class="o">.</span><span class="n">_CACHED_HELICES</span><span class="p">[</span><span class="n">info</span><span class="p">]</span>
-            
-        <span class="c1"># Adjust arguments: Convert lists or tuples to numpy arrays </span>
+
+        <span class="c1"># Adjust arguments: Convert lists or tuples to numpy arrays</span>
         <span class="c1"># for consistency in mathematical operations</span>
         <span class="n">direction_35</span> <span class="o">=</span> <span class="n">directionality</span> <span class="o">==</span> <span class="s2">&quot;35&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
@@ -701,16 +719,16 @@
         <span class="n">rot</span> <span class="o">=</span> <span class="mf">32.73</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>  <span class="c1"># Rotation angle between next bases in radians</span>
         <span class="n">cord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">bp_backbone_distance</span>  <span class="c1"># Chord length</span>
         <span class="c1"># Distance from center to chord</span>
-        <span class="n">center_to_cord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">diameter</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">cord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>  
+        <span class="n">center_to_cord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">diameter</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">cord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">fudge</span> <span class="o">=</span> <span class="mf">0.4</span>  <span class="c1"># Fudge factor for position adjustment</span>
 
         <span class="c1"># Calculate the axis perpendicular to the old A1 and A3 vectors</span>
-        <span class="n">norm_a1_a3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">old_a1</span><span class="p">,</span> <span class="n">old_a3</span><span class="p">)</span>  
+        <span class="n">norm_a1_a3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">old_a1</span><span class="p">,</span> <span class="n">old_a3</span><span class="p">)</span>
         <span class="c1"># Create the rotation matrix for the direction vector</span>
-        <span class="n">R_dir</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">(</span><span class="n">norm_a1_a3</span> <span class="o">*</span> <span class="n">inclination</span><span class="p">)</span> 
-        <span class="c1"># Calculate the direction vector, </span>
-        <span class="c1"># rotating the old normal vector by the inclination angle </span>
-        <span class="n">dir_vector</span> <span class="o">=</span> <span class="o">-</span> <span class="n">R_dir</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">old_a3</span><span class="p">)</span> 
+        <span class="n">R_dir</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">(</span><span class="n">norm_a1_a3</span> <span class="o">*</span> <span class="n">inclination</span><span class="p">)</span>
+        <span class="c1"># Calculate the direction vector,</span>
+        <span class="c1"># rotating the old normal vector by the inclination angle</span>
+        <span class="n">dir_vector</span> <span class="o">=</span> <span class="o">-</span><span class="n">R_dir</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">old_a3</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">direction_35</span><span class="p">:</span>
             <span class="n">dir_vector</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Adjust direction if specified</span>
@@ -718,24 +736,28 @@
         <span class="n">dir_vector</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dir_vector</span><span class="p">)</span>  <span class="c1"># Normalize direction vector</span>
 
         <span class="c1"># Calculate the coordinates if the helix axis is the Z-axis</span>
-        <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span> <span class="o">=</span> <span class="p">(</span><span class="n">center_to_cord</span><span class="p">,</span> 
-                      <span class="o">-</span><span class="n">cord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> 
-                      <span class="o">-</span><span class="p">(</span><span class="n">bp_backbone_distance</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">))</span>
-        <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="p">(</span><span class="n">center_to_cord</span><span class="p">,</span> 
-                      <span class="o">+</span><span class="n">cord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> 
-                      <span class="o">+</span><span class="p">(</span><span class="n">bp_backbone_distance</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">))</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">center_to_cord</span><span class="p">,</span>
+            <span class="o">-</span><span class="n">cord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="o">-</span><span class="p">(</span><span class="n">bp_backbone_distance</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">center_to_cord</span><span class="p">,</span>
+            <span class="o">+</span><span class="n">cord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="o">+</span><span class="p">(</span><span class="n">bp_backbone_distance</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">),</span>
+        <span class="p">)</span>
         <span class="n">r1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span><span class="p">])</span>
         <span class="n">r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span><span class="p">])</span>
 
         <span class="c1">### Set the axis to the correct one</span>
         <span class="n">ref_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># Z-axis is the default axis</span>
         <span class="c1"># Calculate the cross product for rotation</span>
-        <span class="n">cross_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">ref_vector</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span>  
+        <span class="n">cross_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">ref_vector</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span>
         <span class="c1"># Calculate the dot product</span>
-        <span class="n">dot_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ref_vector</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span>  
+        <span class="n">dot_prod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ref_vector</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span>
         <span class="c1"># Calculate the quaternion components</span>
         <span class="c1"># * scalar component to normalize the quaternion</span>
-        <span class="n">scalar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">dot_prod</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span><span class="p">)</span>  
+        <span class="n">scalar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">dot_prod</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span><span class="p">)</span>
 
         <span class="c1"># The quaternion matrix transforms the ref_vector to the dir_vector</span>
         <span class="n">q_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cross_prod</span> <span class="o">/</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">scalar</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>
@@ -747,21 +769,26 @@
         <span class="c1"># Set a1 to the correct orientation</span>
         <span class="n">r1_to_r2</span> <span class="o">=</span> <span class="n">r2</span> <span class="o">-</span> <span class="n">r1</span>
         <span class="k">if</span> <span class="n">direction_35</span><span class="p">:</span>
-            <span class="n">r1_to_r2</span> <span class="o">=</span> <span class="o">-</span> <span class="n">r1_to_r2</span>  <span class="c1"># Adjust direction if specified</span>
+            <span class="n">r1_to_r2</span> <span class="o">=</span> <span class="o">-</span><span class="n">r1_to_r2</span>  <span class="c1"># Adjust direction if specified</span>
         <span class="n">r1_to_r2</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r1_to_r2</span><span class="p">)</span>  <span class="c1"># Normalize the vector</span>
 
         <span class="c1">### Rotate the helix axis to the correct orientation</span>
         <span class="c1"># Project r1_to_r2 onto dir_vector</span>
-        <span class="n">r1_to_r2_proj</span> <span class="o">=</span> <span class="n">r1_to_r2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">r1_to_r2</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span> 
-        <span class="c1"># Project old_a1 onto dir_vector </span>
-        <span class="n">old_a1_proj</span> <span class="o">=</span> <span class="n">old_a1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">old_a1</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span>  
+        <span class="n">r1_to_r2_proj</span> <span class="o">=</span> <span class="n">r1_to_r2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">r1_to_r2</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span>
+        <span class="c1"># Project old_a1 onto dir_vector</span>
+        <span class="n">old_a1_proj</span> <span class="o">=</span> <span class="n">old_a1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">old_a1</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span>
 
-        <span class="n">rotAngle2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">r1_to_r2_proj</span> <span class="o">/</span> 
-                                             <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r1_to_r2_proj</span><span class="p">),</span> 
-                                             <span class="n">old_a1_proj</span> <span class="o">/</span> 
-                                             <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">old_a1_proj</span><span class="p">)),</span> 
-                                             <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
-        
+        <span class="n">rotAngle2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
+                    <span class="n">r1_to_r2_proj</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r1_to_r2_proj</span><span class="p">),</span>
+                    <span class="n">old_a1_proj</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">old_a1_proj</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">r1_to_r2</span><span class="p">,</span> <span class="n">old_a1</span><span class="p">),</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">rotAngle2</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Adjust rotation angle based on the cross product</span>
         <span class="n">q2</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">(</span><span class="n">dir_vector</span> <span class="o">*</span> <span class="n">rotAngle2</span><span class="p">)</span>  <span class="c1"># Create the rotation matrix</span>
@@ -798,10 +825,10 @@
 
             <span class="c1">### Calculate A3 orientation</span>
             <span class="c1"># Project a1 onto dir_vector</span>
-            <span class="n">a1proj</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span> 
+            <span class="n">a1proj</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span>
             <span class="n">a1proj</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1proj</span><span class="p">)</span>  <span class="c1"># Normalize projection</span>
             <span class="c1"># Calculate a3</span>
-            <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">a1proj</span> 
+            <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">a1proj</span>
             <span class="n">a3</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a3</span><span class="p">)</span>  <span class="c1"># Normalize a3</span>
 
             <span class="c1"># Calculate position</span>
@@ -813,16 +840,16 @@
             <span class="n">RNA_fudge</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">fudge</span>  <span class="c1"># Apply fudge factor</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">RNA_fudge</span> <span class="o">+</span> <span class="n">start_pos</span>  <span class="c1"># Calculate position</span>
 
-            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">]</span> <span class="c1"># Append nucleotide properties</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">]</span>  <span class="c1"># Append nucleotide properties</span>
 
             <span class="c1"># Double helix case</span>
             <span class="k">if</span> <span class="n">double</span><span class="p">:</span>
                 <span class="c1"># Calculate a1 for double helix</span>
-                <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="n">r1_to_r2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="o">-</span><span class="n">r1_to_r2</span><span class="p">)</span>  
+                <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="n">r1_to_r2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="o">-</span><span class="n">r1_to_r2</span><span class="p">)</span>
                 <span class="c1"># Project a1 onto dir_vector</span>
-                <span class="n">a1proj</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="o">-</span><span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="n">dir_vector</span>  
-                 <span class="c1"># Normalize projection</span>
-                <span class="n">a1proj</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1proj</span><span class="p">)</span> 
+                <span class="n">a1proj</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="o">-</span><span class="n">dir_vector</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="n">dir_vector</span>
+                <span class="c1"># Normalize projection</span>
+                <span class="n">a1proj</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1proj</span><span class="p">)</span>
                 <span class="c1"># Calculate a3</span>
                 <span class="n">a3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">dir_vector</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inclination</span><span class="p">)</span> <span class="o">*</span> <span class="n">a1proj</span>
                 <span class="n">a3</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a3</span><span class="p">)</span>  <span class="c1"># Normalize a3</span>
@@ -833,15 +860,15 @@
                     <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="n">a3</span>
                 <span class="n">RNA_fudge</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">fudge</span>  <span class="c1"># Apply fudge factor</span>
                 <span class="n">p</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">RNA_fudge</span> <span class="o">+</span> <span class="n">start_pos</span>  <span class="c1"># Calculate position</span>
-                 <span class="c1"># Append nucleotide properties for double helix</span>
-                <span class="n">out_double</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">]</span> 
-        
+                <span class="c1"># Append nucleotide properties for double helix</span>
+                <span class="n">out_double</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">]</span>
+
         <span class="c1"># Combine results</span>
         <span class="k">if</span> <span class="n">double</span><span class="p">:</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">out</span><span class="p">,</span> <span class="n">out_double</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="n">out</span>
-        
+
         <span class="k">if</span> <span class="n">use_cached</span><span class="p">:</span>
             <span class="c1"># Cache the helical coordinates for future use</span>
             <span class="n">Coords</span><span class="o">.</span><span class="n">_CACHED_HELICES</span><span class="p">[</span><span class="n">info</span><span class="p">]</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
@@ -851,14 +878,15 @@
 <div class="viewcode-block" id="Coords.compute_transformation_matrix">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.compute_transformation_matrix">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">compute_transformation_matrix</span><span class="p">(</span><span class="n">p1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                      <span class="n">b1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                      <span class="n">n1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                      <span class="n">p2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                      <span class="n">b2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                      <span class="n">n2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                                      <span class="n">local</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-                                      <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">compute_transformation_matrix</span><span class="p">(</span>
+        <span class="n">p1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">b1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">n1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">p2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">b2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">n2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">local</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute a transformation matrix to align one coordinate frame to another.</span>
 
@@ -887,7 +915,7 @@
         <span class="c1"># Calculate the third orthogonal vectors</span>
         <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
             <span class="n">p2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">set_reference</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
-            <span class="n">p1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">n1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">p1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">n1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
         <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
         <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
@@ -912,13 +940,14 @@
 <div class="viewcode-block" id="Coords.load_from_file">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.load_from_file">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">load_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                       <span class="n">dummy_ends</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                       <span class="n">extend</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
-                       <span class="n">topology_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                       <span class="n">protein</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                       <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Coords&quot;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">load_from_file</span><span class="p">(</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dummy_ends</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="n">extend</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">topology_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">protein</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Coords&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load and cleanup coordinates from an oxDNA configuration or PDB file.</span>
 
@@ -927,7 +956,7 @@
 <span class="sd">        filename : str</span>
 <span class="sd">            Path to the oxDNA configuration or PDB file.</span>
 <span class="sd">        dummy_ends : Tuple[bool, bool], default is (False, False)</span>
-<span class="sd">            A tuple indicating whether the coordinates have dummy ends at the </span>
+<span class="sd">            A tuple indicating whether the coordinates have dummy ends at the</span>
 <span class="sd">            beginning or end.</span>
 <span class="sd">        extend : Tuple[int, int], default is (0, 0)</span>
 <span class="sd">            Number of nucleotides to extend the coordinates at the beginning and end.</span>
@@ -945,48 +974,53 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if the file is a pdb file</span>
         <span class="n">pdb</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">top_text</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># initialize the topology text</span>
+        <span class="n">top_text</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># initialize the topology text</span>
 
         <span class="c1"># check the path</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The filename must be a string or a path-like &quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot;object, got type(filename)&quot;</span><span class="p">)</span>
-            
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The filename must be a string or a path-like &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;object, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s2">. Full error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
         <span class="c1"># check the file extension</span>
-        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdb&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.PDB&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdb&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.PDB&quot;</span><span class="p">):</span>
             <span class="n">pdb</span> <span class="o">=</span> <span class="kc">True</span>
-        
+
         <span class="c1"># read the file</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">conf_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">pdb</span> <span class="ow">and</span> <span class="n">topology_file</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">topology_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">topology_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">top_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_text</span><span class="p">(</span><span class="n">conf_text</span><span class="p">,</span> 
-                                     <span class="n">dummy_ends</span><span class="p">,</span> 
-                                     <span class="n">extend</span><span class="p">,</span> 
-                                     <span class="n">verbose</span><span class="p">,</span> 
-                                     <span class="n">top_text</span><span class="o">=</span><span class="n">top_text</span><span class="p">,</span> 
-                                     <span class="n">pdb_format</span><span class="o">=</span><span class="n">pdb</span><span class="p">,</span>
-                                     <span class="n">protein</span><span class="o">=</span><span class="n">protein</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Coords</span><span class="o">.</span><span class="n">load_from_text</span><span class="p">(</span>
+            <span class="n">conf_text</span><span class="p">,</span>
+            <span class="n">dummy_ends</span><span class="p">,</span>
+            <span class="n">extend</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
+            <span class="n">top_text</span><span class="o">=</span><span class="n">top_text</span><span class="p">,</span>
+            <span class="n">pdb_format</span><span class="o">=</span><span class="n">pdb</span><span class="p">,</span>
+            <span class="n">protein</span><span class="o">=</span><span class="n">protein</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Coords.load_from_text">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.load_from_text">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">load_from_text</span><span class="p">(</span><span class="n">conf_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                       <span class="n">dummy_ends</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> 
-                       <span class="n">extend</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
-                       <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                       <span class="n">top_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                       <span class="n">pdb_format</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                       <span class="n">protein</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Coords&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">load_from_text</span><span class="p">(</span>
+        <span class="n">conf_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dummy_ends</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="n">extend</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">top_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pdb_format</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">protein</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Coords&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load and cleanup coordinates from an oxDNA or PDB configuration text.</span>
 
@@ -995,10 +1029,10 @@
 <span class="sd">        conf_text : str</span>
 <span class="sd">            OxDNA configuration text.</span>
 <span class="sd">        dummy_ends : Tuple[bool, bool], default is (False, False)</span>
-<span class="sd">            A tuple indicating whether the coordinates have dummy ends at the </span>
+<span class="sd">            A tuple indicating whether the coordinates have dummy ends at the</span>
 <span class="sd">            beginning or end.</span>
 <span class="sd">        extend : Tuple[int, int], default is (0, 0)</span>
-<span class="sd">            Number of nucleotides to extend the coordinates at the beginning and end. </span>
+<span class="sd">            Number of nucleotides to extend the coordinates at the beginning and end.</span>
 <span class="sd">        verbose : bool, default False</span>
 <span class="sd">            Whether to print the generated code for the coordinates.</span>
 <span class="sd">        top_text : str, optional</span>
@@ -1011,44 +1045,51 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Coords or None</span>
-<span class="sd">            A Coords object </span>
+<span class="sd">            A Coords object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">pdb_format</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">oat_installed</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;oxDNA_analysis_tools not installed. &quot;</span>
-                                 <span class="s2">&quot;Please install it to use the pdb option&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;oxDNA_analysis_tools not installed. &quot;</span>
+                    <span class="s2">&quot;Please install it to use the pdb option&quot;</span>
+                <span class="p">)</span>
             <span class="n">confs</span><span class="p">,</span> <span class="n">systems</span> <span class="o">=</span> <span class="n">PDB_oxDNA</span><span class="p">(</span><span class="n">conf_text</span><span class="p">)</span>
             <span class="n">conf_text</span> <span class="o">=</span> <span class="n">conf_to_str</span><span class="p">(</span><span class="n">confs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">top_text</span> <span class="o">=</span> <span class="n">get_top_string</span><span class="p">(</span><span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        
-        <span class="n">lines</span> <span class="o">=</span> <span class="n">conf_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="c1">### EXTRACT THE COORDINATES </span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">conf_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1">### EXTRACT THE COORDINATES</span>
         <span class="k">def</span> <span class="nf">extract_coords_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
             <span class="n">splitted</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-            <span class="k">return</span> <span class="p">[[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]],</span> 
-                    <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]],</span> 
-                    <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">]]]</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]],</span>
+                <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]],</span>
+                <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">]],</span>
+            <span class="p">]</span>
 
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">extract_coords_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> 
-                                                            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()])</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">extract_coords_from_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        <span class="p">)</span>
 
-        <span class="c1">### LOAD PROTEINS </span>
+        <span class="c1">### LOAD PROTEINS</span>
         <span class="n">all_prot_coords</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">protein_coords</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="n">protein_text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">protein</span><span class="p">:</span> 
-            
+            <span class="n">protein_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">protein</span><span class="p">:</span>
+
             <span class="k">if</span> <span class="n">top_text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A topology file path must be provided when loading&quot;</span>
-                                 <span class="s2">&quot; a structure with proteins&quot;</span><span class="p">)</span>
-            
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;A topology file path must be provided when loading&quot;</span>
+                    <span class="s2">&quot; a structure with proteins&quot;</span>
+                <span class="p">)</span>
+
             <span class="c1"># initialize protein text</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="n">protein_text</span> <span class="o">=</span> <span class="s1">&#39;,</span><span class="se">\n\t</span><span class="s1">proteins=[&#39;</span>
+                <span class="n">protein_text</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n\t</span><span class="s2">proteins=[&quot;</span>
             <span class="c1"># Split the topology text into lines</span>
-            <span class="n">lines</span> <span class="o">=</span> <span class="n">top_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">top_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
             <span class="n">seq_start_ind</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
@@ -1056,51 +1097,58 @@
                 <span class="c1"># get the sequence</span>
                 <span class="n">seq</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="c1"># Detect a protein sequence</span>
-                <span class="k">if</span> <span class="s1">&#39;peptide&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                    
+                <span class="k">if</span> <span class="s2">&quot;peptide&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+
                     <span class="c1"># load the protein coordinates</span>
-                    <span class="n">protein_coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_start_ind</span><span class="p">:</span> <span class="n">seq_start_ind</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)]</span>
+                    <span class="n">protein_coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">seq_start_ind</span> <span class="p">:</span> <span class="n">seq_start_ind</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)]</span>
                     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                        <span class="n">protein_text</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ProteinCoords(&quot;</span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s1">&quot;, &#39;</span>
-                                         <span class="sa">f</span><span class="s1">&#39;coords=</span><span class="si">{</span><span class="n">protein_coords</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s1">), &#39;</span><span class="p">)</span>
+                        <span class="n">protein_text</span> <span class="o">+=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;ProteinCoords(&quot;</span><span class="si">{</span><span class="n">seq</span><span class="si">}</span><span class="s1">&quot;, &#39;</span>
+                            <span class="sa">f</span><span class="s2">&quot;coords=</span><span class="si">{</span><span class="n">protein_coords</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">), &quot;</span>
+                        <span class="p">)</span>
                     <span class="n">all_prot_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProteinCoords</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">protein_coords</span><span class="p">))</span>
 
                     <span class="c1"># remove the protein coordinates from the main coordinates</span>
-                    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> 
-                                       <span class="n">np</span><span class="o">.</span><span class="n">s_</span><span class="p">[</span><span class="n">seq_start_ind</span><span class="p">:</span> <span class="n">seq_start_ind</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)],</span> 
-                                       <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+                        <span class="n">coords</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">s_</span><span class="p">[</span><span class="n">seq_start_ind</span> <span class="p">:</span> <span class="n">seq_start_ind</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="p">)</span>
                     <span class="n">seq_start_ind</span> <span class="o">-=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
 
                 <span class="c1"># update the coordinates index</span>
                 <span class="n">seq_start_ind</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
-                
+
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="n">protein_text</span> <span class="o">+=</span> <span class="s1">&#39;]&#39;</span>
+                <span class="n">protein_text</span> <span class="o">+=</span> <span class="s2">&quot;]&quot;</span>
 
         <span class="c1">### ENTEND THE COORDINATES</span>
         <span class="k">if</span> <span class="n">extend</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">extend_first</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
-                                                          <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> 
-                                                          <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> 
-                                                          <span class="n">extend</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
-                                                          <span class="n">directionality</span><span class="o">=</span><span class="s2">&quot;35&quot;</span><span class="p">,</span> 
-                                                          <span class="n">double</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                                          <span class="n">use_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">extend_first</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span>
+                <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">extend</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">directionality</span><span class="o">=</span><span class="s2">&quot;35&quot;</span><span class="p">,</span>
+                <span class="n">double</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">use_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">extend_first</span><span class="p">,</span> <span class="n">coords</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">extend</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">extend_last</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
-                                                         <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> 
-                                                         <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> 
-                                                         <span class="n">extend</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> 
-                                                         <span class="n">directionality</span><span class="o">=</span><span class="s2">&quot;53&quot;</span><span class="p">,</span> 
-                                                         <span class="n">double</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                                         <span class="n">use_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">extend_last</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">compute_helix_from_nucl</span><span class="p">(</span>
+                <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">extend</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">directionality</span><span class="o">=</span><span class="s2">&quot;53&quot;</span><span class="p">,</span>
+                <span class="n">double</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">use_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">coords</span><span class="p">,</span> <span class="n">extend_last</span><span class="p">))</span>
 
         <span class="c1">### CREATE DUMMIES</span>
         <span class="n">dummy_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(())</span>
         <span class="n">dummy_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(())</span>
+        <span class="n">dummy_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="n">dummy_0</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1111,30 +1159,29 @@
             <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="n">dummy_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;,</span><span class="se">\n\t</span><span class="s1">dummy_ends=(</span><span class="si">{</span><span class="n">dummy_0</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">dummy_1</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s1">)&#39;</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">dummy_text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">dummy_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;,</span><span class="se">\n\t</span><span class="s2">dummy_ends=(</span><span class="si">{</span><span class="n">dummy_0</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">dummy_1</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
 
         <span class="c1">### RETURN OR PRINT</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Coords(</span><span class="si">{</span><span class="n">coords</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}{</span><span class="n">dummy_text</span><span class="si">}{</span><span class="n">protein_text</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coords(</span><span class="si">{</span><span class="n">coords</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}{</span><span class="n">dummy_text</span><span class="si">}{</span><span class="n">protein_text</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">Coords</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dummy_ends</span><span class="o">=</span><span class="p">(</span><span class="n">dummy_0</span><span class="p">,</span> <span class="n">dummy_1</span><span class="p">),</span> <span class="n">proteins</span><span class="o">=</span><span class="n">all_prot_coords</span><span class="p">)</span></div>
 
-        
 
 <div class="viewcode-block" id="Coords.set_reference">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.coordinates_3d.Coords.set_reference">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">set_reference</span><span class="p">(</span><span class="n">ref_p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                      <span class="n">ref_b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                      <span class="n">ref_n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                      <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                      <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                      <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                      <span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-                      <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">set_reference</span><span class="p">(</span>
+        <span class="n">ref_p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">ref_b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">ref_n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Transform coordinates to a new reference system defined by origin, base, </span>
+<span class="sd">        Transform coordinates to a new reference system defined by origin, base,</span>
 <span class="sd">        and normal vectors.</span>
 
 <span class="sd">        Parameters</span>
@@ -1176,7 +1223,7 @@
             <span class="n">rotation</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">rotation_matrix</span><span class="p">)</span>
             <span class="c1"># Apply the transformation to the new reference frame</span>
             <span class="n">transformed_p</span> <span class="o">=</span> <span class="n">rotation</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">ref_p</span><span class="p">)</span>
-        
+
         <span class="c1"># transform the base and normal vectors</span>
         <span class="n">transformed_b</span> <span class="o">=</span> <span class="n">rotation</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="n">transformed_n</span> <span class="o">=</span> <span class="n">rotation</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
@@ -1190,7 +1237,7 @@
     <span class="k">def</span> <span class="nf">transform_array</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">T_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a transformation matrix to the coordinates inplace.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        array : np.ndarray</span>
@@ -1200,21 +1247,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
-        
+
         <span class="n">positions</span> <span class="o">=</span> <span class="n">array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">base_vectors</span> <span class="o">=</span> <span class="n">array</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">normal_vectors</span> <span class="o">=</span> <span class="n">array</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-        
-        <span class="n">positions_homogeneous</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">positions</span><span class="p">,</span> 
-                                           <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))))</span>
+
+        <span class="n">positions_homogeneous</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">positions</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))))</span>
         <span class="n">transformed_positions</span> <span class="o">=</span> <span class="p">(</span><span class="n">T_matrix</span> <span class="o">@</span> <span class="n">positions_homogeneous</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-        
+
         <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">T_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
         <span class="n">rotation</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">rotation_matrix</span><span class="p">)</span>
-        
+
         <span class="n">transformed_base_vectors</span> <span class="o">=</span> <span class="n">rotation</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">base_vectors</span><span class="p">)</span>
         <span class="n">transformed_normal_vectors</span> <span class="o">=</span> <span class="n">rotation</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">normal_vectors</span><span class="p">)</span>
-        
+
         <span class="n">array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformed_positions</span>
         <span class="n">array</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformed_base_vectors</span>
         <span class="n">array</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformed_normal_vectors</span></div>
@@ -1251,9 +1297,11 @@
 <span class="sd">        Coords</span>
 <span class="sd">            A new Coords object with the same attributes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> 
-                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> 
-                      <span class="p">[</span><span class="n">protein</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">protein</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proteins</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="n">Coords</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="p">[</span><span class="n">protein</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">protein</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proteins</span><span class="p">],</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Coords.is_empty">
@@ -1267,9 +1315,11 @@
 <span class="sd">        bool</span>
 <span class="sd">            True if the object is empty, otherwise False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> 
-                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> 
-                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Coords.reverse_in_place">
@@ -1304,21 +1354,21 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">new_pos</span><span class="p">,</span> <span class="n">new_bv</span><span class="p">,</span> <span class="n">new_nv</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
-                                                <span class="n">T</span><span class="p">,</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                                                <span class="p">)</span>
+                <span class="n">T</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_pos</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_bv</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_nv</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">new_pos</span><span class="p">,</span> <span class="n">new_bv</span><span class="p">,</span> <span class="n">new_nv</span> <span class="o">=</span> <span class="n">Coords</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span>
-                                                <span class="n">T</span><span class="p">,</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                                                <span class="p">)</span>
+                <span class="n">T</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_pos</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_bv</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_ends</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_nv</span>
@@ -1342,7 +1392,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -1353,7 +1403,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

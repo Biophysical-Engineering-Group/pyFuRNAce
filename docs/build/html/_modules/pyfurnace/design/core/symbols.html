@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyfurnace.design.core.symbols &mdash; pyFuRNAce 0.0.6 documentation</title>
+  <title>pyfurnace.design.core.symbols &mdash; pyFuRNAce 0.0.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,13 +79,13 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.design.core.symbols</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains general utility functions and constants for the pyfurnace package.</span>
 
-<span class="sd">It includes: </span>
-<span class="sd">functions for manipulating RNA strands and sequences, </span>
+<span class="sd">It includes:</span>
+<span class="sd">functions for manipulating RNA strands and sequences,</span>
 <span class="sd">utilities for RNA structures (dot-bracket notation, pair maps, trees)</span>
 <span class="sd">folding barriers calculation for canonical co-transcriptional RNA Origami</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -100,115 +100,243 @@
 <span class="c1">###</span>
 
 <span class="c1">#: Set of all accepted nucleotides, including standard bases and extended IUPAC codes.</span>
-<span class="n">nucleotides</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> 
-               <span class="s2">&quot;U&quot;</span><span class="p">,</span> 
-               <span class="s2">&quot;C&quot;</span><span class="p">,</span> 
-               <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="c1"># standard nucleotides</span>
-               <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="c1"># A or U</span>
-               <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="c1"># A or C</span>
-               <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="c1"># A or G</span>
-               <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="c1"># C or U</span>
-               <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="c1"># G or U</span>
-               <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="c1"># G or C  </span>
-               <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="c1"># A or G or U</span>
-               <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="c1"># A or C or U</span>
-               <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="c1"># A or C or G</span>
-               <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="c1"># C or G or U</span>
-               <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="c1"># any nucleotide</span>
-               <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="c1"># any nucleotide for external Kissing Loops in ROAD</span>
-               <span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="c1"># separator</span>
-               <span class="p">}</span>
+<span class="n">nucleotides</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">,</span>  <span class="c1"># standard nucleotides</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">,</span>  <span class="c1"># A or U</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">,</span>  <span class="c1"># A or C</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">,</span>  <span class="c1"># A or G</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">,</span>  <span class="c1"># C or U</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">,</span>  <span class="c1"># G or U</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">,</span>  <span class="c1"># G or C</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">,</span>  <span class="c1"># A or G or U</span>
+    <span class="s2">&quot;H&quot;</span><span class="p">,</span>  <span class="c1"># A or C or U</span>
+    <span class="s2">&quot;V&quot;</span><span class="p">,</span>  <span class="c1"># A or C or G</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">,</span>  <span class="c1"># C or G or U</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">,</span>  <span class="c1"># any nucleotide</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">,</span>  <span class="c1"># any nucleotide for external Kissing Loops in ROAD</span>
+    <span class="s2">&quot;&amp;&quot;</span><span class="p">,</span>  <span class="c1"># separator</span>
+<span class="p">}</span>
 
 <span class="c1">#: Dictionary mapping IUPAC codes to corresponding sets of nucleotides.</span>
 <span class="c1">#: Source: https://www.bioinformatics.org/sms/iupac.html</span>
-<span class="n">iupac_code</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">},</span> 
-              <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;U&quot;</span><span class="p">},</span> 
-              <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">},</span> 
-              <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;G&quot;</span><span class="p">},</span> <span class="c1"># standard nucleotides</span>
-              <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span> <span class="c1"># A or U</span>
-              <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">},</span> <span class="c1"># A or C</span>
-              <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span> <span class="c1"># A or G</span>
-              <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span> <span class="c1"># C or U</span>
-              <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span> <span class="c1"># G or U</span>
-              <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">},</span> <span class="c1"># G or C</span>
-              <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span> <span class="c1"># A or G or U</span>
-              <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span> <span class="c1"># A or C or U</span>
-              <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span> <span class="c1"># A or C or G</span>
-              <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span> <span class="c1"># C or G or U</span>
-              <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span> <span class="c1"># any nucleotide</span>
-              <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span> <span class="c1"># any nucleotide for external Kissing Loops in ROAD</span>
-              <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&amp;&quot;</span><span class="p">},</span> <span class="c1"># separator</span>
-              <span class="p">}</span>
+<span class="n">iupac_code</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;U&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;G&quot;</span><span class="p">},</span>  <span class="c1"># standard nucleotides</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span>  <span class="c1"># A or U</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">},</span>  <span class="c1"># A or C</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span>  <span class="c1"># A or G</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span>  <span class="c1"># C or U</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span>  <span class="c1"># G or U</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">},</span>  <span class="c1"># G or C</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span>  <span class="c1"># A or G or U</span>
+    <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span>  <span class="c1"># A or C or U</span>
+    <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span>  <span class="c1"># A or C or G</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">},</span>  <span class="c1"># C or G or U</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span>  <span class="c1"># any nucleotide</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">},</span>  <span class="c1"># any nucleotide for external Kissing Loops in ROAD</span>
+    <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&amp;&quot;</span><span class="p">},</span>  <span class="c1"># separator</span>
+<span class="p">}</span>
 
 <span class="c1">#: Dictionary mapping IUPAC codes to the set of codes they can base pair with.</span>
-<span class="n">base_pairing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
-                <span class="c1"># this symbol is used for external Kissing Loops in ROAD</span>
-                <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> 
-                      <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">},</span>
-                <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&amp;&quot;</span><span class="p">}</span> <span class="c1"># separator</span>
-                <span class="p">}</span>
+<span class="n">base_pairing</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">},</span>
+    <span class="c1"># this symbol is used for external Kissing Loops in ROAD</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;G&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;K&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;M&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;S&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;U&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;V&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;W&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&amp;&quot;</span><span class="p">},</span>  <span class="c1"># separator</span>
+<span class="p">}</span>
 
 <span class="c1">#: Dictionary mapping dot-bracket symbols to their corresponding pairing symbols.</span>
-<span class="n">db_pairs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;(&quot;</span><span class="p">:</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;[&quot;</span><span class="p">:</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="s2">&quot;{&quot;</span><span class="p">:</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> 
-            <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;J&quot;</span><span class="p">:</span> <span class="s2">&quot;j&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">:</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="s2">&quot;z&quot;</span><span class="p">}</span>
+<span class="n">db_pairs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;(&quot;</span><span class="p">:</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;[&quot;</span><span class="p">:</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;{&quot;</span><span class="p">:</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;J&quot;</span><span class="p">:</span> <span class="s2">&quot;j&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;O&quot;</span><span class="p">:</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 <span class="c1">#: Tuple containing all possible pseudoknot symbols used in dot-bracket notation.</span>
-<span class="n">all_pk_symbols</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;J&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;W&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">)</span>
+<span class="n">all_pk_symbols</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;[&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;]&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;{&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;}&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;E&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;F&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;J&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;L&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;O&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;P&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;V&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;a&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;e&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;g&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;j&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;l&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;o&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;p&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;q&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;s&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;t&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;u&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;v&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;z&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="c1">#: Set of all accepted symbols including nucleotides, dots, brackets, and special ROAD </span>
+<span class="c1">#: Set of all accepted symbols including nucleotides, dots, brackets, and special ROAD</span>
 <span class="c1">#: symbols.</span>
 <span class="n">accept_symbol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">nucleotides</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;.&quot;</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;)&quot;</span><span class="p">}</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">)</span> <span class="o">|</span> <span class="p">{</span>
-        <span class="s2">&quot;─&quot;</span><span class="p">,</span> <span class="s2">&quot;│&quot;</span><span class="p">,</span> <span class="s2">&quot;╭&quot;</span><span class="p">,</span> <span class="s2">&quot;╮&quot;</span><span class="p">,</span> <span class="s2">&quot;╰&quot;</span><span class="p">,</span> <span class="s2">&quot;╯&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;┼&quot;</span><span class="p">,</span> <span class="s2">&quot;┊&quot;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;◦&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;↑&#39;</span><span class="p">,</span> <span class="s1">&#39;↓&#39;</span><span class="p">,</span> <span class="s2">&quot;⊗&quot;</span><span class="p">,</span> <span class="s2">&quot;⊙&quot;</span><span class="p">,</span> <span class="s2">&quot;▂&quot;</span><span class="p">,</span> <span class="s2">&quot;▄&quot;</span><span class="p">,</span> <span class="s2">&quot;█&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;&quot;</span>
+    <span class="n">nucleotides</span>
+    <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;.&quot;</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;)&quot;</span><span class="p">}</span>
+    <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">)</span>
+    <span class="o">|</span> <span class="p">{</span>
+        <span class="s2">&quot;─&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;│&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;╭&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;╮&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;╰&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;╯&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;^&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;┼&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;┊&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;~&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;◦&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;↑&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;↓&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;⊗&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;⊙&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;•&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;▂&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;▄&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;█&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;|&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;=&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;!&quot;</span><span class="p">,</span>
+        <span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&amp;&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 
 <span class="c1">#: Set of symbols representing base pairs.</span>
 <span class="n">bp_symbols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;┊&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">}</span>
 
+<span class="c1">#: Sequence representing the T7 promoter.</span>
+<span class="n">T7_PROMOTER</span> <span class="o">=</span> <span class="s2">&quot;TAATACGACTCACTATA&quot;</span>
+
 <span class="c1">###</span>
 <span class="c1">### STRING TRANSLATORS</span>
 <span class="c1">###</span>
 
 <span class="c1">#: String translator mapping all pseudoknot symbols to dots.</span>
-<span class="n">pseudo_to_dot</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">),</span> <span class="s2">&quot;.&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">))</span>
+<span class="n">pseudo_to_dot</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">),</span> <span class="s2">&quot;.&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">))</span>
 
 <span class="c1">#: String translator to map each dot-bracket opening symbol to its closing counterpart</span>
 <span class="c1">#: and vice versa.</span>
 <span class="n">pair_db_sym</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span>
-    <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-    <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
 <span class="p">)</span>
 
 <span class="c1">#: String translator that removes all nucleotides from a string.</span>
@@ -217,7 +345,7 @@
 <span class="c1">#: String translator that removes all accepted symbols from a string.</span>
 <span class="n">symb_to_none</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">accept_symbol</span><span class="p">))</span>
 
-<span class="c1">#: String translator that maps nucleotides (including IUPAC codes) to their  </span>
+<span class="c1">#: String translator that maps nucleotides (including IUPAC codes) to their</span>
 <span class="c1">#: complementary base.</span>
 <span class="n">nucl_to_pair</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s2">&quot;AUCGWMRYKSDHVBNX&quot;</span><span class="p">,</span> <span class="s2">&quot;UAGCWKYRKSHDBVNX&quot;</span><span class="p">)</span>
 
@@ -240,6 +368,7 @@
 <span class="c1">### SEQUENCE FUNCTIONS</span>
 <span class="c1">###</span>
 
+
 <div class="viewcode-block" id="complement">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.complement">[docs]</a>
 <span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -257,6 +386,7 @@
 <span class="sd">        Complementary sequence with each base replaced by its pair.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="reverse_complement">
@@ -278,11 +408,12 @@
     <span class="k">return</span> <span class="n">sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
+
 <div class="viewcode-block" id="pair_nucleotide">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.pair_nucleotide">[docs]</a>
-<span class="k">def</span> <span class="nf">pair_nucleotide</span><span class="p">(</span><span class="n">nucleotide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iupac_symbol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;N&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">pair_nucleotide</span><span class="p">(</span><span class="n">nucleotide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iupac_symbol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a nucleotide that can pair with the given nucleotide, optionally </span>
+<span class="sd">    Return a nucleotide that can pair with the given nucleotide, optionally</span>
 <span class="sd">    constrained by an IUPAC symbol.</span>
 
 <span class="sd">    Parameters</span>
@@ -297,23 +428,25 @@
 <span class="sd">    str</span>
 <span class="sd">        A valid pairing nucleotide, or the complement of the input base.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">iupac_symbol</span> <span class="ow">in</span> <span class="s1">&#39;AUCG&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">iupac_symbol</span> <span class="ow">in</span> <span class="s2">&quot;AUCG&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">iupac_symbol</span>
-    <span class="k">if</span> <span class="n">iupac_symbol</span> <span class="o">==</span> <span class="s1">&#39;K&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">nucleotide</span> <span class="o">==</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;U&#39;</span>
-        <span class="k">elif</span> <span class="n">nucleotide</span> <span class="o">==</span> <span class="s1">&#39;U&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;G&#39;</span>
+    <span class="k">if</span> <span class="n">iupac_symbol</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nucleotide</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;U&quot;</span>
+        <span class="k">elif</span> <span class="n">nucleotide</span> <span class="o">==</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;G&quot;</span>
     <span class="k">return</span> <span class="n">nucleotide</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="mutate_nucleotide">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.mutate_nucleotide">[docs]</a>
-<span class="k">def</span> <span class="nf">mutate_nucleotide</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                      <span class="n">sequence_constraints</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                      <span class="n">nucl_ind</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                      <span class="n">pair_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
-                      <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">mutate_nucleotide</span><span class="p">(</span>
+    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">sequence_constraints</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">nucl_ind</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">pair_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mutate a nucleotide in the sequence and update its paired counterpart accordingly.</span>
 
@@ -339,13 +472,14 @@
     <span class="n">new_nucl</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">new_set</span><span class="p">))</span>
 
     <span class="c1"># get the index of the paired nucleotide</span>
-    <span class="n">paired_nucl</span> <span class="o">=</span> <span class="n">pair_map</span><span class="p">[</span><span class="n">nucl_ind</span><span class="p">]</span> 
+    <span class="n">paired_nucl</span> <span class="o">=</span> <span class="n">pair_map</span><span class="p">[</span><span class="n">nucl_ind</span><span class="p">]</span>
 
     <span class="c1"># if the nucleotide is paired, get the paired nucleotide</span>
-    <span class="k">if</span> <span class="n">paired_nucl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+    <span class="k">if</span> <span class="n">paired_nucl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># get the possible nucleotides that can pair with the new nucleotide</span>
         <span class="n">paired_nucl</span> <span class="o">=</span> <span class="n">pair_nucleotide</span><span class="p">(</span><span class="n">new_nucl</span><span class="p">,</span> <span class="n">sequence_constraints</span><span class="p">[</span><span class="n">paired_nucl</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">new_nucl</span><span class="p">,</span> <span class="n">paired_nucl</span></div>
+
 
 
 <div class="viewcode-block" id="gc_content">
@@ -369,19 +503,23 @@
     <span class="n">total_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">total_count</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
-    <span class="n">gc_count</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">)</span> 
+    <span class="n">gc_count</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">extended_alphabet</span><span class="p">:</span>
-        <span class="n">gc_count</span> <span class="o">+=</span> <span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">)</span> 
-                     <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">2</span> 
-                     <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">3</span> 
-                     <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span> <span class="p">)</span>
-    <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">gc_count</span> <span class="o">/</span> <span class="n">total_count</span><span class="p">)</span>
+        <span class="n">gc_count</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">3</span>
+            <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span>
+        <span class="p">)</span>
+    <span class="n">percentage</span> <span class="o">=</span> <span class="n">gc_count</span> <span class="o">/</span> <span class="n">total_count</span>
     <span class="k">return</span> <span class="n">percentage</span></div>
+
 
 
 <span class="c1">###</span>
 <span class="c1">### STRUCTURE FUNCTIONS</span>
 <span class="c1">###</span>
+
 
 <div class="viewcode-block" id="rotate_dot_bracket">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.rotate_dot_bracket">[docs]</a>
@@ -402,21 +540,22 @@
 <span class="sd">        Rotated dot-bracket structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">)</span>
-    
+
     <span class="c1"># Step 1: Get the pair map</span>
     <span class="n">pair_map</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">)</span>
-    
+
     <span class="c1"># Step 3: Adjust the pair map</span>
     <span class="n">new_pair_map</span> <span class="o">=</span> <span class="n">BasePair</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">pair_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">new_i</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">shift_left</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
         <span class="n">new_j</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="n">shift_left</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            
+
         <span class="n">new_pair_map</span><span class="p">[</span><span class="n">new_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_j</span>
-    
+
     <span class="k">return</span> <span class="n">pair_map_to_dot_bracket</span><span class="p">(</span><span class="n">new_pair_map</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
 
-    
+
+
 <div class="viewcode-block" id="dot_bracket_to_pair_map">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.dot_bracket_to_pair_map">[docs]</a>
 <span class="k">def</span> <span class="nf">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasePair</span><span class="p">:</span>
@@ -431,7 +570,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    BasePair</span>
-<span class="sd">        A bidirectional dictionary mapping nucleotide indices to their paired </span>
+<span class="sd">        A bidirectional dictionary mapping nucleotide indices to their paired</span>
 <span class="sd">        partner (or None).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pair_map</span> <span class="o">=</span> <span class="n">BasePair</span><span class="p">()</span>
@@ -442,10 +581,10 @@
             <span class="n">stacks</span><span class="p">[</span><span class="n">stack_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">stack_num</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">stacks</span><span class="p">[</span><span class="n">stack_num</span><span class="p">]:</span> <span class="c1"># pop the last element if the stack is not empty</span>
+            <span class="k">if</span> <span class="n">stacks</span><span class="p">[</span><span class="n">stack_num</span><span class="p">]:</span>  <span class="c1"># pop the last element if the stack is not empty</span>
                 <span class="n">j</span> <span class="o">=</span> <span class="n">stacks</span><span class="p">[</span><span class="n">stack_num</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                 <span class="n">pair_map</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># unpaired nucleotide: No pair</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># unpaired nucleotide: No pair</span>
             <span class="n">pair_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># If there are still elements that are not in the dictionary, add them as unpaired</span>
@@ -456,10 +595,12 @@
     <span class="k">return</span> <span class="n">pair_map</span></div>
 
 
+
 <div class="viewcode-block" id="pair_map_to_dot_bracket">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.pair_map_to_dot_bracket">[docs]</a>
-<span class="k">def</span> <span class="nf">pair_map_to_dot_bracket</span><span class="p">(</span><span class="n">pair_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
-                            <span class="n">structure_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">pair_map_to_dot_bracket</span><span class="p">(</span>
+    <span class="n">pair_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">structure_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a base pair map into dot-bracket notation.</span>
 
@@ -482,56 +623,60 @@
     <span class="n">done_pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="c1"># Prepare the variables</span>
-    <span class="n">dotbracket</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">structure_length</span> 
+    <span class="n">dotbracket</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">structure_length</span>
     <span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">recheck</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">while</span> <span class="n">recheck</span><span class="p">:</span> <span class="c1"># recheck the structure, for pseudoknots</span>
+    <span class="k">while</span> <span class="n">recheck</span><span class="p">:</span>  <span class="c1"># recheck the structure, for pseudoknots</span>
         <span class="n">recheck</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">structure_length</span><span class="p">):</span>
 
             <span class="n">paired</span> <span class="o">=</span> <span class="n">pair_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">paired</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">done_pairs</span> <span class="ow">or</span> <span class="n">paired</span> <span class="ow">in</span> <span class="n">done_pairs</span><span class="p">:</span>
-                <span class="k">continue</span> <span class="c1"># ignore unpaired positions or already paired positions</span>
+                <span class="k">continue</span>  <span class="c1"># ignore unpaired positions or already paired positions</span>
 
-            <span class="k">if</span> <span class="n">paired</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span> <span class="c1"># the current position will close the pair later</span>
-                
+            <span class="k">if</span> <span class="n">paired</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>  <span class="c1"># the current position will close the pair later</span>
+
                 <span class="c1"># may be a pseudknot:  Check for clash</span>
                 <span class="k">if</span> <span class="n">stack</span> <span class="ow">and</span> <span class="n">paired</span> <span class="o">&gt;</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                    <span class="n">recheck</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># clash detected: recheck the structure later</span>
+                    <span class="n">recheck</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># clash detected: recheck the structure later</span>
                     <span class="k">continue</span>
-                <span class="k">else</span><span class="p">:</span> <span class="c1"># no clash: add the pair to the stack</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># no clash: add the pair to the stack</span>
                     <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">paired</span><span class="p">)</span>
                     <span class="n">dotbracket</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">bracket_count</span><span class="p">]</span>
                     <span class="n">dotbracket</span><span class="p">[</span><span class="n">paired</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="n">bracket_count</span><span class="p">]</span>
-                    
-            <span class="k">else</span><span class="p">:</span> <span class="c1"># paired already analyzed</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">stack</span><span class="p">:</span> <span class="c1"># no pair in the stack</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># paired already analyzed</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">stack</span><span class="p">:</span>  <span class="c1"># no pair in the stack</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># the current position closes the last pair</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># the current position closes the last pair</span>
                     <span class="c1"># Remove the pair from the map</span>
                     <span class="n">done_pairs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                     <span class="n">done_pairs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">paired</span><span class="p">)</span>
                     <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
-        <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># reset the stack count</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># reset the stack count</span>
         <span class="n">bracket_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">bracket_count</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: Too many bracket types needed in to write the &quot;</span>
-                          <span class="sa">f</span><span class="s2">&quot;structure. Stopping at 30, &#39;Z&#39; to &#39;z&#39;.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Warning: Too many bracket types needed in to write the &quot;</span>
+                <span class="s2">&quot;structure. Stopping at 30, &#39;Z&#39; to &#39;z&#39;.&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">break</span>
 
-    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dotbracket</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dotbracket</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="dot_bracket_to_stacks">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.dot_bracket_to_stacks">[docs]</a>
-<span class="k">def</span> <span class="nf">dot_bracket_to_stacks</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                          <span class="n">only_opening</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-                          <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+<span class="k">def</span> <span class="nf">dot_bracket_to_stacks</span><span class="p">(</span>
+    <span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">only_opening</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Identify contiguous structural elements (stacks) in a dot-bracket string.</span>
 
@@ -550,42 +695,45 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pair_map</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">)</span>
     <span class="c1"># a list of tuples containing starting index and the length of the stack</span>
-    <span class="n">stacks</span> <span class="o">=</span> <span class="p">[]</span> 
+    <span class="n">stacks</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># a list of the reduced dot bracket symbols, that will be returned as a string</span>
-    <span class="n">reduced_dot_bracket</span> <span class="o">=</span> <span class="p">[]</span> 
+    <span class="n">reduced_dot_bracket</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="n">stack_start</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">current_pair_sym</span> <span class="o">=</span> <span class="n">dot_bracket</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">last_stack_pair</span> <span class="o">=</span> <span class="n">pair_map</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">pair_map</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="c1">### NOT NECESSARY </span>
+    <span class="c1">### NOT NECESSARY</span>
     <span class="c1"># open_pair_sym = &#39;.&#39; + &#39;&#39;.join(db_pairs.keys())</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dot_bracket</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dot_bracket</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="p">):</span>
 
-        <span class="c1">### NOT NECESSARY </span>
-        <span class="c1"># # ignore the symbols that are not &#39;.&#39; or not opening pairs, </span>
+        <span class="c1">### NOT NECESSARY</span>
+        <span class="c1"># # ignore the symbols that are not &#39;.&#39; or not opening pairs,</span>
         <span class="c1"># # they should be already taken into accound</span>
         <span class="c1"># if symbol in open_pair_sym:</span>
         <span class="c1">#     continue</span>
 
         <span class="c1"># get the paired index of the current symbol</span>
-        <span class="n">stack_pair</span> <span class="o">=</span> <span class="n">pair_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> 
+        <span class="n">stack_pair</span> <span class="o">=</span> <span class="n">pair_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-        <span class="c1"># if symbol change, or the pairing is not consecutive, </span>
+        <span class="c1"># if symbol change, or the pairing is not consecutive,</span>
         <span class="c1"># add the last stack to the list</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">symbol</span> <span class="o">!=</span> <span class="n">current_pair_sym</span> 
-                <span class="ow">or</span> <span class="n">stack_pair</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> 
-                <span class="ow">and</span> <span class="n">stack_pair</span> <span class="o">!=</span> <span class="n">last_stack_pair</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-            
-            <span class="n">add_last_stack</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># add the last stack to the list by default</span>
-            <span class="c1"># if only the opening stacks are needed, </span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">symbol</span> <span class="o">!=</span> <span class="n">current_pair_sym</span>
+            <span class="ow">or</span> <span class="n">stack_pair</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">stack_pair</span> <span class="o">!=</span> <span class="n">last_stack_pair</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">):</span>
+
+            <span class="n">add_last_stack</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># add the last stack to the list by default</span>
+            <span class="c1"># if only the opening stacks are needed,</span>
             <span class="c1"># check if the last stack is an opening stack or unpaired</span>
 
-            <span class="k">if</span> <span class="n">only_opening</span><span class="p">:</span> 
-                <span class="n">add_last_stack</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_pair_sym</span> <span class="ow">in</span> <span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> 
-                                  <span class="ow">or</span> <span class="n">current_pair_sym</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">only_opening</span><span class="p">:</span>
+                <span class="n">add_last_stack</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">current_pair_sym</span> <span class="ow">in</span> <span class="n">db_pairs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">current_pair_sym</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">add_last_stack</span><span class="p">:</span>
                 <span class="n">reduced_dot_bracket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_pair_sym</span><span class="p">)</span>
@@ -595,13 +743,13 @@
         <span class="n">last_stack_pair</span> <span class="o">=</span> <span class="n">stack_pair</span>
         <span class="n">current_pair_sym</span> <span class="o">=</span> <span class="n">symbol</span>
 
-    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reduced_dot_bracket</span><span class="p">),</span> <span class="n">stacks</span></div>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reduced_dot_bracket</span><span class="p">),</span> <span class="n">stacks</span></div>
 
 
 
 <div class="viewcode-block" id="Node">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Node">[docs]</a>
-<span class="k">class</span> <span class="nc">Node</span><span class="p">():</span>
+<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A tree node representing a region of an RNA secondary structure.</span>
 
@@ -621,12 +769,14 @@
 <span class="sd">        Child nodes representing nested structures.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;5&#39;&quot;</span><span class="p">,</span>
-                 <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;Node&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">seq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;5&#39;&quot;</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Node&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a Node object.</span>
 <span class="sd">        Parameters</span>
@@ -655,18 +805,20 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a string representation of the node and its children.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">paired_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">paired_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">paired_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paired_index</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">paired_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paired_index</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;╰</span><span class="si">{</span><span class="s1">&#39;──&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">level</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="si">}</span><span class="s2"> &quot;</span>
-                   <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">paired_str</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;╰</span><span class="si">{</span><span class="s1">&#39;──&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">level</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">paired_str</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">+=</span> <span class="n">child</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
@@ -679,9 +831,9 @@
 
 <div class="viewcode-block" id="Node.search">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Node.search">[docs]</a>
-    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-               <span class="n">target_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-               <span class="n">target_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;Node&#39;</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">target_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Node&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recursively search for a node with a matching index and label.</span>
 
@@ -698,30 +850,31 @@
 <span class="sd">            The first matching node found, or None if not found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if the current node matches the target criteria</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">target_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> 
-                <span class="ow">and</span> <span class="p">(</span><span class="n">target_label</span> <span class="ow">is</span> <span class="kc">None</span> 
-                     <span class="ow">or</span> <span class="n">target_label</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">target_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">target_label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">target_label</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span> 
-                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span> 
-                <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">target_index</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="bp">self</span> <span class="c1"># special case for the root node</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">target_index</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># special case for the root node</span>
 
         <span class="c1"># Recursively search in child nodes</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">target_index</span><span class="o">=</span><span class="n">target_index</span><span class="p">,</span> 
-                                  <span class="n">target_label</span><span class="o">=</span><span class="n">target_label</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">target_index</span><span class="o">=</span><span class="n">target_index</span><span class="p">,</span> <span class="n">target_label</span><span class="o">=</span><span class="n">target_label</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">result</span>  <span class="c1"># Return the node if found</span>
-    
+
         <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Return None if not found</span></div>
 </div>
 
 
+
 <div class="viewcode-block" id="dot_bracket_to_tree">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.dot_bracket_to_tree">[docs]</a>
-<span class="k">def</span> <span class="nf">dot_bracket_to_tree</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                        <span class="n">sequence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">dot_bracket_to_tree</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a dot-bracket RNA structure into a hierarchical tree of nodes.</span>
 
@@ -746,28 +899,30 @@
             <span class="n">seq_const</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">seq_const</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span><span class="p">:</span> <span class="c1"># add a new node, move to the new node</span>
-            <span class="n">new_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">current_node</span><span class="p">,</span> <span class="n">seq</span> <span class="o">=</span> <span class="n">seq_const</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span><span class="p">:</span>  <span class="c1"># add a new node, move to the new node</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">current_node</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="n">seq_const</span><span class="p">)</span>
             <span class="n">current_node</span> <span class="o">=</span> <span class="n">new_node</span>
         <span class="c1"># add the paired index to the parent, move to the parent node</span>
-        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span> 
+        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span>
             <span class="n">current_node</span><span class="o">.</span><span class="n">paired_index</span> <span class="o">=</span> <span class="n">i</span>
             <span class="n">current_node</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">.</span><span class="n">parent</span>
-        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span> <span class="c1"># add a children to the current node, do not move</span>
-            <span class="n">new_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">current_node</span><span class="p">,</span> <span class="n">seq</span> <span class="o">=</span> <span class="n">seq_const</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">:</span>
-             <span class="n">new_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">current_node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>  <span class="c1"># add a children to the current node, do not move</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">current_node</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="n">seq_const</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">current_node</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">root</span></div>
+
 
 
 <div class="viewcode-block" id="tree_to_dot_bracket">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.tree_to_dot_bracket">[docs]</a>
-<span class="k">def</span> <span class="nf">tree_to_dot_bracket</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span>
-                        <span class="n">dot_bracket</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                        <span class="n">seq_constraints</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span>
-                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">tree_to_dot_bracket</span><span class="p">(</span>
+    <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span>
+    <span class="n">dot_bracket</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">seq_constraints</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a tree of Nodes into a dot-bracket structure and optional sequence </span>
+<span class="sd">    Convert a tree of Nodes into a dot-bracket structure and optional sequence</span>
 <span class="sd">    constraints.</span>
 
 <span class="sd">    Parameters</span>
@@ -787,12 +942,12 @@
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_constraints</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">seq_constraints</span><span class="p">:</span>
         <span class="c1"># initialize the sequence constraints only if it&#39;s a bool</span>
-        <span class="n">seq_constraints</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="c1"># assume the sequence is at least one nucleotide long</span>
+        <span class="n">seq_constraints</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span>  <span class="c1"># assume the sequence is at least one nucleotide long</span>
 
     <span class="k">if</span> <span class="n">dot_bracket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dot_bracket</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">]</span> <span class="c1"># assume the structure is at least one nucleotide long</span>
+        <span class="n">dot_bracket</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">]</span>  <span class="c1"># assume the structure is at least one nucleotide long</span>
 
-    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># don&#39;t add the root node</span>
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># don&#39;t add the root node</span>
         <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">):</span>
             <span class="n">add_length</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">dot_bracket</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">add_length</span>
@@ -815,26 +970,25 @@
             <span class="k">if</span> <span class="n">seq_constraints</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">seq</span><span class="p">:</span>
                 <span class="n">seq_constraints</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">paired_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span> <span class="c1"># recursively add the children</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>  <span class="c1"># recursively add the children</span>
         <span class="n">tree_to_dot_bracket</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">dot_bracket</span><span class="p">,</span> <span class="n">seq_constraints</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># we reached back the root node</span>
+
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># we reached back the root node</span>
         <span class="k">if</span> <span class="n">seq_constraints</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq_constraints</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq_constraints</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">)</span></div>
+
 
 
 <span class="c1">###</span>
 <span class="c1">### DISTANCE FUNCTIONS</span>
 <span class="c1">###</span>
 
+
 <div class="viewcode-block" id="hamming_distance">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.hamming_distance">[docs]</a>
-<span class="k">def</span> <span class="nf">hamming_distance</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
-                     <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
-                     <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">hamming_distance</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Hamming distance between two strings, ignoring specified indices.</span>
 
@@ -852,19 +1006,23 @@
 <span class="sd">    int</span>
 <span class="sd">        Number of differing characters at unignored positions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">((</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">))</span> 
-                    <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignore_ind</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">))</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignore_ind</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="base_pair_difference">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.base_pair_difference">[docs]</a>
-<span class="k">def</span> <span class="nf">base_pair_difference</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                         <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                         <span class="n">pair_map1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                         <span class="n">pair_map2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                         <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-                         <span class="n">accept_unpaired_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">base_pair_difference</span><span class="p">(</span>
+    <span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pair_map1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pair_map2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">accept_unpaired_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find indices where base pairing differs between two structures.</span>
 
@@ -891,7 +1049,7 @@
     <span class="k">if</span> <span class="n">pair_map1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pair_map1</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">pair_map2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">pair_map2</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span> 
+        <span class="n">pair_map2</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
 
     <span class="c1"># Determine if an index should be considered based on the unpaired indices</span>
     <span class="k">def</span> <span class="nf">check_ind</span><span class="p">(</span><span class="n">main_pair_map</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">accept_unpaired</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -899,26 +1057,29 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="n">accept_unpaired</span> <span class="ow">and</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">accept_unpaired_ind</span><span class="p">:</span>
             <span class="c1"># Only count if paired in both but different</span>
-            <span class="k">return</span> <span class="n">pair_map2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pair_map1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pair_map2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  
+            <span class="k">return</span> <span class="n">pair_map2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pair_map1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pair_map2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">pair_map1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pair_map2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
     <span class="c1"># pairs in s1 that are not in s2</span>
-    <span class="n">diff_set</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pair_map1</span> <span class="k">if</span> <span class="n">check_ind</span><span class="p">(</span><span class="n">pair_map1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>  
+    <span class="n">diff_set</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pair_map1</span> <span class="k">if</span> <span class="n">check_ind</span><span class="p">(</span><span class="n">pair_map1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
     <span class="c1"># pairs in s2 that are not in s1</span>
-    <span class="n">diff_set</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pair_map2</span> <span class="k">if</span> <span class="n">check_ind</span><span class="p">(</span><span class="n">pair_map2</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>  
-    
+    <span class="n">diff_set</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pair_map2</span> <span class="k">if</span> <span class="n">check_ind</span><span class="p">(</span><span class="n">pair_map2</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+
     <span class="k">return</span> <span class="n">diff_set</span></div>
+
 
 
 <div class="viewcode-block" id="base_pair_distance">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.base_pair_distance">[docs]</a>
-<span class="k">def</span> <span class="nf">base_pair_distance</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                       <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                       <span class="n">pair_map1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                       <span class="n">pair_map2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                       <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-                       <span class="n">accept_unpaired_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">base_pair_distance</span><span class="p">(</span>
+    <span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pair_map1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pair_map2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">accept_unpaired_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the number of base pair differences between two structures.</span>
 
@@ -942,40 +1103,39 @@
 <span class="sd">    int</span>
 <span class="sd">        Total number of mismatched base pairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_pair_difference</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> 
-                                    <span class="n">s2</span><span class="p">,</span> 
-                                    <span class="n">pair_map1</span><span class="p">,</span> 
-                                    <span class="n">pair_map2</span><span class="p">,</span> 
-                                    <span class="n">ignore_ind</span><span class="p">,</span> 
-                                    <span class="n">accept_unpaired_ind</span><span class="p">,</span> 
-                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span>
+        <span class="n">base_pair_difference</span><span class="p">(</span>
+            <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">pair_map1</span><span class="p">,</span> <span class="n">pair_map2</span><span class="p">,</span> <span class="n">ignore_ind</span><span class="p">,</span> <span class="n">accept_unpaired_ind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
 
 
 <span class="c1">###</span>
 <span class="c1">### FOLDING BARRIERS</span>
 <span class="c1">###</span>
 
+
 <div class="viewcode-block" id="folding_barriers">
 <a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.folding_barriers">[docs]</a>
-<span class="k">def</span> <span class="nf">folding_barriers</span><span class="p">(</span><span class="n">structure</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                     <span class="n">kl_delay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">folding_barriers</span><span class="p">(</span><span class="n">structure</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kl_delay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the folding barriers for a given RNA secondary structure.</span>
-<span class="sd">    This function is based on </span>
+<span class="sd">    This function is based on</span>
 <span class="sd">    ROAD: https://www.nature.com/articles/s41557-021-00679-1</span>
-<span class="sd">    This function analyzes the dot-bracket representation of the RNA secondary </span>
-<span class="sd">    structure to determine folding barriers based on base pair topology and </span>
+<span class="sd">    This function analyzes the dot-bracket representation of the RNA secondary</span>
+<span class="sd">    structure to determine folding barriers based on base pair topology and</span>
 <span class="sd">    kinetic delay.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    structure : str</span>
-<span class="sd">        The dot-bracket notation representing the secondary structure of the RNA. </span>
-<span class="sd">        If folding barriers is called from a Motif or Origami, the structure is </span>
+<span class="sd">        The dot-bracket notation representing the secondary structure of the RNA.</span>
+<span class="sd">        If folding barriers is called from a Motif or Origami, the structure is</span>
 <span class="sd">        already provided by the object in the dot-bracket format.</span>
 <span class="sd">    kl_delay : int, optional, default=150</span>
-<span class="sd">        The number of nucleotides (nts) of delay before kissing loops (KLs) snap </span>
-<span class="sd">        closed. A typical realistic value is around 350 (~1 second), while a </span>
+<span class="sd">        The number of nucleotides (nts) of delay before kissing loops (KLs) snap</span>
+<span class="sd">        closed. A typical realistic value is around 350 (~1 second), while a</span>
 <span class="sd">        more conservative  setting is 150 by default.</span>
 
 <span class="sd">    Returns</span>
@@ -991,13 +1151,13 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The function assigns barrier strengths based on the topology of base pairs </span>
+<span class="sd">    The function assigns barrier strengths based on the topology of base pairs</span>
 <span class="sd">    and kinetic constraints, ensuring proper folding predictions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">ss_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
     <span class="n">s_map</span> <span class="o">=</span> <span class="n">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
-    <span class="n">barriers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
+    <span class="n">barriers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
 
     <span class="c1"># don&#39;t count the nucleotides in the 3&#39; terminal position</span>
     <span class="n">terminal_3_bonus</span> <span class="o">=</span> <span class="mi">16</span>
@@ -1011,68 +1171,69 @@
         <span class="c1">#     continue</span>
 
         <span class="c1"># set the default barrier to &#39;─&#39;, no barrier</span>
-        <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;─&#39;</span>
+        <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;─&quot;</span>
 
         <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;</span> <span class="n">ss_len</span> <span class="o">-</span> <span class="n">terminal_3_bonus</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;─&#39;</span>
+                <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;─&quot;</span>
             <span class="k">continue</span>
 
         <span class="c1">### unpaired nts are not barriers and reset the current barrier count</span>
-        <span class="k">if</span> <span class="n">bra</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
-            <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;─&#39;</span>
+        <span class="k">if</span> <span class="n">bra</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+            <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;─&quot;</span>
             <span class="n">current_barr_count</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="c1">### opening pairs may be barriers or not, </span>
+        <span class="c1">### opening pairs may be barriers or not,</span>
         <span class="c1"># indicate them with &#39;▂&#39;, reset the barrier count</span>
-        <span class="k">elif</span> <span class="n">bra</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
-            <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;▂&#39;</span>
+        <span class="k">elif</span> <span class="n">bra</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span><span class="p">:</span>
+            <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;▂&quot;</span>
             <span class="n">current_barr_count</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="c1">### closing pairs may be barriers or not, </span>
+        <span class="c1">### closing pairs may be barriers or not,</span>
         <span class="c1"># depending on the topology count</span>
-        <span class="k">elif</span> <span class="n">bra</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
-            <span class="c1"># if the opening pair is not blocked, </span>
+        <span class="k">elif</span> <span class="n">bra</span> <span class="o">==</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span>
+            <span class="c1"># if the opening pair is not blocked,</span>
             <span class="c1"># we close and reset the current barrier count</span>
-            <span class="k">if</span> <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">==</span> <span class="s1">&#39;▂&#39;</span><span class="p">:</span>
-                <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;─&#39;</span>
-                <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;─&#39;</span>
+            <span class="k">if</span> <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">==</span> <span class="s2">&quot;▂&quot;</span><span class="p">:</span>
+                <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;─&quot;</span>
+                <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;─&quot;</span>
                 <span class="n">current_barr_count</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="c1"># if the closing pair is already blocked, then </span>
+            <span class="c1"># if the closing pair is already blocked, then</span>
             <span class="c1"># we mark the barrier reached and start counting</span>
-            <span class="k">elif</span> <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">==</span> <span class="s1">&#39;█&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">==</span> <span class="s2">&quot;█&quot;</span><span class="p">:</span>
                 <span class="c1"># if the current barrier count is greater than 5, wa mark it with &#39;█&#39;</span>
                 <span class="k">if</span> <span class="n">current_barr_count</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
-                    <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;█&#39;</span>
-                    <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;▄&#39;</span>
+                    <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;█&quot;</span>
+                    <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;▄&quot;</span>
                 <span class="c1"># if the current barrier count is less than 5, we mark it with &#39;▄&#39;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;▄&#39;</span>
-                    <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;▄&#39;</span>
+                    <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;▄&quot;</span>
+                    <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;▄&quot;</span>
                 <span class="n">current_barr_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="c1"># if the index is bigger than the kl_delay, </span>
+        <span class="c1"># if the index is bigger than the kl_delay,</span>
         <span class="c1"># we check if the internal KLs are closed</span>
         <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;</span> <span class="n">kl_delay</span><span class="p">:</span>
-            
-            <span class="c1"># we check if the KLs are closed, </span>
+
+            <span class="c1"># we check if the KLs are closed,</span>
             <span class="c1"># if yes, we mark them with &#39;N&#39;</span>
             <span class="n">close_sym</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">close_sym</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;(.)&#39;</span> <span class="ow">and</span> <span class="n">close_sym</span> <span class="ow">in</span> <span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;─&#39;</span>
-                <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">]]</span> <span class="o">==</span> <span class="s1">&#39;─&#39;</span>
+            <span class="k">if</span> <span class="n">close_sym</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;(.)&quot;</span> <span class="ow">and</span> <span class="n">close_sym</span> <span class="ow">in</span> <span class="n">db_pairs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">barriers</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;─&quot;</span>
+                <span class="n">barriers</span><span class="p">[</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">]]</span> <span class="o">==</span> <span class="s2">&quot;─&quot;</span>
 
-                <span class="c1"># for each nt in the delay, we check if there are any barriers, </span>
+                <span class="c1"># for each nt in the delay, we check if there are any barriers,</span>
                 <span class="c1"># if yes, we mark them with &#39;█&#39;</span>
-                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">],</span> <span class="n">ind</span><span class="o">-</span><span class="n">kl_delay</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">barriers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;▂&#39;</span><span class="p">:</span>
-                        <span class="n">barriers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;█&#39;</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s_map</span><span class="p">[</span><span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">],</span> <span class="n">ind</span> <span class="o">-</span> <span class="n">kl_delay</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">barriers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;▂&quot;</span><span class="p">:</span>
+                        <span class="n">barriers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;█&quot;</span>
 
-    <span class="n">penalty</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;█&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;▄&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;▂&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;─&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span><span class="c1">#, &#39;&amp;&#39;: 0}</span>
+    <span class="n">penalty</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;█&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;▄&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;▂&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;─&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>  <span class="c1"># , &#39;&amp;&#39;: 0}</span>
     <span class="n">repl</span> <span class="o">=</span> <span class="p">[</span><span class="n">penalty</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">barriers</span><span class="p">]</span>
     <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">repl</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">barriers</span><span class="p">),</span> <span class="n">score</span></div>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">barriers</span><span class="p">),</span> <span class="n">score</span></div>
+
 
 
 <span class="c1">###</span>
@@ -1091,6 +1252,7 @@
 <span class="sd">    - Joining strands with different directionalities</span>
 <span class="sd">    - Logical inconsistencies in structural motifs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">pass</span></div>
 
 
@@ -1109,6 +1271,7 @@
 <span class="sd">    message : str</span>
 <span class="sd">        Description of the ambiguity or issue.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">message</span>
 
@@ -1130,7 +1293,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -1141,7 +1304,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

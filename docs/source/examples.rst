@@ -44,6 +44,8 @@ RNA filament
    :language: python
    :linenos:
 
+.. _full-folding-barrier-optimization:
+
 Full folding barrier optimization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

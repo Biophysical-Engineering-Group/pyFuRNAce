@@ -44,6 +44,24 @@ def test_home_page_renders_without_exception():
     assert not at.exception, f"Streamlit raised: {at.exception}"
     assert at.markdown[0].value == "# Hello and Welcome to pyFuRNAce!"
 
+    # click the button for start here
+    at.button[0].click().run()
+    # check that the radio button is present
+    assert len(at.radio) == 1
+    # click the "No" option and the template should light up
+    at.radio[0].set_value("No").run()
+    assert any("Try this one ↓" in m.value for m in at.markdown)
+    # click the "Yes" option and the second radio should light up
+    at.radio[0].set_value("Yes").run()
+    # the 'try this one' text should disappear
+    assert all("Try this one ↓" not in m.value for m in at.markdown)
+    # click the "No" option and the sequence should light up
+    at.radio[1].set_value("No").run()
+    assert any("Add your sequence or structure: ↓" in m.value for m in at.markdown)
+    # click the "Yes" option and the fasta/python file should light up
+    at.radio[1].set_value("Yes").run()
+    assert any("Try this one ↓" in m.value for m in at.markdown)
+
 
 @pytest.mark.parametrize("page_path", PAGES)
 def test_each_page_loads_without_exception(page_path):

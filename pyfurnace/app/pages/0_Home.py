@@ -183,7 +183,7 @@ def newcomer_flow():
             start = st.radio(
                 "Do you have a sequence or structure (dot-bracket)?",
                 index=None,
-                options=["Yes", "No"],
+                options=["No", "Yes"],
                 horizontal=True,
                 key="design_choice",
             )
@@ -193,7 +193,7 @@ def newcomer_flow():
                 start2 = st.radio(
                     "-> Do you have a fasta or python file?",
                     index=None,
-                    options=["Yes", "No"],
+                    options=["No", "Yes"],
                     horizontal=True,
                     key="design_choice2",
                 )

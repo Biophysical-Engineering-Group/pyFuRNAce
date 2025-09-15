@@ -1145,7 +1145,7 @@ def code():
     col1, col2, col3 = st.columns([1, 3, 1], gap="large", vertical_alignment="center")
     with col1:
         st.link_button(
-            "Check the pyFuRNAce API documentation",
+            "Check the documentation!",
             "https://pyfurnace.readthedocs.io/en/latest/api.html",
             icon=":material/document_search:",
             help="The code editor run python code, so you can program your "

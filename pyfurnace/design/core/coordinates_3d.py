@@ -1195,6 +1195,20 @@ class Coords:
             and self._dummy_ends[1].size == 0
         )
 
+    def reverse(self) -> "Coords":
+        """
+        Return a new Coords object with the order of the coordinates reversed.
+
+        Returns
+        -------
+        Coords
+            A new Coords object with reversed coordinates.
+        """
+        new_dummy = (self._dummy_ends[1], self._dummy_ends[0])
+        new_array = np.flip(self._array, axis=0)
+        new_proteins = [protein.copy() for protein in self._proteins]
+        return Coords(new_array, new_dummy, new_proteins)
+
     def reverse_in_place(self) -> None:
         """
         Reverse the order of the coordinates in place.

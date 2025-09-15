@@ -451,7 +451,7 @@ class Motif(Callback):
         elif isinstance(other, str):
             return any(other in s for s in self._strands)
         elif isinstance(other, BasePair):
-            return other in self.basepair
+            return all(self.basepair.get(k) == v for k, v in other.items())
         return False
 
     def __eq__(self, other: Any) -> bool:
@@ -1160,19 +1160,6 @@ class Motif(Callback):
         if not structure:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
-        if not sequence:
-            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
-        else:
-            sequence = str(sequence).replace("T", "U").upper()
-
-        if isinstance(structure, str) and len(structure.strip("& ")) != len(
-            sequence.strip("& ")
-        ):
-            raise ValueError(
-                f"The sequence length must be equal to the structure "
-                f"length. Got sequence len {len(sequence)} for structure"
-                f" len {len(structure)}."
-            )
 
         # input dot-bracket notation
         if isinstance(structure, str):
@@ -1192,6 +1179,20 @@ class Motif(Callback):
             structure = tree_to_dot_bracket(node)
         else:
             raise ValueError(f"Invalid structure representation: {structure}")
+
+        if not sequence:
+            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
+        else:
+            sequence = str(sequence).replace("T", "U").upper()
+
+        if isinstance(structure, str) and len(structure.strip("& ")) != len(
+            sequence.strip("& ")
+        ):
+            raise ValueError(
+                f"The sequence length must be equal to the structure "
+                f"length. Got sequence len {len(sequence)} for structure"
+                f" len {len(structure)}."
+            )
 
         # initialize the origami object
         origami = Origami([[]], align="first", ss_assembly=True)

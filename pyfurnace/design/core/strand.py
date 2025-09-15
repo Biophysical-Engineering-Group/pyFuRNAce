@@ -334,8 +334,13 @@ class Strand(Callback):
         Set the oxDNA 3D coordinates of the strand.
         Check the Coords documentation for the format of the coordinates.
         """
-        if not new_coords:
+        if isinstance(new_coords, np.ndarray):
+            if new_coords.size == 0:
+                self._coords = Coords()
+                return
+        elif not new_coords:
             self._coords = Coords()
+            return
 
         # sanity check
         if len(new_coords) != len(self.sequence):
@@ -446,7 +451,7 @@ class Strand(Callback):
             if sym in "╰╮\\":
                 direction = direction.swap_xy()
             elif sym in "╭╯/":
-                direction = direction.swap_xy_change_sign()
+                direction = direction.swap_change_sign_xy()
             elif sym == "⊗":
                 direction += Position((0, 0, 1))
             elif sym == "⊙":
@@ -642,7 +647,7 @@ class Strand(Callback):
         Optional[Strand]
             The joined strand if possible, otherwise None.
         """
-        if not isinstance(strand2, Strand) and not isinstance(strand1, Strand):
+        if not isinstance(strand2, Strand) or not isinstance(strand1, Strand):
             raise TypeError(
                 f"The objects to join are not a Strand object, "
                 f"got {type(strand2)}, {type(strand2)} instead."
@@ -770,6 +775,13 @@ class Strand(Callback):
         Position
             The input position or direction as a Position object.
         """
+        if direction and len(set(input_pos_dir) & {-1, 0, 1}) != 2:
+            raise ValueError(
+                f"2D direction not allowed. The allowed values are:\n"
+                f"RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).\n"
+                f"Got {input_pos_dir} instead."
+            )
+
         if isinstance(input_pos_dir, (Direction, Position)):
             return input_pos_dir
 
@@ -781,13 +793,6 @@ class Strand(Callback):
             raise ValueError(
                 f"The 2D coordinates must be a tuple/list of (x,y) "
                 f"integer values. Got {input_pos_dir} instead."
-            )
-
-        if direction and len(set(input_pos_dir) & {-1, 0, 1}) != 2:
-            raise ValueError(
-                f"2D direction not allowed. The allowed values are:\n"
-                f"RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).\n"
-                f"Got {input_pos_dir} instead."
             )
 
         return Position(input_pos_dir)
@@ -1023,7 +1028,7 @@ class Strand(Callback):
             )
         # + Sequence no error
         elif isinstance(other, Sequence):
-            return Strand(Sequence, self.directionality)
+            return Strand(other, other.directionality)
 
         # + Not a strand
         elif not isinstance(other, Strand):
@@ -1081,8 +1086,6 @@ class Strand(Callback):
         if isinstance(line, Sequence):
             return line._sequence
 
-        line = line.upper()  # convert to uppercase
-
         # Not a string
         if not isinstance(line, str):
             raise TypeError(
@@ -1090,13 +1093,14 @@ class Strand(Callback):
                 f"Got {type(line)} instead."
             )
 
+        line = line.upper()  # convert to uppercase
         # Check that the terminal symbols are not in the middle of the strand
         for term_sym in ("3", "5"):
             if term_sym not in line:
                 continue
             if line.count(term_sym) > 1:
                 raise MotifStructureError(
-                    f"The strand can have only one start and one"
+                    f"The strand can have only one start and one "
                     f"end symbol ('5' and '3'). "
                     f"Got {line.count(term_sym)} "
                     f"'{term_sym}' symbols."
@@ -1552,7 +1556,7 @@ class Strand(Callback):
             The base at the specified position.
         """
         pos = self._check_position(pos)
-        return str(self._sequence[self._seq_positions.index(pos)])
+        return str(self._sequence[self.seq_positions.index(pos)])
 
     def get_char_at_pos(self, pos: Union[Position, Tuple[int, int]]) -> str:
         """
@@ -1832,7 +1836,7 @@ class Strand(Callback):
             coords = self.coords
         else:
             seq = str(self.sequence[::-1])
-            coords = self.coords[::-1]
+            coords = self.coords.reverse()
 
         ### initialize the strand and nucleotide length
         seq_len = len(seq)
@@ -1864,6 +1868,7 @@ class Strand(Callback):
             seq_len += len(protein)
             n_strands += 1
 
+        top_text = f"{seq_len} {n_strands} 5->3\n" + top_text
         if return_text:
             return conf_text, top_text
 
@@ -1876,7 +1881,7 @@ class Strand(Callback):
         ### write the top file
         top_file = f"{filename}.top"
         with open(top_file, "w", encoding="utf-8") as f:
-            f.write(f"{seq_len} {n_strands} 5->3\n" + top_text)
+            f.write(top_text)
 
         ### write the pdb file
         if pdb:

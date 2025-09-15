@@ -73,3 +73,26 @@ def test_each_page_loads_without_exception(page_path):
     at.run()
 
     assert not at.exception, f"Exception on {page_path}: {at.exception}"
+
+
+def test_home_load_template():
+    at = AppTest.from_file("streamlit_app.py").run()
+
+    assert not at.exception, f"Streamlit raised: {at.exception}"
+    assert at.markdown[0].value == "# Hello and Welcome to pyFuRNAce!"
+
+    at.button[1].click().run()
+    # check that the template selections is present
+    assert len(at.selectbox) == 1
+
+    # start_nr_button = len(at.button)
+    # select a template
+    at.selectbox[0].select("2_helix").run()
+    # at.button[1].click().run()
+    # print(at.selectbox[0])
+    ### CANNOT PROPERLY TEST DIALOGS BEYOND THIS POINT DUE TO STREAMLIT LIMITATIONS
+    # # check that the load sequence button is present
+    # assert len(at.button) == start_nr_button + 1
+    # # # click the load sequence button and move the design page
+    # # at.button[-1].click().run()
+    # # assert at.markdown[0].value == "# Design"

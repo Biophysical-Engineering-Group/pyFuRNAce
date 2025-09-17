@@ -1,6 +1,9 @@
 import os
+import re
 import pytest
 import tempfile
+from pathlib import Path
+
 from pyfurnace import simple_origami
 from pyfurnace.design import (
     template_2_helix,
@@ -16,17 +19,16 @@ def test_road():
     origami[0, -1] = KissingLoop180(open_left=1, pk_index=1)
     origami[1, -1] = KissingLoop180(open_left=1, pk_index=-1)
     with tempfile.TemporaryDirectory() as tmpdir:
-        dir_name = tmpdir + os.sep + "road_test"
-        with pytest.warns(
-            UserWarning, match=rf"{dir_name} does not exist. Creating it."
-        ):
+        dir_path = Path(tmpdir) / "road_test"
+        pattern = rf"{re.escape(str(dir_path))} does not exist\. Creating it\."
+        with pytest.warns(UserWarning, match=pattern):
             sequence = generate_road(
                 structure=origami.structure,
                 sequence=origami.sequence,
                 pseudoknots=origami.pseudoknots,
                 initial_sequence=origami.sequence.get_random_sequence(),
                 verbose=True,
-                directory=dir_name,
+                directory=str(dir_path),
             )
     seq_fold = fold(sequence)
     assert len(sequence) == len(origami.sequence)
@@ -143,8 +145,9 @@ def test_parallel_road_wait_zip():
     n_trials = 2
     origami = template_2_helix()
     with tempfile.TemporaryDirectory() as tmpdir:
-        dir_name = tmpdir + os.sep + "parallel_road_test"
-        with pytest.warns(UserWarning, match=rf"{dir_name} did not exist. Created it"):
+        dir_path = Path(tmpdir) / "parallel_road_test"
+        pattern = rf"{re.escape(str(dir_path))} did not exist\. Created it\."
+        with pytest.warns(UserWarning, match=pattern):
             sequences = parallel_road(
                 structure=origami.structure,
                 sequence=origami.sequence,
@@ -152,7 +155,7 @@ def test_parallel_road_wait_zip():
                 n_trials=n_trials,
                 zip_directory=True,
                 wait_for_all=True,
-                save_to=dir_name,
+                save_to=str(dir_path),
             )
     seq_fold = fold(sequences[0])
     assert len(sequences) == n_trials

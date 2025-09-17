@@ -548,14 +548,19 @@ def add_motif(origami):
         ### generate the motif code
         st_state.motif_buffer = "strands = []\n"
         for s in st_state["custom_strands"]:
+            coord_txt = ""
+            if s._coords:
+                coord_txt = (
+                    f", coords=pf.Coords({s.coords.array.tolist()}, "
+                    f"dummy_ends=({s.coords.dummy_ends[0].tolist()}, "
+                    f"{s.coords.dummy_ends[1].tolist()}))"
+                )
             st_state.motif_buffer += (
                 f"strands.append(pf.Strand('{s}', "
                 f"directionality='{s.directionality}', "
                 f"start={tuple(s.start)}, "
-                f"direction={tuple(s.direction)}, "
-                f"coords=pf.Coords({s.coords.array.tolist()}, "
-                f"dummy_ends=({s.coords.dummy_ends[0].tolist()}, "
-                f"{s.coords.dummy_ends[1].tolist()}))))\n"
+                f"direction={tuple(s.direction)}{coord_txt}"
+                f"))\n"
             )
 
         st_state.motif_buffer += (
@@ -717,10 +722,11 @@ def custom_text_input(current_custom_motif):
         if "5" not in strand_text:
             st.warning('Don\'t forget to start the strand with "5"')
         else:
-            new_motif = pf.Motif.from_text(strand_text).strip()
-            current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
-            current_custom_motif.basepair = new_motif.basepair
-            st.rerun()
+            if st.button("Convert", key="start_convert", type="primary"):
+                new_motif = pf.Motif.from_text(strand_text).strip()
+                current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
+                current_custom_motif.basepair = new_motif.basepair
+                st.rerun()
 
 
 def structure_converter(current_custom_motif):
@@ -739,32 +745,42 @@ def structure_converter(current_custom_motif):
             help="Add a dot-bracket structure to convert it into " "a 3D motif.",
         )
     with col2:
-        if len(structure) > len(current_seq):
-            current_seq += "".join(
+        def_seq = st_state.get("Sequence_converter", current_seq)
+        if len(structure) > len(def_seq):
+            def_seq += "".join(
                 "N" if sym != "&" else "&"
-                for sym in structure[len(current_seq) : len(structure) + 1]
+                for sym in structure[len(def_seq) : len(structure) + 1]
             )
         sequence = st.text_input(
             "Sequence:",
-            value=current_seq,
-            key="Sequence",
+            value=def_seq,
+            key="Sequence_converter",
             help="Add the sequence of the motif.",
         )
     # check that there is an input
     structure = structure.replace(" ", "")
     sequence = sequence.replace(" ", "")
+    optimize = True
     if not structure and not sequence:
+        optimize = False
+    elif structure != current_struct or sequence != current_seq:
+        optimize = True
+
+    if current_custom_motif:
+        convert = st.button("Convert", key="start_convert", type="primary")
+        optimize = optimize and convert
+
+    if not optimize:
         return
 
-    if structure != current_struct or sequence != current_seq:
-        try:
-            new_motif = pf.Motif.from_structure(structure, sequence=sequence)
-        except Exception as e:
-            st.error(f"Error: {e}")
-            return
-        current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
-        current_custom_motif.basepair = new_motif.basepair
-        st.rerun()
+    try:
+        new_motif = pf.Motif.from_structure(structure, sequence=sequence)
+    except Exception as e:
+        st.error(f"Error: {e}")
+        return
+    current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
+    current_custom_motif.basepair = new_motif.basepair
+    st.rerun()
 
 
 def upload_3d_interface(strand, strand_num, current_custom_motif):

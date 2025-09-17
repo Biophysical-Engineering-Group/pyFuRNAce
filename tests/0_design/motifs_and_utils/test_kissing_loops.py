@@ -163,7 +163,7 @@ def test_kissing_dimer_builds_two_complementary_strands():
     assert bottom.pk_info["id"] == ["Z'"]
 
 
-def test_kissing_dimer_set_up_and_down_sequence_updates():
+def test_dimer_set_up_and_down_sequence_updates():
     kd = KissingDimer(sequence="ACGUAC", pk_index="Z")
     new_seq = "UGCAUG"
     kd.set_up_sequence(new_seq)
@@ -173,6 +173,24 @@ def test_kissing_dimer_set_up_and_down_sequence_updates():
     # bottom is stored as AA + revcomp(top core) + A
     assert str(kd[1].sequence).startswith("AA") and str(kd[1].sequence).endswith("A")
     assert len(kd[1].sequence) == 9  # AA + 6 + A
+
+    kd120 = KissingDimer120(sequence="ACGUUCA", pk_index="Q")
+    new_seq120 = "UGCAUCA"
+    kd120.set_up_sequence(new_seq120)
+    assert kd120[0].sequence == new_seq120
+    kd120.set_down_sequence(new_seq120)
+    assert str(kd120[1].sequence) == "UGCAUCA"
+
+    bkdimer = BranchedDimer(sequence="ACGUAC", pk_index="B")
+    new_seq_branched = "UGCAUG"
+    bkdimer.set_up_sequence(new_seq_branched)
+    assert bkdimer[0].sequence == "AA" + new_seq_branched + "A"
+    assert bkdimer[1].sequence == "CAUGCA" + "A"
+
+    bkdimer.set_down_sequence(new_seq_branched)
+    # bottom is stored as AA + revcomp(top core)
+    assert str(bkdimer[0].sequence) == "AA" + "CAUGCA" + "A"
+    assert str(bkdimer[1].sequence) == new_seq_branched + "A"
 
 
 # --- KissingDimer120 ----------------------------------------------------------

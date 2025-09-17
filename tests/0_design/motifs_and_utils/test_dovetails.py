@@ -18,7 +18,7 @@ def test_dovetail_init_and_sign():
 
 
 def test_cross():
-    dt = Dovetail(sequence="AUCG", sign=-1, up_cross=True, down_cross=True)
+    dt = Dovetail(1, up_cross=True, down_cross=True)
     assert len(dt) == 4
     dt.up_cross = not dt.up_cross
     assert len(dt) == 3

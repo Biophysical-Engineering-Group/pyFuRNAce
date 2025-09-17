@@ -41,6 +41,8 @@ def test_setitem_index_and_slice():
     assert str(s) == "CUGC"
     s[1:3] = "AA"
     assert str(s) == "CAAC"
+    s[-1] = "U"
+    assert str(s) == "CAAU"
 
 
 def test_add_iadd_radd_mul_and_mismatch_addition():
@@ -75,6 +77,8 @@ def test_contains_and_eq_respect_directionality():
     # equality with plain str ignores directionality
     assert Sequence("ACGU", "35") == "ACGU"
     assert (Sequence("ACGU") == 123) is False
+    assert "UGC" in host
+    assert "CUG" not in host
 
 
 def test_hash_is_stable_and_uses_repr():
@@ -181,6 +185,8 @@ def test_pop_and_replace_and_reverse():
 
 def test_directionality_property_and_concat_callbacks_noop():
     s = Sequence("ACGU", directionality="53")
+    s = 0 + s  # radd with int no-op
+    assert str(s) == "ACGU"
     s.directionality = "35"
     assert s.directionality == "35"
     # __iadd__ triggers callbacks (stubbed as noop); ensure sequence updates

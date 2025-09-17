@@ -776,6 +776,8 @@ def dot_bracket_to_tree(dot_bracket: str, sequence: Optional[str] = None) -> Nod
     """
     # Remove pseudoknots from the dot bracket
     dot_bracket = dot_bracket.translate(pseudo_to_dot)
+    if not isinstance(sequence, str) and sequence is not None:
+        sequence = str(sequence)
     root = Node()
     current_node = root
     for i, label in enumerate(dot_bracket):

@@ -1215,7 +1215,7 @@ class Motif(Callback):
 
             if node.label == "(":
                 motif = Motif(
-                    Strand(node.seq),
+                    Strand(node.seq if node.seq else "N"),
                     Strand(
                         sequence[pair_map[node.index]],
                         start=(0, 2),
@@ -1225,7 +1225,9 @@ class Motif(Callback):
                 )
 
             elif node.label == ".":
-                motif = Motif(Strand(node.seq), Strand("-", start=(0, 2)))
+                motif = Motif(
+                    Strand(node.seq if node.seq else "N"), Strand("-", start=(0, 2))
+                )
 
             # add the motif and update the current index
             if motif:

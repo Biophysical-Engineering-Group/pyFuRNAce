@@ -179,15 +179,13 @@ class Dovetail(Stem):
         self._down_cross = bool(new_bool)
         self.length = self._length
 
-    def set_up_sequence(self, new_seq, sign=0):
+    def set_up_sequence(self, sequence, sign=0):
         """Set the sequence of the top strand"""
-        if not isinstance(new_seq, (str, Sequence)):
-            raise TypeError(
-                f"The sequence of a stem must be a " f"string, got {new_seq}."
-            )
+        if not isinstance(sequence, (str, Sequence)):
+            raise TypeError(f"The sequence of a stem must be a string, got {sequence}.")
         if sign not in [-1, 0, 1]:
             raise ValueError(
-                f"The sign of the dovetail must be -1," f" 0 or 1, got {sign}."
+                f"The sign of the dovetail must be -1, 0 or 1, got {sign}."
             )
         self._sign = sign
         if not sign:
@@ -196,12 +194,12 @@ class Dovetail(Stem):
             else:
                 self._sign = -1
 
-        self._length = len(new_seq) * self._sign
-        self._create_strands(sequence=new_seq)
+        self._length = len(sequence) * self._sign
+        self._create_strands(sequence=sequence)
 
-    def set_down_sequence(self, new_seq, sign=None):
+    def set_down_sequence(self, sequence, sign=None):
         """Set the sequence of the bottom strand"""
-        self.set_up_sequence(sequence=new_seq.translate(nucl_to_pair)[::-1], sign=sign)
+        self.set_up_sequence(sequence=sequence.translate(nucl_to_pair)[::-1], sign=sign)
 
     ###
     ### Protected METHODS

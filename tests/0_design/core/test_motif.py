@@ -555,6 +555,10 @@ def test_motif_from_structure():
     assert isinstance(m, Motif)
     assert m.sequence == "NNNNNNNNNNNNNNUUUNNNN"
     assert m.structure == "...(...)....(((...)))"
+    m = Motif.from_structure(structure=pm)
+    assert isinstance(m, Motif)
+    assert m.sequence == "N" * 21
+    assert m.structure == "...(...)....(((...)))"
 
     # Build a simple "()" as a Node tree and pass it in.
     node = dot_bracket_to_tree(
@@ -563,4 +567,10 @@ def test_motif_from_structure():
     m = Motif.from_structure(structure=node)
     assert isinstance(m, Motif)
     assert m.sequence == "NNNNNNNNNNNNNNUUUNNNN"
+    assert m.structure == "...(...)....(((...)))"
+    # Build a simple "()" as a Node tree and pass it in.
+    node = dot_bracket_to_tree("...(...)....(((...)))")
+    m = Motif.from_structure(structure=node)
+    assert isinstance(m, Motif)
+    assert m.sequence == "N" * 21
     assert m.structure == "...(...)....(((...)))"

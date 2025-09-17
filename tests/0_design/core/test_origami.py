@@ -1,5 +1,11 @@
 import pytest
-from pyfurnace.design.core import Origami, Motif, pseudo_to_dot
+from pyfurnace.design.core import (
+    Origami,
+    Motif,
+    pseudo_to_dot,
+    dot_bracket_to_tree,
+    dot_bracket_to_pair_map,
+)
 from pyfurnace.design.motifs import Stem, TetraLoop
 from pyfurnace.design.utils import simple_origami
 
@@ -406,12 +412,19 @@ def test_from_structure():
                 break
         assert hit, "Pseudoknot not found"
 
+    db = "...(...)....(((...)))"
+    ori_from_pm = Origami.from_structure(dot_bracket_to_pair_map(db))
+    ori_from_tree = Origami.from_structure(dot_bracket_to_tree(db))
+    assert ori_from_pm.structure == db
+    assert ori_from_tree.structure == db
+
 
 def test_assembled_string_sequence_structure_are_accessible():
     o = make_simple_origami()
     # __str__ should render something
     s = str(o)
     assert isinstance(s, str) and s.strip() != ""
+    assert repr(TetraLoop()) in repr(o)
 
     # sequence / structure accessible and lengths match (ignoring '&')
     seq = str(o.sequence).replace("&", "")

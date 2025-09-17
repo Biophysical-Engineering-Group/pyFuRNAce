@@ -1,0 +1,16 @@
+# .coveragerc
+[run]
+branch = True
+source_pkgs =
+    pyfurnace.design
+    pyfurnace.generate
+relative_files = True
+
+[report]
+omit =
+    */tests/*
+    */__init__.py
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    if __name__ == .__main__.:

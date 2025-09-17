@@ -4,6 +4,8 @@
 
 [![Downloads/MONTH](https://static.pepy.tech/personalized-badge/pyfurnace?period=month&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=Downloads/Month)](https://pepy.tech/projects/pyfurnace) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/pyfurnace?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=RED&left_text=Downloads)](https://pepy.tech/projects/pyfurnace)
 
+#### pyFuRNAce design API coverage:
+[![codecov](https://codecov.io/gh/Biophysical-Engineering-Group/pyFuRNAce/graph/badge.svg?token=EQX6C990WP)](https://codecov.io/gh/Biophysical-Engineering-Group/pyFuRNAce)
 
 <!-- **Documentation & Source:** _Coming Soon_\ -->
 **WebApp:** [pyfurnace.de](http://pyfurnace.de)\

@@ -48,12 +48,7 @@ jobs:
 
       - name: Run tests with coverage (XML for Codecov)
         run: |
-          pytest \
-            --cov \                # picks sources from .coveragerc
-            --cov-branch \
-            --cov-report=xml \
-            --cov-report=term-missing:skip-covered \
-            tests
+          pytest tests --cov --cov-branch --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

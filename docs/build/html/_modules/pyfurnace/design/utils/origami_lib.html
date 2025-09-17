@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=bbaf98b3"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,44 +79,51 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.design.utils.origami_lib</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span> <span class="k">as</span> <span class="n">mcolors</span><span class="p">,</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
+
 <span class="c1"># try to import the oxDNA_analysis_tools package</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">oxDNA_analysis_tools.UTILS.oxview</span> <span class="kn">import</span> <span class="n">oxdna_conf</span>
     <span class="kn">from</span> <span class="nn">oxDNA_analysis_tools.UTILS.RyeReader</span> <span class="kn">import</span> <span class="n">describe</span><span class="p">,</span> <span class="n">get_confs</span>
+
     <span class="n">oat_installed</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span><span class="p">:</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
     <span class="n">oat_installed</span> <span class="o">=</span> <span class="kc">False</span>
+
 <span class="c1"># own imports</span>
 <span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">..motifs</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.motif_lib</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="c1"># A dictionary to convert angles to dovetail values</span>
-<span class="n">ANGLES_DT_DICT</span> <span class="o">=</span> <span class="p">{</span><span class="mi">26</span><span class="p">:</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
-                  <span class="mi">58</span><span class="p">:</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
-                  <span class="mi">90</span> <span class="p">:</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span>
-                  <span class="mi">122</span> <span class="p">:</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span>
-                  <span class="mi">122</span><span class="p">:</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span>
-                  <span class="mi">154</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
-                  <span class="mi">186</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-                  <span class="mi">218</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                  <span class="mi">250</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                  <span class="mi">282</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-                  <span class="mi">314</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-                  <span class="mi">346</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                  <span class="mi">378</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-                  <span class="mi">410</span><span class="p">:</span> <span class="mi">6</span><span class="p">}</span>
+<span class="n">ANGLES_DT_DICT</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">26</span><span class="p">:</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
+    <span class="mi">58</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span>
+    <span class="mi">90</span><span class="p">:</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span>
+    <span class="mi">122</span><span class="p">:</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span>
+    <span class="mi">154</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+    <span class="mi">186</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="mi">218</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">250</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">282</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="mi">314</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="mi">346</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="mi">378</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="mi">410</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">}</span>
+
 
 <div class="viewcode-block" id="convert_angles_to_dt">
 <a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.convert_angles_to_dt">[docs]</a>
 <span class="k">def</span> <span class="nf">convert_angles_to_dt</span><span class="p">(</span><span class="n">angles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a list of helix angles into corresponding dovetail values based </span>
+<span class="sd">    Convert a list of helix angles into corresponding dovetail values based</span>
 <span class="sd">    on a predefined mapping.</span>
 
 <span class="sd">    Parameters</span>
@@ -131,12 +138,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">angles_sanitize</span> <span class="o">=</span> <span class="p">[</span><span class="n">ang</span> <span class="o">%</span> <span class="mi">360</span> <span class="k">for</span> <span class="n">ang</span> <span class="ow">in</span> <span class="n">angles_list</span><span class="p">]</span>
     <span class="c1"># get the closest angle in the dict</span>
-    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ANGLES_DT_DICT</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">ANGLES_DT_DICT</span><span class="p">,</span> 
-                                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">ang</span><span class="p">))]</span> 
-                                    <span class="k">for</span> <span class="n">ang</span> <span class="ow">in</span> <span class="n">angles_sanitize</span><span class="p">]</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">ANGLES_DT_DICT</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">ANGLES_DT_DICT</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">ang</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">ang</span> <span class="ow">in</span> <span class="n">angles_sanitize</span>
+    <span class="p">]</span>
     <span class="k">return</span> <span class="n">dt_list</span></div>
 
-    
+
 
 <div class="viewcode-block" id="simple_origami">
 <a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.simple_origami">[docs]</a>
@@ -151,10 +159,10 @@
     <span class="n">end_helix_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
     <span class="n">use_angles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">add_start_end</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">align</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;first&#39;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Origami</span><span class="p">:</span>
+    <span class="n">align</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;first&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Origami</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Construct an RNA origami object based on a sequence of dovetail values and </span>
+<span class="sd">    Construct an RNA origami object based on a sequence of dovetail values and</span>
 <span class="sd">    kissing loop parameters.</span>
 
 <span class="sd">    Parameters</span>
@@ -166,10 +174,10 @@
 <span class="sd">    main_stem : int or list of int or list of list of int, optional</span>
 <span class="sd">        Length(s) of the main stem in each kissing loop.</span>
 <span class="sd">        Can be a single int, a list (same for all loops), or a matrix for per-loop</span>
-<span class="sd">          customization.</span>
+<span class="sd">        customization.</span>
 <span class="sd">    left_stem_kl : int or list of int or list of list of int, optional</span>
 <span class="sd">        Length(s) of the left stem for each kissing loop. Defaults to automatic</span>
-<span class="sd">          computation.</span>
+<span class="sd">        computation.</span>
 <span class="sd">    stem_pos : int or list of int, optional</span>
 <span class="sd">        Position(s) of the main stem insertion among helices. Default is 0 for all.</span>
 <span class="sd">    start : int, optional</span>
@@ -179,7 +187,7 @@
 <span class="sd">    end_helix_len : int, optional</span>
 <span class="sd">        Length of the stems at the ends of the helices (default is 8).</span>
 <span class="sd">    use_angles : bool, optional</span>
-<span class="sd">        If True, interpret `dt_list` as helix angles and convert them to dovetail </span>
+<span class="sd">        If True, interpret `dt_list` as helix angles and convert them to dovetail</span>
 <span class="sd">        values (default is False).</span>
 <span class="sd">    add_start_end : bool, default True</span>
 <span class="sd">        Whether to add a start-end motif in the initial helix.</span>
@@ -195,92 +203,137 @@
     <span class="c1"># initialize the origami structure</span>
     <span class="n">origami</span> <span class="o">=</span> <span class="n">Origami</span><span class="p">(</span><span class="n">align</span><span class="o">=</span><span class="n">align</span><span class="p">)</span>
 
+    <span class="c1"># convert angles to dovetail values if needed</span>
     <span class="k">if</span> <span class="n">use_angles</span><span class="p">:</span>
         <span class="n">dt_list</span> <span class="o">=</span> <span class="n">convert_angles_to_dt</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span>
-    
+
     <span class="c1"># add the start and end helix to the dovetail list</span>
     <span class="k">if</span> <span class="n">add_terminal_helix</span><span class="p">:</span>
         <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt_list</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># if the main_stem list is not given, set it to the minimum value for each KL</span>
-    <span class="k">if</span> <span class="n">main_stem</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1">### ADJUST THE MAIN STEM MATRIX</span>
+
+    <span class="k">if</span> <span class="n">main_stem</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># set it to the minimum value for each KL</span>
         <span class="n">max_dt</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">main_stem</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">11</span> <span class="o">*</span> <span class="p">((</span><span class="n">max_dt</span> <span class="o">+</span> <span class="mi">17</span><span class="p">)</span> <span class="o">//</span> <span class="mi">11</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">kl_columns</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">main_stem</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="n">main_stem</span> <span class="o">=</span> <span class="p">[[</span><span class="n">main_stem</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">main_stem</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">main_stem</span><span class="p">):</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">main_stem</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">main_stem</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">main_stem</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))</span>
+        <span class="p">]</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">main_stem</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">main_stem</span><span class="p">):</span>
         <span class="n">main_stem</span> <span class="o">=</span> <span class="p">[</span><span class="n">main_stem</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">main_stem</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">main_stem</span><span class="p">):</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">main_stem</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">main_stem</span>
+    <span class="p">):</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">kl_columns</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">main_stem</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The main_stem list should have the same length as the kissing loops repeats&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The main_stem list should have the same length&quot;</span>
+                <span class="s2">&quot; as the kissing loops repeats&quot;</span>
+            <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The main_stem can be an int, a list of int or a matrix of int&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The main_stem can be an int, a list of int or a&quot;</span> <span class="s2">&quot; matrix of int&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1">### ADJUST THE LEFT KL STEM MATRIX</span>
 
     <span class="k">if</span> <span class="n">left_stem_kl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">left_stem_kl</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">kl_columns</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">left_stem_kl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="n">left_stem</span> <span class="o">=</span> <span class="p">[[</span><span class="n">left_stem_kl</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">left_stem_kl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left_stem_kl</span><span class="p">):</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_stem_kl</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">left_stem_kl</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">left_stem_kl</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))</span>
+        <span class="p">]</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_stem_kl</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left_stem_kl</span>
+    <span class="p">):</span>
         <span class="n">left_stem_kl</span> <span class="o">=</span> <span class="p">[[</span><span class="n">left_stem_kl</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">*</span> <span class="n">kl_columns</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">left_stem_kl</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left_stem_kl</span><span class="p">):</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_stem_kl</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left_stem_kl</span>
+    <span class="p">):</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">kl_columns</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left_stem_kl</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The left_stem_kl list should have the same length as the kissing loops repeats&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The left_stem_kl list should have the same length &quot;</span>
+                <span class="s2">&quot;as the kissing loops repeats&quot;</span>
+            <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The left_stem_kl can be an int, a list of int or a matrix of int&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The left_stem_kl can be an int, a list of int or a &quot;</span> <span class="s2">&quot;matrix of int&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">stem_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">stem_pos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">)]</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">stem_pos</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stem_pos</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">stem_pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">stem_pos</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">)]</span>
 
-    <span class="c1"># create an helix for each dovetail in the list</span>
+    <span class="c1">### BUILD THE ORIGAMI STRUCTURE, helix by helix</span>
     <span class="k">for</span> <span class="n">helix_in</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dt_list</span><span class="p">):</span>
 
-        <span class="c1"># create the start of the stem: a tetraloop and a stem of 5 bases</span>
+        <span class="c1"># create the start of the stem</span>
         <span class="n">helix</span> <span class="o">=</span> <span class="p">[</span><span class="n">TetraLoop</span><span class="p">(),</span> <span class="n">Stem</span><span class="p">(</span><span class="n">end_helix_len</span><span class="p">),</span> <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">)]</span>
 
         <span class="c1"># add Kissing loops repeats to the helix</span>
         <span class="k">for</span> <span class="n">kl_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kl_columns</span><span class="p">):</span>
+
+            <span class="c1"># calculate the stem lengths</span>
             <span class="n">stem_len</span> <span class="o">=</span> <span class="n">main_stem</span><span class="p">[</span><span class="n">helix_in</span><span class="p">][</span><span class="n">kl_index</span><span class="p">]</span>
             <span class="n">left_stem</span> <span class="o">=</span> <span class="n">left_stem_kl</span><span class="p">[</span><span class="n">helix_in</span><span class="p">][</span><span class="n">kl_index</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">left_stem</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">left_stem</span> <span class="o">=</span> <span class="p">(</span><span class="n">stem_len</span> <span class="o">-</span> <span class="mi">8</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">))</span> <span class="o">//</span> <span class="mi">2</span>
             <span class="n">right_stem</span> <span class="o">=</span> <span class="p">(</span><span class="n">stem_len</span> <span class="o">-</span> <span class="mi">8</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">))</span> <span class="o">-</span> <span class="n">left_stem</span>
 
-            <span class="c1"># if the helix position is in the stem_position list for the given KL index, add a stem</span>
+            <span class="c1"># this is a position where to add a continuous stem</span>
             <span class="k">if</span> <span class="n">stem_pos</span><span class="p">[</span><span class="n">kl_index</span><span class="p">]</span> <span class="o">==</span> <span class="n">helix_in</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">kl_index</span> <span class="o">==</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">add_start_end</span><span class="p">:</span> <span class="c1"># add the start motif after the first stem</span>
+
+                <span class="c1"># add the start position in this stem</span>
+                <span class="k">if</span> <span class="n">kl_index</span> <span class="o">==</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">add_start_end</span><span class="p">:</span>
                     <span class="n">half_l_stem</span> <span class="o">=</span> <span class="p">(</span><span class="n">stem_len</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">))</span> <span class="o">//</span> <span class="mi">2</span>
                     <span class="n">half_r_stem</span> <span class="o">=</span> <span class="n">stem_len</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="o">-</span> <span class="n">half_l_stem</span>
-                    <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Stem</span><span class="p">(</span><span class="n">half_l_stem</span><span class="p">)</span>
-                                <span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">extend</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> 
-                              <span class="n">start_end_stem</span><span class="p">(),</span> 
-                              <span class="n">Stem</span><span class="p">(</span><span class="n">half_r_stem</span><span class="p">),</span> <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">)]</span>
+                    <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span>
+                        <span class="n">Stem</span><span class="p">(</span><span class="n">half_l_stem</span><span class="p">)</span><span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">extend</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">start_end_stem</span><span class="p">(),</span>
+                        <span class="n">Stem</span><span class="p">(</span><span class="n">half_r_stem</span><span class="p">),</span>
+                        <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">),</span>
+                    <span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Stem</span><span class="p">(</span><span class="n">main_stem</span><span class="p">[</span><span class="n">helix_in</span><span class="p">][</span><span class="n">kl_index</span><span class="p">]</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">))</span>
-                                <span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">extend</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-                              <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">)]</span>
-            <span class="c1"># add a kissing normal loop repeat</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Stem</span><span class="p">(</span><span class="n">left_stem</span><span class="p">),</span> <span class="n">KissingDimer</span><span class="p">(),</span> <span class="n">Stem</span><span class="p">(</span><span class="n">right_stem</span><span class="p">),</span> <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">)]</span>
+                    <span class="n">stem_len</span> <span class="o">=</span> <span class="n">main_stem</span><span class="p">[</span><span class="n">helix_in</span><span class="p">][</span><span class="n">kl_index</span><span class="p">]</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+                    <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Stem</span><span class="p">(</span><span class="n">stem_len</span><span class="p">)</span><span class="o">.</span><span class="n">shift</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">extend</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">)]</span>
 
-        <span class="c1"># add the end of the helix: a stem of 5 bases and a tetraloop</span>
+            <span class="c1"># normal kissing loop repeat</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span>
+                    <span class="n">Stem</span><span class="p">(</span><span class="n">left_stem</span><span class="p">),</span>
+                    <span class="n">KissingDimer</span><span class="p">(),</span>
+                    <span class="n">Stem</span><span class="p">(</span><span class="n">right_stem</span><span class="p">),</span>
+                    <span class="n">Dovetail</span><span class="p">(</span><span class="n">dt</span><span class="p">),</span>
+                <span class="p">]</span>
+
+        <span class="c1"># add the end of the helix</span>
         <span class="n">helix</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Stem</span><span class="p">(</span><span class="n">end_helix_len</span><span class="p">),</span> <span class="n">TetraLoop</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+
         <span class="c1"># add the helix to the origami</span>
         <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">helix</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># remove the top cross from the dovetails of the first helix</span>
     <span class="k">for</span> <span class="n">motif</span> <span class="ow">in</span> <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">motif</span><span class="p">)</span> <span class="o">==</span> <span class="n">Dovetail</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">motif</span><span class="p">,</span> <span class="n">Dovetail</span><span class="p">):</span>
             <span class="n">motif</span><span class="o">.</span><span class="n">up_cross</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># remove the bottom cross from the dovetails of the last helix</span>
     <span class="k">for</span> <span class="n">motif</span> <span class="ow">in</span> <span class="n">origami</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">motif</span><span class="p">)</span> <span class="o">==</span> <span class="n">Dovetail</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">motif</span><span class="p">,</span> <span class="n">Dovetail</span><span class="p">):</span>
             <span class="n">motif</span><span class="o">.</span><span class="n">down_cross</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># return the origami structure</span>
     <span class="k">return</span> <span class="n">origami</span></div>
+
 
 
 <div class="viewcode-block" id="ipython_display_3D">
@@ -295,7 +348,7 @@
 <span class="sd">    origami : Origami</span>
 <span class="sd">        The Origami structure to visualize.</span>
 <span class="sd">    **kwargs : dict, optional</span>
-<span class="sd">        Additional keyword arguments passed to the `oxdna_conf` </span>
+<span class="sd">        Additional keyword arguments passed to the `oxdna_conf`</span>
 <span class="sd">        visualization function.</span>
 
 <span class="sd">    Returns</span>
@@ -303,27 +356,31 @@
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">oat_installed</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The oxDNA_analysis_tools package is not installed, the 3D display is not available.&quot;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The oxDNA_analysis_tools package is not installed, &quot;</span>
+            <span class="s2">&quot;the 3D display is not available.&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span>
     <span class="c1"># Create a temporary directory</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdirname</span><span class="p">:</span>
         <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tmpdirname</span><span class="si">}</span><span class="s2">/origami&quot;</span>
         <span class="n">origami</span><span class="o">.</span><span class="n">save_3d_model</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-        <span class="n">top_info</span><span class="p">,</span> <span class="n">traj_info</span> <span class="o">=</span> <span class="n">describe</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">.top&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">.dat&#39;</span><span class="p">)</span>
+        <span class="n">top_info</span><span class="p">,</span> <span class="n">traj_info</span> <span class="o">=</span> <span class="n">describe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">.top&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">)</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">get_confs</span><span class="p">(</span><span class="n">top_info</span><span class="p">,</span> <span class="n">traj_info</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">oxdna_conf</span><span class="p">(</span><span class="n">top_info</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="ipython_display_txt">
 <a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_txt">[docs]</a>
-<span class="k">def</span> <span class="nf">ipython_display_txt</span><span class="p">(</span><span class="n">origami_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;500&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">ipython_display_txt</span><span class="p">(</span><span class="n">origami_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;500&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plain text (e.g., a textual representation of an origami object) as a</span>
 <span class="sd">    scrollable HTML block in Jupyter.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    origami_text : str</span>
+<span class="sd">    origami_text : str, Origami</span>
 <span class="sd">        The content to display in scrollable format.</span>
 <span class="sd">    max_height : str, optional</span>
 <span class="sd">        Maximum height of the scrollable box in pixels (default is &#39;500&#39;).</span>
@@ -333,12 +390,478 @@
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Convert your text to scrollable HTML</span>
-    <span class="n">scrollable_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    &lt;div style=&quot;max-height: </span><span class="si">{</span><span class="n">max_height</span><span class="si">}</span><span class="s2">px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;&quot;&gt;</span>
-<span class="s2">    &lt;pre&gt;</span><span class="si">{</span><span class="n">origami_text</span><span class="si">}</span><span class="s2">&lt;/pre&gt;</span>
-<span class="s2">    &lt;/div&gt;</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">ori_txt</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">origami_text</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;br&gt;&quot;</span><span class="p">)</span>
+    <span class="n">scrollable_html</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;&lt;div style=&quot;max-height: </span><span class="si">{</span><span class="n">max_height</span><span class="si">}</span><span class="s1">px; white-space: nowrap;&#39;</span>
+        <span class="sa">f</span><span class="s2">&quot;overflow-x: auto; overflow-y: scroll;&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;font-family: monospace;&quot;</span>
+        <span class="sa">f</span><span class="s1">&#39;border: 1px solid #ccc; padding: 10px;&quot;&gt;&#39;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ori_txt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&amp;nbsp;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;&lt;/div&gt;&quot;</span>
+    <span class="p">)</span>
     <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">scrollable_html</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="ipython_clickable_txt">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_clickable_txt">[docs]</a>
+<span class="k">def</span> <span class="nf">ipython_clickable_txt</span><span class="p">(</span>
+    <span class="n">origami</span><span class="p">:</span> <span class="n">Origami</span><span class="p">,</span>
+    <span class="n">max_height</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;500&quot;</span><span class="p">,</span>
+    <span class="n">barriers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gradient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">font_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate an interactive, scrollable HTML view of a RNA origami structure</span>
+<span class="sd">    with clickable motifs that display their indexes in a JavaScript alert.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origami : Origami</span>
+<span class="sd">        An Origami object representing the RNA structure.</span>
+<span class="sd">    max_height : str or int, optional</span>
+<span class="sd">        The maximum height of the scrollable view in pixels. Default is &#39;500&#39;.</span>
+<span class="sd">    barriers : optional</span>
+<span class="sd">        Optional barrier data to overlay on the origami representation.</span>
+<span class="sd">    gradient : bool or str, optional</span>
+<span class="sd">        Whether to color motifs using a gradient.</span>
+<span class="sd">        If str, interpreted as colormap name from matplotlib.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        Font size of the text in pixels. Default is 12.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        An HTML string rendered via IPython&#39;s display system.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - This function uses inline CSS and JavaScript for visual styling and interaction.</span>
+<span class="sd">    - Clicking a motif will trigger a JavaScript alert showing its position.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">barriers_colors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;▂&quot;</span><span class="p">:</span> <span class="s2">&quot;#FFBA08&quot;</span><span class="p">,</span> <span class="s2">&quot;▄&quot;</span><span class="p">:</span> <span class="s2">&quot;#FFBA08&quot;</span><span class="p">,</span> <span class="s2">&quot;█&quot;</span><span class="p">:</span> <span class="s2">&quot;#D00000&quot;</span><span class="p">}</span>
+    <span class="n">high_color</span> <span class="o">=</span> <span class="s2">&quot;#D00000&quot;</span>
+    <span class="n">normal_color</span> <span class="o">=</span> <span class="s2">&quot;inherit&quot;</span>
+
+    <span class="n">motif</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">assembled</span>
+    <span class="c1"># create a dictionary from positions to index</span>
+    <span class="n">pos_to_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">pos</span><span class="p">:</span> <span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">motif</span><span class="o">.</span><span class="n">seq_positions</span><span class="p">)}</span>
+
+    <span class="k">if</span> <span class="n">barriers</span><span class="p">:</span>
+        <span class="n">origami_lines</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">barrier_repr</span><span class="p">(</span><span class="n">return_list</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">origami_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+        <span class="n">origami_lines</span> <span class="o">=</span> <span class="n">origami_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># create color gradient</span>
+    <span class="k">if</span> <span class="n">gradient</span><span class="p">:</span>
+        <span class="n">tot_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">origami</span><span class="o">.</span><span class="n">strands</span><span class="p">:</span>
+            <span class="n">tot_len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">protein</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">proteins</span><span class="p">:</span>
+                <span class="n">tot_len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">protein</span><span class="p">)</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
+        <span class="n">c_map</span> <span class="o">=</span> <span class="p">[</span><span class="n">mcolors</span><span class="o">.</span><span class="n">to_hex</span><span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tot_len</span><span class="p">)]</span>
+
+    <span class="c1"># Prepare the string to add 5&#39; and 3&#39; symbols for the strands</span>
+    <span class="n">motif_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[[</span><span class="s2">&quot; &quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">motif</span><span class="o">.</span><span class="n">num_char</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="o">+</span> <span class="p">[[</span><span class="s2">&quot; &quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">char</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">line</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">origami_lines</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[[</span><span class="s2">&quot; &quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">motif</span><span class="o">.</span><span class="n">num_char</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">motif</span><span class="p">:</span>  <span class="c1"># Add the 5&#39; and 3&#39; symbols to the motif as 1 and 2</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">sequence</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">sequence</span>
+            <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;35&quot;</span>
+            <span class="ow">and</span> <span class="n">motif_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">prec_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">s</span><span class="o">.</span><span class="n">prec_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">directionality</span> <span class="o">==</span> <span class="s2">&quot;53&quot;</span><span class="p">:</span>
+                <span class="n">motif_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">prec_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">s</span><span class="o">.</span><span class="n">prec_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">motif_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">prec_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">s</span><span class="o">.</span><span class="n">prec_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">sequence</span>
+            <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;35&quot;</span>
+            <span class="ow">and</span> <span class="n">motif_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">next_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">s</span><span class="o">.</span><span class="n">next_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">directionality</span> <span class="o">==</span> <span class="s2">&quot;53&quot;</span><span class="p">:</span>
+                <span class="n">motif_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">next_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">s</span><span class="o">.</span><span class="n">next_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">motif_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">next_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">s</span><span class="o">.</span><span class="n">next_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+
+    <span class="n">origami_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">motif_list</span><span class="p">]</span>
+
+    <span class="n">content</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&lt;div style=&#39;font-family: monospace;&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;font-size: </span><span class="si">{</span><span class="n">font_size</span><span class="si">}</span><span class="s2">px; &quot;</span>
+        <span class="s2">&quot;white-space: nowrap; &quot;</span>
+        <span class="s2">&quot;overflow-x: auto; &quot;</span>
+        <span class="s2">&quot;overflow-y: scroll; &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;max-height: </span><span class="si">{</span><span class="n">max_height</span><span class="si">}</span><span class="s2">px;&#39;&gt;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="s1">&#39;&lt;span style=&quot;font-family: monospace; &#39;</span>
+
+    <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">origami_list</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">ori_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">normal_color</span>
+            <span class="k">if</span> <span class="n">barriers_colors</span> <span class="ow">and</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">barriers_colors</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">barriers_colors</span><span class="p">[</span><span class="n">char</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="n">span</span> <span class="o">+</span> <span class="s1">&#39;line-height:1;&quot;&gt;&amp;nbsp;&lt;/span&gt;&#39;</span>
+            <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="n">span</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;color: </span><span class="si">{</span><span class="n">high_color</span><span class="si">}</span><span class="s1">; line-height:1;&quot;&gt;5&lt;/span&gt;&#39;</span>
+            <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="n">span</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;color: </span><span class="si">{</span><span class="n">high_color</span><span class="si">}</span><span class="s1">; line-height:1;&quot;&gt;3&lt;/span&gt;&#39;</span>
+
+            <span class="k">elif</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">bp_symbols</span><span class="p">:</span>  <span class="c1"># do not highlight the base pair in red</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="n">span</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;color: </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">; line-height:1;&quot;&gt;</span><span class="si">{</span><span class="n">char</span><span class="si">}</span><span class="s1">&lt;/span&gt;&#39;</span>
+
+            <span class="k">elif</span> <span class="n">ori_pos</span> <span class="ow">in</span> <span class="n">origami</span><span class="o">.</span><span class="n">pos_index_map</span><span class="p">:</span>  <span class="c1"># a motif symbol</span>
+                <span class="n">sl</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">pos_index_map</span><span class="p">[</span><span class="n">ori_pos</span><span class="p">]</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">pos_to_index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ori_pos</span><span class="p">)</span>
+                <span class="n">msg_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Line </span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, Motif </span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">msg_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Base </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">, Line </span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, Motif </span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="n">gradient</span><span class="p">:</span>
+                        <span class="n">color</span> <span class="o">=</span> <span class="n">c_map</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+                <span class="n">content</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;&lt;a style=&quot;text-decoration: none;&#39;</span>
+                    <span class="s2">&quot;font-family: monospace; &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;color: </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">; &quot;</span>
+                    <span class="s1">&#39;line-height:1;&quot; &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;href=&quot;#/&quot; &#39;</span>
+                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;onclick=&quot;alert(&#39;</span><span class="si">{</span><span class="n">msg_text</span><span class="si">}</span><span class="s2">&#39;)&quot; &quot;&quot;&quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;id=&quot;</span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">char</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;&lt;/a&gt;&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># is a junction symbol</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="n">span</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;color: </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">; line-height:1;&quot;&gt;</span><span class="si">{</span><span class="n">char</span><span class="si">}</span><span class="s1">&lt;/span&gt;&#39;</span>
+        <span class="n">content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;br /&gt;&quot;</span>
+    <span class="n">content</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/div&gt;&quot;</span>
+
+    <span class="k">return</span> <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">content</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="template_2_helix">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_2_helix">[docs]</a>
+<span class="k">def</span> <span class="nf">template_2_helix</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for a 2-helix structure.</span>
+<span class="sd">    Reference:</span>
+<span class="sd">    1. Krissanaprasit, A. et al. A functional RNA-origami as direct thrombin</span>
+<span class="sd">        inhibitor with fast-acting and specific single-molecule reversal agents in</span>
+<span class="sd">        vivo model. Molecular Therapy 32, 2286-2298 (2024).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the 2-helix RNA structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">line_0</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">line_1</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">([</span><span class="n">line_0</span><span class="p">,</span> <span class="n">line_1</span><span class="p">],</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">origami</span></div>
+
+
+
+<div class="viewcode-block" id="template_rna_filament">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_rna_filament">[docs]</a>
+<span class="k">def</span> <span class="nf">template_rna_filament</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for an RNA filament structure.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami</span>
+<span class="sd">        cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the RNA filament structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">(</span>
+        <span class="n">dt_list</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+        <span class="n">kl_columns</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">main_stem</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">],</span>
+        <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># adjust middle helix terminal stem</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1">### STEMS BEFORE THE EXTERNAL KL</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">7</span>
+
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;1&#39;&quot;</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;2&#39;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">origami</span></div>
+
+
+
+<div class="viewcode-block" id="template_rna_filament_ispinach">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_rna_filament_ispinach">[docs]</a>
+<span class="k">def</span> <span class="nf">template_rna_filament_ispinach</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for an RNA filament structure.</span>
+<span class="sd">    The tiles contains an ispinach aptamer for fluorescence imaging.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    1. Tran, M. P. et al. Genetic encoding and expression of RNA origami</span>
+<span class="sd">        cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the RNA filament structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">(</span>
+        <span class="n">dt_list</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+        <span class="n">kl_columns</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">main_stem</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">],</span>
+        <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># adjust middle helix terminal stem</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1">### STEMS BEFORE THE EXTERNAL KL</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">7</span>
+
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;1&#39;&quot;</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;2&#39;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># add connector for ispinach line</span>
+    <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+    <span class="c1"># add ispinach line</span>
+    <span class="n">ispi_line</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">strong_bases</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Ispinach</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Motif</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="s2">&quot;...&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;UUU&amp;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">stem_cap_link</span><span class="p">(</span><span class="n">hflip</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ispi_line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">origami</span></div>
+
+
+
+<div class="viewcode-block" id="template_3_arms_droplet">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_3_arms_droplet">[docs]</a>
+<span class="k">def</span> <span class="nf">template_3_arms_droplet</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for a 3-arms droplet structure.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">    1. Stewart, J. M. et al. Modular RNA motifs for orthogonal phase separated</span>
+<span class="sd">        compartments. Nat Commun 15, (2024).</span>
+<span class="sd">    2. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates</span>
+<span class="sd">        and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).</span>
+<span class="sd">    3. Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrated</span>
+<span class="sd">        design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the 3-arms droplet structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">palindr_kl</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;AUCGCGAAA&quot;</span><span class="p">)</span>
+    <span class="n">line_0</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">17</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Motif</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="s2">&quot;.&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;U&amp;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Motif</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="s2">&quot;.&amp;.&quot;</span><span class="p">,</span> <span class="s2">&quot;U&amp;U&quot;</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+    <span class="p">]</span>
+    <span class="n">line_1</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Broccoli</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">stem_cap_link</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+    <span class="p">]</span>
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">([</span><span class="n">line_0</span><span class="p">,</span> <span class="n">line_1</span><span class="p">],</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">origami</span></div>
+
+
+
+<div class="viewcode-block" id="template_4_arms_droplet">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_4_arms_droplet">[docs]</a>
+<span class="k">def</span> <span class="nf">template_4_arms_droplet</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for a 4-arms droplet structure.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    1. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates</span>
+<span class="sd">        and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the 4-arms droplet structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">uracil_connect</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Motif</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="s2">&quot;.&amp;.&quot;</span><span class="p">,</span> <span class="s2">&quot;U&amp;U&quot;</span><span class="p">)</span>
+    <span class="n">palindr_kl</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;AUCGCGAAA&quot;</span><span class="p">)</span>
+
+    <span class="n">line_0</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">MalachiteGreenShort</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">uracil_connect</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+    <span class="p">]</span>
+
+    <span class="n">line_1</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">uracil_connect</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span>
+        <span class="n">palindr_kl</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(),</span>
+    <span class="p">]</span>
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">([</span><span class="n">line_0</span><span class="p">,</span> <span class="n">line_1</span><span class="p">],</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">origami</span></div>
+
+
+
+<div class="viewcode-block" id="template_pentagon_tile">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_pentagon_tile">[docs]</a>
+<span class="k">def</span> <span class="nf">template_pentagon_tile</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for a pentagon tile structure.</span>
+<span class="sd">    This follows the 3H-4DT design from Geary et al. (2021).</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    1. Geary, C., Grossi, G., McRae, E. K. S., Rothemund, P. W. K. &amp; Andersen, E. S.</span>
+<span class="sd">        RNA origami design tools enable cotranscriptional folding of kilobase-sized</span>
+<span class="sd">        nanoscaffolds. Nat. Chem. 13, 549-558 (2021).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the pentagon tile structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="n">main_stem</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">end_helix_len</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+    <span class="c1"># adjust start position</span>
+    <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">21</span>
+
+    <span class="c1"># adjust stems before the KL</span>
+    <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">origami</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">17</span>
+    <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">origami</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">21</span>
+
+    <span class="c1"># put the KL in the right place</span>
+    <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop120</span><span class="p">(</span><span class="n">pk_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop120</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop120</span><span class="p">(</span><span class="n">pk_index</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">origami</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop120</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">origami</span></div>
+
+
+
+<div class="viewcode-block" id="template_rectangle_10H_3X">
+<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_rectangle_10H_3X">[docs]</a>
+<span class="k">def</span> <span class="nf">template_rectangle_10H_3X</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the RNA origami template for a rectangle 10H-3X structure.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">    1. Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrated</span>
+<span class="sd">        design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Origami</span>
+<span class="sd">        An Origami object representing the rectangle 10H-3X structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
+
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">(</span>
+        <span class="n">dt_list</span><span class="o">=</span><span class="p">[</span><span class="mi">180</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="n">kl_columns</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">main_stem</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span>
+        <span class="n">add_terminal_helix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span>
+        <span class="n">use_angles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>  <span class="c1"># Create a simple origami</span>
+
+    <span class="n">origami</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">improve_folding_pathway</span><span class="p">(</span><span class="n">kl_delay</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+    <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="n">pf</span><span class="o">.</span><span class="n">Broccoli</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># Add motif</span>
+
+    <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>  <span class="c1"># Add motif</span>
+
+    <span class="k">return</span> <span class="n">origami</span></div>
 
 </pre></div>
 
@@ -355,7 +878,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -366,7 +889,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

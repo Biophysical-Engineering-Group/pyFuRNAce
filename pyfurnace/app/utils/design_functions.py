@@ -232,7 +232,11 @@ def motif_text_format(motif: pf.Motif) -> str:
 def initiate_session_state():
     default_state = {
         "origami": pf.Origami(),
-        "code": ["import pyfurnace as pf", "origami = pf.Origami()"],
+        "code": [
+            "import pyfurnace as pf",
+            "origami = pf.Origami()",
+            "RENDER_TARGET = origami",
+        ],
         "motif_buffer": "",
         "mod_motif_buffer": "",
         "motif": pf.Motif(),
@@ -544,14 +548,19 @@ def add_motif(origami):
         ### generate the motif code
         st_state.motif_buffer = "strands = []\n"
         for s in st_state["custom_strands"]:
+            coord_txt = ""
+            if s._coords:
+                coord_txt = (
+                    f", coords=pf.Coords({s.coords.array.tolist()}, "
+                    f"dummy_ends=({s.coords.dummy_ends[0].tolist()}, "
+                    f"{s.coords.dummy_ends[1].tolist()}))"
+                )
             st_state.motif_buffer += (
                 f"strands.append(pf.Strand('{s}', "
                 f"directionality='{s.directionality}', "
                 f"start={tuple(s.start)}, "
-                f"direction={tuple(s.direction)}, "
-                f"coords=pf.Coords({s.coords.array.tolist()}, "
-                f"dummy_ends=({s.coords.dummy_ends[0].tolist()}, "
-                f"{s.coords.dummy_ends[1].tolist()}))))\n"
+                f"direction={tuple(s.direction)}{coord_txt}"
+                f"))\n"
             )
 
         st_state.motif_buffer += (
@@ -713,51 +722,65 @@ def custom_text_input(current_custom_motif):
         if "5" not in strand_text:
             st.warning('Don\'t forget to start the strand with "5"')
         else:
-            new_motif = pf.Motif.from_text(strand_text).strip()
-            current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
-            current_custom_motif.basepair = new_motif.basepair
-            st.rerun()
+            if st.button("Convert", key="start_convert", type="primary"):
+                new_motif = pf.Motif.from_text(strand_text).strip()
+                current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
+                current_custom_motif.basepair = new_motif.basepair
+                st.rerun()
 
 
 def structure_converter(current_custom_motif):
+    current_struct = current_custom_motif.structure
+    current_seq = str(current_custom_motif.sequence)
+    if len(current_custom_motif.strands) == current_struct.count("&") + 2:
+        current_struct += "&"
+
     ### Add the structure converter
     col1, col2 = st.columns(2)
     with col1:
         structure = st.text_input(
             "Dot-bracket structure:",
-            value=current_custom_motif.structure,
+            value=current_struct,
             key="Dot-bracket_structure",
             help="Add a dot-bracket structure to convert it into " "a 3D motif.",
         )
     with col2:
-        default_seq = str(current_custom_motif.sequence)
-        if len(structure) > len(default_seq):
-            default_seq += "".join(
+        def_seq = st_state.get("Sequence_converter", current_seq)
+        if len(structure) > len(def_seq):
+            def_seq += "".join(
                 "N" if sym != "&" else "&"
-                for sym in structure[len(default_seq) : len(structure) + 1]
+                for sym in structure[len(def_seq) : len(structure) + 1]
             )
         sequence = st.text_input(
             "Sequence:",
-            value=default_seq,
-            key="Sequence",
+            value=def_seq,
+            key="Sequence_converter",
             help="Add the sequence of the motif.",
         )
-        if not sequence:
-            sequence = None
-    if (
-        structure
-        and structure.strip("& ") != current_custom_motif.structure
-        or sequence
-        and sequence.strip("& ") != current_custom_motif.sequence
-    ):
-        try:
-            new_motif = pf.Motif.from_structure(structure, sequence=sequence)
-        except Exception as e:
-            st.error(f"Error: {e}")
-            return
-        current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
-        current_custom_motif.basepair = new_motif.basepair
-        st.rerun()
+    # check that there is an input
+    structure = structure.replace(" ", "")
+    sequence = sequence.replace(" ", "")
+    optimize = True
+    if not structure and not sequence:
+        optimize = False
+    elif structure != current_struct or sequence != current_seq:
+        optimize = True
+
+    if current_custom_motif:
+        convert = st.button("Convert", key="start_convert", type="primary")
+        optimize = optimize and convert
+
+    if not optimize:
+        return
+
+    try:
+        new_motif = pf.Motif.from_structure(structure, sequence=sequence)
+    except Exception as e:
+        st.error(f"Error: {e}")
+        return
+    current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
+    current_custom_motif.basepair = new_motif.basepair
+    st.rerun()
 
 
 def upload_3d_interface(strand, strand_num, current_custom_motif):
@@ -853,8 +876,8 @@ def custom(current_custom_motif):
             "Build the motif with:",
             [
                 "Structure conveter",
-                "Drawing Tool",
                 "Full text input",
+                "Drawing Tool",
             ],
             default="Structure conveter",
             help="Structure conveter: Convert a dot-bracket"
@@ -1102,7 +1125,14 @@ def update_code(code_text, return_origami=False):
     try:
         exec(code_text, {"__builtins__": __builtins__, "pf": pf}, local_context)
         # Retrieve the modified origami variable
-        origami = local_context["origami"]
+        origami = [
+            v
+            for k, v in local_context.items()
+            if isinstance(v, pf.Origami) and k == "origami"
+        ][0]
+        render_target = local_context.get("RENDER_TARGET", None)
+        if render_target and isinstance(render_target, pf.Origami):
+            origami = render_target
 
         if origami:
             # select the end of the origami
@@ -1128,8 +1158,19 @@ def code():
         st_state["last_code_id"] = ""
     code_text = "\n\n".join(st_state.code)
 
-    col1, col2 = st.columns([4, 1], gap="large", vertical_alignment="center")
+    col1, col2, col3 = st.columns([1, 3, 1], gap="large", vertical_alignment="center")
     with col1:
+        st.link_button(
+            "Check the documentation!",
+            "https://pyfurnace.readthedocs.io/en/latest/api.html",
+            icon=":material/document_search:",
+            help="The code editor run python code, so you can program your "
+            "RNA origami. The GUI will render the variable named 'origami'"
+            " as the RNA origami structure. If you want to render a different"
+            " structure, assign it to the variable RENDER_TARGET. If you need"
+            " more info, click the button to open the documentation in a new tab.",
+        )
+    with col2:
         render_lines = st.slider(
             "Number of lines to render:",
             min_value=1,
@@ -1137,7 +1178,7 @@ def code():
             value=15,
             key="render_lines",
         )
-    with col2:
+    with col3:
         wrap = st.toggle(
             "Wrap lines",
             value=False,

@@ -112,7 +112,9 @@ class BasePair(MutableMapping, Callback):
         """Check if two Basepair or dictionary have the same key-value pairs."""
         if not isinstance(other, (BasePair, dict)):
             return False
-        return all(self[k] == other[k] for k in self.keys())
+        return all(self[k] == other.get(k) for k in self.keys()) and all(
+            other[k] == self.get(k) for k in other.keys()
+        )
 
     ###
     ### PUBLIC METHODS

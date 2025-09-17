@@ -131,15 +131,38 @@ class Origami(Callback):
         if not structure:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
+
+        # input dot-bracket notation
+        if isinstance(structure, str):
+            node = dot_bracket_to_tree(structure, sequence=sequence)
+            pair_map = dot_bracket_to_pair_map(structure)
+        # input pair map
+        elif isinstance(structure, (BasePair, dict)):
+            pair_map = structure.copy()
+            node = dot_bracket_to_tree(
+                pair_map_to_dot_bracket(structure), sequence=sequence
+            )
+            structure = pair_map_to_dot_bracket(structure)
+        # input tree
+        elif isinstance(structure, Node):
+            node = structure
+            pair_map = dot_bracket_to_pair_map(tree_to_dot_bracket(node))
+            structure = tree_to_dot_bracket(node)
+        else:
+            raise ValueError(f"Invalid structure representation: {structure}")
+
         if not sequence:
             sequence = "".join("N" if sym != "&" else "&" for sym in structure)
         else:
             sequence = str(sequence).replace("T", "U").upper()
 
-        if isinstance(structure, str) and len(structure) != len(sequence):
+        if isinstance(structure, str) and len(structure.strip("& ")) != len(
+            sequence.strip("& ")
+        ):
             raise ValueError(
                 f"The sequence length must be equal to the structure "
-                f"length. Got {len(sequence)} for {len(structure)}"
+                f"length. Got sequence len {len(sequence)} for structure"
+                f" len {len(structure)}."
             )
 
         if motif_list and not all(isinstance(m, Motif) for m in motif_list):
@@ -179,27 +202,6 @@ class Origami(Callback):
             dot_bracket_to_tree(m.structure, sequence=str(m.sequence))
             for m in motif_list
         ]
-
-        # input dot-bracket notation
-        if isinstance(structure, str):
-            node = dot_bracket_to_tree(structure, sequence=sequence)
-            pair_map = dot_bracket_to_pair_map(structure)
-
-        # input pair map
-        elif isinstance(structure, (BasePair, dict)):
-            pair_map = structure.copy()
-            node = dot_bracket_to_tree(
-                pair_map_to_dot_bracket(structure), sequence=sequence
-            )
-            structure = pair_map_to_dot_bracket(structure)
-
-        # input tree
-        elif isinstance(structure, Node):
-            node = structure
-            pair_map = dot_bracket_to_pair_map(tree_to_dot_bracket(node))
-            structure = tree_to_dot_bracket(node)
-        else:
-            raise ValueError(f"Invalid structure representation: {structure}")
 
         # initialize the origami object
         origami = Origami([[]], align="first", ss_assembly=True)
@@ -330,7 +332,7 @@ class Origami(Callback):
                 pass
 
             elif node.label == "(":
-                m_seq[0] += node.seq
+                m_seq[0] += node.seq if node.seq else "N"
                 m_seq[1] += sequence[pair_map[node.index]]
 
                 # if the next node is not a stem, create a stem motif
@@ -347,7 +349,7 @@ class Origami(Callback):
                         motif[1].sequence = m_seq[1][::-1]
 
             elif node.label == ".":
-                m_seq[0] += node.seq
+                m_seq[0] += node.seq if node.seq else "N"
 
                 # if the next node adjacent node is not unpaired, create a motif
                 if (

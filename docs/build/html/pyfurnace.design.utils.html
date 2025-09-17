@@ -11,7 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=bbaf98b3"></script>
@@ -22,17 +22,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -80,7 +80,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <section id="module-pyfurnace.design.utils">
 <span id="pyfurnace-design-utils-package"></span><h1>pyfurnace.design.utils package<a class="headerlink" href="#module-pyfurnace.design.utils" title="Link to this heading"></a></h1>
 <section id="submodules">
@@ -92,9 +92,19 @@
 <dt class="sig sig-object py" id="pyfurnace.design.utils.motif_lib.Utils">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.motif_lib.</span></span><span class="sig-name descname"><span class="pre">Utils</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hflip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vflip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/motif_lib.html#Utils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.motif_lib.Utils" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif" title="pyfurnace.design.core.motif.Motif"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motif</span></code></a></p>
+<p>Utility class that extends the Motif class with optional flipping and rotation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Positional arguments passed to the base <cite>Motif</cite> class.</p></li>
+<li><p><strong>hflip</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, apply a horizontal flip to the motif. Default is False.</p></li>
+<li><p><strong>vflip</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, apply a vertical flip to the motif. Default is False.</p></li>
+<li><p><strong>rotate</strong> (<em>int</em><em>, </em><em>optional</em>) – Rotation in degrees (usually 90, 180, 270). Default is 0.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments passed to the <cite>Motif</cite> base class.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">autopairing</span></code></dt><dd><p>Indicates whether the motif automatically pairs bases.</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">basepair</span></code></dt><dd><p>A dictionary with positions as key and the paired position as values.</p>
@@ -149,7 +159,7 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend_junctions</span></code>([skip_axis, ...])</p></td>
 <td><p>Extend the junctions of the motif in the direction of the junctions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip</span></code>([horizontally, vertically, strand_index])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip</span></code>([horizontally, vertically, ...])</p></td>
 <td><p>Flip the strands of the motif horizontally and/or vertically inplace.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">folding_barriers</span></code>([kl_delay])</p></td>
@@ -161,8 +171,8 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_list</span></code>(motif_list, **kwargs)</p></td>
 <td><p>Create a Motif object from a list of strings representing a motif sketch.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code>(structure[, sequence, ...])</p></td>
-<td><p>Convert a structure representation to a Motif object.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code>([structure, sequence, ...])</p></td>
+<td><p>Parse a structure or sequence representation to a Motif object.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_text</span></code>(motif_text, **kwargs)</p></td>
 <td><p>Create a Motif object from a text string representing a motif sketch.</p></td>
@@ -221,23 +231,70 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyfurnace.design.utils.motif_lib.start_end_stem">
-<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.motif_lib.</span></span><span class="sig-name descname"><span class="pre">start_end_stem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_left</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'5'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bot_left</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bot_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/motif_lib.html#start_end_stem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.motif_lib.start_end_stem" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.motif_lib.</span></span><span class="sig-name descname"><span class="pre">start_end_stem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">up_left</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">up_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'5'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">down_left</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">down_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/motif_lib.html#start_end_stem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.motif_lib.start_end_stem" title="Link to this definition"></a></dt>
+<dd><p>Creates a <cite>Utils</cite> motif representing the start or end of a stem with optional
+strand labels. For each position, the acceptable values are:
+‘3’, ‘5’, ‘─’, ‘-’, ‘’, or None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>up_left</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional. Default is '3'.</em>) – Label for the top-left strand.</p></li>
+<li><p><strong>up_right</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Label for the top-right strand. Default is ‘5’.</p></li>
+<li><p><strong>down_left</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Label for the bottom-left strand. Default is ‘-‘.</p></li>
+<li><p><strong>down_right</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Label for the bottom-right strand. Default is ‘-‘.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments passed to the <cite>Utils</cite> constructor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the <cite>Utils</cite> class with the appropriate strands.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyfurnace.design.utils.motif_lib.Utils" title="pyfurnace.design.utils.motif_lib.Utils">Utils</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyfurnace.design.utils.motif_lib.stem_cap_link">
 <span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.motif_lib.</span></span><span class="sig-name descname"><span class="pre">stem_cap_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/motif_lib.html#stem_cap_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.motif_lib.stem_cap_link" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Creates a stem cap motif with a curved connection and vertical segments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A stem cap <cite>Utils</cite> object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyfurnace.design.utils.motif_lib.Utils" title="pyfurnace.design.utils.motif_lib.Utils">Utils</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyfurnace.design.utils.motif_lib.vertical_double_link">
 <span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.motif_lib.</span></span><span class="sig-name descname"><span class="pre">vertical_double_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/motif_lib.html#vertical_double_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.motif_lib.vertical_double_link" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Creates a double vertical link motif using two parallel vertical strands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A vertical double link <cite>Utils</cite> object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyfurnace.design.utils.motif_lib.Utils" title="pyfurnace.design.utils.motif_lib.Utils">Utils</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyfurnace.design.utils.motif_lib.vertical_link">
 <span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.motif_lib.</span></span><span class="sig-name descname"><span class="pre">vertical_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/motif_lib.html#vertical_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.motif_lib.vertical_link" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Creates a vertical link motif represented by a single vertical strand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A vertical link <cite>Utils</cite> object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyfurnace.design.utils.motif_lib.Utils" title="pyfurnace.design.utils.motif_lib.Utils">Utils</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-pyfurnace.design.utils.origami_lib">
@@ -258,6 +315,37 @@ on a predefined mapping.</p>
 <dd class="field-odd"><p>list of int</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.ipython_clickable_txt">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">ipython_clickable_txt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origami</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barriers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#ipython_clickable_txt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.ipython_clickable_txt" title="Link to this definition"></a></dt>
+<dd><p>Generate an interactive, scrollable HTML view of a RNA origami structure
+with clickable motifs that display their indexes in a JavaScript alert.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>origami</strong> (<a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami"><em>Origami</em></a>) – An Origami object representing the RNA structure.</p></li>
+<li><p><strong>max_height</strong> (<em>str</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – The maximum height of the scrollable view in pixels. Default is ‘500’.</p></li>
+<li><p><strong>barriers</strong> (<em>optional</em>) – Optional barrier data to overlay on the origami representation.</p></li>
+<li><p><strong>gradient</strong> (<em>bool</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Whether to color motifs using a gradient.
+If str, interpreted as colormap name from matplotlib.
+Default is False.</p></li>
+<li><p><strong>font_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Font size of the text in pixels. Default is 12.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An HTML string rendered via IPython’s display system.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This function uses inline CSS and JavaScript for visual styling and interaction.</p></li>
+<li><p>Clicking a motif will trigger a JavaScript alert showing its position.</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py function">
@@ -287,7 +375,7 @@ scrollable HTML block in Jupyter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>origami_text</strong> (<em>str</em>) – The content to display in scrollable format.</p></li>
+<li><p><strong>origami_text</strong> (<em>str</em><em>, </em><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami"><em>Origami</em></a>) – The content to display in scrollable format.</p></li>
 <li><p><strong>max_height</strong> (<em>str</em><em>, </em><em>optional</em>) – Maximum height of the scrollable box in pixels (default is ‘500’).</p></li>
 </ul>
 </dd>
@@ -307,17 +395,11 @@ kissing loop parameters.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dt_list</strong> (<em>list</em><em> of </em><em>int</em>) – List of dovetail values representing inter-helix connections.</p></li>
 <li><p><strong>kl_columns</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of kissing loop repeats in each helix (default is 1).</p></li>
-<li><p><strong>main_stem</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em><em> or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – <p>Length(s) of the main stem in each kissing loop.
-Can be a single int, a list (same for all loops), or a matrix for per-loop</p>
-<blockquote>
-<div><p>customization.</p>
-</div></blockquote>
-</p></li>
-<li><p><strong>left_stem_kl</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em><em> or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – <dl class="simple">
-<dt>Length(s) of the left stem for each kissing loop. Defaults to automatic</dt><dd><p>computation.</p>
-</dd>
-</dl>
-</p></li>
+<li><p><strong>main_stem</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em><em> or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Length(s) of the main stem in each kissing loop.
+Can be a single int, a list (same for all loops), or a matrix for per-loop
+customization.</p></li>
+<li><p><strong>left_stem_kl</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em><em> or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Length(s) of the left stem for each kissing loop. Defaults to automatic
+computation.</p></li>
 <li><p><strong>stem_pos</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Position(s) of the main stem insertion among helices. Default is 0 for all.</p></li>
 <li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Index of the main stem where origami building starts (default is 0).</p></li>
 <li><p><strong>add_terminal_helix</strong> (<em>bool</em><em>, </em><em>default True</em>) – Whether to prepend and append helices with no dovetails.</p></li>
@@ -333,6 +415,155 @@ values (default is False).</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_2_helix">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_2_helix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_2_helix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_2_helix" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for a 2-helix structure.
+Reference:
+1. Krissanaprasit, A. et al. A functional RNA-origami as direct thrombin</p>
+<blockquote>
+<div><p>inhibitor with fast-acting and specific single-molecule reversal agents in
+vivo model. Molecular Therapy 32, 2286-2298 (2024).</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the 2-helix RNA structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_3_arms_droplet">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_3_arms_droplet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_3_arms_droplet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_3_arms_droplet" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for a 3-arms droplet structure.</p>
+<p>References:
+1. Stewart, J. M. et al. Modular RNA motifs for orthogonal phase separated</p>
+<blockquote>
+<div><p>compartments. Nat Commun 15, (2024).</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates</dt><dd><p>and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrated</dt><dd><p>design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the 3-arms droplet structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_4_arms_droplet">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_4_arms_droplet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_4_arms_droplet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_4_arms_droplet" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for a 4-arms droplet structure.</p>
+<p>Reference:
+1. Fabrini, G. et al. Co-transcriptional production of programmable RNA condensates</p>
+<blockquote>
+<div><p>and synthetic organelles. Nat. Nanotechnol. 19, 1665-1673 (2024).</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the 4-arms droplet structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_pentagon_tile">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_pentagon_tile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_pentagon_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_pentagon_tile" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for a pentagon tile structure.
+This follows the 3H-4DT design from Geary et al. (2021).</p>
+<p>Reference:
+1. Geary, C., Grossi, G., McRae, E. K. S., Rothemund, P. W. K. &amp; Andersen, E. S.</p>
+<blockquote>
+<div><p>RNA origami design tools enable cotranscriptional folding of kilobase-sized
+nanoscaffolds. Nat. Chem. 13, 549-558 (2021).</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the pentagon tile structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_rectangle_10H_3X">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_rectangle_10H_3X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_rectangle_10H_3X"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_rectangle_10H_3X" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for a rectangle 10H-3X structure.</p>
+<p>References:
+1. Monari, L., Braun, I., Poppleton, E. &amp; Göpfrich, K. PyFuRNAce: An integrated</p>
+<blockquote>
+<div><p>design engine for RNA origami. (2025) doi:10.1101/2025.04.17.647389.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the rectangle 10H-3X structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_rna_filament">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_rna_filament</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_rna_filament"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_rna_filament" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for an RNA filament structure.</p>
+<p>Reference:
+1. Tran, M. P. et al. Genetic encoding and expression of RNA origami</p>
+<blockquote>
+<div><p>cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the RNA filament structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.design.utils.origami_lib.template_rna_filament_ispinach">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.design.utils.origami_lib.</span></span><span class="sig-name descname"><span class="pre">template_rna_filament_ispinach</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/design/utils/origami_lib.html#template_rna_filament_ispinach"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.design.utils.origami_lib.template_rna_filament_ispinach" title="Link to this definition"></a></dt>
+<dd><p>Generate the RNA origami template for an RNA filament structure.
+The tiles contains an ispinach aptamer for fluorescence imaging.</p>
+<p>Reference:
+1. Tran, M. P. et al. Genetic encoding and expression of RNA origami</p>
+<blockquote>
+<div><p>cytoskeletons in synthetic cells. Nat. Nanotechnol. 20, 664-671 (2025).</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An Origami object representing the RNA filament structure.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="pyfurnace.design.core.html#pyfurnace.design.core.origami.Origami" title="pyfurnace.design.core.origami.Origami">Origami</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -354,7 +585,7 @@ values (default is False).</p></li>
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -365,7 +596,7 @@ values (default is False).</p></li>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

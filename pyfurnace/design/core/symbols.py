@@ -198,7 +198,7 @@ all_pk_symbols = (
 #: symbols.
 accept_symbol = (
     nucleotides
-    | {"." "(", ")"}
+    | {".", "(", ")"}
     | set(all_pk_symbols)
     | {
         "─",
@@ -511,7 +511,9 @@ def pair_map_to_dot_bracket(
         Dot-bracket notation representing the structure.
     """
     if structure_length is None:
-        structure_length = max(pair_map.keys(), default=-1) + 1
+        keys_max = max(pair_map.keys(), default=-1)
+        values_max = max((k for k in pair_map.values() if k is not None), default=-1)
+        structure_length = max(keys_max, values_max) + 1
 
     ### CREATE THE DOT BRACKET NOTATION ###
     done_pairs = set()
@@ -774,6 +776,8 @@ def dot_bracket_to_tree(dot_bracket: str, sequence: Optional[str] = None) -> Nod
     """
     # Remove pseudoknots from the dot bracket
     dot_bracket = dot_bracket.translate(pseudo_to_dot)
+    if not isinstance(sequence, str) and sequence is not None:
+        sequence = str(sequence)
     root = Node()
     current_node = root
     for i, label in enumerate(dot_bracket):

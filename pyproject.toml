@@ -48,6 +48,11 @@ dev = [
     "mypy",
     "pytest",
     "Flake8-pyproject",
+    "sphinxcontrib-bibtex",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "sphinx-copybutton",
+    "sphinx"
 ]
 
 [tool.setuptools]

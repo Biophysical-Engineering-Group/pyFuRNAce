@@ -451,7 +451,7 @@ class Motif(Callback):
         elif isinstance(other, str):
             return any(other in s for s in self._strands)
         elif isinstance(other, BasePair):
-            return other in self.basepair
+            return all(self.basepair.get(k) == v for k, v in other.items())
         return False
 
     def __eq__(self, other: Any) -> bool:
@@ -1160,16 +1160,6 @@ class Motif(Callback):
         if not structure:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
-        if not sequence:
-            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
-        else:
-            sequence = str(sequence).replace("T", "U").upper()
-
-        if isinstance(structure, str) and len(structure) != len(sequence):
-            raise ValueError(
-                f"The sequence length must be equal to the structure "
-                f"length. Got {len(sequence)} for {len(structure)}"
-            )
 
         # input dot-bracket notation
         if isinstance(structure, str):
@@ -1189,6 +1179,20 @@ class Motif(Callback):
             structure = tree_to_dot_bracket(node)
         else:
             raise ValueError(f"Invalid structure representation: {structure}")
+
+        if not sequence:
+            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
+        else:
+            sequence = str(sequence).replace("T", "U").upper()
+
+        if isinstance(structure, str) and len(structure.strip("& ")) != len(
+            sequence.strip("& ")
+        ):
+            raise ValueError(
+                f"The sequence length must be equal to the structure "
+                f"length. Got sequence len {len(sequence)} for structure"
+                f" len {len(structure)}."
+            )
 
         # initialize the origami object
         origami = Origami([[]], align="first", ss_assembly=True)
@@ -1211,7 +1215,7 @@ class Motif(Callback):
 
             if node.label == "(":
                 motif = Motif(
-                    Strand(node.seq),
+                    Strand(node.seq if node.seq else "N"),
                     Strand(
                         sequence[pair_map[node.index]],
                         start=(0, 2),
@@ -1221,7 +1225,9 @@ class Motif(Callback):
                 )
 
             elif node.label == ".":
-                motif = Motif(Strand(node.seq), Strand("-", start=(0, 2)))
+                motif = Motif(
+                    Strand(node.seq if node.seq else "N"), Strand("-", start=(0, 2))
+                )
 
             # add the motif and update the current index
             if motif:
@@ -2857,8 +2863,8 @@ class Motif(Callback):
         # check if the shift will bring the strands to negative positions
         if min_pos[0] + shift[0] < 0 or min_pos[1] + shift[1] < 0:
             raise MotifStructureError(
-                f"The motif cannot be shifed. The strands cannot be drawn"
-                f" at negative positons. Attempt to draw the motif at "
+                f"The motif cannot be shifted. The strands cannot be drawn"
+                f" at negative positions. Attempt to draw the motif at "
                 f"position ({min_pos[0] + shift_vect[0]}, "
                 f"{min_pos[1] + shift_vect[1]})"
             )

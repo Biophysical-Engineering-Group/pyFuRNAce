@@ -5,15 +5,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyfurnace.generate.viennarna &mdash; pyFuRNAce 0.0.6 documentation</title>
+  <title>pyfurnace.generate.viennarna &mdash; pyFuRNAce 0.0.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../../_static/documentation_options.js?v=bbaf98b3"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -21,17 +21,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="../../../index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -79,16 +79,17 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <h1>Source code for pyfurnace.generate.viennarna</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 <span class="kn">import</span> <span class="nn">RNA</span>
+
 
 <div class="viewcode-block" id="fold">
 <a class="viewcode-back" href="../../../pyfurnace.generate.html#pyfurnace.generate.viennarna.fold">[docs]</a>
 <span class="k">def</span> <span class="nf">fold</span><span class="p">(</span><span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the minimum free energy (MFE) structure for an RNA sequence </span>
+<span class="sd">    Compute the minimum free energy (MFE) structure for an RNA sequence</span>
 <span class="sd">    using ViennaRNA.</span>
 
 <span class="sd">    Parameters</span>
@@ -101,11 +102,12 @@
 <span class="sd">    str</span>
 <span class="sd">        Dot-bracket notation representing the MFE secondary structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># create fold_compound data structure </span>
+    <span class="c1"># create fold_compound data structure</span>
     <span class="n">fc</span> <span class="o">=</span> <span class="n">RNA</span><span class="o">.</span><span class="n">fold_compound</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
     <span class="c1"># compute MFE and MFE structure</span>
     <span class="p">(</span><span class="n">mfe_struct</span><span class="p">,</span> <span class="n">mfe</span><span class="p">)</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">mfe</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">mfe_struct</span></div>
+
 
 
 <div class="viewcode-block" id="fold_p">
@@ -114,7 +116,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute detailed thermodynamic properties of an RNA sequence using ViennaRNA.</span>
 
-<span class="sd">    This includes MFE structure, partition function, centroid structure, </span>
+<span class="sd">    This includes MFE structure, partition function, centroid structure,</span>
 <span class="sd">    and Boltzmann ensemble statistics.</span>
 
 <span class="sd">    Parameters</span>
@@ -140,12 +142,12 @@
 <span class="sd">    Requires ViennaRNA Python bindings (`import RNA`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># create model details</span>
-    <span class="n">md</span> <span class="o">=</span> <span class="n">RNA</span><span class="o">.</span><span class="n">md</span><span class="p">()</span> 
+    <span class="n">md</span> <span class="o">=</span> <span class="n">RNA</span><span class="o">.</span><span class="n">md</span><span class="p">()</span>
     <span class="c1"># adjust the scaling factor for long sequences</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
-        <span class="n">md</span><span class="o">.</span><span class="n">sfact</span> <span class="o">=</span> <span class="mf">1.01</span> 
+        <span class="n">md</span><span class="o">.</span><span class="n">sfact</span> <span class="o">=</span> <span class="mf">1.01</span>
 
-    <span class="c1"># create fold_compound data structure </span>
+    <span class="c1"># create fold_compound data structure</span>
     <span class="c1"># (required for all subsequently applied  algorithms)</span>
     <span class="n">fc</span> <span class="o">=</span> <span class="n">RNA</span><span class="o">.</span><span class="n">fold_compound</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">md</span><span class="p">)</span>
 
@@ -169,10 +171,15 @@
     <span class="n">frequency_centr_ensemble</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">pr_structure</span><span class="p">(</span><span class="n">centroid_struct</span><span class="p">)</span>
     <span class="n">ensemble_diversity</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">mean_bp_distance</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">mfe_struct</span><span class="p">,</span> <span class="n">mfe</span><span class="p">,</span> <span class="n">frequency_mfe_ensemble</span><span class="p">,</span>
-            <span class="n">centroid_struct</span><span class="p">,</span> <span class="n">centroid_en</span><span class="p">,</span> <span class="n">frequency_centr_ensemble</span><span class="p">,</span>
-            <span class="n">ensemble_diversity</span>
-            <span class="p">)</span></div>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">mfe_struct</span><span class="p">,</span>
+        <span class="n">mfe</span><span class="p">,</span>
+        <span class="n">frequency_mfe_ensemble</span><span class="p">,</span>
+        <span class="n">centroid_struct</span><span class="p">,</span>
+        <span class="n">centroid_en</span><span class="p">,</span>
+        <span class="n">frequency_centr_ensemble</span><span class="p">,</span>
+        <span class="n">ensemble_diversity</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 
@@ -189,7 +196,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -200,7 +207,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

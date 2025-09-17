@@ -11,9 +11,9 @@ Welcome to pyFuRNAce's documentation!
 
 **pyFuRNAce** is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.
 
-| **WebApp:** `pyfurnace.de <http://pyfurnace.de>`_  
-| **GitHub:** `Biophysical-Engineering-Group/pyFuRNAce <https://github.com/Biophysical-Engineering-Group/pyFuRNAce>`_  
-| **PyPI:** `pyfurnace <https://pypi.org/project/pyfurnace/>`_  
+| **WebApp:** `pyfurnace.de <http://pyfurnace.de>`_
+| **GitHub:** `Biophysical-Engineering-Group/pyFuRNAce <https://github.com/Biophysical-Engineering-Group/pyFuRNAce>`_
+| **PyPI:** `pyfurnace <https://pypi.org/project/pyfurnace/>`_
 | **Script API examples:** `Code Examples <https://github.com/Biophysical-Engineering-Group/pyFuRNAce/tree/main/examples>`_
 | **Documentation:** `Read the Docs <https://pyfurnace.readthedocs.io/en/latest/>`_
 
@@ -26,4 +26,5 @@ Welcome to pyFuRNAce's documentation!
 
    features
    api
+   limitations
    examples

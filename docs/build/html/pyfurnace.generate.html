@@ -11,7 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
-  
+
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=bbaf98b3"></script>
@@ -22,17 +22,17 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
 
-          
-          
+
+
           <a href="index.html" class="icon icon-home">
             pyFuRNAce
           </a>
@@ -80,7 +80,7 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+
   <section id="module-pyfurnace.generate">
 <span id="pyfurnace-generate-package"></span><h1>pyfurnace.generate package<a class="headerlink" href="#module-pyfurnace.generate" title="Link to this heading"></a></h1>
 <section id="submodules">
@@ -156,8 +156,14 @@ inconsistent index lengths.</p>
 <section id="module-pyfurnace.generate.road">
 <span id="pyfurnace-generate-road-module"></span><h2>pyfurnace.generate.road module<a class="headerlink" href="#module-pyfurnace.generate.road" title="Link to this heading"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.generate.road.cwd">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.generate.road.</span></span><span class="sig-name descname"><span class="pre">cwd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/generate/road.html#cwd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.generate.road.cwd" title="Link to this definition"></a></dt>
+<dd><p>Context manager to change the current working directory and revert it back.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pyfurnace.generate.road.generate_road">
-<span class="sig-prename descclassname"><span class="pre">pyfurnace.generate.road.</span></span><span class="sig-name descname"><span class="pre">generate_road</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pseudoknots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'origami'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zip_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origami_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/generate/road.html#generate_road"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.generate.road.generate_road" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.generate.road.</span></span><span class="sig-name descname"><span class="pre">generate_road</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pseudoknots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'origami'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zip_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origami_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/generate/road.html#generate_road"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.generate.road.generate_road" title="Link to this definition"></a></dt>
 <dd><p>Generate an RNA origami design using the ROAD Revolvr algorithm.</p>
 <p>This function orchestrates the structure processing, pseudoknot embedding,
 and Perl-based design process for RNA origami, with optional support for
@@ -173,6 +179,8 @@ real-time updates and zipped output.</p>
 optimization.</p></li>
 <li><p><strong>callback</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function called during ROAD execution with progress updates:
 <cite>callback(structure, sequence, line, stage_name, stage_progress)</cite></p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, prints progress updates to the console.
+If <cite>callback</cite> is provided, this is ignored. Default is False.</p></li>
 <li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – Timeout in seconds for the ROAD optimization
 (default is 7200 seconds = 2 hours).</p></li>
 <li><p><strong>directory</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory where files should be written. If None, a temporary directory
@@ -202,6 +210,50 @@ the tuple <cite>(designed_sequence, path_to_zip_file)</cite>.</p>
 <li><p>If the final design file is missing, a warning is issued.</p></li>
 </ul>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyfurnace.generate.road.parallel_road">
+<span class="sig-prename descclassname"><span class="pre">pyfurnace.generate.road.</span></span><span class="sig-name descname"><span class="pre">parallel_road</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pseudoknots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'origami'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zip_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origami_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sequence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_for_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyfurnace/generate/road.html#parallel_road"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyfurnace.generate.road.parallel_road" title="Link to this definition"></a></dt>
+<dd><p>Run multiple ROAD optimization trials in parallel and return results.</p>
+<p>You can choose between returning early on the first successful result
+or waiting for all trials to complete. Results can optionally be
+ZIP-archived and saved. If the wait_for_all flag is set to True,
+the sequences are returned sorted by their MFE frequency in the ensemble
+(highest to lowest).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>str</em>) – Dot-bracket notation of the target RNA secondary structure.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – Reference sequence with the same length as the structure.</p></li>
+<li><p><strong>pseudoknots</strong> (<em>str</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – ROAD-style or pyFuRNAce-style pseudoknot definition.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – Base name for output files (default: “origami”).</p></li>
+<li><p><strong>callback</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional function that receives real-time progress updates.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, prints progress to console.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – Timeout in seconds per trial (default: 7200).</p></li>
+<li><p><strong>zip_directory</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save each trial’s output as a ZIP archive.</p></li>
+<li><p><strong>origami_code</strong> (<em>str</em><em>, </em><em>optional</em>) – Python source code to include with the design output.</p></li>
+<li><p><strong>initial_sequence</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional sequence to use as a starting point in optimization.</p></li>
+<li><p><strong>n_trials</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of parallel optimization trials to run.</p></li>
+<li><p><strong>save_to</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory to store ZIP outputs if <cite>zip_directory=True</cite>.</p></li>
+<li><p><strong>wait_for_all</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, waits for all trials to finish and returns results sorted
+by MFE frequency. If False, returns as soon as the first trial succeeds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If <cite>wait_for_all=False</cite> returns the first designed sequence.</p></li>
+<li><p>If <cite>wait_for_all=True</cite> returns a list of designed sequences.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or Tuple[str, str] or List[str]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If no trials successfully generate a design.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -299,7 +351,7 @@ a small scaling factor is applied for numerical stability.</p>
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+
 
 </footer>
         </div>
@@ -310,7 +362,7 @@ a small scaling factor is applied for numerical stability.</p>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
 
 </body>
 </html>

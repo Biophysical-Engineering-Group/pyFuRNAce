@@ -59,12 +59,16 @@ def rna_to_template():
     col1, col2 = st.columns([1, 5])
 
     # coding strand
-    col1, col2 = st.columns([1, 8], vertical_alignment="center")
+    copy_ratio = [1, 8]
+    col1, col2 = st.columns(copy_ratio, vertical_alignment="center")
     with col1:
         copy_to_clipboard(dna_template, "Coding strand:")
-        copy_to_clipboard(non_coding, "Non-coding strand:")
     with col2:
         write_format_text(dna_template)
+    col1, col2 = st.columns(copy_ratio, vertical_alignment="center")
+    with col1:
+        copy_to_clipboard(non_coding, "Non-coding strand:")
+    with col2:
         write_format_text(non_coding)
 
     # Save the DNA template in the session state and add a link to the primer page
@@ -131,8 +135,14 @@ def convert_tab(seq):
         write_format_text(rev_complement)
 
     if seq_type == "DNA":
-        st.write("RNA:")
-        write_format_text(seq.transcribe())
+        # coding strand
+        st.write("**DNA to RNA:**")
+        col1, col2 = st.columns([1, 8], vertical_alignment="center")
+        rna = seq.transcribe()
+        with col1:
+            copy_to_clipboard(rna, "RNA")
+        with col2:
+            write_format_text(rna)
 
     # if the sequence is RNA, create a DNA template
     else:

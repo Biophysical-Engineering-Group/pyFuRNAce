@@ -1,0 +1,14 @@
+biopython
+colour
+git+https://github.com/lorenzo-rovigatti/oxDNA.git#subdirectory=analysis
+matplotlib
+numpy
+pytest
+scipy
+st-click-detector
+st-oxview
+st_forna_component
+streamlit
+streamlit_code_editor
+streamlit_option_menu
+ViennaRNA

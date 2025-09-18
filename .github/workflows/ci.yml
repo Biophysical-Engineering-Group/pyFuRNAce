@@ -24,9 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Codecov needs >1 commit depth to detect the commit SHA properly
-          fetch-depth: 2
 
       - name: Set up Python
         uses: actions/setup-python@v5

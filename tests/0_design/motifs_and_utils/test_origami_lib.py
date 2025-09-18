@@ -2,6 +2,7 @@ import inspect
 import pytest
 
 from pyfurnace.design.utils import origami_lib as o_lib
+from pyfurnace.design.core import dot_bracket_to_stacks
 
 import pyfurnace as pf
 
@@ -43,7 +44,7 @@ def test_ipython_clickable_txt_minimal(monkeypatch):
 
     ori = o_lib.simple_origami(dt_list=[0], kl_columns=1, main_stem=22, align="first")
     ori.pop((0, -1))  # remove motif to have open ends
-    o_lib.ipython_clickable_txt(ori)  # default args
+    o_lib.ipython_clickable_txt(ori, gradient="rainbow", barriers=True)  # default args
     assert spy.calls == 1  # again, only check that display() was invoked
 
 
@@ -214,6 +215,42 @@ def test_simple_origami_main_stem_matrix_forms_and_errors():
             main_stem=22,
             left_stem_kl=[[5, 5], [5]],  # second row too short
         )
+
+
+def test_simple_origami_matrix_inputs():
+    n_kl = 2
+    dt = [0, -1]
+    with pytest.raises(ValueError, match="The main_stem can be an int, a list"):
+        simple_origami(
+            dt_list=dt,
+            kl_columns=n_kl,
+            main_stem="test",
+        )
+    with pytest.raises(ValueError, match="The left_stem_kl can be an int,"):
+        simple_origami(
+            dt_list=dt,
+            kl_columns=n_kl,
+            left_stem_kl="test",
+        )
+    ori1 = simple_origami(
+        dt_list=dt,
+        kl_columns=n_kl,
+        left_stem_kl=7,
+    )
+    ori2 = simple_origami(
+        dt_list=dt,
+        kl_columns=n_kl,
+        left_stem_kl=[7, 7, 7, 7],
+    )
+    ori3 = simple_origami(
+        dt_list=dt,
+        kl_columns=n_kl,
+        stem_pos=0,
+    )
+    db1 = dot_bracket_to_stacks(ori1.structure)[0]
+    db2 = dot_bracket_to_stacks(ori2.structure)[0]
+    db3 = dot_bracket_to_stacks(ori3.structure)[0]
+    assert db1 == db2 == db3
 
 
 # --------------------------

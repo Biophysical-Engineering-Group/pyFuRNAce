@@ -1,1 +1,12 @@
-{"Na": 0.0, "K": 50.0, "Tris": 20.0, "Mg": 1.5, "dNTPs": 0.2, "Method": 7, "DMSO (%)": 0, "mt_method": "Nearest Neighbor", "mt_model": "DNA_NN4", "Primer": 500.0}
+{
+  "DMSO (%)": 0,
+  "K": 50.0,
+  "Method": 7,
+  "Mg": 1.5,
+  "Na": 0.0,
+  "Primer": 500.0,
+  "Tris": 20.0,
+  "dNTPs": 0.2,
+  "mt_method": "Nearest Neighbor",
+  "mt_model": "DNA_NN4"
+}

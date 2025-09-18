@@ -28,7 +28,7 @@ newtonian_steps = 103
 diff_coeff = 2.5
 external_forces = 1
 external_forces_file = pk_forces.txt
-use_average_seq = 0 
+use_average_seq = 0
 seq_dep_file = OXDNA_DIRECTORY/rna_sequence_dependent_parameters.txt
 
 ##############################
@@ -47,4 +47,3 @@ refresh_vel = 1
 restart_step_counter = 1
 no_stdout_energy = 0
 #log_file = log_trap.dat
-

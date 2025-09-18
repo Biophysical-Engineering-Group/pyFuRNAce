@@ -19,12 +19,6 @@ repos:
     - id: check-added-large-files      # Apply a file size limit of 500kB
     - id: check-toml      # Simple parser validation of e.g. pyproject.toml
     - id: requirements-txt-fixer      # Sort lines in requirements files
-    - id: check-json      # Check validity of JSON files
-    - id: pretty-format-json      # Format JSON files consistently
-      exclude_types:
-      - jupyter
-      args:
-      - --autofix
     - id: mixed-line-ending      # Ensure consistent line endings
 
   - repo: https://github.com/abravalheri/validate-pyproject

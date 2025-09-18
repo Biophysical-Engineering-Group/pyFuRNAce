@@ -1,9 +1,9 @@
-sphinx
-sphinx_rtd_theme
-sphinx-autodoc-typehints
-numpydoc
-myst-parser
-nbsphinx
 ipykernel
+myst-parser
 nbconvert
+nbsphinx
+numpydoc
+sphinx
+sphinx-autodoc-typehints
 sphinx_copybutton
+sphinx_rtd_theme

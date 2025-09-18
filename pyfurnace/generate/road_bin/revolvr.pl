@@ -34,14 +34,14 @@ use utf8;
 my $init_setup = 5;			  #Number of cycles of the initial setup
 my $site_mutation_rate = 45;  #Rate of mutation in regions that are mispaired. Only mispaired nts are mutated.
 							  #Mutations that improve the fold are retained, and become the next parent sequence.
-							  
+
 my $mutate_loop = 2;		  #1-100, Rate at which mispaired loop sequence are mutated.
 my $drift_period = 3;		  #Controls frequency of "drift", which allows mutatitions to be tested in properly folded areas.
 							  #5 = drift every 5th round.  Targeted mutations do not occur during drift.
-							  
-my $my_drift_rate = 2;		  #Rate for random point-mutations to the entire sequence.							   
+
+my $my_drift_rate = 2;		  #Rate for random point-mutations to the entire sequence.
 my $gc_mut_ratio = 70;		  #How much GCs are preferred over AUs.
-my $double_mutant = 99;		  #Percent of mutants that target base-pairs rather than single positions.							  
+my $double_mutant = 99;		  #Percent of mutants that target base-pairs rather than single positions.
 my $misfold_tolerance = 1.06; #factor of increase in distance that will be allowed during the mutation stage
 my $output_threshold = 0;	  #1=verbose, 0=hide output for neutral mutations
 my $max_GC=55;				  #set desired GC content of final design
@@ -50,7 +50,7 @@ my $target_GU = 1;			  #Minimum GU, turned off since we are enforcing GU with th
 my $longrange = 250;		  #define the min distance for pairs to require AUC-limited alphabet in initilization.
 
 my $duplicate_window = 10;    ### Length of Duplicates regions that Pattern Search looks for   (marked "D", default=10)
-my $complement_window = 10;        #window-size to search for complement sequences - for GU placer  
+my $complement_window = 10;        #window-size to search for complement sequences - for GU placer
 my $complement_zones=0;
 my $duplication_zones=0;
 
@@ -94,7 +94,7 @@ my @map = ();
 my $randomletter = "A";
 my $name = "";	#the name of the design is extracted from target.txt line 1 and stored here
 
-###These store the folds of all the unique sequences tested 
+###These store the folds of all the unique sequences tested
 my $unique_sequence_id = 0;
 my @sequence_catalog = ();
 my @fold_catalog = ();
@@ -147,7 +147,7 @@ sub read_file
     {
         # Reads the whole file by temporarily undefining the
         # record separator,
-        
+
         local $/ = undef;
         $content = <FILE>;
 
@@ -167,7 +167,7 @@ sub read_file
 
 sub fold { #outputs to $fold
 
-	###These var names store the folds of all the unique sequences tested 
+	###These var names store the folds of all the unique sequences tested
 	# $unique_sequence_id = 0;
 	# @sequence_catalog = ();
 	# @fold_catalog = ();
@@ -176,7 +176,7 @@ sub fold { #outputs to $fold
 	$previously_tried=0;
 	my $sequence_num_counter = 0;
 	my $counter = 0;
-	
+
 	foreach(@sequence_catalog){
 		if(defined $sequence_catalog[$sequence_num_counter]){
 			if($_[0]eq$sequence_catalog[$sequence_num_counter]){
@@ -217,7 +217,7 @@ sub map {
 	my @last_bracket;
 	my @last_brace;
 	my @last_curlybrace;
-	
+
 	my @last_a_brace;
 	my @last_b_brace;
 	my @last_c_brace;
@@ -231,14 +231,14 @@ sub map {
 
 
 
-	
+
 	my $counter = 0;
 	foreach(@secondary){
 		if ($_ eq "."){
 			$map[$counter] = $counter;	 ##Single strands map to themselves
 		}
 		elsif ($_ eq "("){
-			push @last_bracket, $counter;		   
+			push @last_bracket, $counter;
 		}
 		elsif ($_ eq ")"){
 			my $partner = pop @last_bracket;
@@ -246,7 +246,7 @@ sub map {
 			$map[$partner]=$counter;
 		}
 		elsif ($_ eq "["){
-			push @last_brace, $counter;		 
+			push @last_brace, $counter;
 		}
 		elsif ($_ eq "]"){
 			my $buddy = pop @last_brace;
@@ -254,7 +254,7 @@ sub map {
 			$map[$buddy]=$counter;
 		}
 		elsif ($_ eq "{"){
-			push @last_curlybrace, $counter;		  
+			push @last_curlybrace, $counter;
 		}
 		elsif ($_ eq "}"){
 			my $pal = pop @last_curlybrace;
@@ -262,7 +262,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "A"){    ##Outwards pointing KLs map as A-1 B-2 C-3.... I-9 J-0
-			push @last_a_brace, $counter;		  
+			push @last_a_brace, $counter;
 		}
 		elsif ($_ eq "1"){
 			my $pal = pop @last_a_brace;
@@ -270,7 +270,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "B"){
-			push @last_b_brace, $counter;		  
+			push @last_b_brace, $counter;
 		}
 		elsif ($_ eq "2"){
 			my $pal = pop @last_b_brace;
@@ -278,7 +278,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "C"){
-			push @last_c_brace, $counter;		  
+			push @last_c_brace, $counter;
 		}
 		elsif ($_ eq "3"){
 			my $pal = pop @last_c_brace;
@@ -286,7 +286,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "D"){
-			push @last_d_brace, $counter;		  
+			push @last_d_brace, $counter;
 		}
 		elsif ($_ eq "4"){
 			my $pal = pop @last_d_brace;
@@ -294,7 +294,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "E"){
-			push @last_e_brace, $counter;		  
+			push @last_e_brace, $counter;
 		}
 		elsif ($_ eq "5"){
 			my $pal = pop @last_e_brace;
@@ -302,7 +302,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "F"){
-			push @last_f_brace, $counter;		  
+			push @last_f_brace, $counter;
 		}
 		elsif ($_ eq "6"){
 			my $pal = pop @last_f_brace;
@@ -310,7 +310,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "G"){
-			push @last_g_brace, $counter;		  
+			push @last_g_brace, $counter;
 		}
 		elsif ($_ eq "7"){
 			my $pal = pop @last_g_brace;
@@ -318,7 +318,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "H"){
-			push @last_h_brace, $counter;		  
+			push @last_h_brace, $counter;
 		}
 		elsif ($_ eq "8"){
 			my $pal = pop @last_h_brace;
@@ -326,7 +326,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "I"){
-			push @last_i_brace, $counter;		  
+			push @last_i_brace, $counter;
 		}
 		elsif ($_ eq "9"){
 			my $pal = pop @last_i_brace;
@@ -334,7 +334,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 		elsif ($_ eq "J"){
-			push @last_j_brace, $counter;		  
+			push @last_j_brace, $counter;
 		}
 		elsif ($_ eq "0"){
 			my $pal = pop @last_j_brace;
@@ -342,7 +342,7 @@ sub map {
 			$map[$pal]=$counter;
 		}
 
-				
+
 		$counter ++;
 	}
 }
@@ -362,7 +362,7 @@ my @pattern_zones = ();
 my $pairs=0;
 my $GC_pairs=0;
 my $AU_pairs=0;
-my $GU_pairs=0; 
+my $GU_pairs=0;
 my $KL_GC_cont=0;
 my $KL_pairs=0;
 my $KL_GC_pairs=0;
@@ -373,7 +373,7 @@ my $KL_repeats = 0;
 ##########
 
 
-my $outputs = "target.txt"; 
+my $outputs = "target.txt";
 my @results = &read_file( $outputs );
 
 my $counter = 0;
@@ -460,14 +460,14 @@ if($generate_sequence eq 'true'){
 		if ($target[$i] eq "."){
 			if ($constraint[$i] =~ /[AUCG]/){$best_sol[$i]=$constraint[$i];}
 		elsif ($constraint[$i] eq "R"){
-			if(int(rand(2))==0){$best_sol[$i]="G";} else{$best_sol[$i]="A";}	
-		}  
+			if(int(rand(2))==0){$best_sol[$i]="G";} else{$best_sol[$i]="A";}
+		}
 		elsif ($constraint[$i] eq "N"){
 			&randseq;
 			$best_sol[$i]=$randomletter;
-		} 
+		}
 		elsif ($constraint[$i] eq "Y"){
-			if(int(rand(2))==0){$best_sol[$i]="C";} else{$best_sol[$i]="U";}	
+			if(int(rand(2))==0){$best_sol[$i]="C";} else{$best_sol[$i]="U";}
 		}
 		else {$best_sol[$i]="A";} #in the odd case just use A, although this should never happen...
 		}
@@ -489,60 +489,60 @@ if($generate_sequence eq 'true'){
 		}
 		elsif (($target[$i]eq("(") or $target[$i]eq("[")) && ($constraint[$i]eq"U")){
 			$best_sol[$i]="U";
-			if ($constraint[$map[$i]]eq"A" || $constraint[$map[$i]]eq"N"){	  
+			if ($constraint[$map[$i]]eq"A" || $constraint[$map[$i]]eq"N"){
 				$best_sol[$map[$i]]="A";
 			}
-			elsif ($constraint[$map[$i]]eq"G" || $constraint[$map[$i]]eq"K"){	 
+			elsif ($constraint[$map[$i]]eq"G" || $constraint[$map[$i]]eq"K"){
 				$best_sol[$map[$i]]="G";
 			}
 		}
 		elsif (($target[$i]eq("(") or $target[$i]eq("[")) && ($constraint[$i]eq"G")){
 			$best_sol[$i]="G";
-			if ($constraint[$map[$i]]eq"C" || $constraint[$map[$i]]eq"N"){	  
+			if ($constraint[$map[$i]]eq"C" || $constraint[$map[$i]]eq"N"){
 				$best_sol[$map[$i]]="C";
 			}
-			elsif ($constraint[$map[$i]]eq"U" || $constraint[$map[$i]]eq"K"){	 
+			elsif ($constraint[$map[$i]]eq"U" || $constraint[$map[$i]]eq"K"){
 				$best_sol[$map[$i]]="U";
 			}
 		}
 		elsif (($target[$i]eq("(") or $target[$i]eq("[")) && ($constraint[$i]eq"K")){
-			if ($constraint[$map[$i]]eq"G"){	
+			if ($constraint[$map[$i]]eq"G"){
 				$best_sol[$map[$i]]="U";
 			}
-			elsif ($constraint[$map[$i]]eq"U"){	   
+			elsif ($constraint[$map[$i]]eq"U"){
 				$best_sol[$map[$i]]="G";
 			}
 			if ($constraint[$map[$i]]eq"K"){
 				$bp_direction=int(rand(2));
 				if( ($map[$i]-$i)>$longrange ){$bp_direction = 1;}
 				if( $bp_direction==0 || $best_sol[$i]eq"G" || $best_sol[$map[$i]]eq"U"){
-					$best_sol[$i]="G";	
+					$best_sol[$i]="G";
 					$best_sol[$map[$i]]="U";
 				}
 				else {
-					$best_sol[$i]="U";	
-					$best_sol[$map[$i]]="G"; 
-				}	
+					$best_sol[$i]="U";
+					$best_sol[$map[$i]]="G";
+				}
 			}
 		}
 		elsif (($target[$i]eq("(") or $target[$i]eq("[")) && ($constraint[$i]eq"S")){
-			if ($constraint[$map[$i]]eq"G"){	
+			if ($constraint[$map[$i]]eq"G"){
 				$best_sol[$map[$i]]="C";
 			}
-			elsif ($constraint[$map[$i]]eq"C"){	   
+			elsif ($constraint[$map[$i]]eq"C"){
 				$best_sol[$map[$i]]="G";
 			}
 			if ($constraint[$map[$i]]eq"S"){
 				$bp_direction=int(rand(2));
 				if( ($map[$i]-$i)>$longrange ){$bp_direction = 1;}
 				if( $bp_direction==0 || $best_sol[$i]eq"G" || $best_sol[$map[$i]]eq"C"){
-					$best_sol[$i]="G";	
+					$best_sol[$i]="G";
 					$best_sol[$map[$i]]="C";
 				}
 				else {
-					$best_sol[$i]="C";	
-					$best_sol[$map[$i]]="G"; 
-				}	
+					$best_sol[$i]="C";
+					$best_sol[$map[$i]]="G";
+				}
 			}
 		}
 
@@ -576,7 +576,7 @@ if($generate_sequence eq 'true'){
 					else {
 						$best_sol[$i] = "U";
 						$best_sol[$map[$i]] = "A";
-					} 
+					}
 				}
 				else {
 					if ($bp_direction==0) {
@@ -586,7 +586,7 @@ if($generate_sequence eq 'true'){
 					else {
 						$best_sol[$i] = "C";
 						$best_sol[$map[$i]] = "G";
-					} 
+					}
 				}
 			}
 		}
@@ -619,7 +619,7 @@ if($generate_sequence eq 'true'){
 					else {
 						$best_sol[$i] = "C";
 						$best_sol[$map[$i]] = "G";
-					} 
+					}
 				}
 				else {
 					if ($bp_direction==0) {
@@ -629,12 +629,12 @@ if($generate_sequence eq 'true'){
 					else {
 						$best_sol[$i] = "A";
 						$best_sol[$map[$i]] = "U";
-					} 
+					}
 				}
 			}
 		}
-   
-		if ($target[$i]eq("(") && ($constraint[$i]eq"N") && ($constraint[$map[$i]]eq"N") && (($map[$i]-$i)>$longrange)){	 ####find long-range pairs and make them A,U,C limited.		 
+
+		if ($target[$i]eq("(") && ($constraint[$i]eq"N") && ($constraint[$map[$i]]eq"N") && (($map[$i]-$i)>$longrange)){	 ####find long-range pairs and make them A,U,C limited.
 			$bp_type=int(rand(3));
 			if($bp_type==0){
 				$best_sol[$i] = "A";
@@ -649,7 +649,7 @@ if($generate_sequence eq 'true'){
 				$best_sol[$map[$i]] = "A";
 			}
 		}
-	  
+
 		if (($init_target[$i]eq("{")) && ($constraint[$i]eq"N")){	##apply 100%GC to the dovetails specified with '{'
 			if ($constraint[$map[$i]]eq"A"){
 				$best_sol[$i]="U";
@@ -676,9 +676,9 @@ if($generate_sequence eq 'true'){
 				else {
 					$best_sol[$i] = "C";
 					$best_sol[$map[$i]] = "G";
-				} 
+				}
 			}
-		}    
+		}
 	}
 }else{
 	&printer("Inserting new Sequence!\n");
@@ -693,7 +693,7 @@ my $constraintstring = join "",@constraint;
 my $best_sol_seq = join "", @best_sol;
 
 &fold($best_sol_seq);
-@parent_fold = split(//,$fold);	 
+@parent_fold = split(//,$fold);
 #&printer("parent fold =	@parent_fold\n");
 my $parent_fold_string = $fold;
 &distance($parent_fold_string, $targetstring);
@@ -724,8 +724,8 @@ do{	 ####
 			$bp_direction=int(rand(2));	#roll the dice to pick the direction of the bp
 			$bp_type=(rand(100));
 			if( $target[$i]eq"." && $parent_fold[$i]ne"." ){$trial_sol[$i]="A";}
-			if( ($target[$i]eq"(" || $target[$i]eq"[") && $target[$i+1]ne"(" && $target[$i+1]ne"[" ){ $helixend=1;} 
-			if( ($target[$i]eq")" || $target[$i]eq"]") && $target[$i+1]ne")" && $target[$i+1]ne"]" ){ $helixend=1;} 
+			if( ($target[$i]eq"(" || $target[$i]eq"[") && $target[$i+1]ne"(" && $target[$i+1]ne"[" ){ $helixend=1;}
+			if( ($target[$i]eq")" || $target[$i]eq"]") && $target[$i+1]ne")" && $target[$i+1]ne"]" ){ $helixend=1;}
 			if($helixend==1){$bp_type=100;}
 			if (($target[$i]eq"(") && ($parent_fold[$i]ne"(")){
 				if ($bp_type<(100-$max_GC-$target_GU)){
@@ -736,7 +736,7 @@ do{	 ####
 					else {
 						$trial_sol[$i] = "U";
 						$trial_sol[$map[$i]] = "A";
-					} 
+					}
 				}
 				else {
 					if ($bp_direction==0) {
@@ -746,7 +746,7 @@ do{	 ####
 					else {
 						$trial_sol[$i] = "C";
 						$trial_sol[$map[$i]] = "G";
-					} 
+					}
 				}
 			}
 			if (($target[$i]eq")") && ($target[$i+1]eq"(") && ($parent_fold[$i]ne")") && ($parent_fold[$i+1]ne"(") ){
@@ -798,7 +798,7 @@ do{	 ####
 				$trial_sol[$map[$i+1]] = "G";
 				$trial_sol[$i+1] = "C";
 			}
-		}  
+		}
 	}
 
 	##Compute the fold and distance
@@ -828,7 +828,7 @@ do{	 ####
 					$mut_map[$i] = "-";
 			} else {
 				$mut_map[$i] = $trial_sol[$i];
-			}	
+			}
 			if ($parent_fold[$i]ne$targetnopk[$i]){
 				$defect_map[$i] = "X";
 			} else {
@@ -836,13 +836,13 @@ do{	 ####
 			}
 			$best_sol[$i]= $trial_sol[$i];		#move the trial solution to best_sol array
 		}
-  
+
 		my $mut_map_text = join "",@mut_map;
 		my $defect_map_text = join "",@defect_map;
 		$best_sol_seq = join "", @trial_sol;
 
 		$parent_dist=$trial_dist;			  #copy the trial distance to be the new parent_dist
-		my $best_dist=$trial_dist;  
+		my $best_dist=$trial_dist;
 		$parent_fold_string = $fold;
 		@parent_fold = split(//, $fold);
 
@@ -852,7 +852,7 @@ do{	 ####
 		&printer("$best_sol_seq\n");
 		&printer("$parent_fold_string\n");
 		&printer("$defect_map_text\n");
-  
+
 	}
 	else {
 		&printer("( $attempts )");
@@ -864,16 +864,16 @@ do{	 ####
 
 ################################################
 &printer("\n__________________________________________________________\n");
-&printer("Begin Directed Mutation Cycle\n");  
+&printer("Begin Directed Mutation Cycle\n");
 
 my $drift_event_count = 0;	#initialize the counter for mutation events
 my $improved_parent_count = 0;
 my $constraint_check = 0;
 my $failed_tries =0;
-do{	 
-    
+do{
+
 	my $keep_sequence=0;
-	$attempts += 1; 
+	$attempts += 1;
 	$improved_parent_count += 1;
 	$drift_event_count += 1;
 
@@ -891,7 +891,7 @@ do{
 	    if($improved_parent_count>1 && $drift_event_count!=$drift_period){&printer("expanded->");}
 		for ( $i=2; $i<$strand_length-2; $i++){
 			$mutate_now=0;
-			$coin_flip=int(rand(2));	
+			$coin_flip=int(rand(2));
 			if (($drift_event_count==$drift_period) && (rand(100)<$drift_rate) && ($constraint[$i]eq"N" || $constraint[$i]eq"K" || $constraint[$i]eq"S")) {	 #random drift events
 				$mutate_now=1;
 			}
@@ -899,38 +899,38 @@ do{
 				$mutate_now=1;
 			}
 			if ($improved_parent_count>1) {
-				if ( (($parent_fold[$i+1] ne $targetnopk[$i+1]) || ($parent_fold[$i-1] ne $targetnopk[$i-1]) || ($parent_fold[$i+2] ne $targetnopk[$i+2]) || ($parent_fold[$i-2] ne $targetnopk[$i-2]) ) && 
+				if ( (($parent_fold[$i+1] ne $targetnopk[$i+1]) || ($parent_fold[$i-1] ne $targetnopk[$i-1]) || ($parent_fold[$i+2] ne $targetnopk[$i+2]) || ($parent_fold[$i-2] ne $targetnopk[$i-2]) ) &&
 				($drift_event_count!=$drift_period) && (rand(100)<$site_mutation_rate) && $constraint[$i]eq"N") {	#expand mutational window by 2nts
 					$mutate_now=1;
 				}
-			
-				if($parent_fold[$i]ne$target[$i] && $target[$i]eq")" && $target[$i+1]eq"("){ 
+
+				if($parent_fold[$i]ne$target[$i] && $target[$i]eq")" && $target[$i+1]eq"("){
 					$mutation_sites[$i]=1; $mutation_sites[$map[$i]]=1;
 					$mutation_sites[$i+1]=1; $mutation_sites[$map[$i+1]]=1;
 					$mutation_sites[$map[$i]-1]=1;
 					$mutation_sites[$map[$map[$i]-1]]=1;
-					$mutate_now=1; 
+					$mutate_now=1;
 				}
-				
+
 				if($parent_fold[$map[$i]]ne$target[$map[$i]] || $parent_fold[$map[$i+1]]ne$target[$map[$i+1]] || $parent_fold[$map[$i-1]]ne$target[$map[$i-1]]){
 					$mutation_sites[$map[$i]]=1; $mutation_sites[$map[$i+1]]=1; $mutation_sites[$map[$i-1]]=1;
-					$mutate_now=1; 
+					$mutate_now=1;
 				}
-			} 		
-		
+			}
+
 			if ($mutate_now==1){
 				$mutation_sites[$i]=1; $num_mutation_spots++;}
 			else{$mutation_sites[$i]=0;}
 		}
 
 	my $mut_scale = $rad_level/($num_mutation_spots+.001);	##scale back the odds of mutation so that there are always ~$radlevel mutations.
-	&printer(" M[$num_mutation_spots] (*$rad_level) ");  
-  
+	&printer(" M[$num_mutation_spots] (*$rad_level) ");
+
 	for ( $i=2; $i<$strand_length-2; $i++){
 		my $randnum=rand(1);
-  
+
 		if(($mut_scale>$randnum) && $mutation_sites[$i]==1){
-  
+
 			if ( (($target[$i]eq"(") || ($target[$i]eq")") ) && ($constraint[$i]eq"N") && ($constraint[$map[$i]]eq"N")){
 				&printer(" $i");
 				if (rand(100)<$double_mutant){
@@ -950,7 +950,7 @@ do{
 						}else{
 							$trial_sol[$i] = "U";
 							$trial_sol[$map[$i]] = "A";
-						}			   
+						}
 					}
 				}else {
 					&printer(".");
@@ -982,15 +982,15 @@ do{
 					&randseq();
 					$trial_sol[$i]= $randomletter;
 				}
-			} 
+			}
 			elsif (($target[$i]eq".") && ($constraint[$i]eq"R")){
 				&printer("Lr");
 				if (int(rand(2))==0){$trial_sol[$i]= "A";}else{$trial_sol[$i]= "G";}
 			}
-	  
+
 			if ( (($target[$i]eq"[") || ($target[$i]eq"]")) && ($constraint[$i]eq"N") && ($constraint[$map[$i]]eq"N") ) {
 				&printer(" $i");	 &printer("[:");
-				if (rand(100)<($KL_GC)) {  
+				if (rand(100)<($KL_GC)) {
 					if (int(rand(2))==1) {
 						$trial_sol[$i] = "G";
 						$trial_sol[$map[$i]] = "C";
@@ -1006,7 +1006,7 @@ do{
 					}else{
 						$trial_sol[$i] = "U";
 						$trial_sol[$map[$i]] = "A";
-					}			   
+					}
 				}
 			} #endif	 "["
 
@@ -1019,8 +1019,8 @@ do{
 			 elsif ($best_sol[$i] eq "U"){
 			   $trial_sol[$i]= "G";
 			   $trial_sol[$map[$i]]= "U";
-			 } 
-		  }	 
+			 }
+		  }
 
 		  if ( (($target[$i]eq"(") || ($target[$i]eq"[") || ($target[$i]eq")") || ($target[$i]eq"]")) && ($constraint[$i]eq"S") && ($constraint[$map[$i]]eq"S")){
 			 &printer("S");
@@ -1031,12 +1031,12 @@ do{
 			 elsif ($best_sol[$i] eq "C"){
 			   $trial_sol[$i]= "G";
 			   $trial_sol[$map[$i]]= "C";
-			 } 
-		  }	 
+			 }
+		  }
 
-	
-		} #endif for mutscale 
-  
+
+		} #endif for mutscale
+
 	} #end for loop
 
 
@@ -1094,9 +1094,9 @@ do{
 		if($trial_dist<$parent_dist || $output_threshold==1 || $constraint_check==0){$display_the_output = 1;}
 
 		$parent_dist=$trial_dist;			  #copy the trial distance to be the new parent_dist
-		$best_dist=$trial_dist;  
+		$best_dist=$trial_dist;
 		@parent_fold = split(//,$fold);
-		$parent_fold_string = $fold; 
+		$parent_fold_string = $fold;
 
 		if($display_the_output==1 && $previously_tried==0){
 			&printer("\n\nIteration# $attempts, Distance = $trial_dist\n");  #Report outputs
@@ -1107,9 +1107,9 @@ do{
 			&printer("$parent_fold_string\n");
 			&printer("Defect Map:\n");
 			&printer("$defect_map_text\n");
-			
+
 			if ($generate_previews==1){&preview;}
-			
+
 		} else {&printer(" keep -D$trial_dist");}
 		$drift_event_count=0;
 	}else { ##else if keep_sequence==0;
@@ -1124,7 +1124,7 @@ do{
 	&printer("\n");
 
 	if ($constraint_check==0 && $distance>0 && $keep_sequence==1){
-		$failed_tries++; 
+		$failed_tries++;
 		$drift_period=1;
 		&printer(" <Blocked by Constraints - $failed_tries > \n");
 	}
@@ -1132,7 +1132,7 @@ do{
 	if ($constraint_check==0 && $distance>0 && $failed_tries>$max_failed_tries  && $keep_sequence==1){    ##Try to random drift at least $max_failed_tries times before giving up.
 		&printer("All defects are locked by the sequence constraint, resetting target to current best defect mask\n");
 		$distance=0;
-		
+
 		for ( $i=0; $i<$strand_length; $i++){
 		    if( ($target[$i]ne"[") && ($target[$i] ne "]") ){$target[$i]=$new_fold_array[$i];}  #leave PKs in place
 			$targetnopk[$i]=$new_fold_array[$i];
@@ -1176,7 +1176,7 @@ for ( $i=0; $i<$strand_length; $i++){
   $trial_sol[$i]=$best_sol[$i];	 #reset the trial solution
 }
 
-&countrepeats;	
+&countrepeats;
 
 &printer("\nThere are $complement_zones Complementary Regions, $pattern_repeats Strong/Weak Regions, $poly_repeats Poly-N5 Repeats, $duplication_zones nt Duplicated sequence, and $restriction_sites common restriction sites present to start:\n");
 $last_pattern_repeats=$pattern_repeats;
@@ -1192,7 +1192,7 @@ my $test_first =1;
 $drift_rate=$my_drift_rate; #reset drift rate here
 
 do{
- 
+
 	my $keep_sequence=0;
 
 	my $mutate_now = 0;
@@ -1205,7 +1205,7 @@ do{
 	$repeat_map_text = "";
 
     &countrepeats;
-     
+
 	my @au_bust=();
 	my @gu_put =();
 	my @mutation_sites =();  ##array storting the targeted mutations
@@ -1214,29 +1214,29 @@ do{
 
 	if($test_first == 0){ ##test to see if this is the first time running this loop
 
-		$attempts += 1; 
+		$attempts += 1;
 
 		do{
 			&printer("(Iteration $attempts)");
-			$num_mutation_spots=0;  
-			
-		
+			$num_mutation_spots=0;
+
+
 			for ( $i=0; $i<$strand_length; $i++){
 				$trial_sol[$i]=$best_sol[$i];	     #reset the trial solution
 				$gu_put[$i]=0;
 				$mutation_sites[$i]=0;##zero out the arrays that track which type of mutation to put where
 			}
-	
+
 			for ( $i=0; $i<$strand_length; $i++){
-	
+
 				$mutate_now=0;
-				$coin_flip=int(rand(2)); 
+				$coin_flip=int(rand(2));
 				$rand_num_one=rand(100);
 				$rand_num_two=rand(100);
 
-		
+
 				if( ($i>3) && ($i<($strand_length-3)) ){
-					if ( ( (($target[$i-1]eq("(") || $target[$i-1]eq("["))) && (($target[$i]eq("(") || $target[$i]eq("["))) && (($target[$i+1]eq("(") || $target[$i+1]eq("["))) ) && 
+					if ( ( (($target[$i-1]eq("(") || $target[$i-1]eq("["))) && (($target[$i]eq("(") || $target[$i]eq("["))) && (($target[$i+1]eq("(") || $target[$i+1]eq("["))) ) &&
 					  (($trial_sol[$i-1]eq"C") || ($trial_sol[$i-1]eq"A") || (($trial_sol[$i-1]eq"G") && ($trial_sol[$map[$i-1]]eq"C")) || (($trial_sol[$i-1]eq"U") && ($trial_sol[$map[$i-1]]eq"A"))) &&
 					  (($trial_sol[$i+1]eq"C") || ($trial_sol[$i+1]eq"A") || (($trial_sol[$i-1]eq"G") && ($trial_sol[$map[$i-1]]eq"C")) || (($trial_sol[$i-1]eq"U") && ($trial_sol[$map[$i-1]]eq"A")))	 ) {  #dont' put 2 GU next to each other
 						if ( (int(rand(100/($target_GU/10+1)))==0) && ($GU_pairs<($target_GU*$pairs*.01)) ) {
@@ -1244,15 +1244,15 @@ do{
 							$mutate_now=1;
 							$mutation_sites[$i]+=1
 						}
-						
+
 						if ($repeat_map[$i]eq"P" && rand($complement_zones)<15){   #the odds of placing a GU to be roughly 15 GU per total number of sites
 							$gu_put[$i]=1;   ##this allows GUs for sites marked P
 							$mutate_now=1;
 							$mutation_sites[$i]+=1;
 						}
-					} 
+					}
 				}
-		
+
 				if ($repeat_map[$i]eq"-"){  ##if "-" then neutral drift stems
 					if (($target[$i]eq("(") or $target[$i]eq("[")) && $rand_num_one<($drift_rate/2)) {  #any helix or KL is targeted for mutation, drift rate is 1/2 speed
 						$mutate_now=1;
@@ -1267,30 +1267,30 @@ do{
 				} elsif ($repeat_map[$i]eq"S" || $repeat_map[$i]eq"W" || $repeat_map[$i]eq"X" || $repeat_map[$i]eq"D"){
 					if ($coin_flip==0){
 						$mutate_now=1;
-						$mutation_sites[$i]+=1;	
-					}		
+						$mutation_sites[$i]+=1;
+					}
 				} elsif ($repeat_map[$i]eq"P") {  #the odds of random mutation to be roughly 5 per total number of sites
-					if (rand($complement_zones)<5){  
+					if (rand($complement_zones)<5){
 						$mutate_now=1;
 						$mutation_sites[$i]+=1;
 					}
-				}			
-		
+				}
+
 				if ($mutate_now==1){$num_mutation_spots++;}
 			}
-			
+
 			if ($rad_level < 2){$rad_level = 2;} #set a min rad level
 			if ($rad_level > 20){$rad_level = 20;} #set a max rad level
-			
+
 			my $mut_scale = $rad_level/($num_mutation_spots+.001);	##scale back the odds of mutation so that there are always ~radlevel mutations.
-			&printer(" M[$num_mutation_spots] (*$rad_level) ");  
+			&printer(" M[$num_mutation_spots] (*$rad_level) ");
 
 			for ( $i=0; $i<$strand_length-1; $i++){
 
 				if( rand(1) < ($mut_scale*$mutation_sites[$i]) ){
 					if ($target[$i]eq"." && $constraint[$i]eq"N"){
 						&printer(".");
-						&randseq;	   
+						&randseq;
 						$trial_sol[$i] = $randomletter;
 					}
 
@@ -1302,7 +1302,7 @@ do{
 								}else{
 									$trial_sol[$i] = "U";
 									$trial_sol[$map[$i]] = "G";
-								}			
+								}
 					}
 					if (($repeat_map[$i]eq"G" || $repeat_map[$i]eq"C") && rand(1)<0.5 &&
 						 ( $target[$i]eq("(") || $target[$i]eq(")") || $target[$i]eq("[") || $target[$i]eq("]") ) && ($constraint[$i]eq"N") && ($constraint[$map[$i]]eq"N") ){
@@ -1314,11 +1314,11 @@ do{
 							$trial_sol[$i] = "C";
 							$trial_sol[$map[$i]] = "G";
 						}
-					} 
+					}
 					elsif(($target[$i]eq("(") ||$target[$i]eq(")") || $target[$i]eq("[") || $target[$i]eq("]") ) && ($constraint[$i]eq"N") && ($constraint[$map[$i]]eq"N") ){
 						&printer(":"); #bp change
 						if (($trial_sol[$i]eq"C" && $trial_sol[$map[$i]]eq"G") || ($trial_sol[$i]eq"G" && $trial_sol[$map[$i]]eq"C") ){   #GC Reducer
-							if((($GC_pairs/$pairs*100)>$max_GC) || rand(1)<0.5){						
+							if((($GC_pairs/$pairs*100)>$max_GC) || rand(1)<0.5){
 								&printer("+A ");	   #add AU
 								if ($coin_flip==0) {
 									$trial_sol[$i] = "A";
@@ -1342,7 +1342,7 @@ do{
 							}
 						}
 						elsif (($trial_sol[$i]eq"G" && $trial_sol[$map[$i]]eq"U") || ($trial_sol[$i]eq"U" && $trial_sol[$map[$i]]eq"G") ){	#GU Flipper/Deleter
-							
+
 							if(rand(1)<0.9){
 								&printer(":fW "); #f, for flip wobble
 								if ($trial_sol[$i] eq "G"){	##GU flipper
@@ -1360,10 +1360,10 @@ do{
 									$trial_sol[$map[$i]] = "A";
 								}
 							}
-									  
+
 						}
-		 
-					} elsif (($target[$i]eq("(") || $target[$i]eq(")") || $target[$i]eq("[") || $target[$i]eq("]") ) && ($constraint[$i]eq"K") && ($constraint[$map[$i]]eq"K") ){ 
+
+					} elsif (($target[$i]eq("(") || $target[$i]eq(")") || $target[$i]eq("[") || $target[$i]eq("]") ) && ($constraint[$i]eq"K") && ($constraint[$map[$i]]eq"K") ){
 						&printer(":fW "); #f, for flip wobble
 						if ($trial_sol[$i] eq "G"){	##GU flipper
 							$trial_sol[$i] = "U";
@@ -1371,8 +1371,8 @@ do{
 						} else {
 							$trial_sol[$i] = "G";
 							$trial_sol[$map[$i]] = "U";
-						}		  
-					} elsif (($target[$i]eq("(") || $target[$i]eq(")") || $target[$i]eq("[") || $target[$i]eq("]") ) && ($constraint[$i]eq"S") && ($constraint[$map[$i]]eq"S") ){ 
+						}
+					} elsif (($target[$i]eq("(") || $target[$i]eq(")") || $target[$i]eq("[") || $target[$i]eq("]") ) && ($constraint[$i]eq"S") && ($constraint[$map[$i]]eq"S") ){
 						&printer(":fS "); #f, for flip strong
 						if ($trial_sol[$i] eq "G"){	##GC flipper
 							$trial_sol[$i] = "C";
@@ -1380,24 +1380,24 @@ do{
 						} else {
 							$trial_sol[$i] = "G";
 							$trial_sol[$map[$i]] = "C";
-						}		  
+						}
 					} #end mutate pairs
 				}
 			}
 			#####Compute Distances
-	
+
 			###Count up the patterns and make a map
-	
-			&countrepeats;	
+
+			&countrepeats;
 	        &printer("(SW$pattern_repeats/N$poly_repeats/R$restriction_sites/W$complement_zones)");
 			if(($pattern_repeats + $poly_repeats + $restriction_sites + $complement_zones/$complement_window + $duplication_zones) > ($last_pattern_repeats + $last_poly_repeats + $last_restriction_sites + $last_complement_zones/$complement_window + $last_duplication_zones )){&printer(" - bad roll, trying again...\n"); $rad_level += -1;}
-			
-	
+
+
 		}while( (($pattern_repeats + $poly_repeats + $restriction_sites + $complement_zones/$complement_window + $duplication_zones) > ($last_pattern_repeats + $last_poly_repeats + $last_restriction_sites + $last_complement_zones/$complement_window + $last_duplication_zones)) && ($pattern_repeats + $poly_repeats + $restriction_sites + $complement_zones + $duplication_zones));
 
 	}#end test_first comparison
 	$test_first=0;
-	
+
 	$new_trial_seq = join "",@trial_sol;	#Make a string to hold the sequence of the new trial
 	#&printer("(SW$pattern_repeats/N$poly_repeats/R$restriction_sites/W$complement_zones) ... ");
 	&printer("SUCCESS folding...");
@@ -1405,11 +1405,11 @@ do{
 	my $new_fold = $fold;			  #The fold of puzzle solution
 	&distance($new_fold, $targetstring);
 	my $trial_dist = $distance;	  #Distance the puzzle solution is away from the target
-	
+
 
 	my $print_output=0;
 
-	
+
 	if ($distance == 0 && (($pattern_repeats <= $last_pattern_repeats) || ($poly_repeats <= $last_poly_repeats) || ($restriction_sites <= $last_restriction_sites)  || ($complement_zones > $last_complement_zones ) || ($duplication_zones > $last_duplication_zones ) )) {$keep_sequence=1;}
 
 	if ($keep_sequence==1){		   #Check if the new mutant is better than the parent
@@ -1434,12 +1434,12 @@ do{
 		$best_sol_seq = join "",@best_sol;
 
 		$parent_dist=$trial_dist;			  #copy the trial distance to be the new parent_dist
-		$best_dist=$trial_dist;  
+		$best_dist=$trial_dist;
 		@parent_fold = split(//,$fold);
-		$parent_fold_string = $fold; 
+		$parent_fold_string = $fold;
 
 
-		&countGC();	 
+		&countGC();
 		&printer(" 8S|8W Repeats: $pattern_repeats	  5G|5C|5A|5U Repeats: $poly_repeats   Restriction: $restriction_sites  Complement: $complement_zones  Duplication: $duplication_zones\n");
 		&printer("Mutation Map:\n$mut_map_text\n");
 		&printer("$best_sol_seq\n");
@@ -1460,7 +1460,7 @@ do{
 		$happy = 1;
 	} elsif($GC_cont>$max_GC){&printer( "GC content still too high \n");
 	}
-	
+
 	if ($keep_sequence==1){
 		my $unmasked_pattern = 0;
 		my $masked_pattern =0;
@@ -1473,8 +1473,8 @@ do{
 			$happy=1;
 		}
 	}
-	
-	
+
+
 }while ($happy==0);	#Cycle through sequence design again until the target is within the threshold distance from the fold.
 
 &printer("\nTarget conditions met.\n");
@@ -1492,9 +1492,9 @@ $report_KL=1;
 $happy=0;
 
 	do{
-  
+
 	my $keep_sequence=0;
-	$attempts += 1; 
+	$attempts += 1;
 
 	&printer("($attempts)");
 
@@ -1511,7 +1511,7 @@ $happy=0;
 			$rand_num_one = rand(100);
 			$bp_direction= int(rand(2));
 			$bp_type=(rand(100));
-			if($rand_num_one<100*(1/(4*$KL_repeats))){  
+			if($rand_num_one<100*(1/(4*$KL_repeats))){
 				&printer("!");
 				if ($bp_type<$KL_GC) {
 					if ($bp_direction==0) {
@@ -1521,7 +1521,7 @@ $happy=0;
 					else {
 						$trial_sol[$i] = "C";
 						$trial_sol[$map[$i]] = "G";
-					} 
+					}
 				}
 				else {
 					if ($bp_direction==0) {
@@ -1531,7 +1531,7 @@ $happy=0;
 					else {
 						$trial_sol[$i] = "U";
 						$trial_sol[$map[$i]] = "A";
-					} 
+					}
 				}
 			}
 		}
@@ -1555,7 +1555,7 @@ $happy=0;
 
 	$report_KL=1;
 	&pattern_prevent;
-	&countrepeats;  #search for repeated sequences	
+	&countrepeats;  #search for repeated sequences
 
 
 	if ($distance == 0 && ($KL_repeats<=$old_KL_repeats) && $GC_cont<$max_GC && $pattern_repeats==0 && $poly_repeats==0  && $restriction_sites==0 && $complement_zones==0 && $duplication_zones==0) {$keep_sequence=1;}    ##ADD PATTERN PREVENT CHECKING HERE.
@@ -1573,15 +1573,15 @@ $happy=0;
 		$best_sol_seq = join "",@best_sol;
 
 		$parent_dist=$trial_dist;			  #copy the trial distance to be the new parent_dist
-		$best_dist=$trial_dist;  
+		$best_dist=$trial_dist;
 		@parent_fold = split(//,$fold);
-		$parent_fold_string = $fold; 
+		$parent_fold_string = $fold;
 
 		&printer("\nIteration# $attempts\n");  #Report outputs
-		&countGC();	 
+		&countGC();
 		&printer("KL Repeats: $KL_repeats\n");
 		&printer("$best_sol_seq\n\n");
-		
+
 	} else {
 		&printer(" X \n");
 		for ( $i=0; $i<$strand_length; $i++){
@@ -1590,7 +1590,7 @@ $happy=0;
 	}
 
 	if ($distance==0 && $KL_repeats==0) {$happy = 1;}
-	
+
 }while ($happy==0);	#Cycle through sequence design again until the target is within the threshold distance from the fold.
 
 &printer("\nInitial design of $name is complete!\n\n");
@@ -1610,7 +1610,7 @@ $happy=0;
 
 do{
 
-	$attempts += 1; 
+	$attempts += 1;
 
 	&printer("\n(Iteration $attempts)");
 
@@ -1637,7 +1637,7 @@ do{
 					}else {
 						$trial_sol[$i] = "C";
 						$trial_sol[$map[$i]] = "G";
-					} 
+					}
 				}else {
 					if ($bp_direction==0) {
 						$trial_sol[$i] = "A";
@@ -1645,7 +1645,7 @@ do{
 					}else {
 						$trial_sol[$i] = "U";
 						$trial_sol[$map[$i]] = "A";
-					} 
+					}
 				}
 			}
 		}
@@ -1656,7 +1656,7 @@ do{
 
 	$report_KL=0;
 	&pattern_prevent;  ##search for KL
-	&countrepeats;  #search for repeated sequences	
+	&countrepeats;  #search for repeated sequences
 
 	my $new_fold = " ";
 	my $trial_dist = 1;
@@ -1704,9 +1704,9 @@ do{
 	}else{$kl_analyzed =0;}
 
 	if ($KL_score<=$best_KL_score && $trial_dist == 0 && $KL_repeats==0 && $previously_tried==0 && $poly_repeats==0  && $restriction_sites==0 && $pattern_repeats ==0 && $complement_zones==0 && $duplication_zones==0){  #Check if the design performs better or not
-	
-		$best_KL_score=$KL_score;	
-			 
+
+		$best_KL_score=$KL_score;
+
 		for ( $i=0; $i<$strand_length; $i++){
 			$parent_KL_opt_target[$i] = $KL_opt_target[$i];
 			if (($best_sol[$i]) eq ($trial_sol[$i])) {
@@ -1719,33 +1719,33 @@ do{
 		$mut_map_text = join "",@mut_map;
 		$best_sol_seq = join "",@best_sol;
 		$parent_dist=$trial_dist;			  #copy the trial distance to be the new parent_dist
-		$best_dist=$trial_dist;  
+		$best_dist=$trial_dist;
 		@parent_fold = split(//,$fold);
-		$parent_fold_string = $fold; 
+		$parent_fold_string = $fold;
 		&printer("\nIteration# $attempts\n");  #Report outputs
-		&countGC();	 
+		&countGC();
 		&printer("KL Repeats: $KL_repeats\n");
 		&printer("KL Score: $KL_score\n");
 		$KL_opt_target_text = join "",@parent_KL_opt_target;
-		&printer("\nKL Target Mask:\n$KL_opt_target_text\n\n"); 
+		&printer("\nKL Target Mask:\n$KL_opt_target_text\n\n");
 		&printer("$best_sol_seq\n\n");
 		&printer("$mut_map_text\n\n");
-		
+
 		if ($generate_previews==1){&preview;}
-		
+
 	} else {
-	
+
 		&printer("\nRound $attempts Failed:   ");
 		##print error summary here:
 		if($KL_repeats>0){&printer("   $KL_repeats KL repeats were found\n");}
-		if($previously_tried>0){&printer( "   The Sequence was previously tested\n");}	
+		if($previously_tried>0){&printer( "   The Sequence was previously tested\n");}
 		if($KL_score>$best_KL_score && $kl_analyzed==1){&printer("   The KL score $KL_score is greater than the best score $best_KL_score\n")}
 		if($pattern_prevent_failure==1){&printer("   Pattern Prevent Failed.\n");}
-		
+
 		for($i=0; $i<$strand_length; $i++){
 			$KL_opt_target[$i] = $parent_KL_opt_target[$i];
 			$trial_sol[$i]=$best_sol[$i];   #reset the trial solution
-		}			
+		}
 	}
 	if ($distance==0 && $KL_score==0) {$happy = 1;}
 }while ($happy==0);	#Cycle through sequence design again until the target is within the threshold distance from the fold.
@@ -1760,7 +1760,7 @@ do{
 &printer("\nOptimization of design $name is complete!\n\n");
 
 &printer("\n\n\nIteration# $attempts\n");	#Report outputs
-&countGC();	  
+&countGC();
 &printer("KL Repeats: $KL_repeats\n");
 &printer("KL Score: $KL_score\n");
 &printer("$best_sol_seq\n\n");
@@ -1787,70 +1787,70 @@ sub countGC {#Count GCs
    $pairs=0;
    $GC_pairs=0;
    $AU_pairs=0;
-   $GU_pairs=0; 
+   $GU_pairs=0;
    $KL_pairs=0;
    $KL_GC_pairs=0;
-   
+
    for ( $i=0; $i<$strand_length; $i++){
 	 if ($target[$i]eq"("){
 		$pairs += 1;
 		if ((($best_sol[$i]eq"C") && ($best_sol[$map[$i]]eq"G")) || (($best_sol[$i]eq"G") && ($best_sol[$map[$i]]eq"C"))) {
-		  $GC_pairs+=1; 
+		  $GC_pairs+=1;
 		}
 		if ((($best_sol[$i]eq"A") && ($best_sol[$map[$i]]eq"U")) || (($best_sol[$i]eq"U") && ($best_sol[$map[$i]]eq"A"))) {
-		  $AU_pairs+=1; 
+		  $AU_pairs+=1;
 		}
 		if ((($best_sol[$i]eq"U") && ($best_sol[$map[$i]]eq"G")) || (($best_sol[$i]eq"G") && ($best_sol[$map[$i]]eq"U"))) {
-		  $GU_pairs+=1; 
+		  $GU_pairs+=1;
 		}
 	 }
 	 elsif ($init_target[$i]eq"["){	 ##only count KLs, not '{' hinted bps.
 		$KL_pairs += 1;
 		if ((($best_sol[$i]eq"C") && ($best_sol[$map[$i]]eq"G")) || (($best_sol[$i]eq"G") && ($best_sol[$map[$i]]eq"C"))) {
-		  $KL_GC_pairs+=1; 
+		  $KL_GC_pairs+=1;
 		}
-	 }	   
-   } 
-   
+	 }
+   }
+
    if ($pairs>0){$GC_cont=int(1000*($GC_pairs)/($pairs))/10;}else{$GC_cont=-1;}
    if($KL_pairs>0){$KL_GC_cont= int(1000*$KL_GC_pairs/$KL_pairs)/10;} else {$KL_GC_cont=0;}
-   
+
    &printer("\n GC Content: $GC_cont	TotalPairs: $pairs\n GC pairs: $GC_pairs	 AU pairs: $AU_pairs	 GU pairs: $GU_pairs	KL: $KL_GC_cont %GC\n");
 }
 
 sub countrepeats {
 	for ($i=0; $i<$strand_length; $i++){$repeat_map[$i]="-";}  ##zero the map
-	
+
     my $trial_sol_seq = join "",@trial_sol;
     my $pattern_sense = "AAAAAAA";
     my $pattern_antisense = "UUUUUUU";
-    
+
 
 
 	for ( $i=0; $i<($strand_length-$complement_window); $i++){		#search for antisense matches
-		
+
 		$pattern_sense = substr($trial_sol_seq, $i, $complement_window);  #grab the substring pattern here
 		$pattern_antisense = "";  #reset the pattern here
 		for (my $j=0; $j<$complement_window+1; $j++){ #generate the complement sequence
 			if (substr($pattern_sense,$complement_window-$j,1) eq "A" ){$pattern_antisense=$pattern_antisense."U";}
 			if (substr($pattern_sense,$complement_window-$j,1) eq "U" ){$pattern_antisense=$pattern_antisense."A";}
 			if (substr($pattern_sense,$complement_window-$j,1) eq "C" ){$pattern_antisense=$pattern_antisense."G";}
-			if (substr($pattern_sense,$complement_window-$j,1) eq "G" ){$pattern_antisense=$pattern_antisense."C";}									
+			if (substr($pattern_sense,$complement_window-$j,1) eq "G" ){$pattern_antisense=$pattern_antisense."C";}
 		}
 		##  print "$pattern_sense - $pattern_antisense\n";   #for bugchecking
-		
+
 		my $test_result = index($trial_sol_seq, $pattern_antisense, 0);
-		
+
 		for (my $j=$i; $j<$strand_length-$complement_window; $j++){
 			$test_result = index($trial_sol_seq, $pattern_antisense, $j);   #search for antisense matches
 			if ($test_result != -1){
 				for (my $k=0; $k<$complement_window; $k++){
 					$repeat_map[$i+$k]="P";
-					$repeat_map[$test_result+$k]="P"; 
+					$repeat_map[$test_result+$k]="P";
 				}
 			}
 		}
-			
+
 	}
 
 	$complement_zones=0;
@@ -1858,13 +1858,13 @@ sub countrepeats {
 		if ($repeat_map[$i]eq"P" || $repeat_map[$i]eq"p"){$complement_zones+=1;}
 	}
 
-		
+
 	for ( $i=0; $i<($strand_length-$duplicate_window); $i++){		#search for sense duplications
-		
+
 		$pattern_sense = substr($trial_sol_seq, $i, $duplicate_window);  #grab the substring pattern here
 		my $test_result = index($trial_sol_seq, $pattern_sense, 0);
-		
-		for (my $j=$i; $j<$strand_length-$duplicate_window; $j++){		
+
+		for (my $j=$i; $j<$strand_length-$duplicate_window; $j++){
 			$test_result = index($trial_sol_seq, $pattern_sense, $j);    	#search for sense duplications
 			if ($test_result != -1 && $test_result > $j ){
 				for (my $k=0; $k<$duplicate_window; $k++){ ##bugfix try $k=1 rather than 0..
@@ -1873,15 +1873,15 @@ sub countrepeats {
 				}
 			}
 		}
-			
+
 	}
-	
+
 	$duplication_zones=0;
 	for ($i=0; $i<$strand_length; $i++){
 		if ($repeat_map[$i]eq"D"){$duplication_zones+=1;}
 	}
 
-	
+
 	$pattern_repeats=0;
 	for ( $i=0; $i<$strand_length-7; $i++){	   #count up stretches of A/U or G/C that are 8nts
 		if ( ($trial_sol[$i]eq"A" || $trial_sol[$i]eq"U") &&
@@ -1895,8 +1895,8 @@ sub countrepeats {
 			$pattern_repeats+=1;
 			$repeat_map[$i]="W"; $repeat_map[$i+1]="W";
 			$repeat_map[$i+2]="W"; $repeat_map[$i+3]="W";
-			$repeat_map[$i+4]="W"; $repeat_map[$i+5]="W";	   
-			$repeat_map[$i+6]="W"; $repeat_map[$i+7]="W";			  
+			$repeat_map[$i+4]="W"; $repeat_map[$i+5]="W";
+			$repeat_map[$i+6]="W"; $repeat_map[$i+7]="W";
 		}
 		if ( ($trial_sol[$i]eq"C" || $trial_sol[$i]eq"G") &&
 		 ($trial_sol[$i+1]eq"C" || $trial_sol[$i+1]eq"G") &&
@@ -1906,20 +1906,20 @@ sub countrepeats {
 		 ($trial_sol[$i+5]eq"C" || $trial_sol[$i+5]eq"G") &&
 		 ($trial_sol[$i+6]eq"C" || $trial_sol[$i+6]eq"G") &&
 		 ($trial_sol[$i+7]eq"C" || $trial_sol[$i+7]eq"G") ) {  #all stretch of GC_rich are targeted
-		 	if ($constraint[$i]eq"S" && $constraint[$i+1]eq"S" && $constraint[$i+2]eq"S" && $constraint[$i+3]eq"S" &&  
+		 	if ($constraint[$i]eq"S" && $constraint[$i+1]eq"S" && $constraint[$i+2]eq"S" && $constraint[$i+3]eq"S" &&
 		 		$constraint[$i+4]eq"S" && $constraint[$i+5]eq"S" && $constraint[$i+6]eq"S" && $constraint[$i+7]eq"S" ){  #only allow 8S in a row in the rare case that they have been user-specified
 				&printer ("\nLocked contraint of 8S found at position $i\n");
 			}else {$pattern_repeats+=1;}
 			$repeat_map[$i]="S"; $repeat_map[$i+1]="S";
 			$repeat_map[$i+2]="S"; $repeat_map[$i+3]="S";
-			$repeat_map[$i+4]="S"; $repeat_map[$i+5]="S";	   
-			$repeat_map[$i+6]="S"; $repeat_map[$i+7]="S";			  
-		} 
+			$repeat_map[$i+4]="S"; $repeat_map[$i+5]="S";
+			$repeat_map[$i+6]="S"; $repeat_map[$i+7]="S";
+		}
 	}
 
 	$poly_repeats=0;
-	
-		for ( $i=0; $i<$strand_length-6; $i++){	   
+
+		for ( $i=0; $i<$strand_length-6; $i++){
 		if ( ($trial_sol[$i]eq$trial_sol[$i+1]) &&
 			 ($trial_sol[$i]eq$trial_sol[$i+2]) &&
 			 ($trial_sol[$i]eq$trial_sol[$i+3]) &&
@@ -1927,14 +1927,14 @@ sub countrepeats {
 			$poly_repeats+=1;
 			$repeat_map[$i]=$trial_sol[$i]; $repeat_map[$i+1]=$trial_sol[$i+1];
 			$repeat_map[$i+2]=$trial_sol[$i+2]; $repeat_map[$i+3]=$trial_sol[$i+3];
-			$repeat_map[$i+4]=$trial_sol[$i+4];				
+			$repeat_map[$i+4]=$trial_sol[$i+4];
 		}
 	}
 
 
 	$restriction_sites =0;
-		
-	for ( $i=0; $i<$strand_length-6; $i++){	   
+
+	for ( $i=0; $i<$strand_length-6; $i++){
 		if 	(	( ($trial_sol[$i]eq"G") && ($trial_sol[$i+1]eq"G") && ($trial_sol[$i+2]eq"U") && ($trial_sol[$i+3]eq"C") && ($trial_sol[$i+4]eq"U") && ($trial_sol[$i+5]eq"C") ) ||    ## Bsa1 GGUCUC
 				( ($trial_sol[$i]eq"G") && ($trial_sol[$i+1]eq"A") && ($trial_sol[$i+2]eq"G") && ($trial_sol[$i+3]eq"A") && ($trial_sol[$i+4]eq"C") && ($trial_sol[$i+5]eq"C") ) ||    ## Bsa1 GAGACC
 				( ($trial_sol[$i]eq"G") && ($trial_sol[$i+1]eq"A") && ($trial_sol[$i+2]eq"A") && ($trial_sol[$i+3]eq"G") && ($trial_sol[$i+4]eq"A") && ($trial_sol[$i+5]eq"C") ) ||    ## BBs1 GAAGAC
@@ -1948,7 +1948,7 @@ sub countrepeats {
 			$restriction_sites+=1;
 			$repeat_map[$i]="X"; $repeat_map[$i+1]="X";
 			$repeat_map[$i+2]="X"; $repeat_map[$i+3]="X";
-			$repeat_map[$i+4]="X"; $repeat_map[$i+5]="X";	   		  
+			$repeat_map[$i+4]="X"; $repeat_map[$i+5]="X";
 		}
 	}
 }
@@ -1959,7 +1959,7 @@ sub pattern_prevent {
 $KL_repeats=0;
 for ( $i=0; $i<$strand_length; $i++){
    $pattern_zones[$i] = "-";  ##clear out the pattern array
-}	
+}
 
 for ( $i=0; $i<$strand_length-10; $i++){	#seek any repeated KL sequence and mark them.
 	for (my $j=($i+1); $j<$strand_length-9; $j++){
@@ -1988,7 +1988,7 @@ for ( $i=0; $i<$strand_length-10; $i++){	#seek any repeated KL sequence and mark
 		($targetnopk[$i+6]eq".") &&
 		($targetnopk[$i+7]eq".") &&
                ($constraint[$j+4]eq"N")){
-			$pattern_zones[$i]=$trial_sol[$i];	 $pattern_zones[$j]=$trial_sol[$i];	 
+			$pattern_zones[$i]=$trial_sol[$i];	 $pattern_zones[$j]=$trial_sol[$i];
 			$pattern_zones[$i+1]=$trial_sol[$i+1]; $pattern_zones[$j+1]=$trial_sol[$i+1];
 			$pattern_zones[$i+2]=$trial_sol[$i+2]; $pattern_zones[$j+2]=$trial_sol[$i+2];
 			$pattern_zones[$i+3]=$trial_sol[$i+3]; $pattern_zones[$j+3]=$trial_sol[$i+3];
@@ -2034,28 +2034,28 @@ for ( $i=0; $i<$strand_length-10; $i++){	#seek any repeated KL sequence and mark
 			$KL_repeats += 1;
 		}
 	}
-}  
+}
 
 my $pattern_zones_text = join "",@pattern_zones;
 if ($report_KL==1){&printer("\n$KL_repeats repeated KL sequences:\n$pattern_zones_text\n\n");}
 else {&printer("\n$KL_repeats KL repeats found.\n\n");}
-  
+
 }
 
 sub duplex { #outputs to $distance
 	my $duplex_num_counter=0;
 	my $dont_fold = 0;
-	
+
 	foreach my $duplex_name (@duplex_catalog){
 		if(("$_[0].$_[1]" eq $duplex_name) ||
 		   ("$_[1].$_[0]" eq $duplex_name) ){
 			$KLenergy=$duplex_out_catalog[$duplex_num_counter];
 			$parens=$duplex_parens_catalog[$duplex_num_counter];
 			$dont_fold=1;
-		}		
+		}
 		$duplex_num_counter ++;
 	}
-	
+
 	if($dont_fold==0){
 		# open(my $duin, '>', 'KLtest.txt');
 		# 	print $duin "$_[0]\n";
@@ -2077,17 +2077,17 @@ sub duplex { #outputs to $distance
 		# 	if($counter == 5){ $KLenergy = "$KLenergy$_"; }
 		# 	$counter ++;
 		# }
-   
+
 		# my $KLenergy_clean = $KLenergy =~ qr/(-||' ')(\d+).(\d+)/; ##parse out the number from the (-X.XX) in parenthesis
-		# $KLenergy=$&;  ##store the regex part back into the variable	
-		
+		# $KLenergy=$&;  ##store the regex part back into the variable
+
 		$duplex_catalog[$unique_duplex_id]="$_[0].$_[1]";
 		$duplex_out_catalog[$unique_duplex_id]=$KLenergy;
 		$duplex_parens_catalog[$unique_duplex_id]=$parens;
-		
-		$unique_duplex_id ++;		
+
+		$unique_duplex_id ++;
 	}
-	
+
 }
 
 sub analyzeKL {
@@ -2095,9 +2095,9 @@ sub analyzeKL {
 	my $threshold = $KL_min_delta_G;
 
 	####reset the global variables
-	$numKL=0; 
-	$numKL_sites=0;	
-	$KL_notcounted =0; 
+	$numKL=0;
+	$numKL_sites=0;
+	$KL_notcounted =0;
 	$KL_score=0;
 	@Alist = ();  #array of KLA
 	@Blist = ();  #array of KLB
@@ -2118,68 +2118,68 @@ sub analyzeKL {
 			$target[$i+4]eq("]") &&
 			$target[$i+5]eq("]") &&
 			$target[$i+6]eq("]") &&
-			$target[$i+7]eq(".")){  
-		
+			$target[$i+7]eq(".")){
+
 			my $BKLflag=0;
 			if($target[$i]eq(")")){
 				$BKLflag=1;
-				$KL_B="$trial_sol[$i+1]$trial_sol[$i+2]$trial_sol[$i+3]$trial_sol[$i+4]$trial_sol[$i+5]$trial_sol[$i+6]$trial_sol[$i+7]";	
+				$KL_B="$trial_sol[$i+1]$trial_sol[$i+2]$trial_sol[$i+3]$trial_sol[$i+4]$trial_sol[$i+5]$trial_sol[$i+6]$trial_sol[$i+7]";
 			} else {
-				$KL_B="$trial_sol[$i]$trial_sol[$i+1]$trial_sol[$i+2]$trial_sol[$i+3]$trial_sol[$i+4]$trial_sol[$i+5]$trial_sol[$i+6]$trial_sol[$i+7]";				
-			}	 
-		
-			if($target[$map[$i+1]-1]eq("(")){
-			$BKLflag=2;
-			$KL_A="$trial_sol[$map[$i+6]-1]$trial_sol[$map[$i+6]]$trial_sol[$map[$i+5]]$trial_sol[$map[$i+4]]$trial_sol[$map[$i+3]]$trial_sol[$map[$i+2]]$trial_sol[$map[$i+1]]";			  
-			} else {
-			$KL_A="$trial_sol[$map[$i+6]-1]$trial_sol[$map[$i+6]]$trial_sol[$map[$i+5]]$trial_sol[$map[$i+4]]$trial_sol[$map[$i+3]]$trial_sol[$map[$i+2]]$trial_sol[$map[$i+1]]$trial_sol[$map[$i+1]+1]";			  
+				$KL_B="$trial_sol[$i]$trial_sol[$i+1]$trial_sol[$i+2]$trial_sol[$i+3]$trial_sol[$i+4]$trial_sol[$i+5]$trial_sol[$i+6]$trial_sol[$i+7]";
 			}
 
-			
-			
+			if($target[$map[$i+1]-1]eq("(")){
+			$BKLflag=2;
+			$KL_A="$trial_sol[$map[$i+6]-1]$trial_sol[$map[$i+6]]$trial_sol[$map[$i+5]]$trial_sol[$map[$i+4]]$trial_sol[$map[$i+3]]$trial_sol[$map[$i+2]]$trial_sol[$map[$i+1]]";
+			} else {
+			$KL_A="$trial_sol[$map[$i+6]-1]$trial_sol[$map[$i+6]]$trial_sol[$map[$i+5]]$trial_sol[$map[$i+4]]$trial_sol[$map[$i+3]]$trial_sol[$map[$i+2]]$trial_sol[$map[$i+1]]$trial_sol[$map[$i+1]+1]";
+			}
+
+
+
 			$numKL++;
 			if($numKL<10){&printer(" ");}#add a space to make it look nice
 			if($report_KL==1 && $BKLflag==0){&printer("$numKL,180 KL,");}
 			if($report_KL==1 && $BKLflag==1){&printer("$numKL,KL-BKL,");}
 			if($report_KL==1 && $BKLflag==2){&printer("$numKL,BKL-KL,");}
 
-			
+
 			&duplex($KL_A, $KL_B);
 			if($report_KL==1){&printer("$KL_A,$KL_B,$parens,$KLenergy");}
-		
+
 			$Alist[$numKL]=$KL_A;
 			$Blist[$numKL]=$KL_B;
 			$NTlist[$numKL]=$i;
-			$Elist[$numKL]=$KLenergy;	
-			
+			$Elist[$numKL]=$KLenergy;
+
 			if ($constraint[$i+1]eq"N" && $constraint[$i+2]eq"N" && $constraint[$i+3]eq"N" &&   #ignore KL calculation for KLs with ANY constraints in them
 			$constraint[$i+4]eq"N" && $constraint[$i+5]eq"N" && $constraint[$i+6]eq"N"){
 			$KL_specified[$numKL]="N";}else{$KL_specified[$numKL]="Y"; $KL_notcounted++; if($report_KL==1){&printer(" (ignored)");}}
-			
-			if($report_KL==1){&printer("\n");}	
-			
-			$KL_type[$numKL]="A"; 
-				
+
+			if($report_KL==1){&printer("\n");}
+
+			$KL_type[$numKL]="A";
+
 			if((($KLenergy> $MinKL) || ($KLenergy< $MaxKL)) && $KL_specified[$numKL]eq"N"){    ##Scoring function for 180KLs
-			   $KL_score+=2; 
+			   $KL_score+=2;
 			   $numKL_sites += 6;
 			   $KL_opt_target[$i+1]+=1; $KL_opt_target[$i+2]+=1;
 			   $KL_opt_target[$i+3]+=1; $KL_opt_target[$i+4]+=1;
 			   $KL_opt_target[$i+5]+=1; $KL_opt_target[$i+6]+=1;
-			} 
-				
+			}
+
 		}
-		elsif ($target[$i]eq("[") &&           
-			$target[$i+1]eq("[") &&            
+		elsif ($target[$i]eq("[") &&
+			$target[$i+1]eq("[") &&
 			$target[$i+2]eq("[") &&
 			$target[$i+3]eq("[") &&
 			$target[$i+4]eq("[") &&
 			$target[$i+5]eq("[") &&
 			$target[$i+6]eq("[")  ){
-		
-			$KL_A="$trial_sol[$i]$trial_sol[$i+1]$trial_sol[$i+2]$trial_sol[$i+3]$trial_sol[$i+4]$trial_sol[$i+5]$trial_sol[$i+6]";		 
-		
-			$KL_B="$trial_sol[$map[$i+6]]$trial_sol[$map[$i+5]]$trial_sol[$map[$i+4]]$trial_sol[$map[$i+3]]$trial_sol[$map[$i+2]]$trial_sol[$map[$i+1]]$trial_sol[$map[$i]]";			  
+
+			$KL_A="$trial_sol[$i]$trial_sol[$i+1]$trial_sol[$i+2]$trial_sol[$i+3]$trial_sol[$i+4]$trial_sol[$i+5]$trial_sol[$i+6]";
+
+			$KL_B="$trial_sol[$map[$i+6]]$trial_sol[$map[$i+5]]$trial_sol[$map[$i+4]]$trial_sol[$map[$i+3]]$trial_sol[$map[$i+2]]$trial_sol[$map[$i+1]]$trial_sol[$map[$i]]";
 			$numKL++;
 
 
@@ -2193,25 +2193,25 @@ sub analyzeKL {
 			$constraint[$i+4]eq"N" && $constraint[$i+5]eq"N" && $constraint[$i+6]eq"N"){
 			$KL_specified[$numKL]="N";}else{$KL_specified[$numKL]="Y"; $KL_notcounted++; if($report_KL==1){&printer(" (ignored)");}}
 
-			if($report_KL==1){&printer("\n");}			
-		
+			if($report_KL==1){&printer("\n");}
+
 			$Alist[$numKL]=$KL_A;
 			$Blist[$numKL]=$KL_B;
 			$NTlist[$numKL]=$i;
 			$Elist[$numKL]=$KLenergy;
-			$KL_type[$numKL]="B"; 	 
-			
-				
+			$KL_type[$numKL]="B";
+
+
 			if( (($KLenergy> $MinKL) || ($KLenergy< $MaxKL)) && $KL_specified[$numKL]eq"N"){  ##Scoring function for 120KLs
-				$KL_score+=2; 
+				$KL_score+=2;
 				$numKL_sites += 7;
 				$KL_opt_target[$i]+=1; $KL_opt_target[$i+1]+=1;
 				$KL_opt_target[$i+2]+=1; $KL_opt_target[$i+3]+=1;
 				$KL_opt_target[$i+4]+=1; $KL_opt_target[$i+5]+=1;
 				$KL_opt_target[$i+6]+=1;
-			} 		
+			}
 		}
-		
+
 	}
 	my $calculation = $KL_score/2;
 	&printer("\n\n$calculation KLs with energy lower than $MinKL kcal or greater than $MaxKL kcal were counted.\n\n");
@@ -2224,7 +2224,7 @@ sub analyzeKL {
 
 		for ($i=1; $i<($numKL); $i++){
 			for (my $j=($i+1); $j<($numKL+1); $j++){
-						
+
 				&duplex($Alist[$i], $Alist[$j]);
 				if( ($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G) ){
 					if($KL_specified[$i]eq"N" || $KL_specified[$j]eq"N"){$KL_score++;}
@@ -2233,30 +2233,30 @@ sub analyzeKL {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$i]+1]+=1; $KL_opt_target[$NTlist[$i]+2]+=1;
 						$KL_opt_target[$NTlist[$i]+3]+=1; $KL_opt_target[$NTlist[$i]+4]+=1;
-						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;		 
+						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;
 					}
 					elsif($KL_type[$i]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$i]]+=1; $KL_opt_target[$NTlist[$i]+1]+=1;
 						$KL_opt_target[$NTlist[$i]+2]+=1; $KL_opt_target[$NTlist[$i]+3]+=1;
-						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;	
-						$KL_opt_target[$NTlist[$i]+6]+=1;	 
+						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;
+						$KL_opt_target[$NTlist[$i]+6]+=1;
 					}
-				
+
 					if($KL_type[$j]eq"A") {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$j]+1]+=1; $KL_opt_target[$NTlist[$j]+2]+=1;
 						$KL_opt_target[$NTlist[$j]+3]+=1; $KL_opt_target[$NTlist[$j]+4]+=1;
-						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;		 
+						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;
 					}
 					elsif($KL_type[$j]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$j]]+=1; $KL_opt_target[$NTlist[$j]+1]+=1;
 						$KL_opt_target[$NTlist[$j]+2]+=1; $KL_opt_target[$NTlist[$j]+3]+=1;
-						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;	
-						$KL_opt_target[$NTlist[$j]+6]+=1;	 
-					}								
-				}			
+						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;
+						$KL_opt_target[$NTlist[$j]+6]+=1;
+					}
+				}
 				if(($full_KL_output==1 && $KLenergy<$threshold) || ($report_KL==1 && ($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G)) ){
 				   &printer("$i(A) + $j(A),$Alist[$i],$Alist[$j],$parens,$KLenergy\n");
 				   $non_cognates=$non_cognates."$i(A) + $j(A),$Alist[$i],$Alist[$j],$parens,$KLenergy\n";
@@ -2271,36 +2271,36 @@ sub analyzeKL {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$i]+1]+=1; $KL_opt_target[$NTlist[$i]+2]+=1;
 						$KL_opt_target[$NTlist[$i]+3]+=1; $KL_opt_target[$NTlist[$i]+4]+=1;
-						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;		 
+						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;
 					}
 					elsif($KL_type[$i]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$i]]+=1; $KL_opt_target[$NTlist[$i]+1]+=1;
 						$KL_opt_target[$NTlist[$i]+2]+=1; $KL_opt_target[$NTlist[$i]+3]+=1;
-						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;	
-						$KL_opt_target[$NTlist[$i]+6]+=1;	 
+						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;
+						$KL_opt_target[$NTlist[$i]+6]+=1;
 					}
-				
+
 					if($KL_type[$j]eq"A") {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$j]+1]+=1; $KL_opt_target[$NTlist[$j]+2]+=1;
 						$KL_opt_target[$NTlist[$j]+3]+=1; $KL_opt_target[$NTlist[$j]+4]+=1;
-						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;		 
+						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;
 					}
 					elsif($KL_type[$j]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$j]]+=1; $KL_opt_target[$NTlist[$j]+1]+=1;
 						$KL_opt_target[$NTlist[$j]+2]+=1; $KL_opt_target[$NTlist[$j]+3]+=1;
-						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;	
-						$KL_opt_target[$NTlist[$j]+6]+=1;	 
-					}								
-				}			
+						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;
+						$KL_opt_target[$NTlist[$j]+6]+=1;
+					}
+				}
 				if(($full_KL_output==1 && $KLenergy<$threshold) || ($report_KL==1 && ($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G)) ){
 				   &printer("$i(A) + $j(B),$Alist[$i],$Blist[$j],$parens,$KLenergy\n");
 				   $non_cognates=$non_cognates."$i(A) + $j(B),$Alist[$i],$Blist[$j],$parens,$KLenergy\n";
 				}
-	
-	
+
+
 				&duplex($Blist[$i], $Alist[$j]);
 				if(($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G ) ){
 					if($KL_specified[$i]eq"N" || $KL_specified[$j]eq"N"){$KL_score++;}
@@ -2309,35 +2309,35 @@ sub analyzeKL {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$i]+1]+=1; $KL_opt_target[$NTlist[$i]+2]+=1;
 						$KL_opt_target[$NTlist[$i]+3]+=1; $KL_opt_target[$NTlist[$i]+4]+=1;
-						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;		 
+						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;
 					}
 					elsif($KL_type[$i]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$i]]+=1; $KL_opt_target[$NTlist[$i]+1]+=1;
 						$KL_opt_target[$NTlist[$i]+2]+=1; $KL_opt_target[$NTlist[$i]+3]+=1;
-						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;	
-						$KL_opt_target[$NTlist[$i]+6]+=1;	 
+						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;
+						$KL_opt_target[$NTlist[$i]+6]+=1;
 					}
-				
+
 					if($KL_type[$j]eq"A") {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$j]+1]+=1; $KL_opt_target[$NTlist[$j]+2]+=1;
 						$KL_opt_target[$NTlist[$j]+3]+=1; $KL_opt_target[$NTlist[$j]+4]+=1;
-						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;		 
+						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;
 					}
 					elsif($KL_type[$j]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$j]]+=1; $KL_opt_target[$NTlist[$j]+1]+=1;
 						$KL_opt_target[$NTlist[$j]+2]+=1; $KL_opt_target[$NTlist[$j]+3]+=1;
-						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;	
-						$KL_opt_target[$NTlist[$j]+6]+=1;	 
-					}								
-				}			
+						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;
+						$KL_opt_target[$NTlist[$j]+6]+=1;
+					}
+				}
 				if(($full_KL_output==1 && $KLenergy<$threshold) || ($report_KL==1 && ($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G)) ){
 				   &printer("$i(B) + $j(A),$Blist[$i],$Alist[$j],$parens,$KLenergy\n");
 				   $non_cognates=$non_cognates."$i(B) + $j(A),$Blist[$i],$Alist[$j],$parens,$KLenergy\n";
 				}
-		
+
 				&duplex($Blist[$i], $Blist[$j]);
 				if(($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G)){
 					if($KL_specified[$i]eq"N" || $KL_specified[$j]eq"N"){$KL_score++;}
@@ -2346,30 +2346,30 @@ sub analyzeKL {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$i]+1]+=1; $KL_opt_target[$NTlist[$i]+2]+=1;
 						$KL_opt_target[$NTlist[$i]+3]+=1; $KL_opt_target[$NTlist[$i]+4]+=1;
-						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;		 
+						$KL_opt_target[$NTlist[$i]+5]+=1; $KL_opt_target[$NTlist[$i]+6]+=1;
 					}
 					elsif($KL_type[$i]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$i]]+=1; $KL_opt_target[$NTlist[$i]+1]+=1;
 						$KL_opt_target[$NTlist[$i]+2]+=1; $KL_opt_target[$NTlist[$i]+3]+=1;
-						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;	
-						$KL_opt_target[$NTlist[$i]+6]+=1;	 
+						$KL_opt_target[$NTlist[$i]+4]+=1; $KL_opt_target[$NTlist[$i]+5]+=1;
+						$KL_opt_target[$NTlist[$i]+6]+=1;
 					}
-				
+
 					if($KL_type[$j]eq"A") {
 						$numKL_sites += 6;
 						$KL_opt_target[$NTlist[$j]+1]+=1; $KL_opt_target[$NTlist[$j]+2]+=1;
 						$KL_opt_target[$NTlist[$j]+3]+=1; $KL_opt_target[$NTlist[$j]+4]+=1;
-						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;		 
+						$KL_opt_target[$NTlist[$j]+5]+=1; $KL_opt_target[$NTlist[$j]+6]+=1;
 					}
 					elsif($KL_type[$j]eq"B") {
 						$numKL_sites += 7;
 						$KL_opt_target[$NTlist[$j]]+=1; $KL_opt_target[$NTlist[$j]+1]+=1;
 						$KL_opt_target[$NTlist[$j]+2]+=1; $KL_opt_target[$NTlist[$j]+3]+=1;
-						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;	
-						$KL_opt_target[$NTlist[$j]+6]+=1;	 
-					}								
-				}			
+						$KL_opt_target[$NTlist[$j]+4]+=1; $KL_opt_target[$NTlist[$j]+5]+=1;
+						$KL_opt_target[$NTlist[$j]+6]+=1;
+					}
+				}
 				if(($full_KL_output==1 && $KLenergy<$threshold) || ($report_KL==1 && ($KLenergy<=$Elist[$i]) || ($KLenergy<=$Elist[$j]) || ($KLenergy<=$KL_min_delta_G)) ){
 				   &printer("$i(B) + $j(B),$Blist[$i],$Blist[$j],$parens,$KLenergy\n");
 					$non_cognates=$non_cognates."$i(B) + $j(B),$Blist[$i],$Blist[$j],$parens,$KLenergy\n";
@@ -2382,44 +2382,44 @@ sub analyzeKL {
 
 
 sub export {
-		
+
 		# my $ensemblediversity = qx(rnafold --noPS -p < seq.txt);
 		my $ensemblediversity = qx(python viennarna_funcs.py diversity "$full_seq");
 		chomp($ensemblediversity);
-	   
+
 		# my $ensemblediversity_clean = $ensemblediversity =~ qr/;\s*(.+)$/; ##parse out everything after the semicolon
-		# $ensemblediversity=$&;  ##store the regex part back into the variable	
-		
+		# $ensemblediversity=$&;  ##store the regex part back into the variable
+
 		if ($failed_initial_design == 1){
 			&printer(" WARNING: Misfolding within the locked-sequence required altering the target structure. \n");
-			&printer("          Sequence design failed for the inputted target structure.\n\n");  
+			&printer("          Sequence design failed for the inputted target structure.\n\n");
 		}
 
-		
+
 		&printer("Exporting design to $name\_design\n\n");
 		open(my $file_out, '>', "$output_file_path$name\_design.txt");
 		print $file_out "$name\n";
 		print $file_out "$targetstringpk\n";
 		print $file_out "$best_sol_seq\n\n";
-	
+
 		print $file_out " GC Content: $GC_cont	TotalPairs: $pairs\n GC pairs: $GC_pairs	 AU pairs: $AU_pairs	 GU pairs: $GU_pairs	KL: $KL_GC_cont %GC\n\n\n";
 
 		print $file_out "$ensemblediversity \n\n ";
-		
+
 		if ($failed_initial_design == 1){
 			print $file_out " WARNING: Misfolding within the locked-sequence required altering the target structure. \n";
-			print $file_out "          Sequence design failed for the inputted target structure.\n\n";  
-		}		
+			print $file_out "          Sequence design failed for the inputted target structure.\n\n";
+		}
 
 		print $file_out "Kissing Loop List:\n";
 		for (my $j=0; $j<($numKL); $j++){
-			$i=$j+1;	
+			$i=$j+1;
 			print $file_out "$i A,$Alist[$i],$i B,$Blist[$i],$Elist[$i]\n";
 		}
 		print $file_out "\n$non_cognates";
-	
+
 		print $file_out "\n\n\n";
-	
+
 		close $file_out;
 }
 
@@ -2438,7 +2438,7 @@ sub welcome { #prints welcome screen
 &printer("\n____    ____ _  _ ____ _    _  _ ____  \n");
 &printer("|__/ __ |___ |  | |  | |    |  | |__/ \n");
 &printer("|  \\    |___  \\/  |__| |___  \\/  |  \\  v1.93\n\n\n");
-                                                                                                                                            
+
 &printer("       0                                                                                               \n");
 &printer("      1111111                             1111  0                 1    0                            111\n");
 &printer("     11 010111                        11111000 0              11111 1111                      1    011\n");
@@ -2471,28 +2471,28 @@ sub welcome { #prints welcome screen
 
 sub victory { #print fireworks
 
-	&printer("                                 .''.                    \n");  
-	&printer("       .''.             *''*    :_\\/_:     .            \n"); 
-	&printer("      :_\\/_:   .    .:.*_\\/_*   : /\\ :  .'.:.'.       \n");   
-	&printer("  .''.: /\\ : _\\(/_  ':'* /\\ *  : '..'.  -=:o:=-       \n");  
-	&printer(" :_\\/_:'.:::. /)\\*''*  .|.* '.\\'/.'_\\(/_'.':'.'      \n");   
-	&printer(" : /\\ : :::::  '*_\\/_* | |  -= o =- /)\\    '  *       \n");    
-	&printer("  '..'  ':::'   * /\\ * |'|  .'/.\\'.  '._____           \n");  
-	&printer("      *        __*..* |  |     :      |.   |' .---'|     \n");    
-	&printer("       _*   .-'   '-. |  |     .--'|  ||   | _|    |     \n");   
-	&printer("    .-'|  _.|  |    ||   '-__  |   |  |    ||      |     \n");   
-	&printer("    |' | |.    |    ||       | |   |  |    ||      |     \n");   
+	&printer("                                 .''.                    \n");
+	&printer("       .''.             *''*    :_\\/_:     .            \n");
+	&printer("      :_\\/_:   .    .:.*_\\/_*   : /\\ :  .'.:.'.       \n");
+	&printer("  .''.: /\\ : _\\(/_  ':'* /\\ *  : '..'.  -=:o:=-       \n");
+	&printer(" :_\\/_:'.:::. /)\\*''*  .|.* '.\\'/.'_\\(/_'.':'.'      \n");
+	&printer(" : /\\ : :::::  '*_\\/_* | |  -= o =- /)\\    '  *       \n");
+	&printer("  '..'  ':::'   * /\\ * |'|  .'/.\\'.  '._____           \n");
+	&printer("      *        __*..* |  |     :      |.   |' .---'|     \n");
+	&printer("       _*   .-'   '-. |  |     .--'|  ||   | _|    |     \n");
+	&printer("    .-'|  _.|  |    ||   '-__  |   |  |    ||      |     \n");
+	&printer("    |' | |.    |    ||       | |   |  |    ||      |     \n");
 	&printer(" ___|  '-'     '    ''       '-'   '-.'    '`      |____ \n");
-	&printer("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n"); 
+	&printer("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n");
 	&printer("\n\n");
-	
+
 	my $elapsed_time = time-$start_time;
 	&printer("Total Design Time: $elapsed_time seconds\n\n");
 	$start_time = time;  #reset the elapsed timer
 
 	if ($failed_initial_design == 1){
 		&printer(" WARNING: Misfolding within the locked-sequence required altering the target structure. \n");
-		&printer("          Sequence design failed for the inputted target structure.\n\n");  
+		&printer("          Sequence design failed for the inputted target structure.\n\n");
 	}
 }
 

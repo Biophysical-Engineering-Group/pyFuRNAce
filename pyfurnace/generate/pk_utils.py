@@ -86,9 +86,10 @@ def parse_pseudoknots(
                     pk_en_tolerance = float(v)
 
             except Exception as e:
-                print(
+                warnings.warn(
                     f"Error in parsing pseudoknots with key "
-                    f"{k} and value {v}. Error: {e}"
+                    f"{k} and value {v}. Error: {e}",
+                    stacklevel=3,
                 )
 
         if not pk_id:

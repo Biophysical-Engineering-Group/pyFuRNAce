@@ -17,11 +17,11 @@ jobs:
       with:
         python-version: '3.10'
     - name: Install requirements
-      run: pip install -r requirements-ci.txt
-    - name: Set up testing environment
-      run: pip install ".[dev]"
+      run: |
+        pip install -r requirements-ci.txt
+        pip install pytest-cov
     - name: Run tests and collect coverage
-      run: pytest tests --cov --cov-branch --cov-report=xml
+      run: pytest tests --cov=pyfurnace --cov-branch --cov-report=xml
     - name: Upload coverage reports to Codecov with GitHub Action
       uses: codecov/codecov-action@v5
       env:

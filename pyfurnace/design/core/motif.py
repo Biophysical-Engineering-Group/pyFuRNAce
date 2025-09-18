@@ -513,6 +513,11 @@ class Motif(Callback):
     ) -> None:
         """
         Set the basepair dictionary and turn autopairing off.
+
+        Parameters
+        ----------
+        basepair_dict : dict or BasePair
+            A dictionary with positions as key and the paired position as values.
         """
 
         if not isinstance(basepair_dict, (dict, BasePair)):
@@ -660,10 +665,10 @@ class Motif(Callback):
         ValueError
             If the number of sequences is different from the number of strands.
         """
-        if (
+        if not isinstance(seq_list, Iterable) or (
             not isinstance(seq_list, (str, Sequence))
             and not isinstance(seq_list, (tuple, list))
-            and all(isinstance(s, (str, Sequence)) for s in seq_list)
+            and any(not isinstance(s, (str, Sequence)) for s in seq_list)
         ):
             raise ValueError(
                 f"{seq_list} must be a string, a Sequence object or "
@@ -1652,22 +1657,24 @@ class Motif(Callback):
         List[int]
             A list of shift integers for each motif along the axis.
 
-        Example
-        -------
-        m1:
-            --NN--
-              ::
-            --NN--
-        m2:
-            --SK--
-              ::
-            --SK--
-        Resulting shift: 2
-            [0, 2]
-        To have:
-            --NN----SK--
-              ::    ::
-            --NN----SK--
+        Examples
+        --------
+        .. code-block:: text
+
+            m1:
+                --NN--
+                  ::
+                --NN--
+            m2:
+                --SK--
+                  ::
+                --SK--
+            Resulting shift: 2
+                [0, 2]
+            To have:
+                --NN----SK--
+                  ::    ::
+                --NN----SK--
         """
         if isinstance(motifs, Motif):
             motifs = [motifs]
@@ -2898,12 +2905,15 @@ class Motif(Callback):
         Parameters
         ----------
         key : function, optional
-            The function to use to sort the strands.
-            If None, the strands are sorted by:
-                - the strands with 5' end
-                - the strand with the lowest y start position
-                - the strand with the lowest x start position.
+            The function to use to sort the strands. If ``None``, the strands are
+            sorted by:
+
+            - strands with a 5' end first
+            - lowest starting y position
+            - lowest starting x position
+
         reverse : bool, default False
+            If ``True``, sort in descending order.
 
         Returns
         -------

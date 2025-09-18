@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -90,7 +91,7 @@
 
 <span class="c1"># Shared functionality for all Aptamers</span>
 <div class="viewcode-block" id="Aptamer">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Aptamer">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Aptamer">[docs]</a>
 <span class="k">class</span> <span class="nc">Aptamer</span><span class="p">(</span><span class="n">Motif</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for all aptamers, inheriting from the Motif class.</span>
@@ -106,7 +107,7 @@
 
 <span class="c1"># Create the Aptamer class also inheriting from the selected base class</span>
 <div class="viewcode-block" id="create_aptamer">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.create_aptamer">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.create_aptamer">[docs]</a>
 <span class="k">def</span> <span class="nf">create_aptamer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">inherit_from</span><span class="p">:</span> <span class="nb">classmethod</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create an Aptamer object, optionally inheriting from a specified base class.</span>
@@ -142,7 +143,7 @@
 
 
 <div class="viewcode-block" id="Ispinach">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Ispinach">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Ispinach">[docs]</a>
 <span class="k">def</span> <span class="nf">Ispinach</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the ISpinach aptamer motif.</span>
@@ -161,7 +162,7 @@
 
 
 <div class="viewcode-block" id="Mango">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Mango">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Mango">[docs]</a>
 <span class="k">def</span> <span class="nf">Mango</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the Mango aptamer as a loop-based motif.</span>
@@ -180,7 +181,7 @@
 
 
 <div class="viewcode-block" id="MalachiteGreen">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreen">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.MalachiteGreen">[docs]</a>
 <span class="k">def</span> <span class="nf">MalachiteGreen</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the full Malachite Green aptamer motif.</span>
@@ -199,7 +200,7 @@
 
 
 <div class="viewcode-block" id="MalachiteGreenShort">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MalachiteGreenShort">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.MalachiteGreenShort">[docs]</a>
 <span class="k">def</span> <span class="nf">MalachiteGreenShort</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a truncated version of the Malachite Green aptamer.</span>
@@ -217,7 +218,7 @@
 
 
 <div class="viewcode-block" id="Broccoli">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Broccoli">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Broccoli">[docs]</a>
 <span class="k">def</span> <span class="nf">Broccoli</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the Broccoli aptamer motif.</span>
@@ -235,7 +236,7 @@
 
 
 <div class="viewcode-block" id="Pepper">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Pepper">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Pepper">[docs]</a>
 <span class="k">def</span> <span class="nf">Pepper</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the Pepper aptamer motif.</span>
@@ -258,7 +259,7 @@
 
 
 <div class="viewcode-block" id="Biotin">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Biotin">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Biotin">[docs]</a>
 <span class="k">def</span> <span class="nf">Biotin</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the biotin-binding aptamer motif.</span>
@@ -273,7 +274,7 @@
 
 
 <div class="viewcode-block" id="PIP3">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.PIP3">[docs]</a>
 <span class="k">def</span> <span class="nf">PIP3</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the PIP3-binding aptamer motif.</span>
@@ -290,7 +291,7 @@
 
 
 <div class="viewcode-block" id="PIP3_mut1">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut1">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.PIP3_mut1">[docs]</a>
 <span class="k">def</span> <span class="nf">PIP3_mut1</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns mutant 1 of the PIP3 aptamer.</span>
@@ -308,7 +309,7 @@
 
 
 <div class="viewcode-block" id="PIP3_mut3">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut3">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.PIP3_mut3">[docs]</a>
 <span class="k">def</span> <span class="nf">PIP3_mut3</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns mutant 3 of the PIP3 aptamer.</span>
@@ -326,7 +327,7 @@
 
 
 <div class="viewcode-block" id="PIP3_mut5">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PIP3_mut5">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.PIP3_mut5">[docs]</a>
 <span class="k">def</span> <span class="nf">PIP3_mut5</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns mutant 5 of the PIP3 aptamer.</span>
@@ -349,7 +350,7 @@
 
 
 <div class="viewcode-block" id="MS2">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.MS2">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.MS2">[docs]</a>
 <span class="k">def</span> <span class="nf">MS2</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the MS2 coat protein-binding aptamer.</span>
@@ -368,7 +369,7 @@
 
 
 <div class="viewcode-block" id="PP7">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.PP7">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.PP7">[docs]</a>
 <span class="k">def</span> <span class="nf">PP7</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the PP7 coat protein-binding aptamer.</span>
@@ -387,7 +388,7 @@
 
 
 <div class="viewcode-block" id="TAR_TAT">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.TAR_TAT">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.TAR_TAT">[docs]</a>
 <span class="k">def</span> <span class="nf">TAR_TAT</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the HIV TAR-TAT binding aptamer.</span>
@@ -410,7 +411,7 @@
 
 
 <div class="viewcode-block" id="L7Ae">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.L7Ae">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.L7Ae">[docs]</a>
 <span class="k">def</span> <span class="nf">L7Ae</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the L7Ae protein-binding aptamer.</span>
@@ -429,7 +430,7 @@
 
 
 <div class="viewcode-block" id="Streptavidin">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Streptavidin">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Streptavidin">[docs]</a>
 <span class="k">def</span> <span class="nf">Streptavidin</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the Streptavidin-binding aptamer.</span>
@@ -451,7 +452,7 @@
 
 
 <div class="viewcode-block" id="Thrombin_exosite1">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite1">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite1">[docs]</a>
 <span class="k">def</span> <span class="nf">Thrombin_exosite1</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the thrombin exosite 1-binding aptamer.</span>
@@ -475,7 +476,7 @@
 
 
 <div class="viewcode-block" id="Thrombin_exosite2">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite2">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.aptamers.Thrombin_exosite2">[docs]</a>
 <span class="k">def</span> <span class="nf">Thrombin_exosite2</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the thrombin exosite 2-binding aptamer.</span>

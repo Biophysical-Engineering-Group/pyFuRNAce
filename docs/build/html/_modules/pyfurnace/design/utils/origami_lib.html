@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -120,7 +121,7 @@
 
 
 <div class="viewcode-block" id="convert_angles_to_dt">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.convert_angles_to_dt">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.convert_angles_to_dt">[docs]</a>
 <span class="k">def</span> <span class="nf">convert_angles_to_dt</span><span class="p">(</span><span class="n">angles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a list of helix angles into corresponding dovetail values based</span>
@@ -147,7 +148,7 @@
 
 
 <div class="viewcode-block" id="simple_origami">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.simple_origami">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.simple_origami">[docs]</a>
 <span class="k">def</span> <span class="nf">simple_origami</span><span class="p">(</span>
     <span class="n">dt_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">kl_columns</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -337,7 +338,7 @@
 
 
 <div class="viewcode-block" id="ipython_display_3D">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_3D">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.ipython_display_3D">[docs]</a>
 <span class="k">def</span> <span class="nf">ipython_display_3D</span><span class="p">(</span><span class="n">origami</span><span class="p">:</span> <span class="n">Origami</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Display a 3D representation of an Origami structure within a J</span>
@@ -372,7 +373,7 @@
 
 
 <div class="viewcode-block" id="ipython_display_txt">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_display_txt">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.ipython_display_txt">[docs]</a>
 <span class="k">def</span> <span class="nf">ipython_display_txt</span><span class="p">(</span><span class="n">origami_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;500&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Render plain text (e.g., a textual representation of an origami object) as a</span>
@@ -404,7 +405,7 @@
 
 
 <div class="viewcode-block" id="ipython_clickable_txt">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.ipython_clickable_txt">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.ipython_clickable_txt">[docs]</a>
 <span class="k">def</span> <span class="nf">ipython_clickable_txt</span><span class="p">(</span>
     <span class="n">origami</span><span class="p">:</span> <span class="n">Origami</span><span class="p">,</span>
     <span class="n">max_height</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;500&quot;</span><span class="p">,</span>
@@ -555,7 +556,7 @@
 
 
 <div class="viewcode-block" id="template_2_helix">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_2_helix">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_2_helix">[docs]</a>
 <span class="k">def</span> <span class="nf">template_2_helix</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for a 2-helix structure.</span>
@@ -599,7 +600,7 @@
 
 
 <div class="viewcode-block" id="template_rna_filament">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_rna_filament">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_rna_filament">[docs]</a>
 <span class="k">def</span> <span class="nf">template_rna_filament</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for an RNA filament structure.</span>
@@ -641,7 +642,7 @@
 
 
 <div class="viewcode-block" id="template_rna_filament_ispinach">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_rna_filament_ispinach">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_rna_filament_ispinach">[docs]</a>
 <span class="k">def</span> <span class="nf">template_rna_filament_ispinach</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for an RNA filament structure.</span>
@@ -698,7 +699,7 @@
 
 
 <div class="viewcode-block" id="template_3_arms_droplet">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_3_arms_droplet">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_3_arms_droplet">[docs]</a>
 <span class="k">def</span> <span class="nf">template_3_arms_droplet</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for a 3-arms droplet structure.</span>
@@ -743,7 +744,7 @@
 
 
 <div class="viewcode-block" id="template_4_arms_droplet">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_4_arms_droplet">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_4_arms_droplet">[docs]</a>
 <span class="k">def</span> <span class="nf">template_4_arms_droplet</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for a 4-arms droplet structure.</span>
@@ -789,7 +790,7 @@
 
 
 <div class="viewcode-block" id="template_pentagon_tile">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_pentagon_tile">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_pentagon_tile">[docs]</a>
 <span class="k">def</span> <span class="nf">template_pentagon_tile</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for a pentagon tile structure.</span>
@@ -830,7 +831,7 @@
 
 
 <div class="viewcode-block" id="template_rectangle_10H_3X">
-<a class="viewcode-back" href="../../../../pyfurnace.design.utils.html#pyfurnace.design.utils.origami_lib.template_rectangle_10H_3X">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.utils.origami_lib.template_rectangle_10H_3X">[docs]</a>
 <span class="k">def</span> <span class="nf">template_rectangle_10H_3X</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the RNA origami template for a rectangle 10H-3X structure.</span>

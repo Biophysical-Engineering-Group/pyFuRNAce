@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RNA droplets" href="notebooks/droplets.html" />
-    <link rel="prev" title="Script API Reference" href="api.html" />
+    <link rel="prev" title="Limitations &amp; Workarounds" href="limitations.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -56,6 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basics-usage">Basics usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#two-helices-with-flaps-and-optimization">Two helices with FLAPs (and optimization)</a></li>
@@ -116,48 +117,50 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">pyfurnace.generate</span> <span class="kn">import</span> <span class="n">generate_road</span>
 <span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="n">line1</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
-<span class="linenos"> 5</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-<span class="linenos"> 6</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos"> 7</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
-<span class="linenos"> 8</span>         <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
-<span class="linenos"> 9</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
-<span class="linenos">10</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos">11</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
-<span class="linenos">12</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Broccoli</span><span class="p">(),</span>
-<span class="linenos">13</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
-<span class="linenos">14</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-<span class="linenos">15</span>         <span class="p">]</span>
-<span class="linenos">16</span>
-<span class="linenos">17</span><span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
-<span class="linenos">18</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-<span class="linenos">19</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos">20</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
-<span class="linenos">21</span>         <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
-<span class="linenos">22</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
-<span class="linenos">23</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="linenos">24</span>         <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-<span class="linenos">25</span>         <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-<span class="linenos">26</span>         <span class="p">]</span>
-<span class="linenos">27</span>
-<span class="linenos">28</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="linenos"> 4</span><span class="n">line1</span> <span class="o">=</span> <span class="p">[</span>
+<span class="linenos"> 5</span>    <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+<span class="linenos"> 6</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos"> 7</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos"> 8</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+<span class="linenos"> 9</span>    <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">(),</span>
+<span class="linenos">10</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+<span class="linenos">11</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">up_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">12</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+<span class="linenos">13</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Broccoli</span><span class="p">(),</span>
+<span class="linenos">14</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+<span class="linenos">15</span>    <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+<span class="linenos">16</span><span class="p">]</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span><span class="n">line2</span> <span class="o">=</span> <span class="p">[</span>
+<span class="linenos">19</span>    <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(),</span>
+<span class="linenos">20</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos">21</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">22</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="linenos">23</span>    <span class="n">pf</span><span class="o">.</span><span class="n">start_end_stem</span><span class="p">(),</span>
+<span class="linenos">24</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="linenos">25</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Dovetail</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">down_cross</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+<span class="linenos">26</span>    <span class="n">pf</span><span class="o">.</span><span class="n">Stem</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+<span class="linenos">27</span>    <span class="n">pf</span><span class="o">.</span><span class="n">TetraLoop</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
+<span class="linenos">28</span><span class="p">]</span>
 <span class="linenos">29</span>
-<span class="linenos">30</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
-<span class="linenos">31</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
-<span class="linenos">32</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
-<span class="linenos">33</span>
-<span class="linenos">34</span><span class="c1">### Optimization</span>
-<span class="linenos">35</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">sequence</span>
-<span class="linenos">36</span><span class="n">constraints</span> <span class="o">=</span> <span class="s1">&#39;GGGA&#39;</span> <span class="o">+</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
-<span class="linenos">37</span>
-<span class="linenos">38</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">generate_road</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
-<span class="linenos">39</span>                         <span class="n">sequence</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
-<span class="linenos">40</span>                         <span class="n">pseudoknots</span><span class="o">=</span><span class="n">origami</span><span class="o">.</span><span class="n">pseudoknots</span><span class="p">)</span>
-<span class="linenos">41</span>
-<span class="linenos">42</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
-<span class="linenos">43</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
-<span class="linenos">44</span><span class="n">origami</span><span class="o">.</span><span class="n">save_3d_model</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
-<span class="linenos">45</span><span class="n">origami</span><span class="o">.</span><span class="n">save_fasta</span><span class="p">(</span><span class="s1">&#39;basic_origami&#39;</span><span class="p">)</span>
+<span class="linenos">30</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">Origami</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">aling</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+<span class="linenos">31</span>
+<span class="linenos">32</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="linenos">33</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
+<span class="linenos">34</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span><span class="c1">### Optimization</span>
+<span class="linenos">37</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">sequence</span>
+<span class="linenos">38</span><span class="n">constraints</span> <span class="o">=</span> <span class="s2">&quot;GGGA&quot;</span> <span class="o">+</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+<span class="linenos">39</span>
+<span class="linenos">40</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">generate_road</span><span class="p">(</span>
+<span class="linenos">41</span>    <span class="n">origami</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">pseudoknots</span><span class="o">=</span><span class="n">origami</span><span class="o">.</span><span class="n">pseudoknots</span>
+<span class="linenos">42</span><span class="p">)</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span><span class="n">origami</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+<span class="linenos">45</span><span class="nb">print</span><span class="p">(</span><span class="n">origami</span><span class="p">)</span>
+<span class="linenos">46</span><span class="n">origami</span><span class="o">.</span><span class="n">save_3d_model</span><span class="p">(</span><span class="s2">&quot;basic_origami&quot;</span><span class="p">)</span>
+<span class="linenos">47</span><span class="n">origami</span><span class="o">.</span><span class="n">save_fasta</span><span class="p">(</span><span class="s2">&quot;basic_origami&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -196,75 +199,75 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pyfurnace</span> <span class="k">as</span> <span class="nn">pf</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="c1"># MAKE A SIMPLE TILE AND CLEANUP</span>
-<span class="linenos"> 4</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">(</span><span class="n">dt_list</span><span class="o">=</span><span class="p">[</span><span class="mi">120</span><span class="p">],</span>
-<span class="linenos"> 5</span>                            <span class="n">kl_columns</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="linenos"> 6</span>                            <span class="n">main_stem</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">],</span>
-<span class="linenos"> 7</span>                            <span class="n">add_terminal_helix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="linenos"> 8</span>                            <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span>
-<span class="linenos"> 9</span>                            <span class="n">use_angles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span><span class="c1"># Adjust the length of the stems with Tetraloops</span>
-<span class="linenos">12</span><span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="linenos">13</span><span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span><span class="c1"># Adjust the length of the stems with external KL</span>
-<span class="linenos">16</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="linenos">17</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="linenos">18</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="linenos">19</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span><span class="c1"># Replace the tetraloops with kissing loops in the first and last helix</span>
-<span class="linenos">22</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
-<span class="linenos">23</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
-<span class="linenos">24</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="s2">&quot;2&#39;&quot;</span><span class="p">)</span>
-<span class="linenos">25</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span> <span class="o">=</span> <span class="s2">&quot;1&#39;&quot;</span><span class="p">)</span>
-<span class="linenos">26</span>
-<span class="linenos">27</span><span class="c1"># Make three tiles</span>
-<span class="linenos">28</span><span class="n">tile</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="linenos">29</span><span class="n">n_tiles</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="linenos">30</span>
-<span class="linenos">31</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_tiles</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-<span class="linenos">32</span>    <span class="c1"># add and empty line, it will be filled when</span>
-<span class="linenos">33</span>    <span class="c1"># the columns are repeated</span>
-<span class="linenos">34</span>    <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-<span class="linenos">35</span>
-<span class="linenos">36</span>    <span class="c1"># add the tile to the origami</span>
-<span class="linenos">37</span>    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">tile</span><span class="p">:</span>
-<span class="linenos">38</span>        <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="linenos">39</span>
-<span class="linenos">40</span>
-<span class="linenos">41</span><span class="c1"># REPEATE THE COLUMNS</span>
-<span class="linenos">42</span><span class="n">n_columns</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="linenos">43</span>
-<span class="linenos">44</span><span class="c1"># This is gonna be the basic column</span>
-<span class="linenos">45</span><span class="n">column</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="linenos">46</span><span class="k">for</span> <span class="n">col_ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_columns</span><span class="p">):</span>
-<span class="linenos">47</span>
-<span class="linenos">48</span>
-<span class="linenos">49</span>    <span class="c1"># add two empty lines, it will be filled when</span>
-<span class="linenos">50</span>    <span class="c1"># the columns are repeated</span>
-<span class="linenos">51</span>    <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+<span class="linenos"> 4</span><span class="n">origami</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">simple_origami</span><span class="p">(</span>
+<span class="linenos"> 5</span>    <span class="n">dt_list</span><span class="o">=</span><span class="p">[</span><span class="mi">120</span><span class="p">],</span>
+<span class="linenos"> 6</span>    <span class="n">kl_columns</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="linenos"> 7</span>    <span class="n">main_stem</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">],</span>
+<span class="linenos"> 8</span>    <span class="n">add_terminal_helix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="linenos"> 9</span>    <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span>
+<span class="linenos">10</span>    <span class="n">use_angles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="linenos">11</span><span class="p">)</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="c1"># Adjust the length of the stems with Tetraloops</span>
+<span class="linenos">14</span><span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="linenos">15</span><span class="n">origami</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="c1"># Adjust the length of the stems with external KL</span>
+<span class="linenos">18</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="linenos">19</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="linenos">20</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="linenos">21</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span><span class="c1"># Replace the tetraloops with kissing loops in the first and last helix</span>
+<span class="linenos">24</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="linenos">25</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="linenos">26</span><span class="n">origami</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;2&#39;&quot;</span><span class="p">)</span>
+<span class="linenos">27</span><span class="n">origami</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingLoop180</span><span class="p">(</span><span class="n">open_left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="s2">&quot;1&#39;&quot;</span><span class="p">)</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span><span class="c1"># Make three tiles</span>
+<span class="linenos">30</span><span class="n">tile</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="linenos">31</span><span class="n">n_tiles</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_tiles</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos">34</span>    <span class="c1"># add and empty line, it will be filled when</span>
+<span class="linenos">35</span>    <span class="c1"># the columns are repeated</span>
+<span class="linenos">36</span>    <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span>    <span class="c1"># add the tile to the origami</span>
+<span class="linenos">39</span>    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">tile</span><span class="p">:</span>
+<span class="linenos">40</span>        <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span><span class="c1"># REPEATE THE COLUMNS</span>
+<span class="linenos">44</span><span class="n">n_columns</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="linenos">45</span>
+<span class="linenos">46</span><span class="c1"># This is gonna be the basic column</span>
+<span class="linenos">47</span><span class="n">column</span> <span class="o">=</span> <span class="n">origami</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="linenos">48</span><span class="k">for</span> <span class="n">col_ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_columns</span><span class="p">):</span>
+<span class="linenos">49</span>
+<span class="linenos">50</span>    <span class="c1"># add two empty lines, it will be filled when</span>
+<span class="linenos">51</span>    <span class="c1"># the columns are repeated</span>
 <span class="linenos">52</span>    <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-<span class="linenos">53</span>
-<span class="linenos">54</span>    <span class="c1"># # add the column to the origami</span>
-<span class="linenos">55</span>    <span class="k">for</span> <span class="n">line_ind</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
-<span class="linenos">56</span>        <span class="n">line_index</span> <span class="o">=</span> <span class="n">line_ind</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">col_ind</span>
-<span class="linenos">57</span>        <span class="n">insert_at</span> <span class="o">=</span> <span class="p">(</span><span class="n">line_index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">origami</span><span class="p">[</span><span class="n">line_index</span><span class="p">]))</span>
-<span class="linenos">58</span>        <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insert_at</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
-<span class="linenos">59</span>
+<span class="linenos">53</span>    <span class="n">origami</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+<span class="linenos">54</span>
+<span class="linenos">55</span>    <span class="c1"># # add the column to the origami</span>
+<span class="linenos">56</span>    <span class="k">for</span> <span class="n">line_ind</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
+<span class="linenos">57</span>        <span class="n">line_index</span> <span class="o">=</span> <span class="n">line_ind</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">col_ind</span>
+<span class="linenos">58</span>        <span class="n">insert_at</span> <span class="o">=</span> <span class="p">(</span><span class="n">line_index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">origami</span><span class="p">[</span><span class="n">line_index</span><span class="p">]))</span>
+<span class="linenos">59</span>        <span class="n">origami</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insert_at</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
 <span class="linenos">60</span>
-<span class="linenos">61</span><span class="c1"># Join adjacent 180 KL to kissing dimers</span>
-<span class="linenos">62</span><span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">origami</span><span class="p">):</span>
-<span class="linenos">63</span>
-<span class="linenos">64</span>    <span class="c1"># go through the line in reverse order</span>
-<span class="linenos">65</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-<span class="linenos">66</span>
-<span class="linenos">67</span>        <span class="c1"># if the two adjacent motifs are kissing loops</span>
-<span class="linenos">68</span>        <span class="c1"># pop the one and replace the other with a kissing dimer</span>
-<span class="linenos">69</span>        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="n">pf</span><span class="o">.</span><span class="n">KL180</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">pf</span><span class="o">.</span><span class="n">KL180</span><span class="p">:</span>
-<span class="linenos">70</span>            <span class="n">origami</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">y</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
-<span class="linenos">71</span>            <span class="n">origami</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">()</span>
-<span class="linenos">72</span>
+<span class="linenos">61</span>
+<span class="linenos">62</span><span class="c1"># Join adjacent 180 KL to kissing dimers</span>
+<span class="linenos">63</span><span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">origami</span><span class="p">):</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>    <span class="c1"># go through the line in reverse order</span>
+<span class="linenos">66</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="linenos">67</span>
+<span class="linenos">68</span>        <span class="c1"># if the two adjacent motifs are kissing loops</span>
+<span class="linenos">69</span>        <span class="c1"># pop the one and replace the other with a kissing dimer</span>
+<span class="linenos">70</span>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pf</span><span class="o">.</span><span class="n">KL180</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pf</span><span class="o">.</span><span class="n">KL180</span><span class="p">):</span>
+<span class="linenos">71</span>            <span class="n">origami</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+<span class="linenos">72</span>            <span class="n">origami</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">KissingDimer</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -408,7 +411,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="api.html" class="btn btn-neutral float-left" title="Script API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="limitations.html" class="btn btn-neutral float-left" title="Limitations &amp; Workarounds" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="notebooks/droplets.html" class="btn btn-neutral float-right" title="RNA droplets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

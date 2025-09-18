@@ -17,7 +17,7 @@ from .viennarna import fold_p
 
 
 @contextmanager
-def cwd(path: str):
+def _road_cwd(path: str):
     """Context manager to change the current working directory and revert it back."""
     oldpwd = os.getcwd()
     os.chdir(path)
@@ -270,7 +270,7 @@ def generate_road(
     files_to_include.append(vienna_out_path)
 
     # move to the directory
-    with cwd(directory):
+    with _road_cwd(directory):
         command = f'perl revolvr.pl "{directory}"'
         process = subprocess.Popen(
             command,

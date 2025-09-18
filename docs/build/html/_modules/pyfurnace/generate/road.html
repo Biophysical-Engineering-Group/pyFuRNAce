@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 </ul>
 
@@ -99,22 +100,19 @@
 <span class="kn">from</span> <span class="nn">.viennarna</span> <span class="kn">import</span> <span class="n">fold_p</span>
 
 
-<div class="viewcode-block" id="cwd">
-<a class="viewcode-back" href="../../../pyfurnace.generate.html#pyfurnace.generate.road.cwd">[docs]</a>
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">cwd</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_road_cwd</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager to change the current working directory and revert it back.&quot;&quot;&quot;</span>
     <span class="n">oldpwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">yield</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">oldpwd</span><span class="p">)</span></div>
-
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">oldpwd</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="generate_road">
-<a class="viewcode-back" href="../../../pyfurnace.generate.html#pyfurnace.generate.road.generate_road">[docs]</a>
+<a class="viewcode-back" href="../../../api.html#pyfurnace.generate.road.generate_road">[docs]</a>
 <span class="k">def</span> <span class="nf">generate_road</span><span class="p">(</span>
     <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -358,7 +356,7 @@
     <span class="n">files_to_include</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vienna_out_path</span><span class="p">)</span>
 
     <span class="c1"># move to the directory</span>
-    <span class="k">with</span> <span class="n">cwd</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">_road_cwd</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
         <span class="n">command</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;perl revolvr.pl &quot;</span><span class="si">{</span><span class="n">directory</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
             <span class="n">command</span><span class="p">,</span>
@@ -528,7 +526,7 @@
 
 
 <div class="viewcode-block" id="parallel_road">
-<a class="viewcode-back" href="../../../pyfurnace.generate.html#pyfurnace.generate.road.parallel_road">[docs]</a>
+<a class="viewcode-back" href="../../../api.html#pyfurnace.generate.road.parallel_road">[docs]</a>
 <span class="k">def</span> <span class="nf">parallel_road</span><span class="p">(</span>
     <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -629,14 +627,14 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">result</span> <span class="o">=</span> <span class="n">result_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
                     <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span> <span class="c1"># likely empty queue error</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># likely empty queue error</span>
                     <span class="k">pass</span>  <span class="c1"># skip failed or timed-out results</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Wait for the first successful result</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="n">result_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span> <span class="c1"># likely empty queue error</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># likely empty queue error</span>
                 <span class="k">pass</span>  <span class="c1"># no result within timeout</span>
             <span class="n">stop_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
     <span class="k">finally</span><span class="p">:</span>

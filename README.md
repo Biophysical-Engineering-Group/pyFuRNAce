@@ -163,4 +163,4 @@ Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated de
 
 ## 🙏 Acknowledgements
 
-Supported by the ERC Starting Grant “ENSYNC”, DFG, HFSP, and Max Planck Society. Developed by Luca Monari, Ina Braun, Erik Poppleton, and Kerstin Göpfrich.
+This work was supported by the ERC Starting Grant ENSYNC (No. 101076997) and Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under CRC 392 and CRC 1638. This work was supported by a Research Grant from HFSP (Ref.-No: RGP003/2023, DOI: https://doi.org/10.52044/HFSP.RGP0032023.pc.gr.168589). The authors thank the Max Planck Society for access to computational resources and the Alfried Krupp von Bohlen und Halbach Foundation. E.P. was supported through state funds approved by the State Parliament of Baden-Württemberg for the Innovation Campus Health + Life Science Alliance Heidelberg Mannheim. We thank Cody Geary for his feedback on the user interface design. We thank Dominic Kempf for his feedback on software development and testing.

@@ -142,8 +142,4 @@ GPL-3.0 License — `GNU General Public License v3.0 <https://www.gnu.org/licens
 Acknowledgements
 ================
 
-This work was supported by the ERC Starting Grant ”ENSYNC” (No. 101076997) and Deutsche Forschungs-
-gemeinschaft (DFG, German Research Foundation) under CRC 392 and CRC 1638. K.G. acknowledges
-funding from the Human Science Frontier Programme (HFSP). The authors thank the Max Planck Society
-for access to computational resources and the Alfried Krupp Foundation. We thank C. Geary for his valuable
-input on the manuscript and insightful feedback on the user interface design.
+This work was supported by the ERC Starting Grant ENSYNC (No. 101076997) and Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under CRC 392 and CRC 1638. This work was supported by a Research Grant from HFSP (Ref.-No: RGP003/2023, DOI: https://doi.org/10.52044/HFSP.RGP0032023.pc.gr.168589). The authors thank the Max Planck Society for access to computational resources and the Alfried Krupp von Bohlen und Halbach Foundation. E.P. was supported through state funds approved by the State Parliament of Baden-Württemberg for the Innovation Campus Health + Life Science Alliance Heidelberg Mannheim. We thank Dr.~Cody Geary for his feedback on the user interface design. We thank Dominic Kempf for his feedback on software development and testing.

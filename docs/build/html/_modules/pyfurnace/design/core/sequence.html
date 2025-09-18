@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -97,7 +98,7 @@
 
 
 <div class="viewcode-block" id="Sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence">[docs]</a>
 <span class="k">class</span> <span class="nc">Sequence</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a nucleotide sequence with 5&#39; to 3&#39; or 3&#39; to 5&#39; directionality.</span>
@@ -326,7 +327,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Sequence.complement">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.complement">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.complement">[docs]</a>
     <span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the complement of the sequence.</span>
@@ -340,7 +341,7 @@
 
 
 <div class="viewcode-block" id="Sequence.copy">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.copy">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a copy of the sequence.</span>
@@ -354,7 +355,7 @@
 
 
 <div class="viewcode-block" id="Sequence.distance">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.distance">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.distance">[docs]</a>
     <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the number of mismatched bases between this sequence and another.</span>
@@ -389,7 +390,7 @@
 
 
 <div class="viewcode-block" id="Sequence.find">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.find">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.find">[docs]</a>
     <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the first occurrence of a subsequence in the sequence.</span>
@@ -408,7 +409,7 @@
 
 
 <div class="viewcode-block" id="Sequence.find_repeated_subsequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.find_repeated_subsequence">[docs]</a>
     <span class="k">def</span> <span class="nf">find_repeated_subsequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find all subsequences of minimum length that appear more than once.</span>
@@ -437,7 +438,7 @@
 
 
 <div class="viewcode-block" id="Sequence.gc_content">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.gc_content">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.gc_content">[docs]</a>
     <span class="k">def</span> <span class="nf">gc_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extended_alphabet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the GC content of the sequence.</span>
@@ -470,7 +471,7 @@
 
 
 <div class="viewcode-block" id="Sequence.get_random_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.get_random_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.get_random_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">get_random_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a randomized sequence compatible with the IUPAC symbols and</span>
@@ -535,7 +536,7 @@
 
 
 <div class="viewcode-block" id="Sequence.lower">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.lower">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.lower">[docs]</a>
     <span class="k">def</span> <span class="nf">lower</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert sequence to lowercase.</span>
@@ -549,7 +550,7 @@
 
 
 <div class="viewcode-block" id="Sequence.molecular_weight">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.molecular_weight">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.molecular_weight">[docs]</a>
     <span class="k">def</span> <span class="nf">molecular_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the molecular weight of the sequence.</span>
@@ -567,7 +568,7 @@
 
 
 <div class="viewcode-block" id="Sequence.pop">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.pop">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.pop">[docs]</a>
     <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove and return a nucleotide at the given index.</span>
@@ -590,7 +591,7 @@
 
 
 <div class="viewcode-block" id="Sequence.replace">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.replace">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.replace">[docs]</a>
     <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace all occurrences of `old` with `new` in the sequence.</span>
@@ -614,7 +615,7 @@
 
 
 <div class="viewcode-block" id="Sequence.reverse">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.reverse">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.reverse">[docs]</a>
     <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reverse the directionality of the sequence.</span>
@@ -642,7 +643,7 @@
 
 
 <div class="viewcode-block" id="Sequence.reverse_complement">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.reverse_complement">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.reverse_complement">[docs]</a>
     <span class="k">def</span> <span class="nf">reverse_complement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the reverse complement of the sequence.</span>
@@ -658,7 +659,7 @@
 
 
 <div class="viewcode-block" id="Sequence.split">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.split">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.split">[docs]</a>
     <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Sequence&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split the sequence by a separator.</span>
@@ -677,7 +678,7 @@
 
 
 <div class="viewcode-block" id="Sequence.translate">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.translate">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.translate">[docs]</a>
     <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Translate the sequence using a mapping dictionary.</span>
@@ -709,7 +710,7 @@
 
 
 <div class="viewcode-block" id="Sequence.upper">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.sequence.Sequence.upper">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.sequence.Sequence.upper">[docs]</a>
     <span class="k">def</span> <span class="nf">upper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert sequence to uppercase.</span>

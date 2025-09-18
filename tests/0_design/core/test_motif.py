@@ -1,6 +1,8 @@
 import pytest
+
 from pyfurnace.design.motifs import Motif
 from pyfurnace.design.core.strand import Strand
+from pyfurnace.design.core.sequence import Sequence
 from pyfurnace.design.core.basepair import BasePair
 from pyfurnace.design.core import (
     RIGHT,
@@ -45,7 +47,7 @@ def v_strand(chars="││", start=(0, 0)):
 
 
 def test_motif_contains_strand_and_string_and_basepair():
-    s = h_strand("──")
+    s = h_strand("──ACUG")
     m = Motif(s)
 
     # Strand membership
@@ -54,12 +56,15 @@ def test_motif_contains_strand_and_string_and_basepair():
     # String membership (substring within a Strand)
     assert "──" in m
     assert "xx" not in m
+    assert Sequence("ACU") in m
 
     # BasePair membership (set explicit basepair -> autopairing off)
     bp = BasePair({(0, 0): (2, 0)})
     m.basepair = bp
     assert (0, 0) in m.basepair
     assert bp in m
+
+    assert 0 not in m  # int not supported
 
 
 # =========================
@@ -106,6 +111,14 @@ def test_autopairing_setter_recomputes_basepair_no_error():
     # Structure computed without raising
     _ = m.structure
 
+    not_bp = "not_a_bp"
+    with pytest.raises(
+        ValueError, match=f"{not_bp} must be a dictionary or a BasePair"
+    ):
+        m.basepair = not_bp  # type: ignore
+    with pytest.raises(ValueError, match="Error converting the basepair dictionary to"):
+        m.basepair = {(0, 0): 0}  # type: ignore
+
 
 # =========================
 # sequence setter
@@ -123,6 +136,18 @@ def test_sequence_setter_with_string_and_list_and_validation():
     assert s2.sequence == "GC"
     assert str(m.sequence) == "AU&GC"
 
+    # Wrong type -> ValueError
+    seq_list = {1, 2}
+    with pytest.raises(
+        ValueError, match=f"{seq_list} must be a string, a Sequence object or a list"
+    ):
+        m.sequence = seq_list
+    seq_list = 0
+    with pytest.raises(
+        ValueError, match=f"{seq_list} must be a string, a Sequence object or a list"
+    ):
+        m.sequence = seq_list
+
     # Set via list
     m.sequence = ["GG", "CC"]
     assert str(m.sequence) == "GG&CC"
@@ -130,6 +155,34 @@ def test_sequence_setter_with_string_and_list_and_validation():
     # Wrong number of segments -> ValueError
     with pytest.raises(ValueError):
         m.sequence = "AAA"  # only one segment
+
+
+# =========================
+# structure setter
+# =========================
+
+
+def test_structure_setter_with_string_and_validation():
+    s1 = Strand("AUCG")  # length 2
+    s2 = Strand("CGAU", start=(3, 2), direction=(-1, 0))  # length 2
+    m = Motif(s1, s2)
+
+    # Set via single string
+    assert m.structure == "((((&))))"
+
+    structure = False
+    with pytest.raises(ValueError, match=f"{structure} must be a string. "):
+        m.structure = structure
+
+    # structure too short
+    structure = "(((&)))"
+    with pytest.raises(
+        ValueError, match="The length of the dot bracket must be equal "
+    ):
+        m.structure = structure
+
+    m.structure = "(((.&.)))"
+    assert m.structure == "(((.&.)))"
 
 
 # =========================
@@ -244,11 +297,30 @@ def test_insert_rejects_non_strand():
         m.insert(0, "not_a_strand")  # type: ignore
 
 
-def test_motif_creation():
+def test_motif_creation(m_two_strands):
     """Test basic creation of Motif."""
     motif = Motif()
     assert motif is not None
     assert len(motif) == 0
+    assert str(motif) == ""
+    with pytest.raises(
+        TypeError, match=r"`strands` keyword argument must be a Strand or an"
+    ):
+        Motif(strands=0)  # type: ignore
+    with pytest.raises(ValueError, match="All the elements in the strands input"):
+        Motif(strands=[h_strand(), "not_a_strand"])  # type: ignore
+    # assign structure to motif
+    new_structure = ["." if sym != "&" else sym for sym in m_two_strands.structure]
+    new_structure[0] = "("
+    new_structure[-1] = ")"
+    new_structure = "".join(new_structure)
+    new_motif = Motif(strands=m_two_strands.strands, copy=True, structure=new_structure)
+    assert len(new_motif) == 2
+    assert new_motif[0] == m_two_strands[0]
+    assert new_motif[1] == m_two_strands[1]
+    assert new_motif[0] is not m_two_strands[0]
+    assert new_motif[1] is not m_two_strands[1]
+    assert new_motif.structure == new_structure
 
 
 def test_motif_creation_from_text(m_two_strands):
@@ -315,6 +387,18 @@ def test_motif_addition(m_two_strands):
         + str(m_two_strands[1].sequence[::-1]) * 2
     )
     assert combined.sequence == expect_seq
+    assert Motif() == Motif() + Motif()
+    assert motif1 == motif1 + Motif()
+    assert motif2 == Motif() + motif2
+    # turn off autopairing and reassign structure
+    motif1.structure = motif1.structure
+    combined_off_autpair = motif1 + motif2
+    assert combined_off_autpair.autopairing is False
+    assert combined_off_autpair.structure == combined.structure
+
+    # test __radd__
+    assert 0 + Motif() == Motif()
+    assert None + motif1 == motif1
 
 
 def test_motif_in_place_addition(m_two_strands):
@@ -328,6 +412,12 @@ def test_motif_in_place_addition(m_two_strands):
         + str(m_two_strands[1].sequence[::-1]) * 2
     )
     assert motif1.sequence == expect_seq
+    original = motif1.copy()
+    motif1 += Motif()
+    assert motif1 == original
+    motif1.autopairing = False
+    motif1 += m_two_strands.copy()
+    assert motif1.autopairing is False
 
 
 def test_motif_rotation(m_two_strands):

@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -98,7 +99,7 @@
 
 
 <div class="viewcode-block" id="KissingLoop">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop">[docs]</a>
 <span class="k">class</span> <span class="nc">KissingLoop</span><span class="p">(</span><span class="n">Loop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a pseudoknotted kissing loop motif in RNA secondary structure.</span>
@@ -238,7 +239,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="KissingLoop.complementary_pk_index">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.complementary_pk_index">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.complementary_pk_index">[docs]</a>
     <span class="k">def</span> <span class="nf">complementary_pk_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the complementary pseudoknot symbol of the kissing loop</span>
 
@@ -265,14 +266,14 @@
 
 
 <div class="viewcode-block" id="KissingLoop.get_kissing_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.get_kissing_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.get_kissing_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">get_kissing_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the kissing sequence of the kissing loop&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence</span></div>
 
 
 <div class="viewcode-block" id="KissingLoop.set_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.set_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop.set_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the strand&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">new_seq</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pk_index</span><span class="p">)</span></div>
@@ -375,7 +376,7 @@
 
 
 <div class="viewcode-block" id="KissingLoop120">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop120">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop120">[docs]</a>
 <span class="k">class</span> <span class="nc">KissingLoop120</span><span class="p">(</span><span class="n">KissingLoop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kissing loop motif based on structural template from PDB entry 1BJ2.</span>
@@ -423,7 +424,7 @@
 
 <span class="c1"># https://doi.org/10.2210/pdb2D1B/pdb</span>
 <div class="viewcode-block" id="KissingLoop180">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop180">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop180">[docs]</a>
 <span class="k">class</span> <span class="nc">KissingLoop180</span><span class="p">(</span><span class="n">KissingLoop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kissing loop from HIV with idealized helical geometry for 180-degree interaction.</span>
@@ -466,7 +467,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="KissingLoop180.get_kissing_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingLoop180.get_kissing_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingLoop180.get_kissing_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">get_kissing_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the kissing sequence of the kissing loop&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_kissing_sequence</span><span class="p">()[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
@@ -512,7 +513,7 @@
 
 
 <div class="viewcode-block" id="BranchedKissingLoop">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop">[docs]</a>
 <span class="k">class</span> <span class="nc">BranchedKissingLoop</span><span class="p">(</span><span class="n">KissingLoop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a 180° kissing loop motif with a branch connection.</span>
@@ -563,7 +564,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="BranchedKissingLoop.get_kissing_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop.get_kissing_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.BranchedKissingLoop.get_kissing_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">get_kissing_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the kissing sequence of the kissing loop&quot;&quot;&quot;</span>
         <span class="n">strand_ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -614,7 +615,7 @@
 
 
 <div class="viewcode-block" id="KissingDimer">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingDimer">[docs]</a>
 <span class="k">class</span> <span class="nc">KissingDimer</span><span class="p">(</span><span class="n">KissingLoop180</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A kissing loop dimer composed of two complementary 180-degree loops.</span>
@@ -718,14 +719,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KissingDimer.set_up_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer.set_up_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingDimer.set_up_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_up_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the top strand&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="KissingDimer.set_down_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer.set_down_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingDimer.set_down_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_down_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the bottom strand&quot;&quot;&quot;</span>
         <span class="n">new_seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
@@ -735,7 +736,7 @@
 
 
 <div class="viewcode-block" id="KissingDimer120">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120">[docs]</a>
 <span class="k">class</span> <span class="nc">KissingDimer120</span><span class="p">(</span><span class="n">KissingLoop120</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dimer of two complementary kissing loops based on the 120-degree model.</span>
@@ -830,14 +831,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KissingDimer120.set_up_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_up_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_up_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_up_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the top strand&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="KissingDimer120.set_down_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_down_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.KissingDimer120.set_down_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_down_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the bottom strand&quot;&quot;&quot;</span>
         <span class="n">new_seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
@@ -847,7 +848,7 @@
 
 
 <div class="viewcode-block" id="BranchedDimer">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer">[docs]</a>
 <span class="k">class</span> <span class="nc">BranchedDimer</span><span class="p">(</span><span class="n">BranchedKissingLoop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Branched kissing loop dimer with top and bottom interactions.</span>
@@ -955,14 +956,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">replace_all_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BranchedDimer.set_up_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_up_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_up_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_up_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the top strand&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BranchedDimer.set_down_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_down_sequence">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.kissing_loops.BranchedDimer.set_down_sequence">[docs]</a>
     <span class="k">def</span> <span class="nf">set_down_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the bottom strand&quot;&quot;&quot;</span>
         <span class="n">new_seq</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>

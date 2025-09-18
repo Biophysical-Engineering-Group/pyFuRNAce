@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -120,7 +121,7 @@
 
 
 <div class="viewcode-block" id="Dovetail">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.dovetail.Dovetail">[docs]</a>
 <span class="k">class</span> <span class="nc">Dovetail</span><span class="p">(</span><span class="n">Stem</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a double helix RNA stem with junction crossovers before and after</span>
@@ -265,16 +266,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
 
 <div class="viewcode-block" id="Dovetail.set_up_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_up_sequence">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_up_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.dovetail.Dovetail.set_up_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_up_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the top strand&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_seq</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The sequence of a stem must be a &quot;</span> <span class="sa">f</span><span class="s2">&quot;string, got </span><span class="si">{</span><span class="n">new_seq</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The sequence of a stem must be a string, got </span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sign</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The sign of the dovetail must be -1,&quot;</span> <span class="sa">f</span><span class="s2">&quot; 0 or 1, got </span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The sign of the dovetail must be -1, 0 or 1, got </span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="n">sign</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sign</span><span class="p">:</span>
@@ -283,15 +282,15 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_seq</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">new_seq</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_strands</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Dovetail.set_down_sequence">
-<a class="viewcode-back" href="../../../../pyfurnace.design.motifs.html#pyfurnace.design.motifs.dovetail.Dovetail.set_down_sequence">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_down_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_seq</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.motifs.dovetail.Dovetail.set_down_sequence">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_down_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the sequence of the bottom strand&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_up_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">new_seq</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sign</span><span class="o">=</span><span class="n">sign</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_up_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">nucl_to_pair</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sign</span><span class="o">=</span><span class="n">sign</span><span class="p">)</span></div>
 
 
     <span class="c1">###</span>

@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -281,7 +282,7 @@
 <span class="c1">#: symbols.</span>
 <span class="n">accept_symbol</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">nucleotides</span>
-    <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;.&quot;</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;)&quot;</span><span class="p">}</span>
+    <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;)&quot;</span><span class="p">}</span>
     <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_pk_symbols</span><span class="p">)</span>
     <span class="o">|</span> <span class="p">{</span>
         <span class="s2">&quot;─&quot;</span><span class="p">,</span>
@@ -370,7 +371,7 @@
 
 
 <div class="viewcode-block" id="complement">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.complement">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.complement">[docs]</a>
 <span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the complement of an RNA sequence using IUPAC base-pairing rules.</span>
@@ -390,7 +391,7 @@
 
 
 <div class="viewcode-block" id="reverse_complement">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.reverse_complement">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.reverse_complement">[docs]</a>
 <span class="k">def</span> <span class="nf">reverse_complement</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the reverse complement of an RNA sequence.</span>
@@ -410,7 +411,7 @@
 
 
 <div class="viewcode-block" id="pair_nucleotide">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.pair_nucleotide">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.pair_nucleotide">[docs]</a>
 <span class="k">def</span> <span class="nf">pair_nucleotide</span><span class="p">(</span><span class="n">nucleotide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iupac_symbol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a nucleotide that can pair with the given nucleotide, optionally</span>
@@ -440,7 +441,7 @@
 
 
 <div class="viewcode-block" id="mutate_nucleotide">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.mutate_nucleotide">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.mutate_nucleotide">[docs]</a>
 <span class="k">def</span> <span class="nf">mutate_nucleotide</span><span class="p">(</span>
     <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">sequence_constraints</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -483,7 +484,7 @@
 
 
 <div class="viewcode-block" id="gc_content">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.gc_content">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.gc_content">[docs]</a>
 <span class="k">def</span> <span class="nf">gc_content</span><span class="p">(</span><span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extended_alphabet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate GC content (optionally including ambiguous nucleotides).</span>
@@ -522,7 +523,7 @@
 
 
 <div class="viewcode-block" id="rotate_dot_bracket">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.rotate_dot_bracket">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.rotate_dot_bracket">[docs]</a>
 <span class="k">def</span> <span class="nf">rotate_dot_bracket</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">shift_left</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rotate a dot-bracket structure leftward by a given number of positions.</span>
@@ -557,7 +558,7 @@
 
 
 <div class="viewcode-block" id="dot_bracket_to_pair_map">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.dot_bracket_to_pair_map">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.dot_bracket_to_pair_map">[docs]</a>
 <span class="k">def</span> <span class="nf">dot_bracket_to_pair_map</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BasePair</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert dot-bracket notation into a pair map.</span>
@@ -597,7 +598,7 @@
 
 
 <div class="viewcode-block" id="pair_map_to_dot_bracket">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.pair_map_to_dot_bracket">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.pair_map_to_dot_bracket">[docs]</a>
 <span class="k">def</span> <span class="nf">pair_map_to_dot_bracket</span><span class="p">(</span>
     <span class="n">pair_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">structure_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -617,7 +618,9 @@
 <span class="sd">        Dot-bracket notation representing the structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">structure_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">structure_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pair_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">keys_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pair_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">values_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">pair_map</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">),</span> <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">structure_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">keys_max</span><span class="p">,</span> <span class="n">values_max</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
     <span class="c1">### CREATE THE DOT BRACKET NOTATION ###</span>
     <span class="n">done_pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -673,7 +676,7 @@
 
 
 <div class="viewcode-block" id="dot_bracket_to_stacks">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.dot_bracket_to_stacks">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.dot_bracket_to_stacks">[docs]</a>
 <span class="k">def</span> <span class="nf">dot_bracket_to_stacks</span><span class="p">(</span>
     <span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">only_opening</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
@@ -747,8 +750,6 @@
 
 
 
-<div class="viewcode-block" id="Node">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Node">[docs]</a>
 <span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A tree node representing a region of an RNA secondary structure.</span>
@@ -829,8 +830,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Node.search">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Node.search">[docs]</a>
     <span class="k">def</span> <span class="nf">search</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">target_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">target_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Node&quot;</span><span class="p">]:</span>
@@ -867,13 +866,11 @@
             <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">result</span>  <span class="c1"># Return the node if found</span>
 
-        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Return None if not found</span></div>
-</div>
-
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Return None if not found</span>
 
 
 <div class="viewcode-block" id="dot_bracket_to_tree">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.dot_bracket_to_tree">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.dot_bracket_to_tree">[docs]</a>
 <span class="k">def</span> <span class="nf">dot_bracket_to_tree</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a dot-bracket RNA structure into a hierarchical tree of nodes.</span>
@@ -892,6 +889,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Remove pseudoknots from the dot bracket</span>
     <span class="n">dot_bracket</span> <span class="o">=</span> <span class="n">dot_bracket</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">pseudo_to_dot</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sequence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">Node</span><span class="p">()</span>
     <span class="n">current_node</span> <span class="o">=</span> <span class="n">root</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">):</span>
@@ -915,7 +914,7 @@
 
 
 <div class="viewcode-block" id="tree_to_dot_bracket">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.tree_to_dot_bracket">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.tree_to_dot_bracket">[docs]</a>
 <span class="k">def</span> <span class="nf">tree_to_dot_bracket</span><span class="p">(</span>
     <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span>
     <span class="n">dot_bracket</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -987,7 +986,7 @@
 
 
 <div class="viewcode-block" id="hamming_distance">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.hamming_distance">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.hamming_distance">[docs]</a>
 <span class="k">def</span> <span class="nf">hamming_distance</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_ind</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Hamming distance between two strings, ignoring specified indices.</span>
@@ -1013,7 +1012,7 @@
 
 
 <div class="viewcode-block" id="base_pair_difference">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.base_pair_difference">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.base_pair_difference">[docs]</a>
 <span class="k">def</span> <span class="nf">base_pair_difference</span><span class="p">(</span>
     <span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1070,7 +1069,7 @@
 
 
 <div class="viewcode-block" id="base_pair_distance">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.base_pair_distance">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.base_pair_distance">[docs]</a>
 <span class="k">def</span> <span class="nf">base_pair_distance</span><span class="p">(</span>
     <span class="n">s1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">s2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1117,7 +1116,7 @@
 
 
 <div class="viewcode-block" id="folding_barriers">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.folding_barriers">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.folding_barriers">[docs]</a>
 <span class="k">def</span> <span class="nf">folding_barriers</span><span class="p">(</span><span class="n">structure</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kl_delay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the folding barriers for a given RNA secondary structure.</span>
@@ -1242,7 +1241,7 @@
 
 
 <div class="viewcode-block" id="MotifStructureError">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.MotifStructureError">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.MotifStructureError">[docs]</a>
 <span class="k">class</span> <span class="nc">MotifStructureError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception raised when a motif&#39;s secondary structure is invalid or inconsistent.</span>
@@ -1258,7 +1257,7 @@
 
 
 <div class="viewcode-block" id="AmbiguosStructure">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.AmbiguosStructure">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.AmbiguosStructure">[docs]</a>
 <span class="k">class</span> <span class="nc">AmbiguosStructure</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Warning raised when a structure is ambiguous or potentially problematic.</span>

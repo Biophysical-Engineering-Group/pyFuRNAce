@@ -23,22 +23,24 @@ release = "0.0.7"
 
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    # "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
-    "numpydoc",
     "myst_parser",
     "nbsphinx",
+    "numpydoc",
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
 ]
 
+# summary generation
+autosummary_generate = True  # Turn on autosummary
+
+# bibtex settings
 bibtex_bibfiles = ["refs.bib"]
 
-templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/app/*"]
-autodoc_mock_imports = ["pyfurnace.app"]
-
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
@@ -49,4 +51,4 @@ source_suffix = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
+html_static_path = ["static"]

@@ -1,16 +1,16 @@
 Script API Reference
-=============
+====================
 
 Design Core Objects
 -------------------
 
 Strand
 ^^^^^^
+
 .. automodule:: pyfurnace.design.core.strand
    :members:
    :undoc-members:
    :show-inheritance:
-   :noindex:
 
 Motif
 ^^^^^
@@ -49,7 +49,6 @@ Common Variables
 
 Useful collections
 """"""""""""""""""
-
 .. autodata:: pyfurnace.design.core.symbols.nucleotides
 .. autodata:: pyfurnace.design.core.symbols.iupac_code
 .. autodata:: pyfurnace.design.core.symbols.base_pairing
@@ -57,10 +56,10 @@ Useful collections
 .. autodata:: pyfurnace.design.core.symbols.all_pk_symbols
 .. autodata:: pyfurnace.design.core.symbols.accept_symbol
 .. autodata:: pyfurnace.design.core.symbols.bp_symbols
+.. autodata:: pyfurnace.design.core.symbols.T7_PROMOTER
 
 Translators for strings characters
 """"""""""""""""""""""""""""""""""
-
 .. autodata:: pyfurnace.design.core.symbols.pseudo_to_dot
    :no-value:
 .. autodata:: pyfurnace.design.core.symbols.pair_db_sym
@@ -87,8 +86,7 @@ Common functions
 .. automodule:: pyfurnace.design.core.symbols
    :members:
    :undoc-members:
-   :show-inheritance:
-   :noindex:
+   :exclude-members: nucleotides,iupac_code,base_pairing,db_pairs,all_pk_symbols,accept_symbol,bp_symbols,pseudo_to_dot,pair_db_sym,nucl_to_none,symb_to_none,nucl_to_pair,only_nucl,horiz_flip,verti_flip,rotate_90,symb_to_road,T7_PROMOTER,Node,BasePair
 
 Motifs
 ------
@@ -122,12 +120,10 @@ Aptamers
    :members:
    :undoc-members:
 
-
 Utilities
 ---------
-
 Motif Utilities
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 .. automodule:: pyfurnace.design.utils.motif_lib
    :members:
    :undoc-members:
@@ -141,5 +137,20 @@ Origami Utilities
 Sequence Generation
 -------------------
 .. automodule:: pyfurnace.generate.road
+   :members:
+   :undoc-members:
+
+Prepare
+-------
+
+Primers
+^^^^^^^^^^^^^^
+.. automodule:: pyfurnace.prepare.utils
+   :members:
+   :undoc-members:
+
+Oxdna simulation setup
+^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: pyfurnace.prepare.oxdna_sim
    :members:
    :undoc-members:

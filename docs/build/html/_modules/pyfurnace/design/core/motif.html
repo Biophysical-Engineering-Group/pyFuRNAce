@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -139,7 +140,7 @@
 
 
 <div class="viewcode-block" id="Motif">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif">[docs]</a>
 <span class="k">class</span> <span class="nc">Motif</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a structural motif in an RNA Origami design.</span>
@@ -536,7 +537,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">other</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strands</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BasePair</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basepair</span>
+            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepair</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -598,6 +599,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the basepair dictionary and turn autopairing off.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        basepair_dict : dict or BasePair</span>
+<span class="sd">            A dictionary with positions as key and the paired position as values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basepair_dict</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">BasePair</span><span class="p">)):</span>
@@ -745,10 +751,11 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If the number of sequences is different from the number of strands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_list</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">))</span>
-            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_list</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
-            <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seq_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_list</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_list</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">))</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_list</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+                <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seq_list</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq_list</span><span class="si">}</span><span class="s2"> must be a string, a Sequence object or &quot;</span>
@@ -849,7 +856,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Motif.concat">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.concat">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.concat">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
@@ -1039,7 +1046,7 @@
 
 
 <div class="viewcode-block" id="Motif.from_file">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.from_file">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.from_file">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1069,7 +1076,7 @@
 
 
 <div class="viewcode-block" id="Motif.from_list">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.from_list">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.from_list">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">motif_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1214,7 +1221,7 @@
 
 
 <div class="viewcode-block" id="Motif.from_structure">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.from_structure">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.from_structure">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
@@ -1256,19 +1263,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">structure</span><span class="p">:</span>
             <span class="c1"># if only sequence is provided, fold it to get the structure</span>
             <span class="n">structure</span> <span class="o">=</span> <span class="n">fold</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sequence</span><span class="p">:</span>
-            <span class="n">sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;N&quot;</span> <span class="k">if</span> <span class="n">sym</span> <span class="o">!=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">else</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&amp; &quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span>
-            <span class="n">sequence</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&amp; &quot;</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The sequence length must be equal to the structure &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;length. Got sequence len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="si">}</span><span class="s2"> for structure&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
 
         <span class="c1"># input dot-bracket notation</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1288,6 +1282,20 @@
             <span class="n">structure</span> <span class="o">=</span> <span class="n">tree_to_dot_bracket</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid structure representation: </span><span class="si">{</span><span class="n">structure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;N&quot;</span> <span class="k">if</span> <span class="n">sym</span> <span class="o">!=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">else</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&amp; &quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">sequence</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&amp; &quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The sequence length must be equal to the structure &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;length. Got sequence len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="si">}</span><span class="s2"> for structure&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># initialize the origami object</span>
         <span class="n">origami</span> <span class="o">=</span> <span class="n">Origami</span><span class="p">([[]],</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="n">ss_assembly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1310,7 +1318,7 @@
 
             <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span><span class="p">:</span>
                 <span class="n">motif</span> <span class="o">=</span> <span class="n">Motif</span><span class="p">(</span>
-                    <span class="n">Strand</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">seq</span><span class="p">),</span>
+                    <span class="n">Strand</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">seq</span> <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">seq</span> <span class="k">else</span> <span class="s2">&quot;N&quot;</span><span class="p">),</span>
                     <span class="n">Strand</span><span class="p">(</span>
                         <span class="n">sequence</span><span class="p">[</span><span class="n">pair_map</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">index</span><span class="p">]],</span>
                         <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
@@ -1320,7 +1328,9 @@
                 <span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
-                <span class="n">motif</span> <span class="o">=</span> <span class="n">Motif</span><span class="p">(</span><span class="n">Strand</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">seq</span><span class="p">),</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+                <span class="n">motif</span> <span class="o">=</span> <span class="n">Motif</span><span class="p">(</span>
+                    <span class="n">Strand</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">seq</span> <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">seq</span> <span class="k">else</span> <span class="s2">&quot;N&quot;</span><span class="p">),</span> <span class="n">Strand</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="p">)</span>
 
             <span class="c1"># add the motif and update the current index</span>
             <span class="k">if</span> <span class="n">motif</span><span class="p">:</span>
@@ -1474,7 +1484,7 @@
 
 
 <div class="viewcode-block" id="Motif.from_text">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.from_text">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.from_text">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_text</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">motif_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1507,7 +1517,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Motif.align">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.align">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.align">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">align</span><span class="p">(</span>
         <span class="o">*</span><span class="n">motifs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Motif&quot;</span><span class="p">],</span>
@@ -1681,7 +1691,7 @@
 
 
 <div class="viewcode-block" id="Motif.copy_strands_preserve_blocks">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.copy_strands_preserve_blocks">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.copy_strands_preserve_blocks">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">copy_strands_preserve_blocks</span><span class="p">(</span>
         <span class="n">strands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">],</span> <span class="n">motif</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Motif&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1728,7 +1738,7 @@
 
 
 <div class="viewcode-block" id="Motif.get_sequential_shift">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.get_sequential_shift">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.get_sequential_shift">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_sequential_shift</span><span class="p">(</span>
         <span class="n">motifs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Motif&quot;</span><span class="p">],</span>
@@ -1757,22 +1767,24 @@
 <span class="sd">        List[int]</span>
 <span class="sd">            A list of shift integers for each motif along the axis.</span>
 
-<span class="sd">        Example</span>
-<span class="sd">        -------</span>
-<span class="sd">        m1:</span>
-<span class="sd">            --NN--</span>
-<span class="sd">              ::</span>
-<span class="sd">            --NN--</span>
-<span class="sd">        m2:</span>
-<span class="sd">            --SK--</span>
-<span class="sd">              ::</span>
-<span class="sd">            --SK--</span>
-<span class="sd">        Resulting shift: 2</span>
-<span class="sd">            [0, 2]</span>
-<span class="sd">        To have:</span>
-<span class="sd">            --NN----SK--</span>
-<span class="sd">              ::    ::</span>
-<span class="sd">            --NN----SK--</span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">            m1:</span>
+<span class="sd">                --NN--</span>
+<span class="sd">                  ::</span>
+<span class="sd">                --NN--</span>
+<span class="sd">            m2:</span>
+<span class="sd">                --SK--</span>
+<span class="sd">                  ::</span>
+<span class="sd">                --SK--</span>
+<span class="sd">            Resulting shift: 2</span>
+<span class="sd">                [0, 2]</span>
+<span class="sd">            To have:</span>
+<span class="sd">                --NN----SK--</span>
+<span class="sd">                  ::    ::</span>
+<span class="sd">                --NN----SK--</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">motifs</span><span class="p">,</span> <span class="n">Motif</span><span class="p">):</span>
             <span class="n">motifs</span> <span class="o">=</span> <span class="p">[</span><span class="n">motifs</span><span class="p">]</span>
@@ -1818,7 +1830,7 @@
 
 
 <div class="viewcode-block" id="Motif.join_strands">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.join_strands">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.join_strands">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">join_strands</span><span class="p">(</span><span class="n">strands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1904,7 +1916,7 @@
 
 
 <div class="viewcode-block" id="Motif.trace">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.trace">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.trace">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">trace</span><span class="p">(</span>
         <span class="n">motif_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -2175,7 +2187,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Motif.append">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.append">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.append">[docs]</a>
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">strand</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span> <span class="n">join</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
@@ -2221,7 +2233,7 @@
 
 
 <div class="viewcode-block" id="Motif.copy">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.copy">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a copy of the motif.</span>
@@ -2303,7 +2315,7 @@
 
 
 <div class="viewcode-block" id="Motif.extend_junctions">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.extend_junctions">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.extend_junctions">[docs]</a>
     <span class="k">def</span> <span class="nf">extend_junctions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">skip_axis</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2437,7 +2449,7 @@
 
 
 <div class="viewcode-block" id="Motif.flip">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.flip">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.flip">[docs]</a>
     <span class="k">def</span> <span class="nf">flip</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">horizontally</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -2516,7 +2528,7 @@
         <span class="k">return</span> <span class="n">fold_bar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span> <span class="n">kl_delay</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Motif.get_strand_index_map">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.get_strand_index_map">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.get_strand_index_map">[docs]</a>
     <span class="k">def</span> <span class="nf">get_strand_index_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a dictionary of positions as keys and the index of the</span>
@@ -2531,7 +2543,7 @@
 
 
 <div class="viewcode-block" id="Motif.get_position_map">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.get_position_map">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.get_position_map">[docs]</a>
     <span class="k">def</span> <span class="nf">get_position_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a dictionary of positions as keys and the corresponding</span>
@@ -2550,7 +2562,7 @@
 
 
 <div class="viewcode-block" id="Motif.insert">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.insert">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.insert">[docs]</a>
     <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">strand</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span> <span class="n">join</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
@@ -2598,7 +2610,7 @@
 
 
 <div class="viewcode-block" id="Motif.pop">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.pop">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.pop">[docs]</a>
     <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Strand&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove and return the strand at the specified index.</span>
@@ -2634,7 +2646,7 @@
 
 
 <div class="viewcode-block" id="Motif.replace_all_strands">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.replace_all_strands">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.replace_all_strands">[docs]</a>
     <span class="k">def</span> <span class="nf">replace_all_strands</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">strands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">],</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">join</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
@@ -2686,7 +2698,7 @@
 
 
 <div class="viewcode-block" id="Motif.rotate">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.rotate">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.rotate">[docs]</a>
     <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotate the motif 90 degrees clockwise.</span>
@@ -2730,7 +2742,7 @@
 
 
 <div class="viewcode-block" id="Motif.save_3d_model">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.save_3d_model">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.save_3d_model">[docs]</a>
     <span class="k">def</span> <span class="nf">save_3d_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Motif&quot;</span><span class="p">,</span> <span class="s2">&quot;Origami&quot;</span><span class="p">],</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;motif&quot;</span><span class="p">,</span>
@@ -2946,7 +2958,7 @@
 
 
 <div class="viewcode-block" id="Motif.save_fasta">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.save_fasta">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.save_fasta">[docs]</a>
     <span class="k">def</span> <span class="nf">save_fasta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;motif&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the motif sequences in a FASTA file.</span>
@@ -2966,7 +2978,7 @@
 
 
 <div class="viewcode-block" id="Motif.save_text">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.save_text">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.save_text">[docs]</a>
     <span class="k">def</span> <span class="nf">save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;motif&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the motif representation as a text file.</span>
@@ -2986,7 +2998,7 @@
 
 
 <div class="viewcode-block" id="Motif.shift">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.shift">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.shift">[docs]</a>
     <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_vect</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">extend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shift the motif of the given shift vector.</span>
@@ -3016,8 +3028,8 @@
         <span class="c1"># check if the shift will bring the strands to negative positions</span>
         <span class="k">if</span> <span class="n">min_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">shift</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">min_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">shift</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MotifStructureError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The motif cannot be shifed. The strands cannot be drawn&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; at negative positons. Attempt to draw the motif at &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The motif cannot be shifted. The strands cannot be drawn&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; at negative positions. Attempt to draw the motif at &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;position (</span><span class="si">{</span><span class="n">min_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">shift_vect</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">shift_vect</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
             <span class="p">)</span>
@@ -3044,7 +3056,7 @@
 
 
 <div class="viewcode-block" id="Motif.sort">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.sort">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.sort">[docs]</a>
     <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Strand&quot;</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
@@ -3054,12 +3066,15 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        key : function, optional</span>
-<span class="sd">            The function to use to sort the strands.</span>
-<span class="sd">            If None, the strands are sorted by:</span>
-<span class="sd">                - the strands with 5&#39; end</span>
-<span class="sd">                - the strand with the lowest y start position</span>
-<span class="sd">                - the strand with the lowest x start position.</span>
+<span class="sd">            The function to use to sort the strands. If ``None``, the strands are</span>
+<span class="sd">            sorted by:</span>
+
+<span class="sd">            - strands with a 5&#39; end first</span>
+<span class="sd">            - lowest starting y position</span>
+<span class="sd">            - lowest starting x position</span>
+
 <span class="sd">        reverse : bool, default False</span>
+<span class="sd">            If ``True``, sort in descending order.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -3076,7 +3091,7 @@
 
 
 <div class="viewcode-block" id="Motif.strip">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.motif.Motif.strip">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.motif.Motif.strip">[docs]</a>
     <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_axis</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Motif&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove the empty lines/columns in the motif structure.</span>

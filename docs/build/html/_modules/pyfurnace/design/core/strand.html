@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../features.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Script API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../limitations.html">Limitations &amp; Workarounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 </ul>
 
@@ -117,7 +118,7 @@
 
 
 <div class="viewcode-block" id="Strand">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand">[docs]</a>
 <span class="k">class</span> <span class="nc">Strand</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a single RNA strand in a hybrid 1D/2D/3D representation.</span>
@@ -188,6 +189,8 @@
 <span class="sd">        The block of strands to which the strand belongs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="Strand.__init__">
+<a class="viewcode-back" href="../../../../_autosummary/pyfurnace.design.core.strand.Strand.html#pyfurnace.design.core.strand.Strand.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">strand</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -263,7 +266,8 @@
         <span class="k">if</span> <span class="n">strands_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">strands_block</span> <span class="o">=</span> <span class="n">strands_block</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">strands_block</span> <span class="o">=</span> <span class="n">StrandsBlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">strands_block</span> <span class="o">=</span> <span class="n">StrandsBlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of the Strand object.&quot;&quot;&quot;</span>
@@ -419,8 +423,13 @@
 <span class="sd">        Set the oxDNA 3D coordinates of the strand.</span>
 <span class="sd">        Check the Coords documentation for the format of the coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_coords</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">new_coords</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">new_coords</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">Coords</span><span class="p">()</span>
+            <span class="k">return</span>
 
         <span class="c1"># sanity check</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_coords</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">):</span>
@@ -531,7 +540,7 @@
             <span class="k">if</span> <span class="n">sym</span> <span class="ow">in</span> <span class="s2">&quot;╰╮</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span>
                 <span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="o">.</span><span class="n">swap_xy</span><span class="p">()</span>
             <span class="k">elif</span> <span class="n">sym</span> <span class="ow">in</span> <span class="s2">&quot;╭╯/&quot;</span><span class="p">:</span>
-                <span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="o">.</span><span class="n">swap_xy_change_sign</span><span class="p">()</span>
+                <span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="o">.</span><span class="n">swap_change_sign_xy</span><span class="p">()</span>
             <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;⊗&quot;</span><span class="p">:</span>
                 <span class="n">direction</span> <span class="o">+=</span> <span class="n">Position</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;⊙&quot;</span><span class="p">:</span>
@@ -704,7 +713,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Strand.join_strands">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.join_strands">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.join_strands">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">join_strands</span><span class="p">(</span><span class="n">strand1</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span> <span class="n">strand2</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -729,7 +738,7 @@
 <span class="sd">        Optional[Strand]</span>
 <span class="sd">            The joined strand if possible, otherwise None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strand2</span><span class="p">,</span> <span class="n">Strand</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strand1</span><span class="p">,</span> <span class="n">Strand</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strand2</span><span class="p">,</span> <span class="n">Strand</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strand1</span><span class="p">,</span> <span class="n">Strand</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;The objects to join are not a Strand object, &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">strand2</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">strand2</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
@@ -858,6 +867,13 @@
 <span class="sd">        Position</span>
 <span class="sd">            The input position or direction as a Position object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">input_pos_dir</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;2D direction not allowed. The allowed values are:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">input_pos_dir</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_pos_dir</span><span class="p">,</span> <span class="p">(</span><span class="n">Direction</span><span class="p">,</span> <span class="n">Position</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">input_pos_dir</span>
 
@@ -869,13 +885,6 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;The 2D coordinates must be a tuple/list of (x,y) &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;integer values. Got </span><span class="si">{</span><span class="n">input_pos_dir</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">direction</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">input_pos_dir</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;2D direction not allowed. The allowed values are:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;RIGHT (1, 0); DOWN (0, 1); LEFT (-1, 0); UP (0, -1).</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">input_pos_dir</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Position</span><span class="p">(</span><span class="n">input_pos_dir</span><span class="p">)</span>
@@ -1111,7 +1120,7 @@
             <span class="p">)</span>
         <span class="c1"># + Sequence no error</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Strand</span><span class="p">(</span><span class="n">Sequence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Strand</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">directionality</span><span class="p">)</span>
 
         <span class="c1"># + Not a strand</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Strand</span><span class="p">):</span>
@@ -1169,8 +1178,6 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">_sequence</span>
 
-        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>  <span class="c1"># convert to uppercase</span>
-
         <span class="c1"># Not a string</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1178,13 +1185,14 @@
                 <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
             <span class="p">)</span>
 
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>  <span class="c1"># convert to uppercase</span>
         <span class="c1"># Check that the terminal symbols are not in the middle of the strand</span>
         <span class="k">for</span> <span class="n">term_sym</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">term_sym</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">term_sym</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">MotifStructureError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The strand can have only one start and one&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The strand can have only one start and one &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;end symbol (&#39;5&#39; and &#39;3&#39;). &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">term_sym</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">term_sym</span><span class="si">}</span><span class="s2">&#39; symbols.&quot;</span>
@@ -1367,7 +1375,7 @@
     <span class="c1">###</span>
 
 <div class="viewcode-block" id="Strand.copy">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.copy">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Strand&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a copy of the current strand, including coordinates and attributes.</span>
@@ -1420,7 +1428,7 @@
 
 
 <div class="viewcode-block" id="Strand.draw">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.draw">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.draw">[docs]</a>
     <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">return_string</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">plane</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -1507,7 +1515,7 @@
 
 
 <div class="viewcode-block" id="Strand.extend">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.extend">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.extend">[docs]</a>
     <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">direction</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Position</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -1585,7 +1593,7 @@
 
 
 <div class="viewcode-block" id="Strand.flip">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.flip">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.flip">[docs]</a>
     <span class="k">def</span> <span class="nf">flip</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">horizontally</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1638,7 +1646,7 @@
 
 
 <div class="viewcode-block" id="Strand.get_base_at_pos">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.get_base_at_pos">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.get_base_at_pos">[docs]</a>
     <span class="k">def</span> <span class="nf">get_base_at_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Position</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the base at the specified 2D position in the strand.</span>
@@ -1654,11 +1662,11 @@
 <span class="sd">            The base at the specified position.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_position</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_seq_positions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pos</span><span class="p">)])</span></div>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_positions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pos</span><span class="p">)])</span></div>
 
 
 <div class="viewcode-block" id="Strand.get_char_at_pos">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.get_char_at_pos">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.get_char_at_pos">[docs]</a>
     <span class="k">def</span> <span class="nf">get_char_at_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Position</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the character at the specified 2D position in the strand.</span>
@@ -1678,7 +1686,7 @@
 
 
 <div class="viewcode-block" id="Strand.get_position_map">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.get_position_map">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.get_position_map">[docs]</a>
     <span class="k">def</span> <span class="nf">get_position_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a dictionary of positions as keys and the corresponding</span>
@@ -1693,7 +1701,7 @@
 
 
 <div class="viewcode-block" id="Strand.insert">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.insert">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.insert">[docs]</a>
     <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Insert a character into the strand at the specified index.</span>
@@ -1713,7 +1721,7 @@
 
 
 <div class="viewcode-block" id="Strand.invert">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.invert">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.invert">[docs]</a>
     <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Strand&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Invert the start and end positions of the strand,</span>
@@ -1765,7 +1773,7 @@
 
 
 <div class="viewcode-block" id="Strand.join">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.join">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.join">[docs]</a>
     <span class="k">def</span> <span class="nf">join</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">,</span> <span class="n">trigger_callbacks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Strand&quot;</span><span class="p">]:</span>
@@ -1883,7 +1891,7 @@
 
 
 <div class="viewcode-block" id="Strand.pop">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.pop">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.pop">[docs]</a>
     <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove and return a character from the strand at the specified index.</span>
@@ -1905,7 +1913,7 @@
 
 
 <div class="viewcode-block" id="Strand.reverse">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.reverse">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.reverse">[docs]</a>
     <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Strand&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reverse the directionality of the strand sequence</span>
@@ -1922,7 +1930,7 @@
 
 
 <div class="viewcode-block" id="Strand.save_3d_model">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.save_3d_model">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.save_3d_model">[docs]</a>
     <span class="k">def</span> <span class="nf">save_3d_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;strand&quot;</span><span class="p">,</span>
@@ -1958,7 +1966,7 @@
             <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">seq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
 
         <span class="c1">### initialize the strand and nucleotide length</span>
         <span class="n">seq_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
@@ -1990,6 +1998,7 @@
             <span class="n">seq_len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">protein</span><span class="p">)</span>
             <span class="n">n_strands</span> <span class="o">+=</span> <span class="mi">1</span>
 
+        <span class="n">top_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq_len</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">n_strands</span><span class="si">}</span><span class="s2"> 5-&gt;3</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">top_text</span>
         <span class="k">if</span> <span class="n">return_text</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">conf_text</span><span class="p">,</span> <span class="n">top_text</span>
 
@@ -2002,7 +2011,7 @@
         <span class="c1">### write the top file</span>
         <span class="n">top_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.top&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">top_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seq_len</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">n_strands</span><span class="si">}</span><span class="s2"> 5-&gt;3</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">top_text</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">top_text</span><span class="p">)</span>
 
         <span class="c1">### write the pdb file</span>
         <span class="k">if</span> <span class="n">pdb</span><span class="p">:</span>
@@ -2023,7 +2032,7 @@
 
 
 <div class="viewcode-block" id="Strand.shift">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.shift">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.shift">[docs]</a>
     <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">shift_position</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Position&quot;</span><span class="p">,</span> <span class="s2">&quot;Direction&quot;</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -2075,7 +2084,7 @@
 
 
 <div class="viewcode-block" id="Strand.transform">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.Strand.transform">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.Strand.transform">[docs]</a>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformation_matrix</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a transformation matrix to the strand&#39;s 3D coordinates.</span>
@@ -2092,7 +2101,7 @@
 
 
 <div class="viewcode-block" id="StrandsBlock">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.StrandsBlock">[docs]</a>
 <span class="k">class</span> <span class="nc">StrandsBlock</span><span class="p">(</span><span class="nb">set</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A container class that holds a collection of Strand instances.</span>
@@ -2156,7 +2165,7 @@
         <span class="k">return</span> <span class="n">StrandsBlock</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">array</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="StrandsBlock.add">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock.add">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.StrandsBlock.add">[docs]</a>
     <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Append a Strand instance to the StrandsBlock.</span>
@@ -2181,7 +2190,7 @@
 
 
 <div class="viewcode-block" id="StrandsBlock.remove">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock.remove">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.StrandsBlock.remove">[docs]</a>
     <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="s2">&quot;Strand&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a Strand instance from the StrandsBlock.</span>
@@ -2204,7 +2213,7 @@
 
 
 <div class="viewcode-block" id="StrandsBlock.transform">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock.transform">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.StrandsBlock.transform">[docs]</a>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a transformation matrix to all the strands in the StrandsBlock.</span>
@@ -2226,7 +2235,7 @@
 
 
 <div class="viewcode-block" id="StrandsBlock.update">
-<a class="viewcode-back" href="../../../../pyfurnace.design.core.html#pyfurnace.design.core.strand.StrandsBlock.update">[docs]</a>
+<a class="viewcode-back" href="../../../../api.html#pyfurnace.design.core.strand.StrandsBlock.update">[docs]</a>
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="n">others</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;StrandsBlock&quot;</span><span class="p">],</span>

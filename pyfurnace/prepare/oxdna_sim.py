@@ -38,15 +38,22 @@ def oxdna_simulations(
         If True, the function creates a zip file with the files for the simulations
         and returns the path to the zip file. If False, the function returns None.
     temperature : Union[int, float], optional
-        The temperature in Celsius, by default 37
+        The temperature in Celsius, by default 37.
     mc_relax_steps : Union[int, float], optional
-        The number of Monte Carlo relaxation steps, by default 5e3
+        The number of Monte Carlo relaxation steps, by default 5e3.
     md_relax_steps : Union[int, float], optional
-        The number of MD relaxation steps, by default 1e7
+        The number of MD relaxation steps, by default 1e7.
     md_equil_steps : Union[int, float], optional
-        The number of MD equilibration steps, by default 1e8
+        The number of MD equilibration steps, by default 1e8.
     md_prod_steps : Union[int, float], optional
-        The number of MD production steps, by default 1e9
+        The number of MD production steps, by default 1e9.
+
+    Returns
+    -------
+    Union[str, None]
+        If zip_directory is True or directory is None, the function returns the path
+        to the zip file. If zip_directory is False and directory is not None, the
+        function returns None.
     """
 
     inputs_dir = __file__.replace("oxdna_sim.py", "oxdna_inputs")

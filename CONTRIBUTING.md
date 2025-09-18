@@ -4,8 +4,8 @@ Thanks for your interest in improving **pyFuRNAce**!
 
 This guide covers setup, coding style, tests, docs, and how to submit changes.
 
-> Verified project facts used here: Python >= **3.10+**, Streamlit GUI (`pyfurnace` / `python -m pyfurnace`), optional **OAT** (oxDNA analysis tools) and **Perl** (for sequence generation), docs on **Read the Docs**, `.pre-commit-config.yaml`, `tests/`, and CI workflows. License: **GPL-3.0**.
-> Sources: GitHub repo & README; docs site; Actions overview.
+- Project info: Python >= **3.10+**, Streamlit GUI (`pyfurnace` / `python -m pyfurnace`), optional **OAT** (oxDNA analysis tools) and **Perl** (for sequence generation), docs on **Read the Docs**, `.pre-commit-config.yaml`, `tests/`, and CI workflows. License: **GPL-3.0**.
+- Sources: GitHub repo & README; docs site; Actions overview.
 
 ---
 
@@ -15,13 +15,13 @@ Be kind, curious, and constructive. Harassment or disrespectful behavior isn’t
 ---
 
 ## What contributions are welcome?
+- **New motifs additions**
 - Bug reports & minimal reproductions
 - Small fixes (typos, docstrings)
 - New features or UI polish (Streamlit app)
 - Performance / reliability improvements
 - Tests (unit/functional) and coverage bumps
 - Docs & examples (tutorials/how-tos)
-- New motifs additions
 
 Before starting a **large** feature, open an Issue to discuss scope and approach.
 
@@ -96,7 +96,7 @@ Hooks (formatters/linters) are defined in .pre-commit-config.yaml. Ensure your c
 
 ## Style & typing
 
-Let the formatter decide (no manual bikeshedding).
+Let the formatter decide (no manual [bikeshedding](https://en.wikipedia.org/wiki/Law_of_trivialitys)).
 
 Prefer type hints (typing), docstrings, and clear APIs
 
@@ -111,10 +111,10 @@ Docs live in docs/ and are published on Read the Docs.
 Typical Sphinx workflow:
 
 ```bash
+### Install dependencies
 pip install -r docs/requirements.txt || pip install sphinx myst-parser sphinx-autobuild
-sphinx-build -b html docs docs/_build/html
-# or auto-reload while writing:
-sphinx-autobuild docs docs/_build/html
+#### Build HTML
+sphinx-build -b html docs/source docs/build/html
 ```
 Add examples under examples/ where helpful.
 

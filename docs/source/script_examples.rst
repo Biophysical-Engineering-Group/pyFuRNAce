@@ -7,7 +7,7 @@ Basics usage
 ------------
 
 Two helices with FLAPs (and optimization)
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. literalinclude:: ../../examples/basic_usage.py
    :language: python
@@ -15,7 +15,7 @@ Two helices with FLAPs (and optimization)
 
 
 RNA droplets notebook
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 RNA origami designs following the designs of Lorenzo Di Michele and Elisa Franco (https://doi.org/10.1038/s41565-024-01726-x, https://doi.org/10.1038/s41467-024-50003-x)
 

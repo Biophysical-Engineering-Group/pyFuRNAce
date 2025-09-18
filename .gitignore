@@ -12,3 +12,5 @@ __pycache__
 *.pyc
 *.pyidx
 .pytest_cache
+build
+docs/build

@@ -342,3 +342,70 @@ By default, the user interface loads the coordinates as text in the code, so the
   orange_broc[1].coords = pf.Coords.load_from_file("PATH/TO/strand_2.dat")
 
   origami = pf.Origami([orange_broc]) # to visualize the aptamer only
+
+Adding Overhang at the 3’ or 5’
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Following the suggestions from the ``Custom motif: Single Stranded`` tutorial, even when adding single-stranded regions, it’s recommended to use motifs with two pyFuRNAce Strands to avoid ambiguity.
+
+1) Create an origami
+++++++++++++++++++++
+
+To start the design, we’ll make a simple origami with the ``simple origami`` popover at the top left:
+
+.. image:: /_static/simple_origami.png
+    :alt: Simple origami
+    :align: center
+    :width: 400px
+
+2) Add a line and a connection
+++++++++++++++++++++++++++++++
+
+Once the origami is made, select line index to ``-1`` and add a line to make space for the new single-stranded motif. The line indexes at the left of the origami now start from 1 instead of 0.
+
+.. image:: /_static/add_line_to_origami.png
+    :alt: Add line to origami
+    :align: center
+    :width: 400px
+
+We want to add a vertical connection for the single-stranded regions. In the motif menu, select ``Connections``, ``stem_cap_link``, and add it to the line.
+
+.. image:: /_static/stem_cap_link.png
+    :alt: Add stem_cap_link to origami
+    :align: center
+    :width: 400px
+
+3) Create and add the single-stranded motif
++++++++++++++++++++++++++++++++++++++++++++
+
+We can finally go to the Custom motif menu and create our simple single-stranded motif, adding the structure and sequence (with 5’ to 3’ directionality)
+
+.. image:: /_static/custom_ssRNA_motif.png
+    :alt: Custom single-stranded motif
+    :align: center
+    :width: 400px
+
+Once created, we can add the motif to the origami:
+
+.. image:: /_static/add_custom_motif_to_origami.png
+    :alt: Add custom motif to origami
+    :align: center
+    :width: 400px
+
+4) Connect the single-stranded motif
+++++++++++++++++++++++++++++++++++++
+
+Almost done! Now you can add a zero-length dovetail (in the ``Structural`` motif menu) to the origami to connect the single-stranded motif.
+
+To add it at the 5’ prime, insert the dovetail after the start_end_motif (insert it before to add the motif to the 3’).
+
+.. image:: /_static/add_dovetail_to_origami.png
+    :alt: Add dovetail to origami
+    :align: center
+    :width: 400px
+
+And tadaaaa! You have added an ssRNA to the 5’/3’ end.
+
+You can see an example of extending the 3’ end in the ``Homepage/Load a template/rna_filament_ispinach``.
+
+You can use this approach (adding a line with stem_cap_link) also to add motifs to a branched kissing loop.

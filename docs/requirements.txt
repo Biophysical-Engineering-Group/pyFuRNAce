@@ -7,3 +7,4 @@ sphinx
 sphinx-autodoc-typehints
 sphinx_copybutton
 sphinx_rtd_theme
+sphinxcontrib-bibtex

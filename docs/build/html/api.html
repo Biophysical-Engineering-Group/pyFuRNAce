@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Script API Reference &mdash; pyFuRNAce 0.0.7 documentation</title>
+  <title>Python API Reference &mdash; pyFuRNAce 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,17 +14,18 @@
 
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=bbaf98b3"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Limitations &amp; Workarounds" href="limitations.html" />
-    <link rel="prev" title="Features" href="features.html" />
+    <link rel="prev" title="Install and run" href="installation.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -48,14 +49,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html#installation">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html#web-application">Web Application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html#using-the-python-api">Using the Python API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html#license">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html#acknowledgements">Acknowledgements</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Script API Reference</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About pyFuRNAce</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="about.html#web-application">Web Application</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="about.html#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="about.html#python-api">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="about.html#citation">Citation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="about.html#license">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="about.html#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install and run</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-s-the-idea">What’s the idea?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#design-core-objects">Design Core Objects</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-pyfurnace.design.core.strand">Strand</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pyfurnace.design.core.strand.Strand"><code class="docutils literal notranslate"><span class="pre">Strand</span></code></a></li>
@@ -190,8 +197,45 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations &amp; Workarounds</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations &amp; Workarounds</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="limitations.html#pyfurnace-folding-barrier-estimation">PyFuRNAce folding barrier estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="limitations.html#revolvr">Revolvr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="limitations.html#viennarna">ViennaRNA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="limitations.html#oxdna-analysis-tools">oxDNA Analysis Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="limitations.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="script_examples.html">Python script</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="script_examples.html#two-helices-with-flaps-and-optimization">Two helices with FLAPs (and optimization)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="script_examples.html#rna-filament">RNA filament</a></li>
+<li class="toctree-l3"><a class="reference internal" href="script_examples.html#full-folding-barrier-optimization">Full folding barrier optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="script_examples.html#jupyter-notebooks">Jupyter Notebooks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/droplets.html">RNA droplets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/droplets.html#Droplet-A-with-Malachite-Green-aptamer">Droplet A with Malachite Green aptamer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/droplets.html#Droplet-B-with-Broccoli-aptamer">Droplet B with Broccoli aptamer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/rna_filament.html">RNA filaments assembly tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/rna_filament.html#Create-a-basic-RNA-structure">Create a basic RNA structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/rna_filament.html#Adjust-the-ends-to-make-a-tile">Adjust the ends to make a tile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/rna_filament.html#Repeat-the-tiles-to-make-a-filament-section">Repeat the tiles to make a filament section</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/rna_filament.html#Repeat-the-sections-to-make-a-filament">Repeat the sections to make a filament</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/rna_filament.html#Generete-the-sequence-for-a-tile">Generete the sequence for a tile</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/ROAD_origami.html">A collection of origami from ROAD</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/ROAD_origami.html#3H-2DT">3H-2DT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/ROAD_origami.html#3H-3DT">3H-3DT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/ROAD_origami.html#3H-4DT">3H-4DT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -208,7 +252,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Script API Reference</li>
+      <li class="breadcrumb-item active">Python API Reference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -218,8 +262,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
 
-  <section id="script-api-reference">
-<h1>Script API Reference<a class="headerlink" href="#script-api-reference" title="Link to this heading"></a></h1>
+  <section id="python-api-reference">
+<span id="api"></span><h1>Python API Reference<a class="headerlink" href="#python-api-reference" title="Link to this heading"></a></h1>
+<section id="what-s-the-idea">
+<h2>What’s the idea?<a class="headerlink" href="#what-s-the-idea" title="Link to this heading"></a></h2>
+<p>PyFuRNAce is inspired by the ROAD RNA origami software (Geary et al., Nat. Chem., 2021), which uses text-based RNA diagrams for RNA nanostructures design.</p>
+<p>To facilitate the design of RNA nanostructures, pyFuRNAce aims to provide a simple and flexible Python package for creating, manipulating, and visualizing RNA with text-based diagrams.</p>
+<p>The approach of pyFuRNAce is to hierarchically build RNA nanostructures from simple building blocks: strands and motifs.</p>
+<p>Therefore, there are three main classes:</p>
+<ol class="arabic">
+<li><p><strong>Strand</strong>
+A strand is simply a string of ASCII characters, which contains nucleotides (e.g., AUCG) and/or characters to route the strands on the page (e.g., <code class="docutils literal notranslate"><span class="pre">-/\|</span></code>). If we imagine drawing a strand on a page, each symbol has an <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> position. In pyFuRNAce, each character position is calculated automatically, as the strand is defined by:</p>
+<ul class="simple">
+<li><p>strand characters (e.g., <code class="docutils literal notranslate"><span class="pre">A-UCG|CC—</span></code>)</p></li>
+<li><p>start position (e.g., <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code>)</p></li>
+<li><p>start direction (e.g., <code class="docutils literal notranslate"><span class="pre">pf.RIGHT</span></code>)</p></li>
+<li><p>directionality of the sequence (e.g., <code class="docutils literal notranslate"><span class="pre">'53'</span></code>; optional)</p></li>
+</ul>
+<p>A <code class="docutils literal notranslate"><span class="pre">Strand</span></code> can also have 3D coordinates associated with the sequence, allowing the assembly of 3D models in real time.</p>
+</li>
+<li><p><strong>Motif</strong>
+The motif is the building block of the RNA origami, exploiting the vast library of RNA aptamers. In pyFuRNAce, a <code class="docutils literal notranslate"><span class="pre">Motif</span></code> is simply a collection of strands which can have base pairs. The base pairs define the secondary structure of the motifs. Internally, base pairs are represented as strand–position pairs in a dictionary. In the Python API, the secondary structure can be set and obtained in the more common <a class="reference external" href="https://www.tbi.univie.ac.at/RNA/ViennaRNA/doc/html/io/rna_structures.html">dot-bracket notation</a>. In summary, a motif is made of:</p>
+<ul class="simple">
+<li><p>strands (e.g., <code class="docutils literal notranslate"><span class="pre">[Strand('CCAGG'),</span> <span class="pre">Strand('CCGGG',</span> <span class="pre">start=(4,</span> <span class="pre">0),</span> <span class="pre">direction=pf.LEFT)]</span></code>)</p></li>
+<li><p>structure (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;((.((&amp;)).))&quot;</span></code>)</p></li>
+</ul>
+<p>A large library of pre-defined motifs and aptamers is provided in pyFuRNAce.</p>
+</li>
+<li><p><strong>Origami</strong>
+The origami is the final RNA nanostructure. In pyFuRNAce, an <code class="docutils literal notranslate"><span class="pre">Origami</span></code> is simply a collection of motifs in a grid. The <code class="docutils literal notranslate"><span class="pre">Origami</span></code> concatenates motifs horizontally (in rows) and vertically, automatically joining the vertical junctions. In principle, any RNA nanostructure can be represented as an origami:</p>
+<ul class="simple">
+<li><p>motifs (e.g., <code class="docutils literal notranslate"><span class="pre">[[pf.TetraLoop(),</span> <span class="pre">pf.Stem(10),</span> <span class="pre">pf.Dovetail(-1)],</span> <span class="pre">[pf.KissingLoop180(),</span> <span class="pre">pf.Stem(8),</span> <span class="pre">pf.Dovetail(-2)]]</span></code>)</p></li>
+</ul>
+</li>
+</ol>
+<p>When your nanostructure blueprint is ready, pyFuRNAce provides functions to optimize the RNA sequence (in the <code class="docutils literal notranslate"><span class="pre">generate</span></code> subpackage), design PCR primers, or set up oxDNA simulations (<code class="docutils literal notranslate"><span class="pre">prepare</span></code> subpackage).</p>
+<p>Examples of how to use the pyFuRNAce API are available in the <a class="reference internal" href="tutorials.html#tutorials"><span class="std std-ref">Tutorials</span></a> section.</p>
+</section>
 <section id="design-core-objects">
 <h2>Design Core Objects<a class="headerlink" href="#design-core-objects" title="Link to this heading"></a></h2>
 <section id="module-pyfurnace.design.core.strand">
@@ -7273,7 +7352,7 @@ function returns None.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="features.html" class="btn btn-neutral float-left" title="Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Install and run" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="limitations.html" class="btn btn-neutral float-right" title="Limitations &amp; Workarounds" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

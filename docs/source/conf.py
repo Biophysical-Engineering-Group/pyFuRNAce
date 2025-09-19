@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 project = "pyFuRNAce"
 copyright = "2025, Luca Monari"
 author = "Luca Monari"
-release = "0.0.7"
+release = "1.0.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -52,3 +52,10 @@ source_suffix = {
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["static"]
+html_theme_options = {
+    "collapse_navigation": False,  # don’t collapse to just the current page
+    "sticky_navigation": True,  # keeps the sidebar visible while scrolling
+    "navigation_depth": 4,  # how many levels to show
+    "includehidden": True,  # include hidden toctrees in the sidebar
+    "titles_only": False,  # show page sections, not only titles
+}

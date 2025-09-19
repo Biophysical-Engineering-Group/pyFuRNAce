@@ -106,6 +106,29 @@ def test_get_and_set_sequence_roundtrip():
     assert str(kl.get_kissing_sequence()) == "NNN"
     kl.set_sequence("ACG")
     assert str(kl.get_kissing_sequence()) == "ACG"
+    # normal kl
+    for kl_mot in [
+        KissingLoop,
+        KissingLoop180,
+        BranchedKissingLoop,
+        KissingDimer,
+        KissingDimer120,
+        BranchedDimer,
+    ]:
+        seq1 = "GGGUUA"
+        seq2 = "CCCGGG"
+        open_left = True
+
+        if kl_mot in (KissingLoop, KissingDimer120):
+            seq1 = "GGGUUAC"
+            seq2 = "CCCGGGU"
+        if kl_mot in (KissingDimer, KissingDimer120):
+            open_left = False  # dimers always closed
+
+        kl = kl_mot(open_left=open_left, sequence=seq1)
+        kl.set_sequence(seq2)
+        assert str(kl.get_kissing_sequence()) == seq2
+        assert kl == kl_mot(open_left=open_left, sequence=seq2)
 
 
 # --- KissingLoop120 -----------------------------------------------------------

@@ -24,7 +24,8 @@ Welcome to pyFuRNAce's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   features
+   about
+   installation
    api
    limitations
-   examples
+   tutorials

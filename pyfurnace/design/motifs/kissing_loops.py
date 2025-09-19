@@ -182,7 +182,9 @@ class KissingLoop(Loop):
 
     def set_sequence(self, new_seq):
         """Set the sequence of the strand"""
-        self._create_strands(sequence=new_seq, pk_index=self._pk_index)
+        self._create_strands(
+            sequence=new_seq, pk_index=self._pk_index, only_sequence=True
+        )
 
     def _check_pk_index(self, pk_index):
         if pk_index is None:
@@ -199,6 +201,7 @@ class KissingLoop(Loop):
         return_strand: bool = False,
         pk_index: Optional[Union[str, int]] = None,
         fold_180kl: bool = False,
+        only_sequence: bool = False,
     ) -> Union[None, List[Strand]]:
         """
         Protected class that takes a sequence and a pk_index and creates a strand
@@ -214,6 +217,9 @@ class KissingLoop(Loop):
             The pseudoknot index for the kissing loop (default is None).
         fold_180kl : bool, default is False
             If True, folds the kissing loop as a 180-degree loop.
+        only_sequence : bool, default is False
+            If True, only updates the sequence of the existing strand without
+            recreating it (default is False).
 
         Returns
         -------
@@ -254,20 +260,31 @@ class KissingLoop(Loop):
         #     self._strands[0].sequence = sequence
         #     return self._strands
 
+        # if the strands are already created, just update the sequence
+        if only_sequence:
+            if fold_180kl:
+                sequence = "AA" + sequence + "A"
+            self._strands[0].sequence = sequence
+            self._strands[0].pk_info["id"] = [self._pk_index]
+            self._strands[0].pk_info["E"] = [self._energy]
+            self._strands[0].pk_info["dE"] = [self._energy_tolerance]
+            return self._strands
+
         ### create the strand
-        strand = Strand(
-            f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭",
-            start=(seq_len + 2, 2),
-            direction=(-1, 0),
-            directionality=sequence.directionality,
-        )
-        pk_info = {
-            "id": [self._pk_index],
-            "ind_fwd": [(0, seq_len - 1)],
-            "E": [self._energy],
-            "dE": [self._energy_tolerance],
-        }
-        setattr(strand, "pk_info", pk_info)
+        else:
+            strand = Strand(
+                f"┼─{sequence}╭╰{'─' * seq_len}─╯┼│╭",
+                start=(seq_len + 2, 2),
+                direction=(-1, 0),
+                directionality=sequence.directionality,
+            )
+            pk_info = {
+                "id": [self._pk_index],
+                "ind_fwd": [(0, seq_len - 1)],
+                "E": [self._energy],
+                "dE": [self._energy_tolerance],
+            }
+            setattr(strand, "pk_info", pk_info)
 
         # Add oxDNA coordinates
         strand._coords = self._KL_coords.copy()
@@ -370,7 +387,11 @@ class KissingLoop180(KissingLoop):
         return super().get_kissing_sequence()[2:-1]
 
     def _create_strands(
-        self, sequence: str = "", return_strand: bool = False, pk_index: int = 0
+        self,
+        sequence: str = "",
+        return_strand: bool = False,
+        pk_index: int = 0,
+        only_sequence: bool = False,
     ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
@@ -384,6 +405,9 @@ class KissingLoop180(KissingLoop):
             If True, returns the created strand instead of replacing it in the motif.
         pk_index : str or int, optional
             The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            If True, only updates the sequence of the existing strand without
+            recreating it (default is False).
 
         Returns
         -------
@@ -392,12 +416,18 @@ class KissingLoop180(KissingLoop):
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
         strand = super()._create_strands(
-            sequence, return_strand=True, pk_index=pk_index, fold_180kl=True
+            sequence,
+            return_strand=True,
+            pk_index=pk_index,
+            fold_180kl=True,
+            only_sequence=only_sequence,
         )[0]
-        # create the strand
-        strand.start = (10, 2)
-        strand.strand = "AA" + strand.strand + "─A"
-        strand.pk_info["ind_fwd"] = [(2, 7)]
+
+        if not only_sequence:
+            # modify the strand start position and pk_info
+            strand.start = (10, 2)
+            strand.strand = "AA" + strand.strand + "─A"
+            strand.pk_info["ind_fwd"] = [(2, 7)]
 
         # if we don't want to replace the strands, just return the strand
         if return_strand:
@@ -462,7 +492,11 @@ class BranchedKissingLoop(KissingLoop):
         return self[strand_ind].sequence[:-1]
 
     def _create_strands(
-        self, sequence: str = "", return_strand: bool = False, pk_index: int = 0
+        self,
+        sequence: str = "",
+        return_strand: bool = False,
+        pk_index: int = 0,
+        only_sequence: bool = False,
     ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
@@ -476,6 +510,9 @@ class BranchedKissingLoop(KissingLoop):
             If True, returns the created strand instead of replacing it in the motif.
         pk_index : str or int, optional
             The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            If True, only updates the sequence of the existing strand without
+            recreating it (default is False).
 
         Returns
         -------
@@ -484,17 +521,25 @@ class BranchedKissingLoop(KissingLoop):
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
         strand = super()._create_strands(
-            sequence, return_strand=True, pk_index=pk_index
+            sequence,
+            return_strand=True,
+            pk_index=pk_index,
+            only_sequence=only_sequence,
         )[0]
-        # create the strand
-        strand.start = (9, 3)
-        strand.direction = (0, -1)
-        strand.strand = "│╮" + strand.strand + "─A"
-        strand.pk_info["ind_fwd"] = [(0, 5)]
 
-        connect_strand = Strand("╭│", start=(10, 2), direction=(-1, 0))
-        connect_strand._coords = self._KL_coords2.copy()
-        strands = [strand, connect_strand]
+        if not only_sequence:
+            # create the strand
+            strand.start = (9, 3)
+            strand.direction = (0, -1)
+            strand.strand = "│╮" + strand.strand + "─A"
+            strand.pk_info["ind_fwd"] = [(0, 5)]
+
+            connect_strand = Strand("╭│", start=(10, 2), direction=(-1, 0))
+            connect_strand._coords = self._KL_coords2.copy()
+            strands = [strand, connect_strand]
+        else:
+            self[0].strand = self[0].strand + "A"
+            strands = self._strands
 
         if return_strand:
             return strands
@@ -544,7 +589,11 @@ class KissingDimer(KissingLoop180):
     ###
 
     def _create_strands(
-        self, sequence: str = "", return_strand: bool = False, pk_index: int = 0
+        self,
+        sequence: str = "",
+        return_strand: bool = False,
+        pk_index: int = 0,
+        only_sequence: bool = False,
     ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
@@ -558,6 +607,8 @@ class KissingDimer(KissingLoop180):
             If True, returns the created strand instead of replacing it in the motif.
         pk_index : str or int, optional
             The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            Dummy parameter for compatibility; not used here.
 
         Returns
         -------
@@ -567,18 +618,15 @@ class KissingDimer(KissingLoop180):
         """
         bottom_pk_index = self.complementary_pk_index(pk_index)
         bottom_strand = super()._create_strands(
-            sequence, return_strand=True, pk_index=bottom_pk_index
+            sequence,
+            return_strand=True,
+            pk_index=bottom_pk_index,
         )[0]
         # add the pk_index to override the pk_index of the bottom strand
         self._pk_index = self._check_pk_index(pk_index)
 
         seq = bottom_strand.sequence[2:-1]
         rev_comp = seq.reverse_complement()
-
-        # ### if the strands are already created, just update the sequence
-        # if hasattr(self, '_strands'):
-        #     self._strands[1].sequence = 'AA' + rev_comp + 'A'
-        #     return self._strands
 
         ### shift the second strand to make space for the second one
         bottom_strand.start = (13, 3)
@@ -657,7 +705,9 @@ class KissingDimer120(KissingLoop120):
     ### METHODS
     ###
 
-    def _create_strands(self, sequence="", return_strand=False, pk_index=0):
+    def _create_strands(
+        self, sequence="", return_strand=False, pk_index=0, only_sequence: bool = False
+    ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
         with the kissing loop structure and metadata.
@@ -670,6 +720,8 @@ class KissingDimer120(KissingLoop120):
             If True, returns the created strand instead of replacing it in the motif.
         pk_index : str or int, optional
             The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            Dummy parameter for compatibility; not used here.
 
         Returns
         -------
@@ -762,7 +814,9 @@ class BranchedDimer(BranchedKissingLoop):
     ### METHODS
     ###
 
-    def _create_strands(self, sequence="", return_strand=False, pk_index=0):
+    def _create_strands(
+        self, sequence="", return_strand=False, pk_index=0, only_sequence: bool = False
+    ):
         """
         Protected class that takes a sequence and a pk_index and creates a strand
         with the kissing loop structure and metadata.
@@ -775,6 +829,9 @@ class BranchedDimer(BranchedKissingLoop):
             If True, returns the created strand instead of replacing it in the motif.
         pk_index : str or int, optional
             The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            If True, only updates the sequence of the existing strand
+            without creating a new one (default is False).
 
         Returns
         -------
@@ -791,36 +848,48 @@ class BranchedDimer(BranchedKissingLoop):
             sequence = Sequence(sequence, directionality="53")
 
         rev_comp = sequence.reverse_complement()
+
+        if only_sequence:
+            # metti al primo posto il branched KL
+            self._strands[0:2] = self._strands[0:2][::-1]
+
         strands = super()._create_strands(
-            rev_comp, return_strand=True, pk_index=bottom_pk_index
+            rev_comp,
+            return_strand=True,
+            pk_index=bottom_pk_index,
+            only_sequence=only_sequence,
         )
         # add the pk_index to override the pk_index of the bottom strand
         self._pk_index = self._check_pk_index(pk_index)
 
-        # ### if the strands are already created, just update the sequence
-        # if hasattr(self, '_strands'):
-        #     kl_index = [i for i, s in enumerate(self) if len(s.sequence) == 9][0]
-        #     self._strands[kl_index].sequence = 'AA' + sequence + 'A'
-        #     return self._strands
+        if not only_sequence:
+            ### shift the bottom branched KL
+            strands[0].start = (strands[0].start[0] + 3, strands[0].start[1] + 1)
+            strands[1].start = (strands[1].start[0] + 3, strands[1].start[1] + 1)
 
-        ### shift the bottom branched KL
-        strands[0].start = (strands[0].start[0] + 3, strands[0].start[1] + 1)
-        strands[1].start = (strands[1].start[0] + 3, strands[1].start[1] + 1)
+            ### create the top strand
+            top_strand = KissingLoop180(
+                open_left=True,
+                sequence=sequence,
+                pk_index=self._pk_index,
+                energy=self._energy,
+                energy_tolerance=self._energy_tolerance,
+            )[0]
+            top_strand._coords = self._KL_coords3.copy()
 
-        ### create the top strand
-        top_strand = KissingLoop180(
-            open_left=True,
-            sequence=sequence,
-            pk_index=self._pk_index,
-            energy=self._energy,
-            energy_tolerance=self._energy_tolerance,
-        )[0]
-        top_strand._coords = self._KL_coords3.copy()
-
-        strands.insert(0, top_strand)
+            strands.insert(0, top_strand)
+        else:
+            # put back the branched KL at the first position
+            self._strands[0:2] = self._strands[0:2][::-1]
+            # adjust the energy and energy tolerance of the 180°KL strand
+            self[0].sequence = "AA" + sequence + "A"
+            self[0].pk_info["E"] = [self._energy]
+            self[0].pk_info["dE"] = [self._energy_tolerance]
+            strands = self._strands
 
         if return_strand:
             return strands
+
         # replace the strands
         self.replace_all_strands(strands, copy=False, join=False)
 

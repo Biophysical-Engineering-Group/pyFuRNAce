@@ -123,7 +123,7 @@ Now we can download the PDB structure and open it in `OxView <http://www.oxview.
     :align: center
     :width: 400px
 
-We finally have a structure with two strands. We need an individual configuration file for each strand for load the structure in pyFuRNAce.
+We finally have a structure with two strands. We need an individual configuration file for each strand to load the structure in pyFuRNAce.
 To do so, you can delete one strand, save the oxDNA configuration (**use the new topology**), then undo the deletion with ``Ctrl+Z``, delete the other strand and save the configuration again.
 Remember to label the strand configurations so you can identify them later.
 

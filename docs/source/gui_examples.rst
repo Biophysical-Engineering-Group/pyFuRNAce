@@ -64,9 +64,32 @@ The corresponding code for the orange_broccoli aptamer motif is:
   import pyfurnace as pf
 
   orange_broc = pf.Motif.from_structure(
-      "((((.((..((..(((((((.(((&))))))))..))....))..))..))))",
-      "GGAGACGGUCGGGUCCAGGUGCAC&GUGGCCUGUUGAGUAGCGUGUGGGCUCC"
+      structure="((((.((..((..(((((((.(((&))))))))..))....))..))..))))",
+      sequence="GGAGACGGUCGGGUCCAGGUGCAC&GUGGCCUGUUGAGUAGCGUGUGGGCUCC"
   )
+
+  # add the Orange Broccoli to an origami to visualize it in pyFuRNAce:
+  origami = pf.Origami([[orange_broc]])
+
+.. tip::
+
+    You can additionally reduce the minimal aptamer sequence by removing nucleotides from the terminal stems.
+    You can create an aptamer with the minimal sequence:
+
+    .. code-block:: python
+
+      import pyfurnace as pf
+
+      orange_broc = pf.Motif.from_structure(
+          structure="((((.((..((..(((((&)))..))....))..))..))))",
+          sequence="GGAGACGGUCGGGUCCAG&CUGUUGAGUAGCGUGUGGGCUCC"
+      )
+
+      # add the Orange Broccoli to an origami to visualize it in pyFuRNAce:
+      origami = pf.Origami([[orange_broc]])
+
+    You can copy and paste the structure/sequence directly to the Structure Converter in the Custom Motif menu.
+
 
 3) Optional: Add 3D structure
 +++++++++++++++++++++++++++++
@@ -109,7 +132,7 @@ Remember to label the strand configurations so you can identify them later.
     :align: center
     :width: 400px
 
-In pyFuRNAce, in the Custom Motif menu, you can use the ``Upload 3D coordinates`` popover to upload the two configuration files.
+In pyFuRNAce, in the Custom Motif menu, add the dot-bracket structure and sequence of your aptamer (see :ref:`custom-motif-menu` for details). You can use the ``Upload 3D coordinates`` popover to upload the two configuration files.
 If the upload is successful, a brief green message will appear.
 
 .. image:: /_static/broccoli_aptamer_custom_motif_3d.png
@@ -150,13 +173,27 @@ By default, the user interface loads the coordinates as text in the code, so the
   origami = pf.Origami([orange_broc]) # to visualize the aptamer only
 
 
+.. _custom-motif-menu:
+
 Custom motif: origami with single-stranded region
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. warning::
+
+   In pyFuRNAce, the characters ``5`` and ``3`` are **terminal symbols** that mark the ends of strands.
+   If a strand ends with a ``5`` or ``3`` symbol, it cannot be joined at that end.
+
+   In the graphical interface, ``5`` and ``3`` are shown in red purely as **visual indicators of directionality**.
+   These red symbols are not part of the strand itself; they are only for visualization.
+
+   In this tutorial, the red ``3`` and ``5`` indicators are represented as ``5->`` and ``->3`` to make the direction explicit.
+
+
 Purely single-stranded motifs are discouraged in pyFuRNAce, since they are less predictable. In particular, they could lead to ambiguous scenarios in pyFuRNAce. For example, if you want two stems connected with a single-stranded ``3AAAAAAA5`` strand:
 
 .. code-block:: bash
 
-  5->NNNKNN       NKNNN->3
+  5->NNNKNN->3 5->NKNNN->3
      ┊┊┊┊┊┊       ┊┊┊┊┊
   3<-NNNKNNAAAAAAANKNNN<-5
 
@@ -166,7 +203,7 @@ pyFuRNAce will try to connect the first strands at the top, which would lead to:
 
   5->NNNKNNAAAAAAANKNNN->3
      ┊┊┊┊┊┊       ┊┊┊┊┊
-  3<-NNNKNN       NKNNN<-5
+  3<-NNNKNN<-5 3<-NKNNN<-5
 
 This will throw an error, since the directionality of the ``3AAAAAAA5`` strand is not compatible with the top strands of the stems.
 In this example, we will show how to create a custom single-stranded motif to avoid ambiguity and solve the issue.
@@ -184,9 +221,9 @@ You will have an origami made of two stems:
 
 .. code-block:: bash
 
-   NNNKNNNNNNNKNN
-   ┊┊┊┊┊┊┊┊┊┊┊┊┊┊
-   NNNKNNNNNNNKNN
+   5->NNNKNNNNNNNKNN->3
+      ┊┊┊┊┊┊┊┊┊┊┊┊┊┊
+   3<-NNNKNNNNNNNKNN<-5
 
 You can select the second motif (motif index: 1) and select ``Custom`` in the motif menu.
 
@@ -263,6 +300,7 @@ _______________
 The second custom motif creation method is by manual text input. It involves writing the motif as text in the text area.
 
 .. warning::
+
     To set the directionality of a strand, you only need to add the ``5`` character at the beginning of the strand. Do not add a ``3`` character at the end of the strand.
 
 .. image:: /_static/custom_motif_manual_input1.png
@@ -333,9 +371,9 @@ Here is the final result:
 
 .. code-block:: bash
 
-  5NNNNKNN─3 5────────NNNNKNN3
-   ┊┊┊┊┊┊┊            ┊┊┊┊┊┊┊
-  3NNNNKNN─────AAAAAAANNNNKNN5
+  5->NNNNKNN─3 5────────NNNNKNN->3
+     ┊┊┊┊┊┊┊            ┊┊┊┊┊┊┊
+  3<-NNNNKNN─────AAAAAAANNNNKNN<-5
 
 
 4) Equivalent Code

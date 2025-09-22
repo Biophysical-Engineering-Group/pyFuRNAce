@@ -1165,6 +1165,9 @@ class Motif(Callback):
         if not structure:
             # if only sequence is provided, fold it to get the structure
             structure = fold(sequence)[0]
+            for i, sym in enumerate(sequence[::-1]):
+                if sym == "&":
+                    structure = structure[:-i] + "&" + structure[-i:]
 
         # input dot-bracket notation
         if isinstance(structure, str):

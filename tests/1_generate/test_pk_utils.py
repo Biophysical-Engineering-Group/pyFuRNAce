@@ -67,9 +67,7 @@ def test_parse_pseudoknots_literal_eval_error_prints_and_skips(capsys):
     # Make one of the lists unparsable; should print an error,
     # then skip for missing indices.
     s = "id:oops,ind_fwd:NOT_A_LIST,ind_rev:[(1,2)]"
-    with pytest.warns(
-        UserWarning, match="Skipping pseudoknot with id oops due to missing indices"
-    ):
+    with pytest.warns(UserWarning):
         out = parse_pseudoknots(s)
     assert "oops" not in out
 

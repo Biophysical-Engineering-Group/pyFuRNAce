@@ -218,6 +218,12 @@ def test_from_structure_with_basepair_map():
     assert m.structure.replace("&", "").count("(") == 1
     assert m.structure.replace("&", "").count(")") == 1
 
+    # from structure with a split sequence
+    seq = "GGGGGG&CCCCCCA"
+    mot_from_seq = Motif.from_structure(sequence=seq)
+    assert mot_from_seq.sequence == seq
+    assert mot_from_seq.structure == "((((((&))))))."
+
 
 # =========================
 # _check_addition

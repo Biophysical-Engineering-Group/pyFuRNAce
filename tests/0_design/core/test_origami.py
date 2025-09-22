@@ -413,10 +413,18 @@ def test_from_structure():
         assert hit, "Pseudoknot not found"
 
     db = "...(...)....(((...)))"
+    ori_from_db = Origami.from_structure(db)
     ori_from_pm = Origami.from_structure(dot_bracket_to_pair_map(db))
     ori_from_tree = Origami.from_structure(dot_bracket_to_tree(db))
+    assert ori_from_db.structure == db
     assert ori_from_pm.structure == db
     assert ori_from_tree.structure == db
+
+    # from structure with a split sequence
+    seq = "GGGGGG&CCCCCCA"
+    ori_from_seq = Origami.from_structure(sequence=seq)
+    assert ori_from_seq.sequence == seq
+    assert ori_from_seq.structure == "((((((&))))))."
 
 
 def test_assembled_string_sequence_structure_are_accessible():

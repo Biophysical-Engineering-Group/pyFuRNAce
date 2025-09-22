@@ -205,29 +205,37 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="gui_examples.html">Graphical User Interfaces Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="gui_examples.html#custom-motif-single-stranded">Custom motif: Single Stranded</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#create-an-origami-with-two-stems">1) Create an Origami with two stems</a></li>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#a-custom-structure-converter">2. A) Custom structure converter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#b-custom-manual-input">2. B) Custom manual input</a></li>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#c-custom-drawing-tool">2. C) Custom drawing tool</a></li>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#complete-the-structure">3. Complete the structure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#equivalent-code">3. Equivalent Code</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="gui_examples.html#make-an-aptamer">Make an aptamer</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#import-the-trna-aptamer-sequence">1) Import the trna-aptamer sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_examples.html">Graphical User Interface Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui_examples.html#including-a-custom-aptamer">Including a custom aptamer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#import-the-trna-aptamer-sequence">1) Import the tRNA-aptamer sequence</a></li>
 <li class="toctree-l4"><a class="reference internal" href="gui_examples.html#isolate-the-aptamer-motif">2) Isolate the aptamer motif</a></li>
-<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#optional-add-3d-structure">3) Optional: add 3D structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#optional-add-3d-structure">3) Optional: Add 3D structure</a></li>
 <li class="toctree-l4"><a class="reference internal" href="gui_examples.html#python-code">4) Python code</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="gui_examples.html#custom-motif-origami-with-single-stranded-region">Custom motif: origami with single-stranded region</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#create-an-origami-with-two-stems">1) Create an origami with two stems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#custom-motif-creation">2) Custom motif creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#complete-the-structure">3) Complete the structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#equivalent-code">4) Equivalent Code</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="script_examples.html">Python script</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui_examples.html#adding-an-overhang-at-the-5-or-3-end">Adding an overhang at the 5’ or 3’ end</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#create-an-origami">1) Create an origami</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#add-a-line-and-a-connection">2) Add a line and a connection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#create-and-add-the-single-stranded-motif">3) Create and add the single-stranded motif</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gui_examples.html#connect-the-single-stranded-motif">4) Connect the single-stranded motif</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="script_examples.html">Python Scripting Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="script_examples.html#two-helices-with-flaps-and-optimization">Two helices with FLAPs (and optimization)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="script_examples.html#rna-filament">RNA filament</a></li>
-<li class="toctree-l3"><a class="reference internal" href="script_examples.html#full-folding-barrier-optimization">Full folding barrier optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="script_examples.html#folding-barrier-optimization">Folding barrier optimization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="script_examples.html#full-optimisation">Full optimisation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="script_examples.html#jupyter-notebooks">Jupyter Notebooks</a><ul>
@@ -284,6 +292,7 @@
 <h1>Welcome to pyFuRNAce’s documentation!<a class="headerlink" href="#welcome-to-pyfurnace-s-documentation" title="Link to this heading"></a></h1>
 <img alt="pyFuRNAce logo" src="https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/pyfurnace/app/static/logo_text.png?raw=true" />
 <p><strong>pyFuRNAce</strong> is an open-source Python package and web-based design engine for creating complex RNA nanostructures using the co-transcriptional RNA origami approach. It streamlines the entire design pipeline — from structural motif assembly to sequence generation and primer design — into an intuitive, user-friendly platform.</p>
+<p><a class="reference external" href="https://pepy.tech/projects/pyfurnace"><img alt="Downloads per month (pepy)" src="https://static.pepy.tech/personalized-badge/pyfurnace?period=month&amp;units=INTERNATIONAL_SYSTEM&amp;left_color=GREY&amp;right_color=GREEN&amp;left_text=Downloads/Month" /></a> <a class="reference external" href="https://pepy.tech/projects/pyfurnace"><img alt="Total downloads (pepy)" src="https://static.pepy.tech/personalized-badge/pyfurnace?period=total&amp;units=INTERNATIONAL_SYSTEM&amp;left_color=GREY&amp;right_color=RED&amp;left_text=Downloads" /></a></p>
 <div class="line-block">
 <div class="line"><strong>WebApp:</strong> <a class="reference external" href="http://pyfurnace.de">pyfurnace.de</a></div>
 <div class="line"><strong>GitHub:</strong> <a class="reference external" href="https://github.com/Biophysical-Engineering-Group/pyFuRNAce">Biophysical-Engineering-Group/pyFuRNAce</a></div>
@@ -291,6 +300,7 @@
 <div class="line"><strong>Script API examples:</strong> <a class="reference external" href="https://github.com/Biophysical-Engineering-Group/pyFuRNAce/tree/main/examples">Code Examples</a></div>
 <div class="line"><strong>Documentation:</strong> <a class="reference external" href="https://pyfurnace.readthedocs.io/en/latest/">Read the Docs</a></div>
 </div>
+<p>pyFuRNAce design API coverage:  <a class="reference external" href="https://codecov.io/gh/Biophysical-Engineering-Group/pyFuRNAce"><img alt="Codecov coverage" src="https://codecov.io/gh/Biophysical-Engineering-Group/pyFuRNAce/graph/badge.svg?token=EQX6C990WP" /></a></p>
 <img alt="pyFuRNAce demo" src="https://github.com/Biophysical-Engineering-Group/pyFuRNAce/blob/main/vid/demo_1min.gif?raw=true" />
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
@@ -322,8 +332,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="gui_examples.html">Graphical User Interfaces Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="script_examples.html">Python script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui_examples.html">Graphical User Interface Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="script_examples.html">Python Scripting Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="script_examples.html#jupyter-notebooks">Jupyter Notebooks</a></li>
 </ul>
 </li>

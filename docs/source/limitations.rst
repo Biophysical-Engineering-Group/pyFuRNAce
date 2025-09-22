@@ -3,6 +3,8 @@
 Limitations & Workarounds
 =========================
 
+.. _barrier-limit:
+
 PyFuRNAce folding barrier estimation
 ------------------------------------
 
@@ -16,22 +18,10 @@ The folding barrier calculation in ROAD and pyFuRNAce highlights such cases: if 
 To reduce folding barriers, three strategies are useful:
 
 - **Use short dovetails rather than long dovetails,** since short dovetails require less than half a helix turn and thus lead to weaker barriers.
-- **Change the 5′ start position of the structure,** which alters strand routing and can reduce the number of kissing loops between complementary sequences. This optimization is available in both the pyFuRNAce GUI and API.
-- **Modify the placement of continuous stems and kissing loops in the RNA origami structure,** which also changes routing. Since this requires altering the origami structure itself, it is not implemented as a direct function, but we provide a Python script in the documentation to assist with this.
+- **Change the 5′ start position of the structure,** which alters strand routing and can reduce the number of kissing loops between complementary sequences. This optimization is available in both the pyFuRNAce GUI and API  (see :ref:`barrier-opti`).
+- **Modify the placement of continuous stems and kissing loops in the RNA origami structure,** which also changes routing. Since this requires altering the origami structure itself, it is not implemented as a direct function, but we provide a Python script in the documentation to assist with this (see :ref:`barrier-opti-script`).
 
 Ultimately, cotranscriptional folding depends on many factors beyond this simplified model. While the folding barrier calculation is a useful heuristic for estimating cotranscriptional feasibility, our experimental validation did not reveal a clear correlation between predicted penalties and folding outcomes. At present, the final judgment still rests with the designer and further experimental characterization is needed to fully understand the kinetic landscape of RNA origami folding.
-
-Example of making an origami reducing the folding barriers:
-
-.. code-block:: python
-
-    import pyfurnace as pf
-    # create a 6 helix bundle with 3 kissing loops columns
-    origami = pf.simple_origami(dt_list=[-3] * 4, kl_columns=3, main_stem=33)
-    # improve the folding pathway by changing the 5' start position
-    origami = origami.improve_folding_pathway(kl_delay=150)
-
-For extensive folding barrier optimization, we recommend using the See :ref:`the full folding barrier optimization <full-folding-barrier-optimization>` example.
 
 Revolvr
 -------
@@ -40,18 +30,22 @@ For sequence generation and optimization, we use the Revolvr program from ROAD :
 
 - **Optimization failure of structures containing repeated fixed sequences.**
   If there are more than four copies of a fixed sequence in a structure, Revolvr optimization will often get stuck during sequence-symmetry minimization. This is because the fixed sequence plus one base will fail the test for repeated sequences.
+
   **Solution:** By extending the fixed sequences by unequal amounts of random sequence, repeats of the exact same sequence in the optimization region can be avoided.
 
 - **No multimeric structures.**
   Revolvr can only perform optimization of one strand at a time.
+
   **Solution:** Optimization of multi-strand assemblies needs to be done in multiple steps. The user can also replace external KLs with continuous duplexes and optimize the combined structure, replacing the continuous duplex with separate KLs after optimization.
 
 - **Timeout during optimization of large structures.**
   Revolvr can be very slow at optimizing large structures, and due to server constraints the pyFuRNAce webserver has a timeout of 2 hours.
-  **Solution:** When running the optimisation through Python scripts, the Revolvr timeout can be set to an arbitrary value. For the 2.5 kb structure shown in Figure 5, we used a 24-hour timeout (see Supplementary Note S5). Designs with particular constraints (e.g. short stems, such as dovetails or long unpaired regions) are typically hard to design, and Revolvr might fail repeatedly. PyFuRNAce also provides a function to run multiple instances of Revolvr in parallel, called ``parallel_road``, which can speed up the optimisation, but requires multiple compute cores. Optimisation through Python scripts can also be run on a high-performance computer cluster, even though the parallelism is shared exclusively on one node.
+
+  **Solution:** When running the optimisation through Python scripts, the Revolvr timeout can be set to an arbitrary value. For the 2.5 kb structure shown in Figure 5, we used a 24-hour timeout (see Supplementary Note S5). Designs with particular constraints (e.g. short stems, such as dovetails or long unpaired regions) are typically hard to design, and Revolvr might fail repeatedly. PyFuRNAce also provides a function to run multiple instances of Revolvr in parallel, called ``parallel_road``, which can speed up the optimisation, but requires multiple compute cores. Optimisation through Python scripts can also be run on a high-performance computing cluster, even though the parallelism is shared exclusively on one node.
 
 - **Lack of fine control over KL energies.**
   As RNA structures grow in size and complexity, the number of KL needed to fold the complete structure naturally also increases. By specifying the interaction energy of each KL pair, RNA designers could gain some control over the folding pathway and assembly order of multimeric structures, enabling larger, more complex structures.
+
   **Solution:** Users can identify orthogonal KLs with the target energies ahead of time and manually insert the desired sequences. The KL sequence can be inserted when the motif is added or edited later in the ``Edit`` tab. We frequently use Table S4 from Geary *et al.* 2021 :cite:`geary2021rna`, which lists KL energies, for this purpose.
 
 We are investigating novel sequence optimization strategies which overcome these limitations. PyFuRNAce is written with this eventuality in mind, and the sequence optimization algorithm is something which can be integrated later with a list of available algorithms.
@@ -76,6 +70,7 @@ PyFuRNAce uses oxDNA Analysis Tools (OAT) to convert 3D models from the xoDNA re
 
 - **Inaccurate sub-nucleotide features.**
   As an anisotropic one-bead-per-nucleotide model, oxDNA's file format only tracks the center of mass and orientation of each base, but lower level atomic information is lost. When users download PDB files from pyFuRNAce, the files are generated from the oxDNA representation via OAT's converter, which assembles ideal all-atom representations of nucleotides to the reference frame of the coarse-grained representation. These all-atom representations come from an NMR structure of an RNA helix (PDB ID: 2jxq) :cite:`popenda2008bulged`. This is not an optimized structure and should be considered a low-resolution model.
+
   **Solution:** Before additional model building or all-atom molecular dynamics simulations, we usually refine the all-atom PDB structures with QRNAS :cite:`stasiewicz2019qrnas` using default settings.
 
 References

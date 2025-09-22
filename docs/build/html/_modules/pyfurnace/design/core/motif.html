@@ -9,6 +9,7 @@
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
 
 
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
@@ -18,6 +19,7 @@
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="../../../../about.html" />
@@ -203,10 +205,37 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../script_examples.html">Python script</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../gui_examples.html">Graphical User Interface Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../gui_examples.html#including-a-custom-aptamer">Including a custom aptamer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#import-the-trna-aptamer-sequence">1) Import the tRNA-aptamer sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#isolate-the-aptamer-motif">2) Isolate the aptamer motif</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#optional-add-3d-structure">3) Optional: Add 3D structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#python-code">4) Python code</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../gui_examples.html#custom-motif-origami-with-single-stranded-region">Custom motif: origami with single-stranded region</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#create-an-origami-with-two-stems">1) Create an origami with two stems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#custom-motif-creation">2) Custom motif creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#complete-the-structure">3) Complete the structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#equivalent-code">4) Equivalent Code</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../gui_examples.html#adding-an-overhang-at-the-5-or-3-end">Adding an overhang at the 5’ or 3’ end</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#create-an-origami">1) Create an origami</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#add-a-line-and-a-connection">2) Add a line and a connection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#create-and-add-the-single-stranded-motif">3) Create and add the single-stranded motif</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../gui_examples.html#connect-the-single-stranded-motif">4) Connect the single-stranded motif</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../script_examples.html">Python Scripting Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../script_examples.html#two-helices-with-flaps-and-optimization">Two helices with FLAPs (and optimization)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../script_examples.html#rna-filament">RNA filament</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../script_examples.html#full-folding-barrier-optimization">Full folding barrier optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../script_examples.html#folding-barrier-optimization">Folding barrier optimization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../script_examples.html#full-optimisation">Full optimisation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../script_examples.html#jupyter-notebooks">Jupyter Notebooks</a><ul>
@@ -1440,6 +1469,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">structure</span><span class="p">:</span>
             <span class="c1"># if only sequence is provided, fold it to get the structure</span>
             <span class="n">structure</span> <span class="o">=</span> <span class="n">fold</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sym</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequence</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">sym</span> <span class="o">==</span> <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span>
+                    <span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[:</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="n">structure</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">:]</span>
 
         <span class="c1"># input dot-bracket notation</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>

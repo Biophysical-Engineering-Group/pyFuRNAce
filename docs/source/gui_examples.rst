@@ -297,11 +297,11 @@ Using the flip button at the top will produce the motif that we want:
 b) Manual input
 _______________
 
-The second custom motif creation method is by manual text input. It involves writing the motif as text in the text area.
+The second custom motif creation method is by manual text input (``Full text input`` tab). It involves writing the motif as text in the text area.
 
 .. warning::
 
-    To set the directionality of a strand, you only need to add the ``5`` character at the beginning of the strand. Do not add a ``3`` character at the end of the strand.
+    To set the directionality of a strand in ``Full text input``, you only need to add the ``5`` character at the beginning of the strand. Do not add a ``3`` character at the end of the strand.
 
 .. image:: /_static/custom_motif_manual_input1.png
     :alt: Custom motif with manual input

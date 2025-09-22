@@ -130,6 +130,38 @@ def Broccoli(**kwargs):
     return create_aptamer([strand1, strand2], **kwargs)
 
 
+def OrangeBroccoli(**kwargs):
+    """
+    Returns the Orange Broccoli aptamer motif.
+    Pubblication: https://doi.org/10.1038/nchembio.2477
+
+    Structure from the Broccoli PDB 7ZJ5.
+    """
+    strand1 = Strand("GGAGAC────GGUCGGG─UC────CAG")
+    strand1._coords = Coords.load_from_file(CONFS_PATH / "Broccoli_1.dat")
+
+    strand2 = Strand("CUG─UU─GA─GUAGCGUGUG─GGCUCC", start=(26, 2), direction=(-1, 0))
+    strand2._coords = Coords.load_from_file(CONFS_PATH / "Broccoli_2.dat")
+    kwargs.setdefault("join", False)
+    return create_aptamer([strand1, strand2], **kwargs)
+
+
+def RedBroccoli(**kwargs):
+    """
+    Returns the Red Broccoli aptamer motif.
+    Pubblication: https://doi.org/10.1038/nchembio.2477
+
+    Structure from the Broccoli PDB 7ZJ5.
+    """
+    strand1 = Strand("GGAGAC────GGUCGGG─UC────CAG")
+    strand1._coords = Coords.load_from_file(CONFS_PATH / "Broccoli_1.dat")
+
+    strand2 = Strand("CUG─UU─GA─GUAGUGUGUG─GGCUCC", start=(26, 2), direction=(-1, 0))
+    strand2._coords = Coords.load_from_file(CONFS_PATH / "Broccoli_2.dat")
+    kwargs.setdefault("join", False)
+    return create_aptamer([strand1, strand2], **kwargs)
+
+
 def Pepper(**kwargs):
     """
     Returns the Pepper aptamer motif.

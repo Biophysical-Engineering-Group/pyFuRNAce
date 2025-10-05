@@ -419,7 +419,6 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
             min_value=-1,
             max_value=origami_len - 1,
             value=line_index,
-            key=f"select_line_index{st_state.ori_click_count}",
         )
         st_state.current_line_occupied = False
 
@@ -472,7 +471,6 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
             min_value=0,
             max_value=max_val,
             value=motif_index,
-            key=f"select_motif_index_{st_state.ori_click_count}",
         )
 
         if motif_index != st_state.motif_index:

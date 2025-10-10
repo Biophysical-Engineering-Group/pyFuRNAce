@@ -56,6 +56,6 @@ class AptamersCommand(MotifCommand):
                 flip_default = True
             st.session_state.motif = motif
             st.session_state.motif_buffer = f"motif = pf.{aptamer_selection}()"
-            if st.toggle("Flip the aptamer", value=flip_default, key="flip_aptamer"):
+            if st.toggle("Flip the aptamer", value=flip_default):
                 motif.flip(1, 1)
                 st.session_state.motif_buffer += ".flip(1, 1)"

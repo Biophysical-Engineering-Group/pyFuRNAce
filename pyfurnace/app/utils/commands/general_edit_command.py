@@ -29,31 +29,32 @@ class GeneralEditCommand(MotifCommand):
                 subcol1, subcol2 = st.columns(2)
                 with subcol1:
                     flip_vert = st.toggle(
-                        "Flip vertically", value=True, key=f"{key}flip_vert"
+                        "Flip vertically",
+                        value=True,
                     )
                 with subcol2:
                     flip_hor = st.toggle(
-                        "Flip horizontally", value=True, key=f"{key}flip_hor"
+                        "Flip horizontally",
+                        value=True,
                     )
             with col2:
                 if flip_vert or flip_hor:
-                    flip = st.button("Flip", key=f"{key}flip")
+                    flip = st.button("Flip")
                     flip_vert &= flip
                     flip_hor &= flip
             with col3:
-                rotate = st.button("Rotate 90° clockwise", key=f"{key}rotate")
+                rotate = st.button("Rotate 90° clockwise")
 
         else:
             with col1:
-                flip_vert = st.toggle("Flip vertically", key=f"{key}flip_vert")
+                flip_vert = st.toggle("Flip vertically")
             with col2:
-                flip_hor = st.toggle("Flip horizontally", key=f"{key}flip_hor")
+                flip_hor = st.toggle("Flip horizontally")
             with col3:
                 rotate = st.number_input(
                     "Rotate 90° clockwise:",
                     min_value=0,
                     max_value=4,
-                    key=f"{key}rotate",
                 )
 
         return flip_vert, flip_hor, rotate

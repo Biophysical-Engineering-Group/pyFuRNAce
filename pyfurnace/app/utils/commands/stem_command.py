@@ -12,7 +12,6 @@ class StemCommand(MotifCommand):
             # interface data:
             # top_seq, seq_length, wobble_interval, wobble_tolerance
             data = self.interface(
-                "mod",
                 motif[0].sequence,
                 motif.length,
                 motif.wobble_interval,
@@ -67,7 +66,7 @@ class StemCommand(MotifCommand):
             st_state.motif = motif
 
     def interface(
-        self, key="", top_seq=None, len_default=7, wobble_interval=5, wobble_tolerance=2
+        self, top_seq=None, len_default=7, wobble_interval=5, wobble_tolerance=2
     ):
 
         ### initialize the variables
@@ -77,38 +76,36 @@ class StemCommand(MotifCommand):
         col1, col2 = st.columns([1, 5], vertical_alignment="bottom")
 
         with col1:
-            specific_seq = st.toggle("Custom Sequence", key=f"seq_stem{key}")
+            specific_seq = st.toggle("Custom Sequence")
 
         with col2:
             if specific_seq:
                 col1, col2 = st.columns([5, 1])
                 with col1:
-                    top_seq = st.text_input(
-                        "Sequence:", key=f"txt_top_seq_stem{key}", value=top_seq
-                    )
+                    top_seq = st.text_input("Sequence:", value=top_seq)
             else:
                 subcol1, subcol2, subcol3 = st.columns([3, 1, 1])
                 with subcol1:
                     seq_length = st.number_input(
                         "Length:",
-                        key=f"stem_length{key}",
                         min_value=1,
                         value=len_default,
                     )
                 with subcol2:
                     wobble_interval = st.number_input(
                         "Wobble interval:",
-                        key=f"stem_wobble_interv{key}",
                         min_value=0,
                         value=wobble_interval,
-                        help="Add a wobble every n° " "nucleotides",
+                        help="Add a wobble every n° nucleotides, to avoid secondary "
+                        "structures in the DNA",
                     )
                 with subcol3:
                     wobble_tolerance = st.number_input(
                         "Wobble tolerance:",
-                        key=f"stem_wobble_tole{key}",
                         min_value=0,
                         value=wobble_tolerance,
+                        help="Randomize the number of wobbles by ± n, to speed up "
+                        "sequence optimization",
                     )
 
         return top_seq, seq_length, wobble_interval, wobble_tolerance

@@ -37,19 +37,16 @@ class TetraLoopCommand(MotifCommand):
         open_left = False
         col1, col2, col3 = st.columns([1, 1, 4], vertical_alignment="bottom")
         with col1:
-            custom_seq = st.toggle("Custom Sequence", key=f"seq_tetra{key}")
+            custom_seq = st.toggle("Custom Sequence")
         with col2:
             if key == "mod":
-                open_left = st.button("Flip", key=f"open_left_tetra{key}")
+                open_left = st.button("Flip")
             else:
                 open_left = st.toggle(
                     "Flip",
                     value=st_state.current_line_occupied,
-                    key=f"open_left_tetra{key}",
                 )
         if custom_seq:
             with col3:
-                seq = st.text_input(
-                    "Sequence:", value=seq_default, key=f"txt_seq_tetra{key}"
-                )
+                seq = st.text_input("Sequence:", value=seq_default)
         return seq, open_left

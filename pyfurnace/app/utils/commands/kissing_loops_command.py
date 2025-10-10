@@ -128,7 +128,6 @@ class KissingLoopsCommand(MotifCommand):
                 "Pseudoknot id:",
                 options=all_pk_indexes,
                 index=index_for_list,
-                key=f"pk_index_kl{key}",
                 help="Select the pseudoknot id for the kissing loop motif. "
                 "The id is used to identify the pseudoknot in the sequence."
                 " Pseudoknots with the same id will have the same sequence."
@@ -141,20 +140,18 @@ class KissingLoopsCommand(MotifCommand):
         col1, col2, col3 = st.columns([1, 1, 5], vertical_alignment="bottom")
         open_left = False
         with col1:
-            specific_seq = st.toggle("Custom Sequence", key=f"seq_int_kl{key}")
+            specific_seq = st.toggle("Custom Sequence")
         with col2:
             if key == "mod":
-                open_left = st.button("Flip", key=f"open_left_kl{key}")
+                open_left = st.button("Flip")
             else:
-                open_left = st.toggle("Flip", value=flip, key=f"open_left_kl{key}")
+                open_left = st.toggle("Flip", value=flip)
 
         with col3:
             if specific_seq:
                 subcol1, subcol2 = st.columns([5, 1])
                 with subcol1:  # either sequence of energy info
-                    top_seq = st.text_input(
-                        "Sequence:", key=f"seq_top_int_kl{key}", value=top_seq
-                    )
+                    top_seq = st.text_input("Sequence:", value=top_seq)
                 with subcol2:
                     pk_index = pk_index_interface()
 
@@ -170,7 +167,6 @@ class KissingLoopsCommand(MotifCommand):
                         value=(min_kl_E, max_kl_E),
                         step=0.1,
                         format="-%.1f",
-                        key=f"energy_range_kl{key}",
                     )
                     kl_energy = round(-sum(kl_range) / 2, 2)
                     energy_tolerance = round(abs(kl_range[1] - kl_range[0]) / 2, 3)

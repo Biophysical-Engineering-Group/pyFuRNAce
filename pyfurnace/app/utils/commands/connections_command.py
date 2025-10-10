@@ -72,7 +72,7 @@ class ConnectionsCommand(MotifCommand):
 
 class start_end_stemCommand(MotifCommand):
 
-    def execute(self, motif=None):
+    def execute(self):
         t_l, t_r, b_l, b_r = self.interface()
         st.session_state.motif_buffer = (
             f"motif = pf.start_end_stem(up_left='{t_l}', "
@@ -85,7 +85,6 @@ class start_end_stemCommand(MotifCommand):
 
     def interface(
         self,
-        key="",
         up_l_def="3",
         up_r_def="5",
         down_l_def="5",
@@ -99,26 +98,22 @@ class start_end_stemCommand(MotifCommand):
                 "Top left:",
                 [up_l_def] + ["─", None],
                 index=up_ind,
-                key=f"start_end_stem_up_left{key}",
             )
             b_l = st.selectbox(
                 "Bottom left:",
                 [down_l_def] + ["─", None],
                 index=down_ind,
-                key=f"start_end_stem_down_left{key}",
             )
         with col2:
             t_r = st.selectbox(
                 "Top right:",
                 [up_r_def] + ["─", None],
                 index=up_ind,
-                key=f"start_end_stem_up_right{key}",
             )
             b_r = st.selectbox(
                 "Bottom right:",
                 [down_r_def] + ["─", None],
                 index=down_ind,
-                key=f"start_end_stem_down_right{key}",
             )
         if not t_l:
             t_l = ""

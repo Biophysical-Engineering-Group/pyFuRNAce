@@ -12,7 +12,6 @@ class DovetailCommand(MotifCommand):
             # interface data:
             # sign,top_seq,length,w_interval,w_tolerance, up_cross, down_cross
             data = self.interface(
-                "mod",
                 motif[0].sequence,
                 motif.length,
                 motif.wobble_interval,
@@ -107,7 +106,6 @@ class DovetailCommand(MotifCommand):
 
     def interface(
         self,
-        key="",
         top_seq=None,
         len_default=-2,
         wobble_interval=5,
@@ -122,57 +120,47 @@ class DovetailCommand(MotifCommand):
         ### create the interface
         col1, col2 = st.columns([1, 5], vertical_alignment="bottom")
         with col1:
-            specific_seq = st.toggle("Custom Sequence", key=f"seq_dt{key}")
+            specific_seq = st.toggle("Custom Sequence")
         with col2:
             if specific_seq:
                 col1, col2, col3, col4 = st.columns(
                     [4, 1, 1, 1], vertical_alignment="bottom"
                 )
                 with col1:
-                    top_seq = st.text_input(
-                        "Sequence:", key=f"txt_up_seq_dt{key}", value=top_seq
-                    )
+                    top_seq = st.text_input("Sequence:", value=top_seq)
                 with col2:
-                    sign = st.selectbox("Sign:", [-1, +1], key=f"txt_sign_dt{key}")
+                    sign = st.selectbox("Sign:", [-1, +1])
                 with col3:
-                    up_cross = st.toggle(
-                        "Up cross", key=f"up_cross_dt{key}", value=up_cross
-                    )
+                    up_cross = st.toggle("Up cross", value=up_cross)
                 with col4:
-                    down_cross = st.toggle(
-                        "Down cross", key=f"down_cross_dt{key}", value=down_cross
-                    )
+                    down_cross = st.toggle("Down cross", value=down_cross)
             else:
                 subcols = st.columns([1, 1, 1, 1, 1], vertical_alignment="bottom")
                 with subcols[0]:
                     seq_length = st.number_input(
                         "Length:",
-                        key=f"dt_length{key}",
                         min_value=-100,
                         value=len_default,
                     )
                 with subcols[1]:
-                    up_cross = st.toggle(
-                        "Up cross", key=f"up_cross_dt{key}", value=up_cross
-                    )
+                    up_cross = st.toggle("Up cross", value=up_cross)
                 with subcols[2]:
-                    down_cross = st.toggle(
-                        "Down cross", key=f"down_cross_dt{key}", value=down_cross
-                    )
+                    down_cross = st.toggle("Down cross", value=down_cross)
                 with subcols[3]:
                     wobble_interval = st.number_input(
                         "Wobble interval:",
-                        key=f"dt_wobble_interval{key}",
                         min_value=0,
                         value=wobble_interval,
-                        help="Add a wobble every " "n° nucleotides",
+                        help="Add a wobble every n° nucleotides, to avoid secondary "
+                        "structures in the DNA",
                     )
                 with subcols[4]:
                     wobble_tolerance = st.number_input(
                         "Wobble tolerance:",
-                        key=f"dt_wobble_tolerance{key}",
                         min_value=0,
                         value=wobble_tolerance,
+                        help="Randomize the number of wobbles by ± n, to speed up "
+                        "sequence optimization",
                     )
 
         return (

@@ -137,7 +137,7 @@ class KissingLoopsCommand(MotifCommand):
             )
             return pk_index
 
-        col1, col2, col3 = st.columns([1, 1, 5], vertical_alignment="bottom")
+        col1, col2, col3 = st.columns([1.5, 1, 5], vertical_alignment="bottom")
         open_left = False
         with col1:
             specific_seq = st.toggle("Custom Sequence")

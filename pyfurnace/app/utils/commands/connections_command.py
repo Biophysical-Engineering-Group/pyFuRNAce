@@ -1,5 +1,5 @@
 import inspect
-from pyfurnace.design import utils, start_end_stem
+from pyfurnace.design import utils, single_strand, start_end_stem
 
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -45,6 +45,9 @@ class ConnectionsCommand(MotifCommand):
             if util_option == "Tetraloop":
                 TetraLoopCommand().execute()
                 return
+            if util_option == "single_strand":
+                single_strandCommand().execute()
+                return
             if util_option == "start_end_stem":
                 start_end_stemCommand().execute()
                 return
@@ -68,6 +71,39 @@ class ConnectionsCommand(MotifCommand):
 
     def interface(self, key=""):
         return GeneralEditCommand.interface(key)
+
+
+class single_strandCommand(MotifCommand):
+    def execute(self):
+        seq, loop, flip = self.interface()
+        st.session_state.motif_buffer = (
+            f"motif = pf.single_strand(sequence='{seq}', "
+            "loop={loop}, vflip={flip}, hflip={flip})"
+        )
+        st.session_state.motif = single_strand(
+            sequence=seq, loop=loop, vflip=flip, hflip=flip
+        )
+
+    def interface(
+        self,
+        seq_def="",
+        loop_def=False,
+    ):
+        col1, col2, col3 = st.columns([3, 1, 1], vertical_alignment="bottom")
+        with col1:
+            seq = st.text_input(
+                "Sequence:",
+                value=seq_def,
+            )
+        with col2:
+            loop = st.toggle(
+                "Make a loop",
+                value=loop_def,
+                help="If checked, the strand will form a loop.",
+            )
+        with col3:
+            flip = st.toggle("Flip", value=False, help="Flip the strand diagonally.")
+        return seq, loop, flip
 
 
 class start_end_stemCommand(MotifCommand):

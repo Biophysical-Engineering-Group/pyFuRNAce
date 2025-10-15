@@ -332,7 +332,7 @@ def make_motif_menu(origami):
 
         ### Adding the menu here, otherwise there are issues choosing the
         # custom motif with st.fragment when the edit mode is off
-        col1, col2 = st.columns([5, 1], vertical_alignment="bottom")
+        col1, col2 = st.columns([5, 1.5], vertical_alignment="bottom")
         with col1:
             motif_selected = option_menu(
                 None,
@@ -378,13 +378,15 @@ def make_motif_menu(origami):
     #     motif_add = False
 
     if motif_add:
-        st.markdown(
-            "<hr style='margin-top:-0em;margin-bottom:-1em' />", unsafe_allow_html=True
-        )
         add_motif(origami)
 
 
 def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
+    # add divider
+    st.markdown(
+        "<hr style='margin-top:-0em;margin-bottom:-1em' />", unsafe_allow_html=True
+    )
+
     warnings.filterwarnings("error")  # raise warnings as errors
     origami = st_state.origami
     origami_len = len(origami)
@@ -403,8 +405,9 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         st_state.code.append("origami.append([]) # Add empty line")
         origami_len = 1
 
-    col1, col2, col3, col4, col5, col6 = st.columns(
-        [1, 1.5, 1.5, 1, 1, 1], vertical_alignment="bottom"
+    col1, col2, col3, col4, col5 = st.columns(
+        [1, 1.4, 1.4, 1, 0.8],
+        vertical_alignment="top",
     )
 
     with col1:
@@ -498,30 +501,22 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                     # st_state.redo = [] # clear the redo buffer
                     st.rerun()  # rerun app
 
-    ### duplicate the current line
-    with col4:
-        if st.button("Duplicate line", key="duplicate_line"):
-            # warnings.filterwarnings("ignore") # ignore kl energy warning
-            origami.duplicate_line(line_index, insert_idx=len(origami))
-            st_state.code.append(
-                f"origami.duplicate_line({line_index}, "
-                f"insert_idx={len(origami)}) # Duplicate line"
-            )
-            st_state.line_index = len(origami) - 1
-            st.rerun()  # rerun app
-
     ### copy/paste motif
-    with col5:
-        subcol1, subcol2 = st.columns(2)
-        with subcol1:
-            copy_motif()
+    with col4:
+        if f_col1:
+            copy_motif("preview")
+        slice = (line_index, motif_index)
+        if 0 <= line_index < len(origami) and 0 <= motif_index < len(
+            origami[line_index]
+        ):
+
+            motif = origami[slice]
+            copy_motif("selected", motif=motif, motif_slice=slice)
+
         # Paste motif
-        with subcol2:
+        if st_state.copied_motif:
             paste_button = st.button("Paste motif", key="paste_motif")
             if paste_button:
-                if not st_state.copied_motif:
-                    st.warning("No motif copied")
-                    return
                 origami.insert((line_index, motif_index), st_state.copied_motif)
                 st_state.code.append(
                     st_state.copied_motif_text + f"\norigami.insert(({line_index}, "
@@ -530,9 +525,24 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                 # st_state.redo = []
                 st.rerun()
 
-    # Uno action
-    with col6:
+    # Duplicate line and undo
+    with col5:
         undo(key="motif_undo")
+
+        if (
+            0 <= line_index < len(origami)
+            and origami[line_index]
+            and st.button("Duplicate line", key="duplicate_line")
+        ):
+
+            # warnings.filterwarnings("ignore") # ignore kl energy warning
+            origami.duplicate_line(line_index, insert_idx=len(origami))
+            st_state.code.append(
+                f"origami.duplicate_line({line_index}, "
+                f"insert_idx={len(origami)}) # Duplicate line"
+            )
+            st_state.line_index = len(origami) - 1
+            st.rerun()  # rerun app
 
 
 def add_motif(origami):
@@ -614,7 +624,7 @@ def add_motif(origami):
 
 
 def copy_motif(key="", motif=None, motif_slice=None):
-    copy_button = st.button("Copy motif", key=f"copy_motif{key}")
+    copy_button = st.button(f"Copy {key} motif", key=f"copy_motif{key}")
     if copy_button:
         if not motif:
             st_state.copied_motif = st_state.motif
@@ -734,12 +744,11 @@ def structure_converter(current_custom_motif):
         current_struct += "&"
 
     ### Add the structure converter
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns([4, 4, 1], vertical_alignment="bottom")
     with col1:
         structure = st.text_input(
             "Dot-bracket structure:",
             value=current_struct,
-            key="Dot-bracket_structure",
             help="Add a dot-bracket structure to convert it into " "a 3D motif.",
         )
     with col2:
@@ -752,7 +761,6 @@ def structure_converter(current_custom_motif):
         sequence = st.text_input(
             "Sequence:",
             value=def_seq,
-            key="Sequence_converter",
             help="Add the sequence of the motif.",
         )
     # check that there is an input
@@ -765,8 +773,9 @@ def structure_converter(current_custom_motif):
         optimize = True
 
     if current_custom_motif:
-        convert = st.button("Convert", key="start_convert", type="primary")
-        optimize = optimize and convert
+        with col3:
+            convert = st.button("Convert", key="start_convert", type="primary")
+            optimize = optimize and convert
 
     if not optimize:
         return
@@ -868,19 +877,19 @@ def custom(current_custom_motif):
     if not current_custom_motif:
         st_state["custom_strands"] = [pf.Strand("")]
 
-    col1, col2 = st.columns([4, 1], vertical_alignment="bottom")
+    col1, col2 = st.columns([4, 1.5], vertical_alignment="bottom")
     with col1:
         method = st.segmented_control(
             "Build the motif with:",
             [
-                "Structure conveter",
+                "Structure converter",
                 "Full text input",
-                "Drawing Tool",
+                "Drawing tool",
             ],
-            default="Structure conveter",
-            help="Structure conveter: Convert a dot-bracket"
+            default="Structure converter",
+            help="Structure converter: Convert a dot-bracket"
             " structure into a 3D motif automatically.\n\n"
-            "Drawing Tool: Draw each strand on a grid by "
+            "Drawing tool: Draw each strand on a grid by "
             "clicking on the positions where you want the "
             "strand to go; curves and crossings are "
             "calculated automatically.\n\n"
@@ -898,11 +907,11 @@ def custom(current_custom_motif):
                 with cols[i]:
                     copy_to_clipboard(sym, sym)
 
-    if method == "Structure conveter":
+    if method == "Structure converter":
         structure_converter(current_custom_motif)
     elif method == "Full text input":
         custom_text_input(current_custom_motif)
-    if method != "Drawing Tool":
+    if method != "Drawing tool":
 
         with st.popover("Upload 3D coordinates"):
             subcol1, subcol2 = st.columns([1, 4])
@@ -1156,7 +1165,7 @@ def code():
         st_state["last_code_id"] = ""
     code_text = "\n\n".join(st_state.code)
 
-    col1, col2, col3 = st.columns([1, 3, 1], gap="large", vertical_alignment="center")
+    col1, col2, col3 = st.columns([1, 1, 1], gap="large", vertical_alignment="center")
     with col1:
         st.link_button(
             "Check the documentation!",
@@ -1173,7 +1182,7 @@ def code():
             "Number of lines to render:",
             min_value=1,
             max_value=200,
-            value=15,
+            value=10,
             key="render_lines",
         )
     with col3:
@@ -1210,7 +1219,7 @@ def undo(key=""):
         st.warning("Nothing to undo.")
         return
     undo_button = st.button(
-        "Undo",
+        ":red[Undo]",
         key=f"undo{key}",
         use_container_width=False,
         help="Undo the last action.",
@@ -1595,11 +1604,11 @@ def display_origami(barriers=None):
         )
     except pf.MotifStructureError as e:
         st.error(f"Structure error: \n {e}", icon=":material/personal_injury:")
-        undo("error", key="error")
+        undo(key="error")
         st.stop()
     except pf.AmbiguosStructure as e:
         st.error(f"Ambigouse structure: \n {e}", icon=":material/theater_comedy:")
-        undo("warning", key="warning")
+        undo(key="warning")
         st.write("You can try flipping the motif or changing the sequence direction.")
         st.stop()
     return clicked
@@ -1643,16 +1652,11 @@ def clicked_options(clicked):
             st_state.motif_index = motif_slice[1]
             st.rerun()
 
-        col1, col2, _ = st.columns([1, 1, 1], vertical_alignment="center")
-        with col1:
-            st.markdown(
-                f"Selected {nucl_text} :orange[{motif_class_name}]: "
-                f":orange[line {motif_slice[0]}], "
-                f":orange[motif {motif_slice[1]}]"
-            )
-        with col2:
-            ### copy the motif
-            copy_motif("selected", motif=motif, motif_slice=motif_slice)
+        st.markdown(
+            f"Selected {nucl_text} :orange[{motif_class_name}]: "
+            f":orange[line {motif_slice[0]}], "
+            f":orange[motif {motif_slice[1]}]"
+        )
 
 
 def display_structure_sequence():
@@ -1774,35 +1778,37 @@ def edit(x, y):
 
 @st.fragment
 def advaced_edit(motif_slice):
-    y, x = motif_slice
-
     ### try to change each strand
     with st.popover(
         "Advanced feature, modify the strands of the selected motif:",
         use_container_width=True,
     ):
 
-        cols = st.columns(7, vertical_alignment="bottom")
+        cols = st.columns(
+            [1.4, 1.4, 0.7, 0.9, 1.4, 1.4, 0.8], vertical_alignment="bottom"
+        )
         with cols[0]:
-            flip_vert = st.toggle("Flip vertically", value=True, key="adv_flip_vert")
+            flip_vert = st.toggle("Flip vertically", value=False)
         with cols[1]:
-            flip_h = st.toggle("Flip horizontally", value=True, key="adv_flip_h")
+            flip_h = st.toggle("Flip horizontally", value=False)
         with cols[2]:
             if flip_vert or flip_h:
-                flip = st.button("Flip", key="adv_flip")
+                flip = st.button("Flip")
                 flip_vert &= flip
                 flip_h &= flip
 
         with cols[3]:
-            if st.button("Rotate 90° clockwise", key="adv_rotate"):
+            if st.button("Rotate clockwise"):
                 st_state.mot_adv_edit.rotate()
                 st_state.modified_motif_text += "\nmotif.rotate()"
+                st.rerun(scope="fragment")
 
         if flip_h or flip_vert:
             st_state.mot_adv_edit.flip(horizontally=flip_h, vertically=flip_vert)
             st_state.modified_motif_text += (
                 f"\nmotif.flip(" f"horizontally={flip_h}, " f"vertically={flip_vert})"
             )
+            st.rerun(scope="fragment")
 
         with cols[4]:
             x_shift = st.number_input("Horizontal shift amount:", value=0)
@@ -1810,56 +1816,53 @@ def advaced_edit(motif_slice):
             y_shift = st.number_input("Vertical shift amount:", value=0)
 
         with cols[6]:
-            shift = st.button(
-                "Shift motif",
-                help="Shift the motif by the specified x and y values. "
-                "The shift is applied to all strands in the motif.",
-            )
-
-        if (x_shift != 0 or y_shift != 0) and shift:
-            st_state.mot_adv_edit.shift((x_shift, y_shift))
-            st_state.modified_motif_text += f"\nmotif.shift((" f"{x_shift}, {y_shift}))"
+            if x_shift != 0 or y_shift != 0:
+                if st.button(
+                    "Shift motif",
+                    help="Shift the motif by the specified x and y values. "
+                    "The shift is applied to all strands in the motif.",
+                ):
+                    st_state.mot_adv_edit.shift((x_shift, y_shift))
+                    st_state.modified_motif_text += (
+                        f"\nmotif.shift((" f"{x_shift}, {y_shift}))"
+                    )
+                    st.rerun(scope="fragment")
 
         for i, s in enumerate(st.session_state.mot_adv_edit):
-            col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
+            col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 3])
             with col1:
                 start_x = st.number_input(
-                    "Start x:",
+                    f"{i}) Start x:",
                     min_value=0,
                     value=s.start[0],
-                    key=f"start_x_{x}_{y}_{i}",
                 )
             with col2:
                 start_y = st.number_input(
-                    "Start y:",
+                    f"{i}) Start y:",
                     min_value=0,
                     value=s.start[1],
-                    key=f"start_y_{x}_{y}_{i}",
                 )
 
             with col3:
                 strand_direction_ind = [d for d in pf.Direction].index(s.direction)
                 new_dir = st.selectbox(
-                    "Start direction:",
+                    f"{i}) Start direction:",
                     direction_list,
                     index=strand_direction_ind,
-                    key=f"dir_{x}_{y}_{i}",
                 )
                 new_dir_tuple = pf.Direction[new_dir]
 
             with col4:
                 seq_dir = st.selectbox(
-                    "Directionality:",
+                    f"{i}) Directionality:",
                     ["35", "53"],
                     index=["35", "53"].index(s.directionality),
-                    key=f"seq_dir_{x}_{y}_{i}",
                 )
 
             with col5:
                 new_strand = st.text_input(
-                    f"New strand (strand directionality: " f"{s.directionality}) ",
+                    f"{i}) New strand (strand directionality: " f"{s.directionality}) ",
                     value=str(s),
-                    key=f"strand_{x}_{y}_{i}",
                     help=" The strand contains all "
                     "the symbols of the structure "
                     "(nucleotides and direction "
@@ -1873,28 +1876,34 @@ def advaced_edit(motif_slice):
                 st_state.modified_motif_text += (
                     f"\nmotif[{i}].start = " f"({start_x}, {start_y})"
                 )
+                st.rerun(scope="fragment")
+
             if s.directionality != seq_dir:
                 s.directionality = seq_dir
                 st_state.modified_motif_text += (
                     f"\nmotif[{i}].directionality " f'= "{seq_dir}"'
                 )
+                st.rerun(scope="fragment")
+
             if s.direction != new_dir_tuple:
                 s.direction = new_dir_tuple
                 st_state.modified_motif_text += (
                     f"\nmotif[{i}].direction = " f"{new_dir_tuple}"
                 )
+                st.rerun(scope="fragment")
+
             if s.strand != strand_stripped:
                 s.strand = strand_stripped
                 st_state.modified_motif_text += (
                     f"\nmotif[{i}].strand = " f'"{strand_stripped}"'
                 )
+                st.rerun(scope="fragment")
 
         ### check the base pair symbols of the motif
         current_structure = st_state.mot_adv_edit.structure
         new_db = st.text_input(
             "Add dot-bracket notation:",
             value=current_structure,
-            key=f"structure_{x}_{y}",
             help="Add the dot-bracket notation of the motif for"
             ' each strand, separated by a "&". If the '
             "paired bases are more than one position "
@@ -1908,6 +1917,7 @@ def advaced_edit(motif_slice):
             else:
                 st_state.mot_adv_edit.structure = new_db
                 st_state.modified_motif_text += f'\nmotif.structure = "{new_db}"'
+            st.rerun(scope="fragment")
 
         ### update the motif
         try:

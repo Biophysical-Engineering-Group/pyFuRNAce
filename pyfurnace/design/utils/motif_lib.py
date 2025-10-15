@@ -97,6 +97,36 @@ def start_end_stem(
     return Utils(strands=strands, **kwargs)
 
 
+def single_strand(sequence: str = "", loop: bool = False, **kwargs) -> Utils:
+    """
+    Creates a single-stranded region motif, optionally forming a loop.
+
+    Parameters
+    ----------
+    sequence : str, optional
+        The nucleotide sequence for the single-stranded region.
+        Default is an empty string.
+    loop : bool, optional
+        If True, the single-stranded region forms a loop.
+        Default is False.
+    **kwargs : dict
+        Additional keyword arguments passed to the `Utils` constructor.
+
+    Returns
+    -------
+    Utils
+        A single-stranded region `Utils` object.
+    """
+    bottom = "─" * len(sequence)
+    strands = kwargs.pop("strands", [])
+    if loop:
+        strands.append(Strand(sequence + "╮│╯" + bottom))
+    else:
+        strands.append(Strand(sequence))
+        strands.append(Strand(bottom, start=(len(sequence) - 1, 2), direction=(-1, 0)))
+    return Utils(strands=strands, **kwargs)
+
+
 def vertical_link(*args, **kwargs) -> Utils:
     """
     Creates a vertical link motif represented by a single vertical strand.

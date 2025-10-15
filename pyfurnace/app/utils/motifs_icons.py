@@ -1,6 +1,7 @@
 MOTIF_ICONS = {
     # Connection motifs
     "Tetraloop": "bi bi-braces",
+    "single_strand": "bi bi-dash-square",
     "start_end_stem": "bi bi-skip-end-fill",
     "stem_cap_link": "bi bi-align-start",
     "vertical_double_link": "bi bi-arrow-down-up",

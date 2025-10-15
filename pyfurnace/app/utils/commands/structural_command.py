@@ -53,6 +53,6 @@ class StructuralCommand(MotifCommand):
         st.session_state.motif = motif
         st.session_state.motif_buffer = f"motif = pf.{selected}()"
 
-        if st.toggle("Flip the aptamer", value=flip_default, key="flip_aptamer"):
+        if st.toggle("Flip the motif", value=flip_default, key="flip_motif"):
             motif.flip(1, 1)
             st.session_state.motif_buffer += ".flip(1, 1)"

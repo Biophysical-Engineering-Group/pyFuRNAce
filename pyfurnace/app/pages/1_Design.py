@@ -24,7 +24,7 @@ if __name__ == "__main__":
     des_func.origami_general_options(st.session_state.origami, expanded=False)
 
     ### make 3 common options for the RNA origami
-    cols = st.columns([1.3, 1.3] + [1] * 2 + [2, 1.3], vertical_alignment="center")
+    cols = st.columns([1] + [1] * 3 + [1], vertical_alignment="center")
 
     # simple origami popover
     with cols[0]:
@@ -36,22 +36,18 @@ if __name__ == "__main__":
         ):
             des_func.simple_origami()
 
-    # colormap text
     with cols[2]:
-        st.write("OxView 3D colormap:")
-    # colormap selection
-    with cols[3]:
         cmap = st.selectbox(
             "OxView 3D colormap:",
             ["Reds", None] + plt.colormaps(),
             key="colormap",
-            label_visibility="collapsed",
+            # label_visibility="collapsed",
             help="Change the color of the OxView visualization.",
         )
         st.session_state.oxview_colormap = cmap
 
     # gradient toggle
-    with cols[5]:
+    with cols[4]:
         grad = st.toggle(
             "Color gradient path",
             key="grad",

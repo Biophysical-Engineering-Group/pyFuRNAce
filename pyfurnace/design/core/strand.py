@@ -81,7 +81,7 @@ class Strand(Callback):
         acount structural errors.
     next_pos : Position
         The next position of the strand in 2D space.
-    pk_info : Optional[Dict]
+    pk_info : Optional[dict]
         The pseudoknot information of the strand (if any).
     positions : Tuple[Position]
         The positions of each strand character in 2D space (x,y coordinates).
@@ -211,7 +211,7 @@ class Strand(Callback):
         # create a new strand combined strand
         new_strand = Strand(
             str(self) + str(other),
-            self.sequence.directionality,
+            self.directionality,
             self.start,
             self.direction,
             callbacks=self._callbacks,
@@ -1008,13 +1008,13 @@ class Strand(Callback):
         """
         # + str
         if isinstance(other, str):
-            return Strand(other, self.sequence.directionality)
+            return Strand(other, self.directionality)
 
         # + Sequence error
         elif (
             isinstance(other, Sequence)
-            and self.sequence
-            and self.sequence.directionality != other.directionality
+            and (self.sequence or "5" in self._strand or "3" in self._strand)
+            and self.directionality != other.directionality
         ):
             raise MotifStructureError(
                 f"Cannot add a strand with a Sequence with "
@@ -1035,9 +1035,9 @@ class Strand(Callback):
             raise TypeError(f"{other} is not a valid type for addition")
 
         # + Strand error
-        elif (
-            self.sequence
-            and other.sequence
+        if (
+            (self.sequence or "5" in self._strand or "3" in self._strand)
+            and (other.sequence or "5" in other._strand or "3" in other._strand)
             and self.directionality != other.directionality
         ):
             raise MotifStructureError(
@@ -1069,7 +1069,7 @@ class Strand(Callback):
         ----------
         line : Union[str, Sequence]
             The input strand to check.
-        translator : Dict, default symb_to_none
+        translator : dict, default symb_to_none
             The translator dictionary to check the strand symbols.
 
         Raises

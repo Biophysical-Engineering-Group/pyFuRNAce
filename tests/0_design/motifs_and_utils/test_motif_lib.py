@@ -3,6 +3,7 @@ import pytest
 from pyfurnace.design.core import Position, RIGHT, LEFT, Strand
 from pyfurnace.design.utils.motif_lib import (
     Utils,
+    single_strand,
     start_end_stem,
     vertical_link,
     vertical_double_link,
@@ -104,6 +105,23 @@ def test_start_end_stem_respects_explicit_strands_kwarg():
     )  # may copy internally, but content must match order/values
     assert [s.strand for s in m.strands] == ["X", "Y"]
     assert m.strands[1].start == (1, 1)
+
+
+# --------------------------------------------------------------------------- #
+# single strand
+# --------------------------------------------------------------------------- #
+
+
+def test_single_strand():
+    ss_mot = single_strand()
+    assert len(ss_mot.strands) == 0
+    ss_mot = single_strand("aucg")
+    assert len(ss_mot.strands) == 2
+    assert "AUCG" in ss_mot.strands[0].strand
+    assert ss_mot.strands[0].start == Position.zero()
+    ss_mot = single_strand("aucg", loop=True)
+    assert len(ss_mot.strands) == 1
+    assert "AUCG" in ss_mot.strands[0].sequence
 
 
 # --------------------------------------------------------------------------- #

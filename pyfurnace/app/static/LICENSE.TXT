@@ -1,0 +1,8 @@
+pyFuRNAce Logo License
+Copyright © 2025 Luca Monari
+
+The pyFuRNAce logo is original artwork created by Luca Monari.
+
+Permission is granted to reproduce the logo in academic, scientific, or educational materials that reference or use pyFuRNAce, including publications, presentations, and documentation (whether commercial or non-commercial).
+
+Any other use of the logo requires prior written permission from the copyright holder.

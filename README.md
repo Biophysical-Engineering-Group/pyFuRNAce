@@ -156,6 +156,16 @@ Code is licensed under the GNU General Public License v3.0 ([GPL-3.0](https://ww
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%20v3-lightgrey.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
+
+## 📜 Logo Copyright & Permission
+The pyFuRNAce logo is original artwork created by Luca Monari.
+
+Luca Monari retains full copyright ownership of the logo.
+
+Permission is granted to reproduce the logo in academic, scientific, or educational materials that reference or use pyFuRNAce, including publications, presentations, and documentation (whether commercial or non-commercial).
+
+Any other use of the logo requires prior written permission from the copyright holder.
+
 ## 🧠 Citation
 
 If you use pyFuRNAce in your research, please cite:

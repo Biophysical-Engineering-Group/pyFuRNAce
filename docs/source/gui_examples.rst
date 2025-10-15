@@ -3,6 +3,10 @@
 Graphical User Interface Examples
 ---------------------------------
 
+.. tip::
+
+    You can adapt the font size of the GUI in the browser by pressing ``Ctrl`` and ``+`` (or ``Cmd`` and ``+`` on macOS) to increase the font size, or ``Ctrl`` and ``-`` (or ``Cmd`` and ``-`` on macOS) to decrease it.
+
 Including a custom aptamer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

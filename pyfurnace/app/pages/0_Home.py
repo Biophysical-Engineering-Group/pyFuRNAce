@@ -115,7 +115,12 @@ def load_template():
 
 @st.dialog("Load a file")
 def load_file():
-    uploaded_file = st.file_uploader("File format", type=["py", "fasta"])
+    uploaded_file = st.file_uploader(
+        "Add a fasta file (.fasta) with sequence and "
+        " structure or a python script (.py)"
+        " with the pyfurnace origami code.",
+        type=["py", "fasta"],
+    )
 
     if uploaded_file is None:
         return

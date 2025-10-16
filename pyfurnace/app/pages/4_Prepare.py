@@ -314,7 +314,7 @@ def primers_setup():
 
     # take the input sequence and sanitize it
     seq = sanitize_input(
-        st.text_input("Input sequence:", value=st.session_state["dna_template"])
+        st.text_area("Input sequence:", value=st.session_state["dna_template"])
     )
 
     # check the symbols in the sequence
@@ -344,12 +344,19 @@ def primers_setup():
             calculate_mt, tm_kwargs = tm_parameters()
 
     with mcol2:
-        with st.popover("Add restriction sites", use_container_width=True):
+        with st.popover(
+            "Add primers overhangs",
+            use_container_width=True,
+            help="Add restriction sites or other sequences to the primers"
+            " without affecting the gene sequence. The overhangs will be "
+            "added to the 5' end of the primers and taken into account "
+            "for the melting temperature calculation.",
+        ):
             restric_site_1 = st.text_input(
-                "Restriction site sequence (5'->3')" " before the promoter:"
+                "Coding overhang sequence (5'->3')" " before the promoter:"
             )
             restric_site_2 = st.text_input(
-                "Restriction site sequence (5'->3')" " after the fragment:"
+                "Non-coding overhang sequence (5'->3')" " after the fragment:"
             )
 
     with mcol3:

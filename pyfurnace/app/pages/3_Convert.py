@@ -21,7 +21,7 @@ def initialize_session_state():
 def check_seq():
     # take the input sequence and sanitize it
     seq = sanitize_input(
-        st.text_input("Input sequence (DNA or RNA):", value=st_state["rna_origami_seq"])
+        st.text_area("Input sequence (DNA or RNA):", value=st_state["rna_origami_seq"])
     )
     # check the symbols in the sequence
     if set(seq) - symbols:
@@ -31,9 +31,10 @@ def check_seq():
             icon="⚠️",
         )
 
-    if seq != st_state["rna_origami_seq"]:
-        st_state["rna_origami_seq"] = seq
-        st.rerun()
+    ### Avoid to change the RNA origami sequence from generate commenting this:
+    # if seq != st_state["rna_origami_seq"]:
+    #     st_state["rna_origami_seq"] = seq
+    #     st.rerun()
 
     seq = Seq(seq)
     return seq
@@ -59,7 +60,7 @@ def rna_to_template():
     col1, col2 = st.columns([1, 5])
 
     # coding strand
-    copy_ratio = [1, 8]
+    copy_ratio = [1.5, 8]
     col1, col2 = st.columns(copy_ratio, vertical_alignment="center")
     with col1:
         copy_to_clipboard(dna_template, "Coding strand:")

@@ -78,7 +78,7 @@ class single_strandCommand(MotifCommand):
         seq, loop, flip = self.interface()
         st.session_state.motif_buffer = (
             f"motif = pf.single_strand(sequence='{seq}', "
-            "loop={loop}, vflip={flip}, hflip={flip})"
+            f"loop={loop}, vflip={flip}, hflip={flip})"
         )
         st.session_state.motif = single_strand(
             sequence=seq, loop=loop, vflip=flip, hflip=flip

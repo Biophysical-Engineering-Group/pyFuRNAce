@@ -78,11 +78,10 @@ def origami_general_options(origami, expanded=True):
                 "Alignment type:",
                 ["To the left", "Junctions alignment: first", "Line center"],
                 index=0,
-                key="alignment",
             )
 
             ### add the alignment to the code
-            if st.button("Set alignment", key="set_alignment"):
+            if st.button("Set alignment"):
                 align = align.split()[-1]
                 origami.align = align
                 st_state.code.append(f"origami.align = '{align}' # Align the lines")
@@ -91,7 +90,6 @@ def origami_general_options(origami, expanded=True):
             st.toggle(
                 "Optimize the blueprint for ROAD",
                 value=False,
-                key="to_road",
                 help="Optimize the blueprint for the ROAD software. "
                 'This substitutes the Kissing Loops base pairings with "*";'
                 ' and the short stem base pairings with "!".',
@@ -101,7 +99,6 @@ def origami_general_options(origami, expanded=True):
             new_sticky = st.toggle(
                 "Stick the motif menu at the top",
                 value=st_state.motif_menu_sticky,
-                key="sticky_menu",
                 help="Keep the motif menu and origami visualization"
                 " menu to stick to the top of the page.",
             )
@@ -116,7 +113,6 @@ def origami_general_options(origami, expanded=True):
                 min_value=2,
                 max_value=50,
                 value=14,
-                key="ori_font_size",
             )
             st_state.origami_font_size = font_size
 
@@ -127,7 +123,6 @@ def origami_general_options(origami, expanded=True):
                 min_value=0,
                 max_value=2000,
                 value=500,
-                key="oxFrame_size",
             )
             st_state.oxview_frame_size = frame_size
 
@@ -137,7 +132,6 @@ def simple_origami():
         dt_text = st.text_input(
             "Enter a list of the angles between helices, " "separated by commas",
             "120, ",
-            key="dt_text_list",
             help=f"The program calculates the best connections"
             f" bewteen the helices to fit the given angles."
             f"The connection between helices (Dovetails) are "
@@ -418,7 +412,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
     with col2:
         line_index = min(line_index, origami_len - 1)
         line_index = st.number_input(
-            "**Select line index:**",
+            "**Line index:**",
             min_value=-1,
             max_value=origami_len - 1,
             value=line_index,
@@ -448,7 +442,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
                     return
                 if len(st_state.origami) > 0:
                     del_line = st.button(
-                        "Delete line", key="del_line", help="Delete the choosen line"
+                        "Delete", width="stretch", help="Delete the choosen line"
                     )
                     if del_line:
                         st_state.origami.pop(
@@ -470,7 +464,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         if motif_index > max_val:
             motif_index = max_val
         motif_index = st.number_input(
-            "**Select motif index:**",
+            "**Motif index:**",
             min_value=0,
             max_value=max_val,
             value=motif_index,
@@ -489,7 +483,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         with subcol2:
             ### Delete motif
             if len(origami[st_state.line_index]) > 0:
-                delete_button = st.button(":red[Delete motif]", key="delete_motif")
+                delete_button = st.button(":red[Delete]", width="stretch")
                 if delete_button:
                     if st_state.motif_index == len(origami[st_state.line_index]):
                         st_state.motif_index -= 1
@@ -515,7 +509,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
 
         # Paste motif
         if st_state.copied_motif:
-            paste_button = st.button("Paste motif", key="paste_motif")
+            paste_button = st.button("Paste", width="stretch")
             if paste_button:
                 origami.insert((line_index, motif_index), st_state.copied_motif)
                 st_state.code.append(
@@ -532,7 +526,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         if (
             0 <= line_index < len(origami)
             and origami[line_index]
-            and st.button("Duplicate line", key="duplicate_line")
+            and st.button("Duplicate line", width="stretch")
         ):
 
             # warnings.filterwarnings("ignore") # ignore kl energy warning
@@ -589,7 +583,7 @@ def add_motif(origami):
         # check that the origami has more than one line, or the line is not empty
         if len(st_state.origami) > 1 or st_state.origami[0]:
             add_line = st.button(
-                "Add line", key="Insert_line", help=f"Add a new line n° {linex_index}."
+                "Add", width="stretch", help=f"Add a new line n° {linex_index}."
             )
             if add_line:
                 # add empty line at the choosen position
@@ -600,12 +594,12 @@ def add_motif(origami):
 
     ### Add motif
     def f_subcol3():
-        button_label = "Insert motif"
+        button_label = "Insert"
         if st_state.motif_index == len(origami[st_state.line_index]):
-            button_label = "Add motif"
+            button_label = "Add"
         add_button = st.button(
             f"**:green[{button_label}]**",
-            key="insert_motif",
+            width="stretch",
             help="Insert the motif at the choosen position",
         )
 
@@ -624,7 +618,7 @@ def add_motif(origami):
 
 
 def copy_motif(key="", motif=None, motif_slice=None):
-    copy_button = st.button(f"Copy {key} motif", key=f"copy_motif{key}")
+    copy_button = st.button(f"Copy {key}", width="stretch", key=f"copy_motif{key}")
     if copy_button:
         if not motif:
             st_state.copied_motif = st_state.motif
@@ -719,7 +713,6 @@ def custom_text_input(current_custom_motif):
     strand_text = st.text_area(
         "Motif text: draw a motif where each Strand starts " "with a 5",
         value=current_custom_motif_str,
-        key="Motif_text",
         help="Draw a motif, where each strand has to start "
         'with "5". If you want to start a strand with 5, '
         "add an additional 5 at the beginning of the "
@@ -730,7 +723,7 @@ def custom_text_input(current_custom_motif):
         if "5" not in strand_text:
             st.warning('Don\'t forget to start the strand with "5"')
         else:
-            if st.button("Convert", key="start_convert", type="primary"):
+            if st.button("Convert", type="primary"):
                 new_motif = pf.Motif.from_text(strand_text).strip()
                 current_custom_motif.replace_all_strands(new_motif._strands, copy=False)
                 current_custom_motif.basepair = new_motif.basepair
@@ -774,7 +767,7 @@ def structure_converter(current_custom_motif):
 
     if current_custom_motif:
         with col3:
-            convert = st.button("Convert", key="start_convert", type="primary")
+            convert = st.button("Convert", type="primary")
             optimize = optimize and convert
 
     if not optimize:
@@ -807,13 +800,9 @@ def upload_3d_interface(strand, strand_num, current_custom_motif):
     )
 
     with dummy_cols[0]:
-        dummy_start = st.toggle(
-            "Start dummy nucleotide", key="dummy_start_custom", help=dummy_help
-        )
+        dummy_start = st.toggle("Start dummy nucleotide", help=dummy_help)
     with dummy_cols[1]:
-        dummy_end = st.toggle(
-            "End dummy nucleotide", key="dummy_end_custom", help=dummy_help
-        )
+        dummy_end = st.toggle("End dummy nucleotide", help=dummy_help)
 
     if file_3d:
         pdb_format = file_3d.name.endswith(".pdb")
@@ -844,11 +833,7 @@ def strand_number_button(current_custom_motif, delete=True):
     )
     strand = strands[strand_num]
 
-    if (
-        delete
-        and st.button("Delete strand", key="delete_strand")
-        and current_custom_motif
-    ):
+    if delete and st.button("Delete strand") and current_custom_motif:
 
         st_state["custom_strands"].pop(strand_num)
         current_custom_motif.pop(strand_num)
@@ -866,7 +851,7 @@ def custom(current_custom_motif):
     st_state.motif = current_custom_motif
 
     if not st_state["custom_edit"]:
-        if st.button(":orange[Edit the motif]", key="edit_strand"):
+        if st.button(":orange[Edit the motif]"):
             st_state["custom_edit"] = True
             st.rerun()
         return
@@ -877,7 +862,7 @@ def custom(current_custom_motif):
     if not current_custom_motif:
         st_state["custom_strands"] = [pf.Strand("")]
 
-    col1, col2 = st.columns([4, 1.5], vertical_alignment="bottom")
+    col1, col2 = st.columns(2, vertical_alignment="bottom")
     with col1:
         method = st.segmented_control(
             "Build the motif with:",
@@ -930,15 +915,15 @@ def custom(current_custom_motif):
 
     cols = st.columns(4, vertical_alignment="bottom")
     with cols[0]:
-        if st.button("Add strand", key="add_strand"):
+        if st.button("Add strand"):
             st_state["custom_strands"].append(pf.Strand(""))
             current_custom_motif.append(pf.Strand(""), copy=False, join=False)
     with cols[1]:
-        x_dots = st.number_input("Canvas x size", min_value=1, value=64, key="x_size")
+        x_dots = st.number_input("Canvas x size", min_value=1, value=64)
     with cols[2]:
-        y_dots = st.number_input("Canvas y size", min_value=1, value=8, key="y_size")
+        y_dots = st.number_input("Canvas y size", min_value=1, value=8)
     with cols[3]:
-        if st.button("Clear", key="clear_strand"):
+        if st.button("Clear"):
             st_state["custom_strands"] = [pf.Strand("")]
             current_custom_motif.replace_all_strands([pf.Strand("")], copy=False)
 
@@ -1046,20 +1031,15 @@ def custom(current_custom_motif):
     ### Show the strand options
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 5])
     with col1:
-        start_x = st.number_input(
-            "Start x:", min_value=0, value=strand.start[0], key="start_x_custom"
-        )
+        start_x = st.number_input("Start x:", min_value=0, value=strand.start[0])
     with col2:
-        start_y = st.number_input(
-            "Start y:", min_value=0, value=strand.start[1], key="start_y_custom"
-        )
+        start_y = st.number_input("Start y:", min_value=0, value=strand.start[1])
     with col3:
         strand_direction_ind = [d for d in pf.Direction].index(strand.direction)
         new_dir = st.selectbox(
             "Start direction:",
             direction_list,
             index=strand_direction_ind,
-            key="dir_custom",
         )
         new_dir_tuple = pf.Direction[new_dir]
     with col4:
@@ -1067,13 +1047,11 @@ def custom(current_custom_motif):
             "Directionality:",
             ["35", "53"],
             index=["35", "53"].index(strand.directionality),
-            key="seq_dir_custom",
         )
     with col5:
         new_strand = st.text_input(
             f"New strand (strand directionality: " f"{strand.directionality}) ",
             value=str(strand),
-            key="strand_custom",
         )
 
     ### update the strand
@@ -1095,7 +1073,6 @@ def custom(current_custom_motif):
     new_db = st.text_input(
         "Add dot-bracket notation:",
         value=current_structure,
-        key="structure_custom",
         help="Add the dot-bracket notation of the motif for each "
         'strand, separated by a "&". If the paired bases are '
         'more than one position apart, the pairing symbol "┊"'
@@ -1109,7 +1086,7 @@ def custom(current_custom_motif):
 
 
 def finish_editing(current_custom_motif):
-    if st.button(":green[Finish editing to add motif to the origami]", key="end_edit"):
+    if st.button(":green[Finish editing to add motif to the origami]"):
         st_state["custom_edit"] = False
         current_custom_motif.replace_all_strands(st_state["custom_strands"], copy=False)
         st.rerun()
@@ -1183,13 +1160,11 @@ def code():
             min_value=1,
             max_value=200,
             value=10,
-            key="render_lines",
         )
     with col3:
         wrap = st.toggle(
             "Wrap lines",
             value=False,
-            key="wrap_lines",
             help="Wrap lines in the code editor to fit the screen.",
         )
 
@@ -1199,7 +1174,7 @@ def code():
         height=render_lines,
         options={"showLineNumbers": True, "wrap": wrap},
         allow_reset=True,
-        key="pyroad_code_editor",
+        key="code_editor",
     )
 
     if response_dict["id"] != st_state["last_code_id"] and (
@@ -1221,7 +1196,7 @@ def undo(key=""):
     undo_button = st.button(
         ":red[Undo]",
         key=f"undo{key}",
-        use_container_width=False,
+        width="stretch",
         help="Undo the last action.",
     )
     if not undo_button:
@@ -1314,7 +1289,6 @@ def origami_build_view(selected_display):
             if score > 30:
                 if st.button(
                     "Try to fix the folding pathway",
-                    key="fix_pathway",
                     help="Try to change the starting position of the sequence, "
                     "keeping the same structure, to reduce the folding "
                     "pathway penalty. This function is designed for "

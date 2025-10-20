@@ -131,6 +131,32 @@ def test_get_and_set_sequence_roundtrip():
         assert kl == kl_mot(open_left=open_left, sequence=seq2)
 
 
+def test_pk_index_setter():
+
+    for kl_mot in [
+        KissingLoop,
+        KissingLoop180,
+        BranchedKissingLoop,
+        KissingDimer,
+        KissingDimer120,
+        BranchedDimer,
+    ]:
+        open_left = True
+        kl = kl_mot(open_left=open_left)
+        kl.pk_index = "Z"
+        assert kl.pk_index == "Z"
+        kl.pk_index = -3
+        assert kl.pk_index == "3'"
+        # check that all strands with pk_info have correct ids
+        assert kl[0].pk_info["id"][0] == "3'"
+        assert kl[0].strand == kl_mot(open_left=open_left)[0]
+        if len(kl) > 1:
+            for s in kl[1:]:
+                if hasattr(s, "pk_info") and getattr(s, "pk_info"):
+                    assert s.pk_info["id"][0] == "3"
+                    assert s.strand == kl_mot(open_left=open_left)[1]
+
+
 # --- KissingLoop120 -----------------------------------------------------------
 
 

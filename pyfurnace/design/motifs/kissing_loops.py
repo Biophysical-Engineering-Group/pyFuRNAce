@@ -112,7 +112,16 @@ class KissingLoop(Loop):
     def pk_index(self, new_index):
         """Set the pseudoknot symbol of the kissing loop"""
         new_index = self._check_pk_index(new_index)
-        self._create_strands(sequence=self.get_kissing_sequence(), pk_index=new_index)
+        complementary_index = self.complementary_pk_index(new_index)
+        assigned = False
+        for s in self._strands:
+            if hasattr(s, "pk_info") and getattr(s, "pk_info"):
+                if not assigned:
+                    s.pk_info["id"] = [new_index]
+                    self._pk_index = new_index
+                    assigned = True
+                else:
+                    s.pk_info["id"] = [complementary_index]
 
     @property
     def energy_tolerance(self):

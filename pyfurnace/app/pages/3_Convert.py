@@ -60,16 +60,12 @@ def rna_to_template():
     col1, col2 = st.columns([1, 5])
 
     # coding strand
-    copy_ratio = [1.5, 8]
-    col1, col2 = st.columns(copy_ratio, vertical_alignment="center")
+    col1, col2 = st.columns(2, vertical_alignment="center")
     with col1:
         copy_to_clipboard(dna_template, "Coding strand:")
-    with col2:
         write_format_text(dna_template)
-    col1, col2 = st.columns(copy_ratio, vertical_alignment="center")
-    with col1:
-        copy_to_clipboard(non_coding, "Non-coding strand:")
     with col2:
+        copy_to_clipboard(non_coding, "Non-coding strand:")
         write_format_text(non_coding)
 
     # Save the DNA template in the session state and add a link to the primer page
@@ -95,7 +91,7 @@ def convert_tab(seq):
     # write_format_text(seq)
 
     # calculate the main properties of the sequence
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns(4, vertical_alignment="bottom")
     with col1:
         st.write("GC content (%)")
         write_format_text(round(gc_fraction(seq, ambiguous="ignore") * 100, 2))

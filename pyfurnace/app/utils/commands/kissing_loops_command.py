@@ -6,6 +6,7 @@ from pyfurnace.design.motifs import kissing_loops
 from .motif_command import MotifCommand
 from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
+from .. import pyfurnace_layout_cols
 
 kl_name_map = {
     "Dimer": "KissingDimer",
@@ -137,26 +138,27 @@ class KissingLoopsCommand(MotifCommand):
             )
             return pk_index
 
-        col1, col2, col3 = st.columns([1.5, 1, 5], vertical_alignment="bottom")
+        col1, col2 = pyfurnace_layout_cols([2.5, 5], vertical_alignment="bottom")
         open_left = False
         with col1:
-            specific_seq = st.toggle("Custom Sequence")
-        with col2:
-            if key == "mod":
-                open_left = st.button("Flip")
-            else:
-                open_left = st.toggle("Flip", value=flip)
+            subcol1, subcol2 = st.columns(2, vertical_alignment="bottom")
+            with subcol1:
+                specific_seq = st.toggle("Custom Sequence")
+            with subcol2:
+                if key == "mod":
+                    open_left = st.button("Flip")
+                else:
+                    open_left = st.toggle("Flip", value=flip)
 
-        with col3:
+        with col2:
+            subcol1, subcol2 = st.columns([2, 1])
             if specific_seq:
-                subcol1, subcol2 = st.columns([5, 1])
                 with subcol1:  # either sequence of energy info
                     top_seq = st.text_input("Sequence:", value=top_seq)
                 with subcol2:
                     pk_index = pk_index_interface()
 
             else:
-                subcol1, subcol2 = st.columns([4, 1])
                 min_kl_E = abs(kl_energy) - abs(energy_tolerance)
                 max_kl_E = abs(kl_energy) + abs(energy_tolerance)
                 with subcol1:

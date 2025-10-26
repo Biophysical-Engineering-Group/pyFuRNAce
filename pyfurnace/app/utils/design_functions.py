@@ -14,7 +14,12 @@ from st_oxview import oxview_from_text
 from code_editor import code_editor
 
 ### pyFuRNAce modules
-from . import main_menu_style, second_menu_style, copy_to_clipboard
+from . import (
+    main_menu_style,
+    second_menu_style,
+    copy_to_clipboard,
+    pyfurnace_layout_cols,
+)
 import pyfurnace as pf
 from utils.commands import (  # noqa: F401
     AptamersCommand,
@@ -96,6 +101,17 @@ def origami_general_options(origami, expanded=True):
             )
 
         with cols[2]:
+            # motif_menu_sidebar = st.toggle(
+            #     "Show motif menu in sidebar",
+            #     value=st_state.sidebar_motif_menu,
+            #     help="Show the motif menu in the sidebar "
+            #     "instead of below the general options.",
+            # )
+            # if motif_menu_sidebar != st_state.sidebar_motif_menu:
+            #     st_state.sidebar_motif_menu = motif_menu_sidebar
+            #     st.rerun()
+
+            # # if not st_state.sidebar_motif_menu:
             new_sticky = st.toggle(
                 "Stick the motif menu at the top",
                 value=st_state.motif_menu_sticky,
@@ -105,6 +121,8 @@ def origami_general_options(origami, expanded=True):
             if new_sticky != st_state.motif_menu_sticky:
                 st_state.motif_menu_sticky = new_sticky
                 st.rerun()
+        # else:
+        #     st.write(":green[<- Check the sidebar]")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -118,7 +136,8 @@ def origami_general_options(origami, expanded=True):
 
         with col2:
             frame_size = st.slider(
-                "Oxview frame size (disable and renable "
+                "Oxview frame size",
+                help="Set the height of the OxView frame (disable and renable "
                 "the OxView to apply changes)",
                 min_value=0,
                 max_value=2000,
@@ -236,6 +255,7 @@ def initiate_session_state():
         "motif": pf.Motif(),
         #   "redo": [],
         "motif_menu_sticky": False,
+        "sidebar_motif_menu": False,
         "copied_motif": None,
         "copied_motif_text": "",
         "modified_motif_text": "",
@@ -326,7 +346,7 @@ def make_motif_menu(origami):
 
         ### Adding the menu here, otherwise there are issues choosing the
         # custom motif with st.fragment when the edit mode is off
-        col1, col2 = st.columns([5, 1.5], vertical_alignment="bottom")
+        col1, col2 = st.columns([3, 1.5], vertical_alignment="bottom")
         with col1:
             motif_selected = option_menu(
                 None,
@@ -338,7 +358,7 @@ def make_motif_menu(origami):
             )
         with col2:
             new_name = st.text_input(
-                ":green[Add custom motif with name:]",
+                ":green[New custom name:]",
                 key=f"new_custom_motif{st_state.custom_key}",
             )
             if new_name:
@@ -399,8 +419,8 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         st_state.code.append("origami.append([]) # Add empty line")
         origami_len = 1
 
-    col1, col2, col3, col4, col5 = st.columns(
-        [1, 1.4, 1.4, 1, 0.8],
+    col1, col2, col3 = pyfurnace_layout_cols(
+        [1, 4, 2],
         vertical_alignment="top",
     )
 
@@ -408,135 +428,142 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         if f_col1:
             f_col1()
 
-    ### Select the line in which to add the motif
     with col2:
-        line_index = min(line_index, origami_len - 1)
-        line_index = st.number_input(
-            "**Line index:**",
-            min_value=-1,
-            max_value=origami_len - 1,
-            value=line_index,
-        )
-        st_state.current_line_occupied = False
+        line_ind_col, mot_ind_col = st.columns(2)
+        ### Select the line in which to add the motif
+        with line_ind_col:
+            line_index = min(line_index, origami_len - 1)
+            line_index = st.number_input(
+                "**Line index:**",
+                min_value=-1,
+                max_value=origami_len - 1,
+                value=line_index,
+            )
+            st_state.current_line_occupied = False
 
-        if line_index < origami_len and origami[line_index]:
-            st_state.current_line_occupied = True
-        if line_index != st_state.line_index:
-            st_state.line_index = line_index
-            if clicked_indexes:
-                st_state.ori_click_count += 1
-            st.rerun()
-
-        subcol1, subcol2 = st.columns(2)
-
-        with subcol1:
-            if f_subcol2:
-                f_subcol2(line_index + 1)
-
-        ### delete line
-        with subcol2:
-            # check that the origami has more than one line, or the line is not empty
-            if len(st_state.origami) > 1 or st_state.origami[0]:
-                # If we want to add a new line, we stop the function here
-                if st_state.line_index >= len(st_state.origami):
-                    return
-                if len(st_state.origami) > 0:
-                    del_line = st.button(
-                        "Delete", width="stretch", help="Delete the choosen line"
-                    )
-                    if del_line:
-                        st_state.origami.pop(
-                            st_state.line_index
-                        )  # remove choosen helix
-                        st_state.code.append(f"origami.pop({st_state.line_index})")
-                        st_state.line_index -= 1
-                        st.rerun()  # rerun app
-            # if there is the button to add a motif, add a empty button to align
-            elif f_subcol3:
-                st.button("", type="tertiary")
-
-    if st_state.line_index >= len(origami):
-        return
-
-    ### Motif index selection
-    with col3:
-        max_val = len(origami[line_index])
-        if motif_index > max_val:
-            motif_index = max_val
-        motif_index = st.number_input(
-            "**Motif index:**",
-            min_value=0,
-            max_value=max_val,
-            value=motif_index,
-        )
-
-        if motif_index != st_state.motif_index:
-            st_state.motif_index = motif_index
-            if clicked_indexes:
-                st_state.ori_click_count += 1
-            st.rerun()
-        subcol1, subcol2 = st.columns(2)
-
-        with subcol1:
-            if f_subcol3:
-                f_subcol3()
-        with subcol2:
-            ### Delete motif
-            if len(origami[st_state.line_index]) > 0:
-                delete_button = st.button(":red[Delete]", width="stretch")
-                if delete_button:
-                    if st_state.motif_index == len(origami[st_state.line_index]):
-                        st_state.motif_index -= 1
-                    origami.pop((st_state.line_index, st_state.motif_index))
-                    st_state.code.append(
-                        f"origami.pop(({st_state.line_index}, "
-                        f"{st_state.motif_index})) # Delete motif"
-                    )
-                    # st_state.redo = [] # clear the redo buffer
-                    st.rerun()  # rerun app
-
-    ### copy/paste motif
-    with col4:
-        if f_col1:
-            copy_motif("preview")
-        slice = (line_index, motif_index)
-        if 0 <= line_index < len(origami) and 0 <= motif_index < len(
-            origami[line_index]
-        ):
-
-            motif = origami[slice]
-            copy_motif("selected", motif=motif, motif_slice=slice)
-
-        # Paste motif
-        if st_state.copied_motif:
-            paste_button = st.button("Paste", width="stretch")
-            if paste_button:
-                origami.insert((line_index, motif_index), st_state.copied_motif)
-                st_state.code.append(
-                    st_state.copied_motif_text + f"\norigami.insert(({line_index}, "
-                    f"{motif_index}), motif) # Paste motif"
-                )
-                # st_state.redo = []
+            if line_index < origami_len and origami[line_index]:
+                st_state.current_line_occupied = True
+            if line_index != st_state.line_index:
+                st_state.line_index = line_index
+                if clicked_indexes:
+                    st_state.ori_click_count += 1
                 st.rerun()
 
-    # Duplicate line and undo
-    with col5:
-        undo(key="motif_undo")
+            subcol1, subcol2 = st.columns(2)
 
-        if (
-            0 <= line_index < len(origami)
-            and origami[line_index]
-            and st.button("Duplicate line", width="stretch")
-        ):
+            with subcol1:
+                if f_subcol2:
+                    f_subcol2(line_index + 1)
 
-            # warnings.filterwarnings("ignore") # ignore kl energy warning
-            origami.duplicate_line(line_index, insert_idx=len(origami))
-            st_state.code.append(
-                f"origami.duplicate_line({line_index}, "
-                f"insert_idx={len(origami)}) # Duplicate line"
+            ### delete line
+            with subcol2:
+                # check that the origami has more than one line,
+                # or the line is not empty
+                if len(st_state.origami) > 1 or st_state.origami[0]:
+                    # If we want to add a new line, we stop the function here
+                    if st_state.line_index >= len(st_state.origami):
+                        return
+                    if len(st_state.origami) > 0:
+                        del_line = st.button(
+                            "Delete", width="stretch", help="Delete the choosen line"
+                        )
+                        if del_line:
+                            st_state.origami.pop(
+                                st_state.line_index
+                            )  # remove choosen helix
+                            st_state.code.append(f"origami.pop({st_state.line_index})")
+                            st_state.line_index -= 1
+                            st.rerun()  # rerun app
+                # if there is the button to add a motif, add a empty button to align
+                elif f_subcol3:
+                    st.button("", type="tertiary")
+
+        if st_state.line_index >= len(origami):
+            return
+
+        ### Motif index selection
+        with mot_ind_col:
+            max_val = len(origami[line_index])
+            if motif_index > max_val:
+                motif_index = max_val
+            motif_index = st.number_input(
+                "**Motif index:**",
+                min_value=0,
+                max_value=max_val,
+                value=motif_index,
             )
-            st_state.line_index = len(origami) - 1
-            st.rerun()  # rerun app
+
+            if motif_index != st_state.motif_index:
+                st_state.motif_index = motif_index
+                if clicked_indexes:
+                    st_state.ori_click_count += 1
+                st.rerun()
+            subcol1, subcol2 = st.columns(2)
+
+            with subcol1:
+                if f_subcol3:
+                    f_subcol3()
+            with subcol2:
+                ### Delete motif
+                if len(origami[st_state.line_index]) > 0:
+                    delete_button = st.button(":red[Delete]", width="stretch")
+                    if delete_button:
+                        if st_state.motif_index == len(origami[st_state.line_index]):
+                            st_state.motif_index -= 1
+                        origami.pop((st_state.line_index, st_state.motif_index))
+                        st_state.code.append(
+                            f"origami.pop(({st_state.line_index}, "
+                            f"{st_state.motif_index})) # Delete motif"
+                        )
+                        # st_state.redo = [] # clear the redo buffer
+                        st.rerun()  # rerun app
+
+    # Buttons
+    with col3:
+        subcol1, subcol2 = st.columns(2)
+
+        ### copy/paste motif
+        with subcol1:
+            if f_col1:
+                copy_motif("preview")
+            slice = (line_index, motif_index)
+            if 0 <= line_index < len(origami) and 0 <= motif_index < len(
+                origami[line_index]
+            ):
+
+                motif = origami[slice]
+                copy_motif("selected", motif=motif, motif_slice=slice)
+
+            # Paste motif
+            if st_state.copied_motif:
+                paste_button = st.button("Paste", width="stretch")
+                if paste_button:
+                    origami.insert((line_index, motif_index), st_state.copied_motif)
+                    st_state.code.append(
+                        st_state.copied_motif_text + f"\norigami.insert(({line_index}, "
+                        f"{motif_index}), motif) # Paste motif"
+                    )
+                    # st_state.redo = []
+                    st.rerun()
+
+        # Duplicate line and undo
+        with subcol2:
+            undo(key="motif_undo")
+
+            if (
+                0 <= line_index < len(origami)
+                and origami[line_index]
+                and st.button("Duplicate line", width="stretch")
+            ):
+
+                # warnings.filterwarnings("ignore") # ignore kl energy warning
+                origami.duplicate_line(line_index, insert_idx=len(origami))
+                st_state.code.append(
+                    f"origami.duplicate_line({line_index}, "
+                    f"insert_idx={len(origami)}) # Duplicate line"
+                )
+                st_state.line_index = len(origami) - 1
+                st.rerun()  # rerun app
 
 
 def add_motif(origami):
@@ -737,7 +764,7 @@ def structure_converter(current_custom_motif):
         current_struct += "&"
 
     ### Add the structure converter
-    col1, col2, col3 = st.columns([4, 4, 1], vertical_alignment="bottom")
+    col1, col2, col3 = pyfurnace_layout_cols([4, 4, 1], vertical_alignment="bottom")
     with col1:
         structure = st.text_input(
             "Dot-bracket structure:",
@@ -1758,7 +1785,7 @@ def advaced_edit(motif_slice):
         use_container_width=True,
     ):
 
-        cols = st.columns(
+        cols = pyfurnace_layout_cols(
             [1.4, 1.4, 0.7, 0.9, 1.4, 1.4, 0.8], vertical_alignment="bottom"
         )
         with cols[0]:
@@ -1803,7 +1830,9 @@ def advaced_edit(motif_slice):
                     st.rerun(scope="fragment")
 
         for i, s in enumerate(st.session_state.mot_adv_edit):
-            col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 3])
+            col1, col2, col3, col4, col5 = st.columns(
+                [0.5, 0.5, 1, 1, 2], vertical_alignment="bottom"
+            )
             with col1:
                 start_x = st.number_input(
                     f"{i}) Start x:",

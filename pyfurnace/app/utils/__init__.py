@@ -31,6 +31,34 @@ inactive_menu_style["nav-link-selected"]["color"] = "#31333e"
 inactive_menu_style["nav-link-selected"]["font-weight"] = "normal"
 
 
+class DummyCol:
+    """A dummy column class to mimic Streamlit context manager for columns"""
+
+    def __enter__(self):
+        return
+
+    def __exit__(self, type, value, traceback):
+        return
+
+
+def pyfurnace_layout_cols(cols, **kwargs):
+    """
+    Function to handle streamlit columns, to adapt the switch between
+    sidebar motif menu and normal layout.
+    If the session state contains the sidebar_motif_menu set to True,
+    it returns dummy columns that do nothing.
+    Otherwise, it returns normal streamlit columns.
+    """
+    if st.session_state.get("sidebar_motif_menu", False):
+        if isinstance(cols, int):
+            n_cols = cols
+        elif isinstance(cols, (list, tuple)):
+            n_cols = len(cols)
+        return [DummyCol() for _ in range(n_cols)]
+    else:
+        return st.columns(cols, **kwargs)
+
+
 def check_import_pyfurnace():
     ### If the module is already imported, skip
     if "pyfurnace" in sys.modules:
@@ -54,7 +82,7 @@ def load_logo(page_title="pyFuRNAce", page_icon=str(app_path / "static" / "logo.
         page_title=page_title,
         page_icon=page_icon,
         layout="wide",
-        initial_sidebar_state="collapsed",
+        initial_sidebar_state="expanded",
     )
     st.logo(
         str(app_path / "static" / "logo_text.png"),

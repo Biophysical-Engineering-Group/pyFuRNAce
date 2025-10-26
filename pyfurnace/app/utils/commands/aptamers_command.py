@@ -9,7 +9,6 @@ from ..motifs_icons import MOTIF_ICONS
 common_aptamers = [
     "Broccoli",
     "Pepper",
-    "Ispinach",
     "MS2",
     "Streptavidin",
 ]
@@ -19,7 +18,7 @@ class AptamersCommand(MotifCommand):
 
     def execute(self):
         # override the theme
-        col1, col2 = st.columns([1, 5], vertical_alignment="bottom")
+        col1, col2 = st.columns([1, 3], vertical_alignment="bottom")
         with col1:
             aptamers_box = st.selectbox(
                 ":green[Search an Aptamer or]",

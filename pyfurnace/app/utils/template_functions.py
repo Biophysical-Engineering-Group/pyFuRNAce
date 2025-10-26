@@ -24,7 +24,7 @@ symbols = {
 
 def sanitize_input(text):
     """Remove spaces and convert to upper case the text input"""
-    return text.upper().replace(" ", "")
+    return text.upper().replace(" ", "").strip()
 
 
 def upload_setting_button():

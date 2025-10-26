@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit import session_state as st_state
 import pyfurnace as pf
 from .motif_command import MotifCommand
+from .. import pyfurnace_layout_cols
 
 
 class TetraLoopCommand(MotifCommand):
@@ -35,17 +36,19 @@ class TetraLoopCommand(MotifCommand):
     def interface(self, key="", seq_default="UUCG"):
         seq = None
         open_left = False
-        col1, col2, col3 = st.columns([1, 1, 4], vertical_alignment="bottom")
+        col1, col3 = pyfurnace_layout_cols(2, vertical_alignment="bottom")
         with col1:
-            custom_seq = st.toggle("Custom Sequence")
-        with col2:
-            if key == "mod":
-                open_left = st.button("Flip")
-            else:
-                open_left = st.toggle(
-                    "Flip",
-                    value=st_state.current_line_occupied,
-                )
+            subcol1, subcol2 = st.columns(2, vertical_alignment="bottom")
+            with subcol1:
+                custom_seq = st.toggle("Custom Sequence")
+            with subcol2:
+                if key == "mod":
+                    open_left = st.button("Flip")
+                else:
+                    open_left = st.toggle(
+                        "Flip",
+                        value=st_state.current_line_occupied,
+                    )
         if custom_seq:
             with col3:
                 seq = st.text_input("Sequence:", value=seq_default)

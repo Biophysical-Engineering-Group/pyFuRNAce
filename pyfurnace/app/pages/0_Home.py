@@ -172,8 +172,8 @@ def load_file():
 
 
 def newcomer_flow():
-    cols_ratio = [1.7, 2.1, 2, 4]
-    col1, col2, col3, _ = st.columns(cols_ratio, vertical_alignment="bottom")
+    cols_ratio = [2, 2, 2]
+    col1, col2, col3 = st.columns(cols_ratio, vertical_alignment="bottom")
     sequence_type = "secondary"
     template_type = "secondary"
     file_type = "secondary"
@@ -203,7 +203,7 @@ def newcomer_flow():
                     key="design_choice2",
                 )
 
-            col1, col2, col3, _ = st.columns(cols_ratio, vertical_alignment="bottom")
+            col1, col2, col3 = st.columns(cols_ratio, vertical_alignment="bottom")
 
             if start2 == "Yes":
                 file_type = "primary"
@@ -216,12 +216,12 @@ def newcomer_flow():
                     st.write("Add your sequence or structure: ↓")
 
         elif start == "No":
-            col1, col2, col3, _ = st.columns(cols_ratio, vertical_alignment="bottom")
+            col1, col2, col3 = st.columns(cols_ratio, vertical_alignment="bottom")
             template_type = "primary"
             with col1:
                 st.write("Try this one ↓")
 
-    col1, col2, col3, _ = st.columns(cols_ratio, vertical_alignment="bottom")
+    col1, col2, col3 = st.columns(cols_ratio, vertical_alignment="bottom")
 
     with col1:
         if st.button(

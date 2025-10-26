@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit import session_state as st_state
 import pyfurnace as pf
 from .motif_command import MotifCommand
+from .. import pyfurnace_layout_cols
 
 
 class StemCommand(MotifCommand):
@@ -73,7 +74,7 @@ class StemCommand(MotifCommand):
         seq_length = 0
 
         ### create the interface
-        col1, col2 = st.columns([1, 5], vertical_alignment="bottom")
+        col1, col2 = pyfurnace_layout_cols([1, 5], vertical_alignment="bottom")
 
         with col1:
             specific_seq = st.toggle("Custom Sequence")
@@ -84,7 +85,7 @@ class StemCommand(MotifCommand):
                 with col1:
                     top_seq = st.text_input("Sequence:", value=top_seq)
             else:
-                subcol1, subcol2, subcol3 = st.columns([3, 1, 1])
+                subcol1, subcol2, subcol3 = st.columns(3)
                 with subcol1:
                     seq_length = st.number_input(
                         "Length:",
@@ -101,7 +102,7 @@ class StemCommand(MotifCommand):
                     )
                 with subcol3:
                     wobble_tolerance = st.number_input(
-                        "Wobble tolerance:",
+                        "Wobble randomize:",
                         min_value=0,
                         value=wobble_tolerance,
                         help="Randomize the number of wobbles by ± n, to speed up "

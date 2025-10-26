@@ -8,6 +8,7 @@ from .general_edit_command import GeneralEditCommand
 from .tetraloop_command import TetraLoopCommand
 from .. import second_menu_style
 from ..motifs_icons import MOTIF_ICONS
+from .. import pyfurnace_layout_cols
 
 # Filter and collect the motif utils
 util_names = [
@@ -89,20 +90,24 @@ class single_strandCommand(MotifCommand):
         seq_def="",
         loop_def=False,
     ):
-        col1, col2, col3 = st.columns([3, 1, 1], vertical_alignment="bottom")
+        col1, col2 = pyfurnace_layout_cols([3, 2], vertical_alignment="bottom")
         with col1:
             seq = st.text_input(
                 "Sequence:",
                 value=seq_def,
             )
         with col2:
-            loop = st.toggle(
-                "Make a loop",
-                value=loop_def,
-                help="If checked, the strand will form a loop.",
-            )
-        with col3:
-            flip = st.toggle("Flip", value=False, help="Flip the strand diagonally.")
+            subcol1, subcol2 = st.columns([1, 1], vertical_alignment="bottom")
+            with subcol1:
+                loop = st.toggle(
+                    "Make a loop",
+                    value=loop_def,
+                    help="If checked, the strand will form a loop.",
+                )
+            with subcol2:
+                flip = st.toggle(
+                    "Flip", value=False, help="Flip the strand diagonally."
+                )
         return seq, loop, flip
 
 
@@ -128,28 +133,26 @@ class start_end_stemCommand(MotifCommand):
         up_ind=0,
         down_ind=1,
     ):
-        _, _, col1, col2, _, _ = st.columns([1, 1, 1, 1, 1, 1])
+        _, col1, col2, _ = st.columns([1, 1, 1, 1])
         with col1:
             t_l = st.selectbox(
-                "Top left:",
-                [up_l_def] + ["─", None],
-                index=up_ind,
+                "Top left:", [up_l_def] + ["─", None], index=up_ind, width="stretch"
             )
             b_l = st.selectbox(
                 "Bottom left:",
                 [down_l_def] + ["─", None],
                 index=down_ind,
+                width="stretch",
             )
         with col2:
             t_r = st.selectbox(
-                "Top right:",
-                [up_r_def] + ["─", None],
-                index=up_ind,
+                "Top right:", [up_r_def] + ["─", None], index=up_ind, width="stretch"
             )
             b_r = st.selectbox(
                 "Bottom right:",
                 [down_r_def] + ["─", None],
                 index=down_ind,
+                width="stretch",
             )
         if not t_l:
             t_l = ""

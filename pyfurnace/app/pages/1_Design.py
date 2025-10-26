@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit import session_state as st_state
 import matplotlib.pyplot as plt
 
 ### pyFuRNAce modules
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     des_func.origami_general_options(st.session_state.origami, expanded=False)
 
     ### make 3 common options for the RNA origami
-    cols = st.columns([1] + [1] * 3 + [1], vertical_alignment="center")
+    cols = st.columns([1, 1, 1, 1], vertical_alignment="center")
 
     # simple origami popover
     with cols[0]:
@@ -36,9 +37,20 @@ if __name__ == "__main__":
         ):
             des_func.simple_origami()
 
+    with cols[1]:
+        motif_menu_sidebar = st.toggle(
+            "Motif menu in the sidebar",
+            value=st_state.sidebar_motif_menu,
+            help="Show the motif menu in the sidebar "
+            "instead of below the general options.",
+        )
+        if motif_menu_sidebar != st_state.sidebar_motif_menu:
+            st_state.sidebar_motif_menu = motif_menu_sidebar
+            st.rerun()
+
     with cols[2]:
         cmap = st.selectbox(
-            "OxView 3D colormap:",
+            "Colormap:",
             ["Reds", None] + plt.colormaps(),
             key="colormap",
             # label_visibility="collapsed",
@@ -47,7 +59,7 @@ if __name__ == "__main__":
         st.session_state.oxview_colormap = cmap
 
     # gradient toggle
-    with cols[4]:
+    with cols[3]:
         grad = st.toggle(
             "Color gradient path",
             key="grad",
@@ -60,14 +72,22 @@ if __name__ == "__main__":
         with st.expander("**Add motifs to the origami:**", expanded=True):
             des_func.make_motif_menu(st.session_state.origami)
 
-    # put the motif menu in a sticky container or not
-    if st.session_state.motif_menu_sticky:
-        with sticky_container(mode="top", border=False):
+    ### display the motif menu in the sidebar or as sticky container
+    if st.session_state.sidebar_motif_menu:
+        with st.sidebar:
             motif_menu_expander()
+        # if the motif menu is in the sidebar,
+        # keep the origami view menu sticky, so no need to scroll back up
+        with sticky_container(mode="top", border=False):
             view_opt = des_func.origami_select_display()
     else:
-        motif_menu_expander()
-        view_opt = des_func.origami_select_display()
+        if st.session_state.motif_menu_sticky:
+            with sticky_container(mode="top", border=False):
+                motif_menu_expander()
+                view_opt = des_func.origami_select_display()
+        else:
+            motif_menu_expander()
+            view_opt = des_func.origami_select_display()
 
     ### select the render mode
     if not st.session_state.origami:

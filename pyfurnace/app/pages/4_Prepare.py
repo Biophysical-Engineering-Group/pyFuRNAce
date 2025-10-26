@@ -337,7 +337,9 @@ def primers_setup():
     # Various for PCR settings
     ###
 
-    mcol1, mcol2, mcol3, mcol4 = st.columns(4, vertical_alignment="center", gap="large")
+    mcol1, mcol2, mcol3, mcol4 = st.columns(
+        4, vertical_alignment="center", gap="medium"
+    )
     with mcol1:
         with st.popover("Melting temperature parameters", use_container_width=True):
 

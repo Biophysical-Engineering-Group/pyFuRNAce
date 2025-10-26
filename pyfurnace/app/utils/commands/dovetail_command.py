@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit import session_state as st_state
 import pyfurnace as pf
 from .motif_command import MotifCommand
+from .. import pyfurnace_layout_cols
 
 
 class DovetailCommand(MotifCommand):
@@ -118,7 +119,7 @@ class DovetailCommand(MotifCommand):
         sign = 0
 
         ### create the interface
-        col1, col2 = st.columns([1, 5], vertical_alignment="bottom")
+        col1, col2 = pyfurnace_layout_cols([1, 5], vertical_alignment="bottom")
         with col1:
             specific_seq = st.toggle("Custom Sequence")
         with col2:
@@ -135,33 +136,37 @@ class DovetailCommand(MotifCommand):
                 with col4:
                     down_cross = st.toggle("Down cross", value=down_cross)
             else:
-                subcols = st.columns([1, 1, 1, 1, 1], vertical_alignment="bottom")
-                with subcols[0]:
-                    seq_length = st.number_input(
-                        "Length:",
-                        min_value=-100,
-                        value=len_default,
-                    )
-                with subcols[1]:
-                    up_cross = st.toggle("Up cross", value=up_cross)
-                with subcols[2]:
-                    down_cross = st.toggle("Down cross", value=down_cross)
-                with subcols[3]:
-                    wobble_interval = st.number_input(
-                        "Wobble interval:",
-                        min_value=0,
-                        value=wobble_interval,
-                        help="Add a wobble every n° nucleotides, to avoid secondary "
-                        "structures in the DNA",
-                    )
-                with subcols[4]:
-                    wobble_tolerance = st.number_input(
-                        "Wobble tolerance:",
-                        min_value=0,
-                        value=wobble_tolerance,
-                        help="Randomize the number of wobbles by ± n, to speed up "
-                        "sequence optimization",
-                    )
+                subcol1, subcol2 = pyfurnace_layout_cols(2, vertical_alignment="bottom")
+                with subcol1:
+                    subsubcols = st.columns(3, vertical_alignment="bottom")
+                    with subsubcols[0]:
+                        seq_length = st.number_input(
+                            "Length:",
+                            min_value=-100,
+                            value=len_default,
+                        )
+                    with subsubcols[1]:
+                        wobble_interval = st.number_input(
+                            "Wobble interval:",
+                            min_value=0,
+                            value=wobble_interval,
+                            help="Add a wobble every n° nucleotides, to avoid "
+                            "secondary structures in the DNA",
+                        )
+                    with subsubcols[2]:
+                        wobble_tolerance = st.number_input(
+                            "Wobble randomize:",
+                            min_value=0,
+                            value=wobble_tolerance,
+                            help="Randomize the number of wobbles by ± n, to speed "
+                            "up sequence optimization",
+                        )
+                with subcol2:
+                    subsubcols = st.columns(2, vertical_alignment="bottom")
+                    with subsubcols[0]:
+                        up_cross = st.toggle("Up cross", value=up_cross)
+                    with subsubcols[1]:
+                        down_cross = st.toggle("Down cross", value=down_cross)
 
         return (
             sign,

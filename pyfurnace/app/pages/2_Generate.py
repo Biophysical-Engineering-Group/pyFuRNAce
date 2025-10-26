@@ -167,7 +167,7 @@ def adjust_sequence_start(sequence_constraint):
     if sequence_constraint and sequence_constraint[0] != "G":
         col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
         with col1:
-            st.warning("The RNA sequence doens't start with G.")
+            st.error("The RNA sequence doens't start with G.", icon=":material/error:")
         with col2:
             new_start = st.text_input(
                 "Start the sequence with",
@@ -310,13 +310,12 @@ def show_vienna_params():
 
     col1, col2 = st.columns(2)
     with col1:
-        with st.columns(3)[1]:
-            st.markdown(
-                "#### MFE Structure",
-                help="The Minimum Free Energy (MFE) structure is the  "
-                "structure with the lowest free energy. It is the most stable "
-                "structure that can be formed by the sequence. ",
-            )
+        st.markdown(
+            "#### MFE Structure",
+            help="The Minimum Free Energy (MFE) structure is the  "
+            "structure with the lowest free energy. It is the most stable "
+            "structure that can be formed by the sequence. ",
+        )
 
         subcol1, subcol2 = st.columns(2)
         with subcol1:
@@ -334,14 +333,13 @@ def show_vienna_params():
             st.markdown(write_format_text(folds[0]))
 
     with col2:
-        with st.columns(3)[1]:
-            st.markdown(
-                "#### Centroid",
-                help="The centroid structure is the structure that is the  "
-                "most similar to the average structure of the ensemble. It is "
-                "the closest structure to represent the average of all the "
-                "possible structures that can be formed by the sequence. ",
-            )
+        st.markdown(
+            "#### Centroid",
+            help="The centroid structure is the structure that is the  "
+            "most similar to the average structure of the ensemble. It is "
+            "the closest structure to represent the average of all the "
+            "possible structures that can be formed by the sequence. ",
+        )
         subcol1, subcol2 = st.columns(2)
         with subcol1:
             st.markdown(f"Energy: {round(folds[4], 2)} Kcal/mol")
@@ -409,7 +407,8 @@ if __name__ == "__main__":
 
     # check if the dot-bracket notation contains multiple strands
     if "&" in structure:
-        st.warning("Experimental: the dot-bracket notation contains multiple strands")
+        st.error("Revolvr sequence generator doesn't support multiple strands.")
+        st.stop()
 
     ### INITIALIZE FORNA
     use_forna, partial_forna = initialize_forna()
@@ -429,7 +428,7 @@ if __name__ == "__main__":
         filename = st.text_input("Name of RNA origami", value="Origami")
     with col2:
         generate = False
-        if st.button("Generate RNA sequence"):
+        if st.button("Generate RNA sequence", type="primary"):
             generate = True
 
     if generate:

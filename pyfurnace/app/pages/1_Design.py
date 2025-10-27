@@ -74,7 +74,18 @@ if __name__ == "__main__":
 
     ### display the motif menu in the sidebar or as sticky container
     if st.session_state.sidebar_motif_menu:
+        st.markdown(
+            """
+            <style>
+            [data-testid="stSidebar"][aria-expanded="true"]{
+                min-width: 30%;
+                max-width: 50%;
+            }
+            """,
+            unsafe_allow_html=True,
+        )
         with st.sidebar:
+            st.markdown("#### :green[Drag the border of the sidebar to resize it ->]")
             motif_menu_expander()
         # if the motif menu is in the sidebar,
         # keep the origami view menu sticky, so no need to scroll back up

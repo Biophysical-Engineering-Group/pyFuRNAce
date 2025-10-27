@@ -1,6 +1,6 @@
 import warnings
 import copy
-from typing import Optional, Union, Literal, List, Dict, Tuple, Any, Set
+from typing import Iterable, Optional, Union, Literal, List, Dict, Tuple, Any, Set
 import numpy as np
 
 try:
@@ -1806,6 +1806,7 @@ class Strand(Callback):
         filename: str = "strand",
         return_text: bool = False,
         pdb: bool = False,
+        box_size: Iterable[float] = (1000.0, 1000.0, 1000.0),
         **kwargs,
     ) -> Optional[Tuple[str, str]]:
         """
@@ -1822,6 +1823,8 @@ class Strand(Callback):
         pdb : bool, default=False
             If True, exports the structure as a PDB file (requires
             `oxDNA_analysis_tools`).
+        box_size : Iterable of float, default=(1000.0, 1000.0, 1000.0)
+            The dimensions of the simulation box (x, y, z) in oxDNA simulation units.
         **kwargs : dict
             Additional keyword arguments passed to the PDB export.
 
@@ -1843,10 +1846,12 @@ class Strand(Callback):
         n_strands = 1
 
         ### initialize the configuration and topology text
-        conf_text = "t = 0\nb = 100 100 100\nE = 0 0 0\n"
+        conf_text = (
+            f"t = 0\n" f"b = {box_size[0]} {box_size[1]} {box_size[2]}\n" f"E = 0 0 0\n"
+        )
         top_text = seq + " type=RNA circular=false \n"
 
-        ### Buil the configuration text
+        ### Build the configuration text
         for pos, a1, a3 in coords:
             conf_text += (
                 f"{pos[0]} {pos[1]} {pos[2]} "

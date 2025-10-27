@@ -2607,6 +2607,7 @@ class Motif(Callback):
         return_text: bool = False,
         sequence: str = None,
         pdb: bool = False,
+        box_size: Iterable[float] = (1000.0, 1000.0, 1000.0),
         **kwargs,
     ) -> Optional[Tuple[str, str]]:
         """
@@ -2635,6 +2636,8 @@ class Motif(Callback):
             If provided, uses the given sequence to generate the topology.
         pdb : bool, optional, default=False
             If True, exports a PDB (Protein Data Bank) file for visualization.
+        box_size : Iterable of float, default=(1000.0, 1000.0, 1000.0)
+            The dimensions of the simulation box (x, y, z) in oxDNA simulation units.
         **kwargs
             Additional arguments for customizing force constraints
             and PDB export settings.
@@ -2670,7 +2673,9 @@ class Motif(Callback):
         n_strands = len(strands)
 
         # create the conformation and topology text
-        conf_text = "t = 0\nb = 1000 1000 1000\nE = 0 0 0\n"
+        conf_text = (
+            f"t = 0\n" f"b = {box_size[0]} {box_size[1]} {box_size[2]}\n" f"E = 0 0 0\n"
+        )
         topology_text = ""
 
         ### ADD THE STRANDS TO THE CONFORMATION AND TOPOLOGY TEXTS ###

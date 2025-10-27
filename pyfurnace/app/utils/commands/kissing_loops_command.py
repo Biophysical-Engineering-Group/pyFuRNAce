@@ -125,8 +125,12 @@ class KissingLoopsCommand(MotifCommand):
                 index_for_list = all_pk_indexes.index(default_pk_index)
             else:
                 index_for_list = len(all_pk_indexes) - 1
+            if key:
+                pk_index_label = "Selected pseudoknot id:"
+            else:
+                pk_index_label = "Next pseudoknot id:"
             pk_index = st.selectbox(
-                "Pseudoknot id:",
+                pk_index_label,
                 options=all_pk_indexes,
                 index=index_for_list,
                 help="Select the pseudoknot id for the kissing loop motif. "
@@ -151,7 +155,7 @@ class KissingLoopsCommand(MotifCommand):
                     open_left = st.toggle("Flip", value=flip)
 
         with col2:
-            subcol1, subcol2 = st.columns([2, 1])
+            subcol1, subcol2 = st.columns(2)
             if specific_seq:
                 with subcol1:  # either sequence of energy info
                     top_seq = st.text_input("Sequence:", value=top_seq)
@@ -163,7 +167,7 @@ class KissingLoopsCommand(MotifCommand):
                 max_kl_E = abs(kl_energy) + abs(energy_tolerance)
                 with subcol1:
                     kl_range = st.slider(
-                        "Kissing binding energy range:",
+                        "Binding energy range:",
                         min_value=2.0,
                         max_value=15.0,
                         value=(min_kl_E, max_kl_E),

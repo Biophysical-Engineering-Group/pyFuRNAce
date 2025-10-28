@@ -71,6 +71,7 @@ funny_bootstrap_icons = [
 ]
 
 direction_list = pf.Direction.names()
+highlight_color = "#D00000"
 
 
 def origami_general_options(origami, expanded=True):
@@ -236,8 +237,8 @@ def motif_text_format(motif: pf.Motif) -> str:
     preview_txt = (
         motif_str.replace(" ", "&nbsp;")
         .replace("\n", "<br />")
-        .replace("<5>", '<span style="color: #D52919;">5</span>')
-        .replace("<3>", '<span style="color: #D52919;">3</span>')
+        .replace("<5>", f'<span style="color: {highlight_color};">5</span>')
+        .replace("<3>", f'<span style="color: {highlight_color};">3</span>')
     )
     return preview_txt
 
@@ -432,11 +433,11 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         line_ind_col, mot_ind_col = st.columns(2)
         ### Select the line in which to add the motif
         with line_ind_col:
-            line_index = min(line_index, origami_len - 1)
+            line_index = min(line_index, origami_len)
             line_index = st.number_input(
                 "**Line index:**",
-                min_value=-1,
-                max_value=origami_len - 1,
+                min_value=0,
+                max_value=origami_len,
                 value=line_index,
             )
             st_state.current_line_occupied = False
@@ -453,7 +454,7 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
 
             with subcol1:
                 if f_subcol2:
-                    f_subcol2(line_index + 1)
+                    f_subcol2(line_index)
 
             ### delete line
             with subcol2:
@@ -610,7 +611,9 @@ def add_motif(origami):
         # check that the origami has more than one line, or the line is not empty
         if len(st_state.origami) > 1 or st_state.origami[0]:
             add_line = st.button(
-                "Add", width="stretch", help=f"Add a new line n° {linex_index}."
+                "Insert",
+                width="stretch",
+                help=f"Add a new line at index n° {linex_index}.",
             )
             if add_line:
                 # add empty line at the choosen position
@@ -1280,6 +1283,10 @@ def origami_build_view(selected_display):
         col1, col2 = st.columns(2)
         with col1:
             clicked = display_origami()
+            # in case I want to adjust the frame size based on the origami size
+            # here the code: (p.s.: the problem is refreshing the oxview iframe height)
+        # origami_lines = len(str(st_state.origami).split("\n")) + 2
+        # st_state.oxview_frame_size = origami_lines * st_state.origami_font_size * 1.5
         with col2:
             display3d()
         clicked_options(clicked)
@@ -1372,7 +1379,8 @@ def display3d():
 
 def build_origami_content(barriers=None):
     barriers_colors = {"▂": "#FFBA08", "▄": "#FFBA08", "█": "#D00000"}
-    highlight_color = "#D00000"
+    # for highlight_color see the top of the file
+    click_grey = "#DDDDDD"
     normal_color = "#333333"  # 80% black
 
     origami = st_state.origami
@@ -1435,7 +1443,7 @@ def build_origami_content(barriers=None):
         f' font-size: {st_state.origami_font_size}px;">Line:<br />'
     )
 
-    line_nr = -2
+    line_nr = -1
     origami_list_len = len(origami_list)
     span_text = '<span style="font-family: monospace; '
 
@@ -1476,12 +1484,27 @@ def build_origami_content(barriers=None):
             )
             line_nr = current_line_nr
 
-        # the origami line is empty
+        # the origami line is empty and selected
         elif (
             isinstance(next_line_nr, int)
             and line_nr < st_state.line_index < next_line_nr
         ):
-            content += span_text + 'color: #D52919; line-height:1;">_____</span>'
+            content += span_text + (
+                f'color: {highlight_color}; line-height:1;">_____</span>'
+            )
+
+        # the origami line is empty but not selected
+        elif (
+            isinstance(line_nr, int)
+            and isinstance(next_line_nr, int)
+            and next_line_nr > line_nr + 1 != next_line_nr
+        ):
+            content += (
+                f'<a style="font-family: monospace; color: {click_grey}; '
+                'line-height:1;" href="javascript:void(0);" '
+                f'id="{line_nr + 1},{0},{0},'
+                f'{0}">_____</a>'
+            )
 
         # is not a new origami line
         else:
@@ -1550,17 +1573,34 @@ def build_origami_content(barriers=None):
                 content += span_text + f'color: {color}; line-height:1;">{char}</span>'
 
         # Check if you wanna add the cursor
-        if motif_slice and motif_slice[0] == st_state.line_index:
-            if len(origami[motif_slice[0]]) == st_state.motif_index:
-                content += (
-                    span_text + f'color: {highlight_color}; line-height:1;">│</span>'
-                )
+        if (
+            motif_slice
+            and motif_slice[0] == st_state.line_index
+            and len(origami[motif_slice[0]]) == st_state.motif_index
+        ):
+            content += span_text + f'color: {highlight_color}; line-height:1;">│</span>'
+        # add a clickable space at the end of the line to select new index
+        elif motif_slice:
+            content += (
+                f'<a style="font-family: monospace; color: {click_grey}; '
+                'line-height:1;" href="javascript:void(0);" '
+                f'id="{motif_slice[0]},{len(origami[motif_slice[0]])},{x},'
+                f'{y - 1}">|</a>'
+            )
         content += "<br />"
 
     if line_nr < st_state.line_index:
-        # the origami line is empty
-        content += span_text + 'color: #D52919; line-height:1;">_____</span>'
-
+        # the origami line is empty and is at the end
+        content += span_text + (
+            f'color: {highlight_color}; line-height:1;">_____</span>'
+        )
+    else:
+        content += (
+            f'<a style="font-family: monospace; color: {click_grey}; '
+            'line-height:1;" href="javascript:void(0);" '
+            f'id="{line_nr + 1},{0},{0},'
+            f'{0}">_____</a>'
+        )
     content += "</div>"
     content += "</div>"
     return content
@@ -1628,6 +1668,15 @@ def clicked_options(clicked):
         motif_slice = (y_slice, x_slice)
         pos = (x_pos, y_pos)
 
+        ### highlight the selected motif
+        if (
+            st_state.line_index != motif_slice[0]
+            or st_state.motif_index != motif_slice[1]
+        ):
+            st_state.line_index = motif_slice[0]
+            st_state.motif_index = motif_slice[1]
+            st.rerun()
+
         # Write the selected motif on screen
         try:
             motif = st_state.origami[motif_slice]
@@ -1643,15 +1692,6 @@ def clicked_options(clicked):
         if pos in st_state.origami.seq_positions:
             ind = st_state.origami.seq_positions.index(pos)
             nucl_text += f":orange[nucleotide index {ind}] in"
-
-        ### highlight the selected motif
-        if (
-            st_state.line_index != motif_slice[0]
-            or st_state.motif_index != motif_slice[1]
-        ):
-            st_state.line_index = motif_slice[0]
-            st_state.motif_index = motif_slice[1]
-            st.rerun()
 
         st.markdown(
             f"Selected {nucl_text} :orange[{motif_class_name}]: "
@@ -1728,6 +1768,8 @@ def display_structure_sequence():
                 "pages/2_Generate.py",
                 label="**:orange[Generate the sequence]**",
                 icon=":material/network_node:",
+                help="Switch to the Generate page to generate "
+                "the sequence from the structure.",
             )
         with col2:
             copy_to_clipboard(origami.structure, "Structure")

@@ -318,7 +318,7 @@ def test_strand_draw(strand):
 
 def test_save_3d_model(tmp_path, strand):
     conf_text, top_text = strand.save_3d_model(return_text=True)
-    assert conf_text.startswith("t = 0\nb = 100 100 100\nE = 0 0 0\n")
+    assert conf_text.startswith("t = 0\nb = 1000.0 1000.0 1000.0\nE = 0 0 0\n")
     seq = strand.sequence
     def_text = f"{len(seq)} 1 5->3\n" + str(seq) + " type=RNA circular=false \n"
     assert top_text == def_text

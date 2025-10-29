@@ -2040,15 +2040,13 @@ class Origami(Callback):
     def save_3d_model(self, *args, **kwargs) -> Optional[Tuple[str, str]]:
         return self.assembled.save_3d_model(*args, **kwargs)
 
-    def save_fasta(
-        self, filename_path: str, return_text: bool = False
-    ) -> Optional[str]:
+    def save_fasta(self, filename: str, return_text: bool = False) -> Optional[str]:
         """
         Save the sequence of the Origami to a FASTA file.
 
         Parameters
         ----------
-        filename_path : str
+        filename : str
             Path to the output file.
         return_text : bool, default=False
             If True, return the text instead of saving it to a file.
@@ -2058,7 +2056,7 @@ class Origami(Callback):
         Optional[str]
             The FASTA text if return_text is True.
         """
-        path = Path(filename_path).with_suffix(".fasta")
+        path = Path(filename).with_suffix(".fasta")
         name = path.stem
         text = f">{name}\n" f"{self.sequence}\n" f"{self.structure}\n"
 
@@ -2069,14 +2067,14 @@ class Origami(Callback):
             f.write(text)
 
     def save_text(
-        self, filename_path: str, to_road: bool = False, return_text: bool = False
+        self, filename: str, to_road: bool = False, return_text: bool = False
     ) -> Optional[str]:
         """
         Save only the structure part of the Origami to a text file.
 
         Parameters
         ----------
-        filename_path : str
+        filename : str
             Path to the output file.
         to_road : bool, default=False
             If True, convert to ROAD-compatible format.
@@ -2088,7 +2086,7 @@ class Origami(Callback):
         Optional[str]
             The text if return_text is True.
         """
-        path = Path(filename_path).with_suffix(".txt")
+        path = Path(filename).with_suffix(".txt")
         name = path.stem
         text = (
             f">{name}\n"

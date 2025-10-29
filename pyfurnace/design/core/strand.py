@@ -1,3 +1,4 @@
+from pathlib import Path
 import warnings
 import copy
 from typing import Iterable, Optional, Union, Literal, List, Dict, Tuple, Any, Set
@@ -1878,7 +1879,7 @@ class Strand(Callback):
             return conf_text, top_text
 
         ### write the oxDNA file
-        filename = filename.split(".")[0]  # remove the extension from the filename
+        filename = str(Path(filename).with_suffix(""))  # remove the extension
         conf_file = f"{filename}.dat"
         with open(conf_file, "w", encoding="utf-8") as f:
             f.write(conf_text)

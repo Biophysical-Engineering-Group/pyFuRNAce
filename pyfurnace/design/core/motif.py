@@ -1,3 +1,4 @@
+from pathlib import Path
 import warnings
 import copy
 from functools import wraps
@@ -2667,7 +2668,7 @@ class Motif(Callback):
             return kwargs
 
         # remove the extension from the filename
-        filename = filename.split(".")[0]
+        filename = str(Path(filename).with_suffix(""))  # remove the extension
         strands = [s for s in self if s.sequence]
         n_nucleotides = sum([len(s.sequence) for s in strands])
         n_strands = len(strands)
@@ -2824,15 +2825,17 @@ class Motif(Callback):
         filename : str, optional
             The filepath to save (without extension). Default is 'motif'.
         """
+        path = Path(filename).with_suffix(".fasta")
+        name = path.stem
         seqs = self.sequence.split("&")
         dotb = self.structure.split("&")
-        with open(f"{filename}.fasta", "w", encoding="utf-8") as f:
+        with open(str(path), "w", encoding="utf-8") as f:
             for i, seq in enumerate(seqs):
-                f.write(f">strand_{i}\n")
+                f.write(f">{name}_strand_{i}\n")
                 f.write(f"{seq}\n")
                 f.write(f"{dotb[i]}\n")
 
-    def save_text(self, filename_path: str = "motif") -> None:
+    def save_text(self, filename: str = "motif") -> None:
         """
         Save the motif representation as a text file.
 
@@ -2841,9 +2844,9 @@ class Motif(Callback):
         filename_path : str, optional
             The filepath to save (without extension). Default is 'motif'.
         """
-        path = filename_path.split(".")[0]
-        name = path.split("/")[-1].split("\\")[-1]
-        with open(f"{path}.txt", "w", encoding="utf-8") as f:
+        path = Path(filename).with_suffix(".txt")
+        name = path.stem
+        with open(str(path), "w", encoding="utf-8") as f:
             f.write(f">{str(name)}\n")
             f.write(f"{self.sequence}\n")
             f.write(f"{self.structure}\n\n")

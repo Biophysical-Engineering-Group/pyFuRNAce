@@ -64,6 +64,7 @@ def oxdna_simulations(
         tempdir = tempfile.TemporaryDirectory()
         directory = tempdir.name
     else:
+        directory = os.path.abspath(directory)
         if not os.path.exists(directory):
             warnings.warn(f"Directory {directory} does not exist. Creating it.")
             os.makedirs(directory)

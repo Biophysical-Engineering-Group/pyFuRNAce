@@ -256,19 +256,22 @@ def save_origami(origami_name="Origami"):
             elif file_type == "txt":
                 to_road = st.session_state.get("to_road")
                 text_data = origami.save_text(
-                    "ori_name",
+                    ori_name,
                     to_road=to_road,
                     return_text=True,
                 )
 
             elif file_type == "fasta":
                 text_data = origami.save_fasta(
-                    "ori_name",
+                    ori_name,
                     return_text=True,
                 )
 
             st.download_button(
-                "Download", text_data, f"{ori_name}.{file_type}", on_click="ignore"
+                label="Download",
+                data=text_data,
+                file_name=f"{ori_name}.{file_type}",
+                on_click="ignore",
             )
 
 

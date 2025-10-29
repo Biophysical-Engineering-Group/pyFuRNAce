@@ -102,17 +102,6 @@ def origami_general_options(origami, expanded=True):
             )
 
         with cols[2]:
-            # motif_menu_sidebar = st.toggle(
-            #     "Show motif menu in sidebar",
-            #     value=st_state.sidebar_motif_menu,
-            #     help="Show the motif menu in the sidebar "
-            #     "instead of below the general options.",
-            # )
-            # if motif_menu_sidebar != st_state.sidebar_motif_menu:
-            #     st_state.sidebar_motif_menu = motif_menu_sidebar
-            #     st.rerun()
-
-            # # if not st_state.sidebar_motif_menu:
             new_sticky = st.toggle(
                 "Stick the motif menu at the top",
                 value=st_state.motif_menu_sticky,
@@ -122,8 +111,6 @@ def origami_general_options(origami, expanded=True):
             if new_sticky != st_state.motif_menu_sticky:
                 st_state.motif_menu_sticky = new_sticky
                 st.rerun()
-        # else:
-        #     st.write(":green[<- Check the sidebar]")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -892,8 +879,9 @@ def custom(current_custom_motif):
     if not current_custom_motif:
         st_state["custom_strands"] = [pf.Strand("")]
 
-    col1, col2 = st.columns(2, vertical_alignment="bottom")
-    with col1:
+    with st.container(
+        horizontal=True, horizontal_alignment="distribute", vertical_alignment="center"
+    ):
         method = st.segmented_control(
             "Build the motif with:",
             [
@@ -913,13 +901,11 @@ def custom(current_custom_motif):
             "and basepairing.\n",
         )
 
-    with col2:
         ### add instructions and common symbols
-        with st.popover("Common symbols to copy"):
+        with st.popover("Symbols to copy"):
             common_pyroad_sym = ["─", "│", "╭", "╮", "╰", "╯", "^", "┼", "┊", "&"]
-            cols = st.columns(len(common_pyroad_sym))
-            for i, sym in enumerate(common_pyroad_sym):
-                with cols[i]:
+            with st.container(horizontal=True, horizontal_alignment="distribute"):
+                for sym in common_pyroad_sym:
                     copy_to_clipboard(sym, sym)
 
     if method == "Structure converter":
@@ -1172,10 +1158,19 @@ def code():
         st_state["last_code_id"] = ""
     code_text = "\n\n".join(st_state.code)
 
-    col1, col2, col3 = st.columns([1, 1, 1], gap="large", vertical_alignment="center")
-    with col1:
+    # col1, col2, col3 = st.columns([1, 1, 1], gap="small", vertical_alignment="center")
+    with st.container(
+        horizontal=True,
+        horizontal_alignment="distribute",
+        gap="large",
+        vertical_alignment="center",
+    ):
+        # with col1:
+        doc_text = "Check the documentation!"
+        if st_state.sidebar_motif_menu:
+            doc_text = "Docs"
         st.link_button(
-            "Check the documentation!",
+            doc_text,
             "https://pyfurnace.readthedocs.io/en/latest/api.html",
             icon=":material/document_search:",
             help="The code editor run python code, so you can program your "
@@ -1184,14 +1179,16 @@ def code():
             " structure, assign it to the variable RENDER_TARGET. If you need"
             " more info, click the button to open the documentation in a new tab.",
         )
-    with col2:
+        # with col2:
         render_lines = st.slider(
-            "Number of lines to render:",
+            "Show up to:",
             min_value=1,
-            max_value=200,
+            max_value=100,
             value=10,
+            format="%d lines",
+            help="Set the maximum number of visible lines in the code editor.",
         )
-    with col3:
+        # with col3:
         wrap = st.toggle(
             "Wrap lines",
             value=False,
@@ -1762,7 +1759,8 @@ def display_structure_sequence():
         st_state.generate_structure = origami.structure
         st_state.generate_sequence = str(origami.sequence)
         st_state.generate_pseudoknots = pseudoknot_text
-        col1, col2, col3, col4 = st.columns(4)
+
+        col1, col2 = pyfurnace_layout_cols([1, 3], vertical_alignment="center")
         with col1:
             st.page_link(
                 "pages/2_Generate.py",
@@ -1772,11 +1770,15 @@ def display_structure_sequence():
                 "the sequence from the structure.",
             )
         with col2:
-            copy_to_clipboard(origami.structure, "Structure")
-        with col3:
-            copy_to_clipboard(origami.sequence, "Sequence")
-        with col4:
-            copy_to_clipboard(pseudoknot_text, "Pseudoknots")
+            # with st.container(horizontal=True, horizontal_alignment="distribute",
+            #                     gap="small", vertical_alignment="center"):
+            subcol1, subcol2, subcol3 = st.columns(3, vertical_alignment="center")
+            with subcol1:
+                copy_to_clipboard(origami.structure, "Structure")
+            with subcol2:
+                copy_to_clipboard(origami.sequence, "Sequence")
+            with subcol3:
+                copy_to_clipboard(pseudoknot_text, "Pseudoknots")
 
 
 def edit(x, y):

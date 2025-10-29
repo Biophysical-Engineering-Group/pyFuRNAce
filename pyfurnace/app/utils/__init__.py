@@ -25,8 +25,11 @@ second_menu_style = deepcopy(main_menu_style)
 second_menu_style["nav-link-selected"]["background-color"] = "#D00000"
 
 inactive_menu_style = deepcopy(second_menu_style)
-inactive_menu_style["nav-link"]["--hover-color"] = "#f0f2f6"
-inactive_menu_style["nav-link-selected"]["background-color"] = "#f0f2f6"
+inactive_menu_style["container"]["background-color"] = "#9e9e9e"
+inactive_menu_style["nav-link"]["--hover-color"] = "#9e9e9e"
+inactive_menu_style["nav-link"]["background-color"] = "#9e9e9e"
+inactive_menu_style["nav-link-selected"]["background-color"] = "#9e9e9e"
+inactive_menu_style["nav-link-selected"]["background-color"] = "#9e9e9e"
 inactive_menu_style["nav-link-selected"]["color"] = "#31333e"
 inactive_menu_style["nav-link-selected"]["font-weight"] = "normal"
 
@@ -225,10 +228,10 @@ def save_origami(origami_name="Origami"):
     origami = st.session_state.origami
     st.divider()
     st.write("### Download RNA origami structure")
-    col1, col2 = st.columns([1, 6])
+    col1, col2 = st.columns([1, 5])
     with col1:
         file_type = st.selectbox(
-            "Select file type", ["py", "txt", "fasta", "PDB", "oxDNA"], key="file_type"
+            "File type", ["py", "txt", "fasta", "PDB", "oxDNA"], key="file_type"
         )
     with col2:
         ori_name = st.text_input(

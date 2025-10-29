@@ -18,10 +18,10 @@ class AptamersCommand(MotifCommand):
 
     def execute(self):
         # override the theme
-        col1, col2 = st.columns([1, 3], vertical_alignment="bottom")
+        col1, col2 = st.columns([1, 3], vertical_alignment="center")
         with col1:
             aptamers_box = st.selectbox(
-                ":green[Search an Aptamer or]",
+                ":green[Aptamers List:]",
                 ["No selection"] + aptamers_list,
                 key="aptamers_box",
             )
@@ -29,7 +29,7 @@ class AptamersCommand(MotifCommand):
             st.markdown(
                 """
                 <div style="text-align: center;">
-                    Select a common aptamer:
+                    or select a common aptamer:
                 </div>
                 """,
                 unsafe_allow_html=True,

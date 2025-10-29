@@ -87,7 +87,7 @@ class single_strandCommand(MotifCommand):
 
     def interface(
         self,
-        seq_def="",
+        seq_def="AA",
         loop_def=False,
     ):
         col1, col2 = pyfurnace_layout_cols([3, 2], vertical_alignment="bottom")

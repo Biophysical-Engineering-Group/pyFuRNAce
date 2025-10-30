@@ -1833,17 +1833,17 @@ def advaced_edit(motif_slice):
             [1.4, 1.4, 0.7, 0.9, 1.4, 1.4, 0.8], vertical_alignment="bottom"
         )
         with cols[0]:
-            flip_vert = st.toggle("Flip vertically", value=False)
+            flip_vert = st.toggle("Edit) Flip vertically", value=False)
         with cols[1]:
-            flip_h = st.toggle("Flip horizontally", value=False)
+            flip_h = st.toggle("Edit) Flip horizontally", value=False)
         with cols[2]:
             if flip_vert or flip_h:
-                flip = st.button("Flip")
+                flip = st.button("Edit) Flip")
                 flip_vert &= flip
                 flip_h &= flip
 
         with cols[3]:
-            if st.button("Rotate clockwise"):
+            if st.button("Edit) Rotate clockwise"):
                 st_state.mot_adv_edit.rotate()
                 st_state.modified_motif_text += "\nmotif.rotate()"
                 st.rerun(scope="fragment")

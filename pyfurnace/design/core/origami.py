@@ -1627,6 +1627,15 @@ class Origami(Callback):
             A new instance identical to the current one.
         """
         new = Origami.__new__(Origami)
+        # make sure to register the callback in all the motifs
+        # as a failsafe mechanism. This is needed in case you modify
+        # the motifs at the line level, like origami[0][0] = new_motif
+        for line in self._matrix:
+            for m in line:
+                if self._updated_motif not in m._callbacks:
+                    m.register_callback(self._updated_motif)
+
+        # prepare the new attributes
         new._matrix = [
             [m.copy(callback=new._updated_motif) for m in line] for line in self._matrix
         ]

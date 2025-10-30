@@ -179,4 +179,4 @@ def test_stem_cap_link_two_strands_with_curves_and_verticals():
 
     assert s2.strand == "╭"
     assert s2.start == (1, 2)
-    assert s2.direction == (0, -1)
+    assert s2.direction == (-1, 0)

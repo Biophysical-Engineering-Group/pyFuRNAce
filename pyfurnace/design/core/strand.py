@@ -705,7 +705,12 @@ class Strand(Callback):
             # set the directionality of the strand with the sequence
             # always priority to strand1
             directionality = strand1.directionality
-            if not strand1._sequence:
+            if (
+                not strand1._sequence
+                and "5" not in strand1._strand
+                and "3" not in strand1._strand
+                or ("5" in strand2._strand or "3" in strand2._strand)
+            ):
                 directionality = strand2.directionality
 
             # create a new joined strand
@@ -1719,7 +1724,12 @@ class Strand(Callback):
             else:
                 first, second = other, self
 
-            if not self._sequence:
+            if (
+                not self._sequence
+                and "5" not in self._strand
+                and "3" not in self._strand
+                or ("5" in other._strand or "3" in other._strand)
+            ):
                 self._sequence._directionality = other._sequence.directionality
 
             self._start = first._start

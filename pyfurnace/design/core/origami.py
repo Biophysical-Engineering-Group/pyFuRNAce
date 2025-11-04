@@ -135,29 +135,37 @@ class Origami(Callback):
                 if sym == "&":
                     structure = structure[:-i] + "&" + structure[-i:]
 
+        if sequence:
+            sequence = str(sequence).replace("T", "U").upper()
+
+        def build_sequence():
+            """Build a default sequence if it's not provided."""
+            nonlocal sequence
+            if not sequence:
+                sequence = "".join("N" if sym != "&" else "&" for sym in structure)
+
         # input dot-bracket notation
         if isinstance(structure, str):
+            build_sequence()
             node = dot_bracket_to_tree(structure, sequence=sequence)
             pair_map = dot_bracket_to_pair_map(structure)
+
         # input pair map
         elif isinstance(structure, (BasePair, dict)):
             pair_map = structure.copy()
-            node = dot_bracket_to_tree(
-                pair_map_to_dot_bracket(structure), sequence=sequence
-            )
             structure = pair_map_to_dot_bracket(structure)
+            build_sequence()
+            node = dot_bracket_to_tree(structure, sequence=sequence)
+
         # input tree
         elif isinstance(structure, Node):
             node = structure
             pair_map = dot_bracket_to_pair_map(tree_to_dot_bracket(node))
             structure = tree_to_dot_bracket(node)
+            build_sequence()
+
         else:
             raise ValueError(f"Invalid structure representation: {structure}")
-
-        if not sequence:
-            sequence = "".join("N" if sym != "&" else "&" for sym in structure)
-        else:
-            sequence = str(sequence).replace("T", "U").upper()
 
         if isinstance(structure, str) and len(structure.strip("& ")) != len(
             sequence.strip("& ")

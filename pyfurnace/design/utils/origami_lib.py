@@ -737,7 +737,11 @@ def template_rectangle_10H_3X():
         use_angles=True,
     )  # Create a simple origami
 
-    origami = origami.improve_folding_pathway(kl_delay=150)
+    # If the improved folding pathway is not known, use the function to find it
+    # origami = origami.improve_folding_pathway(kl_delay=150)
+    # Known good folding pathway for this origami:
+    origami.pop(origami.index(lambda m: "5" in m)[0])
+    origami[1, 5] = [pf.Stem(6), pf.start_end_stem(), pf.Stem(6)]
 
     origami.insert((0, 11), pf.Broccoli().flip(1, 1))  # Add motif
 

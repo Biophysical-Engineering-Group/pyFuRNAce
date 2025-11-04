@@ -11,9 +11,21 @@ import pyfurnace.design.utils.origami_lib as origami_lib
 
 
 def load_origami_button():
+    cleaned_code = [
+        "import pyfurnace as pf",
+        "origami = pf.Origami()",
+        "RENDER_TARGET = origami",
+    ]
     st_state.new_comer = False
-    if st.button("Load the Origami Design", icon=":material/draw:", type="primary"):
+    clean_code = False
+    if st_state.code != cleaned_code:
+        clean_code = st.checkbox(
+            "Remove previous design code", key="clean_code_checkbox", value=True
+        )
 
+    if st.button("Load the Origami Design", icon=":material/draw:", type="primary"):
+        if clean_code:
+            st_state.code = cleaned_code
         st_state.code.append(st_state.qs_text)
         st_state.origami = st_state.qs_origami
         st.switch_page("pages/1_Design.py")

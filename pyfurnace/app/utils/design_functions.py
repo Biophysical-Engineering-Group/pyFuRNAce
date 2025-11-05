@@ -75,54 +75,46 @@ highlight_color = "#D00000"
 
 
 def origami_general_options(origami, expanded=True):
-    with st.expander("General settings", expanded=expanded):
-        cols = st.columns(3)
 
-        ### select alignment
-        with cols[0]:
-            align = st.radio(
-                "Alignment type:",
-                ["To the left", "Junctions alignment: first", "Line center"],
-                index=0,
-            )
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        with st.expander("General settings", icon=":material/settings:"):
+            cols = st.columns(3)
 
-            ### add the alignment to the code
-            if st.button("Set alignment"):
-                align = align.split()[-1]
-                origami.align = align
-                st_state.code.append(f"origami.align = '{align}' # Align the lines")
+            ### select alignment
+            with cols[0]:
+                align = st.radio(
+                    "Alignment type:",
+                    ["To the left", "Junctions alignment: first", "Line center"],
+                    index=0,
+                )
 
-        with cols[1]:
-            st.toggle(
-                "Optimize the blueprint for ROAD",
-                value=False,
-                help="Optimize the blueprint for the ROAD software. "
-                'This substitutes the Kissing Loops base pairings with "*";'
-                ' and the short stem base pairings with "!".',
-            )
+                ### add the alignment to the code
+                if st.button("Set alignment"):
+                    align = align.split()[-1]
+                    origami.align = align
+                    st_state.code.append(f"origami.align = '{align}' # Align the lines")
 
-        with cols[2]:
-            new_sticky = st.toggle(
-                "Stick the motif menu at the top",
-                value=st_state.motif_menu_sticky,
-                help="Keep the motif menu and origami visualization"
-                " menu to stick to the top of the page.",
-            )
-            if new_sticky != st_state.motif_menu_sticky:
-                st_state.motif_menu_sticky = new_sticky
-                st.rerun()
+            with cols[1]:
+                st.toggle(
+                    "Optimize the blueprint for ROAD",
+                    value=False,
+                    help="Optimize the blueprint for the ROAD software. "
+                    'This substitutes the Kissing Loops base pairings with "*";'
+                    ' and the short stem base pairings with "!".',
+                )
 
-        col1, col2 = st.columns(2)
-        with col1:
-            font_size = st.slider(
-                "Origami font size",
-                min_value=2,
-                max_value=50,
-                value=14,
-            )
-            st_state.origami_font_size = font_size
+            with cols[2]:
+                new_sticky = st.toggle(
+                    "Stick the motif menu at the top",
+                    value=st_state.motif_menu_sticky,
+                    help="Keep the motif menu and origami visualization"
+                    " menu to stick to the top of the page.",
+                )
+                if new_sticky != st_state.motif_menu_sticky:
+                    st_state.motif_menu_sticky = new_sticky
+                    st.rerun()
 
-        with col2:
             frame_size = st.slider(
                 "Oxview frame size",
                 help="Set the height of the OxView frame (disable and renable "
@@ -133,63 +125,113 @@ def origami_general_options(origami, expanded=True):
             )
             st_state.oxview_frame_size = frame_size
 
+    with col2:
+        font_size = st.slider(
+            "Origami font size",
+            min_value=2,
+            max_value=50,
+            value=14,
+            label_visibility="collapsed",
+            format="Origami font ~%d px",
+        )
+        st_state.origami_font_size = font_size
 
+
+@st.fragment
 def simple_origami():
-    with st.form(key="simple_origami_form"):
-        dt_text = st.text_input(
-            "Enter a list of the angles between helices, " "separated by commas",
-            "120, ",
-            help=f"The program calculates the best connections"
-            f" bewteen the helices to fit the given angles."
-            f"The connection between helices (Dovetails) are "
-            f"obtained roughly with this lookup table "
-            f"(angle --> dt): {pf.ANGLES_DT_DICT}",
+    dt_text = st.text_input(
+        "Enter a list of the angles between helices, " "separated by commas",
+        "120, ",
+        help=f"The program calculates the best connections"
+        f" bewteen the helices to fit the given angles."
+        f"The connection between helices (Dovetails) are "
+        f"obtained roughly with this lookup table "
+        f"(angle --> dt): {pf.ANGLES_DT_DICT}. \n\n"
+        "To make a 2-helix origami, leave the field empty.",
+    )
+
+    angle_list = [int(x) for x in dt_text.split(",") if x and x.strip()]
+    dt_list = pf.convert_angles_to_dt(angle_list)
+    main_stem_default = 11 * (
+        (max([abs(dt) for dt in dt_list], default=0) + 17) // 11 + 1
+    )
+    col1, col2 = st.columns(2, vertical_alignment="bottom")
+    with col1:
+        kl_columns = st.number_input(
+            "Kissing loop columns:",
+            min_value=1,
+            value=1,
+            help="number of KL repeats in the helix",
+        )
+    with col2:
+        main_stem = st.number_input(
+            "Spacing between crossovers (bp):",
+            min_value=22,
+            value=main_stem_default,
+            step=11,
+            help="The length of the consecutive stems " "in the helix",
         )
 
-        angle_list = [int(x) for x in dt_text.split(",") if x and x.strip()]
-        dt_list = pf.convert_angles_to_dt(angle_list)
-        main_stem_default = 11 * (
-            (max([abs(dt) for dt in dt_list], default=0) + 17) // 11 + 1
+    stem_pos = [0] * kl_columns
+    n_helix = len(angle_list) + 2
+    with st.expander(
+        "Advanced (strand routing)", icon=":material/conversion_path:", expanded=False
+    ):
+        st.write(
+            "For each kissing loop column, select on which helix "
+            "to place the continuous stem:"
         )
-        col1, col2 = st.columns(2, vertical_alignment="bottom")
-        with col1:
-            kl_columns = st.number_input(
-                "Kissing loop columns:",
-                min_value=1,
-                value=1,
-                help="number of KL repeats in the helix",
-            )
-        with col2:
-            main_stem = st.number_input(
-                "Spacing between crossovers (bp):",
-                min_value=22,
-                value=main_stem_default,
-                step=11,
-                help="The length of the consecutive stems " "in the helix",
+        with st.container(
+            horizontal=True, horizontal_alignment="left", vertical_alignment="center"
+        ):
+
+            # Dummy radio button for legends
+            st.radio(
+                "000)",
+                [f"{i})" for i in range(n_helix)],
+                captions=[f"Line {i}" for i in range(n_helix)],
+                index=None,
+                label_visibility="hidden",
+                disabled=True,
             )
 
-        submitted = st.form_submit_button("Submit")
-        if submitted:
-            st_state.origami = pf.simple_origami(
-                dt_list=angle_list,
-                kl_columns=kl_columns,
-                main_stem=main_stem,
-                add_terminal_helix=True,
-                align=st_state.origami.align,
-                use_angles=True,
-            )
-            st_state.code.append(
-                f"origami = pf.simple_origami(dt_list={angle_list}, "
-                f"kl_columns={kl_columns}, "
-                f"main_stem={main_stem}, "
-                f"add_terminal_helix=True, "
-                f'align="{st_state.origami.align}", use_angles=True) '
-                f"# Create a simple origami"
-            )
+            # Kl columns radio buttons
+            for j in range(kl_columns):
+                stem_at_j = st.radio(
+                    f"KL {j}:",
+                    [f"{i})" for i in range(n_helix)],
+                    captions=[f"{i}" for i in range(n_helix)],
+                    index=stem_pos[j] if stem_pos[j] < n_helix else None,
+                )
+                stem_pos[j] = int(stem_at_j.split(")")[0])
 
-            # select the end of the origami
-            st_state.line_index = len(st_state.origami) - 1
-            st_state.motif_index = len(st_state.origami[-1])
+    # submit button
+    submitted = st.button("Submit", type="primary")
+    if submitted:
+        st_state.origami = pf.simple_origami(
+            dt_list=angle_list,
+            kl_columns=kl_columns,
+            main_stem=main_stem,
+            add_terminal_helix=True,
+            align=st_state.origami.align,
+            use_angles=True,
+            stem_pos=stem_pos,
+        )
+        st_state.code.append(
+            f"origami = pf.simple_origami(dt_list={angle_list}, "
+            f"kl_columns={kl_columns}, "
+            f"main_stem={main_stem}, "
+            f"stem_pos={stem_pos}, "
+            f"add_terminal_helix=True, "
+            f'align="{st_state.origami.align}", use_angles=True) '
+            f"# Create a simple origami"
+        )
+
+        # select the end of the origami
+        st_state.line_index = len(st_state.origami) - 1
+        st_state.motif_index = len(st_state.origami[-1])
+
+        st.rerun()
 
 
 def motif_text_format(motif: pf.Motif) -> str:

@@ -42,28 +42,27 @@ def initiate_session_state():
 
 def forna_options(lenght):
     ### checkboxes for the options
-    col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
-    with col1:
+    with st.container(
+        horizontal=True, horizontal_alignment="distribute", vertical_alignment="bottom"
+    ):
         st_state.zoomable = st.checkbox(
             "Zoomable", value=True, help="""Enable zooming in and out the structure"""
         )
-    with col2:
         st_state.animation = st.checkbox(
             "Interact", value=False, help="""Enable interaction with the structure"""
         )
-    with col3:
         st_state.node_label = st.checkbox(
             "Label", value=True, help="""Show the nucleotide label"""
         )
 
     ### second row of options
-    col1, col2, col3 = st.columns(3, vertical_alignment="center")
-    with col1:
+    with st.container(
+        horizontal=True, horizontal_alignment="distribute", vertical_alignment="bottom"
+    ):
         ### color scheme options
         scheme_options = ["sequence", "structure", "positions", "color range", "custom"]
         st_state.color_scheme = st.selectbox("Color scheme", scheme_options, index=1)
 
-    with col2:
         st_state.height = st.slider(
             "Frame height",
             min_value=10,
@@ -72,7 +71,6 @@ def forna_options(lenght):
             help="""Set the height of the frame""",
         )
 
-    with col3:
         st_state.label_interval = st.slider(
             "Label every",
             min_value=0,
@@ -88,10 +86,10 @@ def forna_options(lenght):
     if st_state.color_scheme == "color range":
         st_state.color_scheme = "custom"
 
-        with col2:  # start color
+        with st.container(
+            horizontal=True, horizontal_alignment="center", vertical_alignment="bottom"
+        ):
             first = st.color_picker("Start color", "#ff0000")
-
-        with col3:  # end color
             last = st.color_picker("End color", "#00ff00")
 
         # create the colors range
@@ -108,10 +106,10 @@ def forna_options(lenght):
     ### custom colors for each nucleotide
     elif st_state.color_scheme == "custom":
 
-        with col2:  # select nucleotide index
+        with st.container(
+            horizontal=True, horizontal_alignment="center", vertical_alignment="bottom"
+        ):
             index = st.number_input("Select nucleotide index", 1, lenght, 1)
-
-        with col3:  # select color
             color = st.color_picker("Select a color", "#ffffff")
 
         # save the color in the session state
@@ -127,9 +125,11 @@ def forna_options(lenght):
 
 
 def initialize_forna():
-    col1, col2, _ = st.columns([1, 1.3, 2])
     partial_forna = None
-    with col1:
+    with st.container(
+        horizontal=True,
+        horizontal_alignment="distribute",
+    ):
         use_forna = st.toggle(
             "Forna display",
             key="forna_display",
@@ -144,22 +144,24 @@ def initialize_forna():
                 "Please install it with `pip install st-forna-component` "
                 "to use the Forna display."
             )
-    if use_forna:
-        with col2:
-            with st.popover("Forna options", use_container_width=True):
+        if use_forna:
+            with st.popover(
+                "Forna options",
+                icon=":material/pattern:",
+            ):
                 forna_options(len(structure))
 
-        partial_forna = partial(
-            forna_component,
-            height=st_state.height,
-            animation=st_state.animation,
-            zoomable=st_state.zoomable,
-            label_interval=st_state.label_interval,
-            node_label=st_state.node_label,
-            editable=st_state.editable,
-            color_scheme=st_state.color_scheme,
-            colors=st_state.color_text,
-        )
+                partial_forna = partial(
+                    forna_component,
+                    height=st_state.height,
+                    animation=st_state.animation,
+                    zoomable=st_state.zoomable,
+                    label_interval=st_state.label_interval,
+                    node_label=st_state.node_label,
+                    editable=st_state.editable,
+                    color_scheme=st_state.color_scheme,
+                    colors=st_state.color_text,
+                )
     return use_forna, partial_forna
 
 

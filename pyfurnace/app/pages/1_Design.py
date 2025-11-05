@@ -41,6 +41,7 @@ if __name__ == "__main__":
         with st.popover(
             "Make a simple origami",
             use_container_width=False,
+            icon=":material/mist:",
             help="Start by creating a simple origami rather than "
             "starting from scratch",
         ):
@@ -98,7 +99,6 @@ if __name__ == "__main__":
     ### display the motif menu in the sidebar
     if st_state.sidebar_motif_menu:
         with motif_sidebar:
-            st.write("#### Motif Menu:")
             with sticky_container(mode="top", border=False):
                 des_func.make_motif_menu(st.session_state.origami)
 

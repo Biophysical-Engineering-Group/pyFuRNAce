@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyfurnace"
-version = "1.1.0"
+version = "1.1.1"
 description = "An integrated design engine for RNA origami"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
@@ -27,7 +27,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
-    "streamlit>=1.48,<=1.50",
+    "streamlit>=1.48,<=1.51",
     "st-click-detector",
     "streamlit_code_editor",
     "st_forna_component",

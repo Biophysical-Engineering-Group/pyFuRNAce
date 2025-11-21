@@ -40,7 +40,6 @@ if __name__ == "__main__":
         # simple origami popover
         with st.popover(
             "Make a simple origami",
-            use_container_width=False,
             icon=":material/mist:",
             help="Start by creating a simple origami rather than "
             "starting from scratch",

@@ -341,14 +341,14 @@ def primers_setup():
         4, vertical_alignment="center", gap="medium"
     )
     with mcol1:
-        with st.popover("Melting temperature parameters", use_container_width=True):
+        with st.popover("Melting temperature parameters", width="stretch"):
 
             calculate_mt, tm_kwargs = tm_parameters()
 
     with mcol2:
         with st.popover(
             "Add primers overhangs",
-            use_container_width=True,
+            width="stretch",
             help="Add restriction sites or other sequences to the primers"
             " without affecting the gene sequence. The overhangs will be "
             "added to the 5' end of the primers and taken into account "
@@ -362,7 +362,7 @@ def primers_setup():
             )
 
     with mcol3:
-        with st.popover("Annealing calculation", use_container_width=True):
+        with st.popover("Annealing calculation", width="stretch"):
             st.selectbox(
                 "Calculate annealing:",
                 ["IDT method [2]", "Phusion method [3]"],
@@ -376,7 +376,7 @@ def primers_setup():
         with st.popover(
             "**Auto design primers**",
             icon=":material/precision_manufacturing:",
-            use_container_width=True,
+            width="stretch",
         ):
 
             target_temp = st.number_input(

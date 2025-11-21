@@ -1868,7 +1868,7 @@ def advaced_edit(motif_slice):
     ### try to change each strand
     with st.popover(
         "Advanced feature, modify the strands of the selected motif:",
-        use_container_width=True,
+        width="stretch",
     ):
 
         cols = pyfurnace_layout_cols(

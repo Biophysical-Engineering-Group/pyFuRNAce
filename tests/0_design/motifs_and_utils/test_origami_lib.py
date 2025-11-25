@@ -48,7 +48,7 @@ def test_ipython_clickable_txt_minimal(monkeypatch):
     assert spy.calls == 1  # again, only check that display() was invoked
 
 
-def test_ipython_display_3D_when_oat_missing_runs_and_does_not_call_oat(monkeypatch):
+def test_ipython_display_3d_when_oat_missing_runs_and_does_not_call_oat(monkeypatch):
     # Force the lightweight branch
     monkeypatch.setattr(o_lib, "oat_installed", False, raising=True)
 
@@ -76,11 +76,11 @@ def test_ipython_display_3D_when_oat_missing_runs_and_does_not_call_oat(monkeypa
 
     # Assert it WARNs and RETURNS (i.e., actually ran the branch and exited)
     with pytest.warns(UserWarning):
-        ret = o_lib.ipython_display_3D(ori)
+        ret = o_lib.ipython_display_3d(ori)
     assert ret is None
 
 
-def test_ipython_display_3D_happy_path_runs_and_calls_oat(monkeypatch):
+def test_ipython_display_3d_happy_path_runs_and_calls_oat(monkeypatch):
     # Force the full path
     monkeypatch.setattr(o_lib, "oat_installed", True, raising=True)
 
@@ -105,7 +105,7 @@ def test_ipython_display_3D_happy_path_runs_and_calls_oat(monkeypatch):
     ori = o_lib.simple_origami(dt_list=[0], kl_columns=1, main_stem=22, align="first")
 
     # Should run without warnings or exceptions
-    o_lib.ipython_display_3D(ori)
+    o_lib.ipython_display_3d(ori)
 
     assert calls["describe"] == 1
     assert calls["get_confs"] == 1

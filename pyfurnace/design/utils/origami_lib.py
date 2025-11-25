@@ -247,7 +247,7 @@ def simple_origami(
     return origami
 
 
-def ipython_display_3D(origami: Origami, **kwargs: Any) -> None:
+def ipython_display_3d(origami: Origami, **kwargs: Any) -> None:
     """
     Display a 3D representation of an Origami structure within a J
     upyter notebook using oxDNA.

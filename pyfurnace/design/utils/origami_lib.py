@@ -308,12 +308,37 @@ def ipython_display_txt(origami_text: str, max_height: str = "500") -> None:
     display(HTML(scrollable_html))
 
 
+def log_norm(data, eps=1e-12):
+    """
+    Normalize data using logarithmic normalization.
+
+    Parameters
+    ----------
+    data : array-like
+        The input data to be normalized.
+    eps : float, optional
+        A small value to avoid log(0) issues (default is 1e-12).
+
+    Returns
+    -------
+    normalized_values : array-like
+        The log-normalized data.
+    """
+    data = np.maximum(data, eps)
+    vmin = data.min()
+    vmax = data.max()
+    normalized_values = (np.log(data) - np.log(vmin)) / (np.log(vmax) - np.log(vmin))
+    return normalized_values
+
+
 def ipython_clickable_txt(
     origami: Origami,
     max_height: Union[str, int] = "500",
     barriers: Optional[Any] = None,
     gradient: Union[bool, str] = False,
     font_size: int = 12,
+    overlay_data: dict = None,
+    norm_cmap_function: Optional[Any] = None,
 ) -> str:
     """
     Generate an interactive, scrollable HTML view of a RNA origami structure
@@ -333,6 +358,15 @@ def ipython_clickable_txt(
         Default is False.
     font_size : int, optional
         Font size of the text in pixels. Default is 12.
+    overlay_data: dict, optional
+        Dictinary of the overlay data. Default is None.
+        Format is {"Parameter name": [nt1_value, nt2_value, ...]}
+        If a gradient is given, it is based on this data.
+    norm_cmap_function: function, optional
+        Function to normalize the overlay data to generate the
+        colormap only (the data itself is not changed).
+        Only applied if overlay_data is not None.
+        Default is None.
 
     Returns
     -------
@@ -360,13 +394,20 @@ def ipython_clickable_txt(
 
     # create color gradient
     if gradient:
-        tot_len = 0
-        for s in origami.strands:
-            tot_len += len(s.sequence)
-            for protein in s.coords.proteins:
-                tot_len += len(protein)
         cmap = plt.get_cmap(gradient)
-        c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len)]
+        if overlay_data is None:
+            tot_len = 0
+            for s in origami.strands:
+                tot_len += len(s.sequence)
+                for protein in s.coords.proteins:
+                    tot_len += len(protein)
+            c_map = [mcolors.to_hex(cmap(i)) for i in np.linspace(0, 1, tot_len)]
+
+        else:
+            data = np.array(next(iter(overlay_data.values())))
+            if norm_cmap_function is not None:
+                data = norm_cmap_function(data)
+            c_map = [mcolors.to_hex(cmap(i)) for i in data]
 
     # Prepare the string to add 5' and 3' symbols for the strands
     motif_list = (
@@ -432,7 +473,17 @@ def ipython_clickable_txt(
                 index = pos_to_index.get(ori_pos)
                 msg_text = f"Line {sl[0]}, Motif {sl[1]}"
                 if index is not None:
-                    msg_text = f"Base {index}, Line {sl[0]}, Motif {sl[1]}"
+                    if overlay_data is not None:
+                        data_name = next(iter(overlay_data))
+                        data_list = overlay_data[data_name]
+                        msg_text = (
+                            f"Base {index}, Line {sl[0]}, Motif {sl[1]}, "
+                            f"{data_name} {data_list[index]}"
+                        )
+
+                    else:
+                        msg_text = f"Base {index}, Line {sl[0]}, Motif {sl[1]}"
+
                     if gradient:
                         color = c_map[index]
 

@@ -626,7 +626,7 @@ def template_rna_filament_ispinach():
     origami[(-1, -1)] = pf.KissingLoop180(open_left=True, pk_index="2'")
 
     # add connector for ispinach line
-    origami.insert((0, 4), pf.Dovetail(0, down_cross=False))
+    origami[(0, 4)] = pf.Dovetail(0, down_cross=False)
 
     # add ispinach line
     ispi_line = [
@@ -635,6 +635,7 @@ def template_rna_filament_ispinach():
         pf.Ispinach().flip(),
         pf.Stem(3),
         pf.Motif.from_structure("...&", "UUU&").flip(),
+        pf.start_end_stem(),  # make sure the 3d model connects at the ss region
         pf.stem_cap_link(hflip=True),
     ]
     origami.insert(0, ispi_line)

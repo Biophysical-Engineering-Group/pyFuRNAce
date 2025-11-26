@@ -280,6 +280,7 @@ def initiate_session_state():
         "mod_motif_buffer": "",
         "motif": pf.Motif(),
         #   "redo": [],
+        "json_paths": dict(),
         "motif_menu_sticky": False,
         "sidebar_motif_menu": False,
         "copied_motif": None,
@@ -440,10 +441,11 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
         motif_index = 0
 
     ### Check if the origami is empty and add an empty line
+    add_pyfurnace = "import pyfurnace as pf" not in "".join(st_state.code)
     if origami_len == 0:
         st_state.code.append(
-            "import pyfurnace as pf # import pyfurnace\n\n"
-            "origami = pf.Origami([[]]) # create an empty Origami\n"
+            "import pyfurnace as pf\n" * add_pyfurnace
+            + "origami = pf.Origami([[]]) # create an empty Origami\n"
             "RENDER_TARGET = origami # render the origami in the app"
         )
         origami.append([])  # add empty line if the Origami is empty
@@ -1167,14 +1169,17 @@ def update_code(code_text, return_origami=False):
             return False
 
     # Define the local environment in which the user's code will be executed
-    local_context = {}
+    local_context = st_state.json_paths.copy()
     # Attempt to execute the code safely
     try:
         exec(code_text, {"__builtins__": __builtins__, "pf": pf}, local_context)
 
-        # Retrieve the first called origami
+        # Retrieve the last defined Origami object
         origami = next(
-            iter([v for v in local_context.values() if isinstance(v, pf.Origami)]), None
+            iter(
+                [v for v in local_context.values() if isinstance(v, pf.Origami)][::-1]
+            ),
+            None,
         )
 
         render_target = local_context.get("RENDER_TARGET", None)

@@ -1,3 +1,5 @@
+import atexit
+import os
 from pathlib import Path
 from copy import deepcopy
 import tempfile
@@ -292,3 +294,16 @@ def save_origami(origami_name="Origami"):
 def write_format_text(text):
     """Format text in a code block"""
     st.markdown(f"```\n{text}\n```")
+
+
+def _cleanup_temp_files():
+    for path in st.session_state.get("json_paths", dict()).values():
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except Exception as e:
+                print(f"Could not remove temporary file {path}: {e}")
+                pass
+
+
+atexit.register(_cleanup_temp_files)

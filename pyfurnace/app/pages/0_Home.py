@@ -1,5 +1,6 @@
 import inspect
 import streamlit as st
+import tempfile
 from streamlit import session_state as st_state
 
 ### pyFuRNAce modules
@@ -10,7 +11,7 @@ import pyfurnace as pf
 import pyfurnace.design.utils.origami_lib as origami_lib
 
 
-def load_origami_button(add_import=False):
+def load_origami_button(add_import=False, on_load=None):
     st_state.new_comer = False
     clean_code = False
     if st_state.code:
@@ -21,8 +22,10 @@ def load_origami_button(add_import=False):
     if st.button("Load the Origami Design", icon=":material/draw:", type="primary"):
         if clean_code:
             st_state.code = []
-        if add_import:
+        if add_import and "import pyfurnace as pf" not in "".join(st_state.code):
             st_state.code.append("import pyfurnace as pf")
+        if on_load:
+            on_load()
         st_state.code.append(st_state.qs_text)
         st_state.origami = st_state.qs_origami
         st.switch_page("pages/1_Design.py")
@@ -78,7 +81,10 @@ def load_seq_dot():
                 f'sequence="{sequence}")'
             )
         except ValueError as e:
-            st.error(f"Error: {e}", icon=":material/personal_injury:")
+            st.error(
+                f"Error in sequence/dot-bracket input: {e}",
+                icon=":material/personal_injury:",
+            )
         else:
             st.success("Origami created successfully!", icon=":material/check_circle:")
     load_origami_button(add_import=True)
@@ -112,6 +118,9 @@ def load_template():
     only_code = func_code.split('"""')[2].split("return")[0]
     func_code = "\n".join([line[4:] for line in only_code.splitlines()])
 
+    if "import pyfurnace as pf" in "".join(st_state.code):
+        func_code = func_code.replace("import pyfurnace as pf\n", "")
+
     st_state.qs_origami = templ_funcs[template]()
     st_state.qs_text = f"{func_code.strip()}\n"
 
@@ -134,8 +143,12 @@ def load_file():
     if uploaded_file is None:
         return
 
+    file_contents = uploaded_file.read().decode("utf-8")
+
+    on_load = None
+    add_import = True
     if ".fasta" in uploaded_file.name:
-        file_contents = uploaded_file.read().decode("utf-8")
+
         dot_b_symbols = set(pf.all_pk_symbols).union({"(", ")", "."})
         try:
             lines = file_contents.strip().split("\n")
@@ -165,32 +178,50 @@ def load_file():
             st.error(
                 f"Error loading FASTA file: {e}", icon=":material/personal_injury:"
             )
+            return
 
     elif ".py" in uploaded_file.name:
-        file_contents = uploaded_file.read().decode("utf-8")
-        st_state.qs_text = file_contents.strip()
-
+        add_import = False
         with st.spinner("Loading the Origami..."):
-            origami = update_code(st_state.qs_text, return_origami=True)
-        if not origami:
-            return
-        st_state.qs_origami = origami
-        st.success("File loaded successfully!", icon=":material/check_circle:")
+            try:
+                origami = update_code(file_contents.strip(), return_origami=True)
+                st_state.qs_text = file_contents.strip()
+                st_state.qs_origami = origami
+            except Exception as e:
+                st.error(
+                    f"Error loading Python file: {e}", icon=":material/personal_injury:"
+                )
+                return
 
     elif ".json" in uploaded_file.name:
-        file_contents = uploaded_file.read().decode("utf-8")
+
         try:
+            # save the json to a temp file and load from there
             st_state.qs_origami = pf.Origami.from_json(file_contents)
-            st_state.qs_text = (
-                "# Origami loaded from json file\n"
-                f"origami = pf.Origami.from_json('''{file_contents}''')"
-            )
+
+            # run this function only on loading,
+            # to avoid unnecessary temp files creation
+            def create_temp_json_files():
+                temp_json = tempfile.NamedTemporaryFile(
+                    delete=False, mode="w+", suffix=".json"
+                )
+                temp_json.write(file_contents)
+                temp_json.flush()
+                name = "JSON_FILEPATH_" + str(len(st_state.json_paths) + 1)
+                st_state.qs_text = (
+                    "# Origami loaded from json data; saved in a temporary file\n"
+                    f"origami = pf.Origami.from_json_file({name})"
+                )
+                st_state.json_paths[name] = temp_json.name
+
+            on_load = create_temp_json_files
+
         except Exception as e:
             st.error(f"Error loading JSON file: {e}", icon=":material/personal_injury:")
-        else:
-            st.success("File loaded successfully!", icon=":material/check_circle:")
+            return
 
-    load_origami_button()
+    st.success("File loaded successfully!", icon=":material/check_circle:")
+    load_origami_button(add_import=add_import, on_load=on_load)
 
 
 def newcomer_flow():

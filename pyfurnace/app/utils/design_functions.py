@@ -651,7 +651,6 @@ def add_motif(origami):
                 # add empty line at the choosen position
                 origami.insert(linex_index, [])
                 st_state.code.append(f"origami.insert({linex_index}, [])")
-                st_state.line_index += 1
                 st.rerun()
 
     ### Add motif

@@ -275,11 +275,7 @@ def motif_text_format(motif: pf.Motif) -> str:
 def initiate_session_state():
     default_state = {
         "origami": pf.Origami(),
-        "code": [
-            "import pyfurnace as pf",
-            "origami = pf.Origami()",
-            "RENDER_TARGET = origami",
-        ],
+        "code": [],
         "motif_buffer": "",
         "mod_motif_buffer": "",
         "motif": pf.Motif(),
@@ -445,9 +441,16 @@ def select_line(f_col1=None, f_subcol2=None, f_subcol3=None):
 
     ### Check if the origami is empty and add an empty line
     if origami_len == 0:
+        st_state.code.append(
+            "import pyfurnace as pf # import pyfurnace\n\n"
+            "origami = pf.Origami([[]]) # create an empty Origami\n"
+            "RENDER_TARGET = origami # render the origami in the app"
+        )
         origami.append([])  # add empty line if the Origami is empty
-        st_state.code.append("origami.append([]) # Add empty line")
         origami_len = 1
+
+    if not origami:
+        line_index = 0
 
     col1, col2, col3 = pyfurnace_layout_cols(
         [1, 4, 2],
@@ -1153,8 +1156,11 @@ def finish_editing(current_custom_motif):
 def update_code(code_text, return_origami=False):
     # Check for forbidden keywords
     forbidden_keywords = ["exec", "eval", "compile", " open", " os", " sys", " __"]
+
+    # Remove __name__ and __main__ to avoid false positives
+    cleaned_text = code_text.replace("__name__", "").replace("__main__", "")
     for kw in forbidden_keywords:
-        if kw in code_text:
+        if kw in cleaned_text:
             st.error(
                 f"Forbidden keyword detected in the code: '{kw}'",
                 icon=":material/sentiment_extremely_dissatisfied:",
@@ -1162,16 +1168,16 @@ def update_code(code_text, return_origami=False):
             return False
 
     # Define the local environment in which the user's code will be executed
-    local_context = {"origami": st_state.origami}
+    local_context = {}
     # Attempt to execute the code safely
     try:
         exec(code_text, {"__builtins__": __builtins__, "pf": pf}, local_context)
-        # Retrieve the modified origami variable
-        origami = [
-            v
-            for k, v in local_context.items()
-            if isinstance(v, pf.Origami) and k == "origami"
-        ][0]
+
+        # Retrieve the first called origami
+        origami = next(
+            iter([v for v in local_context.values() if isinstance(v, pf.Origami)]), None
+        )
+
         render_target = local_context.get("RENDER_TARGET", None)
         if render_target and isinstance(render_target, pf.Origami):
             origami = render_target

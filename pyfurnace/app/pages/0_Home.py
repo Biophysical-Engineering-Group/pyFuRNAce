@@ -10,22 +10,19 @@ import pyfurnace as pf
 import pyfurnace.design.utils.origami_lib as origami_lib
 
 
-def load_origami_button():
-    cleaned_code = [
-        "import pyfurnace as pf",
-        "origami = pf.Origami()",
-        "RENDER_TARGET = origami",
-    ]
+def load_origami_button(add_import=False):
     st_state.new_comer = False
     clean_code = False
-    if st_state.code != cleaned_code:
+    if st_state.code:
         clean_code = st.checkbox(
             "Remove previous design code", key="clean_code_checkbox", value=True
         )
 
     if st.button("Load the Origami Design", icon=":material/draw:", type="primary"):
         if clean_code:
-            st_state.code = cleaned_code
+            st_state.code = []
+        if add_import:
+            st_state.code.append("import pyfurnace as pf")
         st_state.code.append(st_state.qs_text)
         st_state.origami = st_state.qs_origami
         st.switch_page("pages/1_Design.py")
@@ -84,7 +81,7 @@ def load_seq_dot():
             st.error(f"Error: {e}", icon=":material/personal_injury:")
         else:
             st.success("Origami created successfully!", icon=":material/check_circle:")
-    load_origami_button()
+    load_origami_button(add_import=True)
 
 
 @st.dialog("Load a template")
@@ -114,8 +111,6 @@ def load_template():
     # remove one layer of indentation
     only_code = func_code.split('"""')[2].split("return")[0]
     func_code = "\n".join([line[4:] for line in only_code.splitlines()])
-    # remove the pyfurnace import if present
-    func_code = func_code.replace("import pyfurnace as pf", "").strip()
 
     st_state.qs_origami = templ_funcs[template]()
     st_state.qs_text = f"{func_code.strip()}\n"

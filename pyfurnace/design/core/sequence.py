@@ -228,12 +228,6 @@ class Sequence(Callback):
                     stacklevel=3,
                 )
 
-        if self.directionality[0] in line[1:] or self.directionality[1] in line[:-1]:
-            raise ValueError(
-                f"The start/end symbols '{self.directionality}' "
-                f"are not at the end of the sequence: '{line}'"
-            )
-
         return line
 
     ###

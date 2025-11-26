@@ -1,6 +1,6 @@
 import random
 import pytest
-from pyfurnace.design import Sequence, AmbiguosStructure
+from pyfurnace.design import Sequence, AmbiguosStructure, pair_nucleotide
 
 # --------------------
 # Core construction & dunders
@@ -14,6 +14,15 @@ def test_init_and_str_repr_len_bool_iter():
     assert len(s) == 4
     assert bool(s) is True
     assert list(iter(s)) == list("ACGU")
+    s = Sequence(Sequence("ACGU"))
+    assert str(s) == "ACGU"
+    assert repr(s) in {"5 ACGU 3", "3 ACGU 5"}  # default '53' -> "5 ACGU 3"
+
+    # empty sequence
+    s = Sequence()
+    # valuerror on invalid type
+    with pytest.raises(ValueError):
+        _ = Sequence(123)  # type: ignore
 
 
 def test_invalid_directionality_raises_on_init_and_setter():
@@ -63,12 +72,18 @@ def test_add_iadd_radd_mul_and_mismatch_addition():
     with pytest.raises(ValueError):
         _ = Sequence("AU", "53") + Sequence("GC", "35")
 
+    # different type cannot add
+    with pytest.raises(ValueError):
+        _ = Sequence("AU", "53") + 3
+
 
 def test_contains_and_eq_respect_directionality():
     host = Sequence("AUGC", "53")
     # other with opposite directionality: reversed string is tested for containment
     other = Sequence("GU", "35")  # reversed -> "UG" which *is* in host
     assert other in host
+    assert "GGG" not in host
+    assert 2 not in host
 
     # equality: same content and directionality
     assert Sequence("ACGU", "53") == Sequence("ACGU", "53")
@@ -147,7 +162,18 @@ def test_find_and_split_lower_upper_translate():
     assert "G" not in str(s)
 
 
+def test_find_repeated_subsequence():
+    s = Sequence("AUCGAAAUCGAAAU")
+    subseqs = s.find_repeated_subsequence(min_length=4)
+    assert "AUCG" in subseqs
+    assert "GAAA" in subseqs
+    assert "AAAU" in subseqs
+
+
 def test_gc_content_basic_and_extended():
+    s = Sequence()
+    assert s.gc_content() == 0  # empty sequence
+
     s = Sequence("GGCCAAUU")  # 4/8 are GC -> 50%
     assert pytest.approx(s.gc_content(), rel=1e-6) == 50.0
 
@@ -200,11 +226,22 @@ def test_directionality_property_and_concat_callbacks_noop():
 
 
 def test_get_random_sequence_length_and_chars_no_structure():
-    s = Sequence("NNNN")
+    s = Sequence("NNKNNNNKNN")
+    rnd = s.get_random_sequence(structure="(((....)))")
+    assert len(rnd) == len(s)
+    assert set(str(rnd)) <= set("ACGU")  # N expands to A/C/G/U
+    assert rnd.directionality == s.directionality
+    assert str(rnd[2]) in "GU"  # K expands to G/U
+    assert str(rnd[7]) in pair_nucleotide(rnd[2], "K")  # paired correctly
+    assert str(rnd[0]) in pair_nucleotide(rnd[9], "N")  # paired correctly
+
+    # same test with no structure
+    s = Sequence("NNKNNNNKNN")
     rnd = s.get_random_sequence()
     assert len(rnd) == len(s)
     assert set(str(rnd)) <= set("ACGU")  # N expands to A/C/G/U
     assert rnd.directionality == s.directionality
+    assert str(rnd[2]) in "GU"  # K expands to G/U
 
 
 def test_get_random_sequence_raises_on_length_mismatch_structure():

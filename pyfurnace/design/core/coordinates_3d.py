@@ -1032,6 +1032,129 @@ class Coords:
         return Coords(combined)
 
     @staticmethod
+    def compute_3d_kissing_loop180(
+        second_strand: bool = False, branched=False
+    ) -> "Coords":
+        """
+        Compute the coordinates for a 3D kissing loop with 180-degree angle.
+        This structure is a key element in RNA nanostructures, so it's important
+        to keep it parameterized according to the RNA-A helix parameters.
+
+        Parameters
+        ----------
+        second_strand : bool, default False
+            If True, it generates a complementary kissing loop to the first one.
+        branched : bool, default False
+            If True, it generates the coordinates with a branched kissing loop,
+            (both connecting and kissing strands) with dummy ends for branching.
+            The transformation matricess are adapted from the 3D model of branched
+            kissing loops from ROAD (https://doi.org/10.1038/s41557-021-00679-1).
+
+        Returns
+        -------
+        Coords
+            Generated coordinates for the 3D kissing loop.
+        """
+
+        def middle_nucleotide_coords(n1, n2):
+            """
+            Compute the coordinates of a middle nucleotide between two nucleotides.
+
+            Parameters
+            ----------
+            n1 : np.ndarray
+                Coordinates of the first nucleotide (position, base, normal).
+            n2 : np.ndarray
+                Coordinates of the second nucleotide (position, base, normal).
+
+            Returns
+            -------
+            np.ndarray
+                Coordinates of the middle nucleotide (position, base, normal).
+            """
+            # Alternative more complex method to compute middle nucleotide coords
+            # p1, b1, n1 = n1[0], n1[1], n1[2]
+            # p2, b2, n2 = n2[0], n2[1], n2[2]
+
+            # r_mid = 0.5 * (p1 + p2)
+
+            # b_mid = (b1 + b2) / np.linalg.norm(b1 + b2)
+
+            # n_raw = (n1 + n2)
+            # # Remove component along b_mid
+            # n_raw_proj = np.dot(n_raw, b_mid) * b_mid
+            # n_ortho = n_raw - n_raw_proj
+            # n_norm = np.linalg.norm(n_ortho)
+            # n_mid = n_ortho / n_norm if n_norm > 0 else n_raw
+
+            # return np.vstack([r_mid, b_mid, n_mid])
+            return (n1 + n2) / 2
+
+        coords = Coords.compute_helix_from_nucl(
+            (0, 0, 0),  # start position
+            (1, 0, 0),  # base vector
+            (0, 1, 0),  # normal vector
+            length=9,  # kl180 are equivalent to a stem of 8 nts
+            # 1 extra nt will be used for branched loops
+            double=True,
+        )
+
+        coords = coords.array
+        # dummy ends used for branching
+        connect_dummy_start = coords[0]
+        kl_dummy_end = coords[-1]
+        coords = coords[1:-1]  # remove extra nts used for branching dummies
+
+        coords1 = coords[:8]
+        coords2 = coords[8:]
+        if second_strand:
+            coords1 = coords[8:]
+            coords2 = coords[:8]
+
+        first_A1 = coords1[0]
+        first_kl1_nt = coords2[1]
+        second_A1 = (first_A1 + first_kl1_nt) / 2
+        second_A1 = middle_nucleotide_coords(first_A1, first_kl1_nt)
+
+        # coords = Coords(np.vstack([[first_A1], [second_A1], coords2[1:7]]))
+        if branched:
+            connect_T = np.array(
+                [
+                    [-0.48806033, 0.85282456, 0.18592603, -0.84215779],
+                    [-0.71462651, -0.51266626, 0.4758265, -0.42680393],
+                    [0.50110485, 0.09931554, 0.8596631, -0.33252832],
+                    [0.0, 0.0, 0.0, 1.0],
+                ]
+            )
+            connect_dummy_end = Coords.apply_transformation(
+                connect_T,
+                connect_dummy_start[0],
+                connect_dummy_start[1],
+                connect_dummy_start[2],
+                local=True,
+            )
+
+            kl_T = np.array(
+                [
+                    [-0.40776493, -0.74831039, 0.52316322, -0.84935859],
+                    [-0.73687618, -0.06857565, -0.67253327, -0.13894851],
+                    [0.53920428, -0.65979462, -0.52344936, -0.28125316],
+                    [0.0, 0.0, 0.0, 1.0],
+                ]
+            )
+            start_KL = coords2[1]
+            kl_dummy_start = Coords.apply_transformation(
+                kl_T, start_KL[0], start_KL[1], start_KL[2], local=True
+            )
+            connect_coords = Coords(dummy_ends=(connect_dummy_start, connect_dummy_end))
+            kl_coords = Coords(coords2[1:8], dummy_ends=(kl_dummy_start, kl_dummy_end))
+
+            return kl_coords, connect_coords
+        else:
+            coords = Coords(np.vstack([[first_A1], [second_A1], coords2[1:8]]))
+            return coords
+
+    @staticmethod
     def compute_transformation_matrix(
         p1: np.ndarray,
         b1: np.ndarray,

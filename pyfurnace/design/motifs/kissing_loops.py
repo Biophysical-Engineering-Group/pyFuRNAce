@@ -370,7 +370,7 @@ class KissingLoop180(KissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords = Coords.load_from_file(CONFS_PATH / "KissingLoop180.dat")
+    _KL_coords = Coords.compute_3d_kissing_loop180()
 
     def __init__(
         self,
@@ -453,6 +453,10 @@ class BranchedKissingLoop(KissingLoop):
     - 1) A kissing loop strand with a branch
     - 2) A connection strand for the branched kissing loop
 
+    The geometry is idealized to match the RNA-A helix structure,
+    trying to adapt the branched kissing loop model from
+    ROAD (https://doi.org/10.1038/s41557-021-00679-1).
+
     Parameters
     ----------
     open_left : bool, optional
@@ -469,12 +473,13 @@ class BranchedKissingLoop(KissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords = Coords.load_from_file(
-        CONFS_PATH / "BranchedKissingLoop_1.dat", dummy_ends=(True, False)
-    )
-    _KL_coords2 = Coords.load_from_file(
-        CONFS_PATH / "BranchedKissingLoop_2.dat", dummy_ends=(True, True)
-    )
+    # _KL_coords = Coords.load_from_file(
+    #     CONFS_PATH / "BranchedKissingLoop_1.dat", dummy_ends=(True, False)
+    # )
+    # _KL_coords2 = Coords.load_from_file(
+    #     CONFS_PATH / "BranchedKissingLoop_2.dat", dummy_ends=(True, True)
+    # )
+    _KL_coords, _KL_coords2 = Coords.compute_3d_kissing_loop180(branched=True)
 
     def __init__(
         self,
@@ -560,6 +565,7 @@ class BranchedKissingLoop(KissingLoop):
 class KissingDimer(KissingLoop180):
     """
     A kissing loop dimer composed of two complementary 180-degree loops.
+    The geometry is idealized to match the RNA-A helix structure.
 
     Parameters
     ----------
@@ -575,7 +581,7 @@ class KissingDimer(KissingLoop180):
         Additional keyword arguments.
     """
 
-    _KL_coords2 = Coords.load_from_file(CONFS_PATH / "KissingLoop180_2.dat")
+    _KL_coords2 = Coords.compute_3d_kissing_loop180(second_strand=True)
 
     def __init__(
         self,
@@ -787,6 +793,10 @@ class BranchedDimer(BranchedKissingLoop):
     - 2) A branched kissing loop strand
     - 3) A connection strand for the branched kissing loop
 
+    The geometry is idealized to match the RNA-A helix structure,
+    trying to adapt the branched kissing loop model from
+    ROAD (https://doi.org/10.1038/s41557-021-00679-1).
+
     Parameters
     ----------
     sequence : str, optional
@@ -801,7 +811,7 @@ class BranchedDimer(BranchedKissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords3 = Coords.load_from_file(CONFS_PATH / "BranchedKissingLoop_3.dat")
+    _KL_coords3 = Coords.compute_3d_kissing_loop180(second_strand=True)
 
     def __init__(
         self,

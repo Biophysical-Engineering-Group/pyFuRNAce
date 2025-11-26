@@ -134,6 +134,26 @@ class Position(tuple):
             return cls((0, 0, 0))
         return cls((0, 0))
 
+    @classmethod
+    def from_json(cls, json_str: str) -> "Position":
+        """
+        Create a Position instance from a JSON-serializable format.
+
+        Parameters
+        ----------
+        json_str : str
+            A JSON-serializable representation of the Position.
+
+        Returns
+        -------
+        Position
+            A Position instance.
+        """
+        if not json_str:
+            return Position.zero()
+        pos = tuple(int(coord) for coord in json_str.split(","))
+        return cls(pos)
+
     ###
     ### METHODS
     ###
@@ -180,6 +200,17 @@ class Position(tuple):
         return Position(
             (x if x is not None else self[0], y if y is not None else self[1])
         )
+
+    def to_json(self) -> str:
+        """
+        Convert the Position to a JSON-serializable format.
+
+        Returns
+        -------
+        str
+            A JSON-serializable representation of the Position.
+        """
+        return ",".join(str(coord) for coord in self)
 
 
 class DirectionMeta(type):

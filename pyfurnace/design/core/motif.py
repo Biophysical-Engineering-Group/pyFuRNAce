@@ -1,6 +1,7 @@
 from pathlib import Path
 import warnings
 import copy
+import json
 from functools import wraps
 from inspect import signature
 from collections.abc import Iterable
@@ -177,7 +178,7 @@ class Motif(Callback):
         self._pair_map = BasePair()
         self._structure = None
         self._strands = []
-        self.lock_coords = lock_coords
+        self._lock_coords = lock_coords
         self._strands_block = StrandsBlock()
 
         ### STRANDS INITIALIZATION
@@ -982,6 +983,103 @@ class Motif(Callback):
         with open(file_path, "r", encoding="utf-8") as f:
             motif_text = f.read()
         return cls.from_text(motif_text, **kwargs)
+
+    @classmethod
+    def from_json(cls, json_data: Union[str, Dict], **kwargs) -> "Motif":
+        """
+        Create a Motif object from a JSON string or dictionary.
+        The json dictionary is parsed, and is consumed to create the Motif object.
+
+        Parameters
+        ----------
+        json_data : str or dict
+            The JSON string or dictionary representing the motif.
+        **kwargs : dict
+            Additional arguments to pass to the Motif constructor.
+
+        Returns
+        -------
+        Motif
+            The constructed Motif object.
+        """
+        from ... import motifs
+
+        if isinstance(json_data, str):
+            data = json.loads(json_data)
+        elif isinstance(json_data, dict):
+            data = json_data
+        else:
+            raise ValueError(
+                f"{json_data} must be a JSON string or dictionary."
+                f" Got {type(json_data)} instead."
+            )
+
+        # remove version if present
+        data.pop("pyfurnace_version", None)
+        # version tracking is useful for backward compatibility
+
+        # try to retrieve the motif data
+        mot_type = data.pop("motif_type", None)
+        search_cls = getattr(motifs, mot_type, None)
+        if search_cls:
+            cls = search_cls
+
+        strands = []
+        strands_blocks_id = {}
+        for strand_data in data.pop("strands", []):
+            sb_id = strand_data.get("strands_block_id", None)
+            strand = Strand.from_json(strand_data)
+            strands.append(strand)
+            # handle strands blocks
+            if sb_id is not None:
+                strands_blocks_id.setdefault(sb_id, []).append(strand)
+
+        # assign strands blocks
+        lock_coords = data.pop("lock_coords", True)
+        if not lock_coords:
+            for sb_strands in strands_blocks_id.values():
+                StrandsBlock(*sb_strands)
+
+        basepair = BasePair(
+            {
+                Position.from_json(k): Position.from_json(v)
+                for k, v in data.pop("basepair", {}).items()
+            }
+        )
+
+        new_motif = cls()
+        new_motif._lock_coords = lock_coords
+        new_motif.replace_all_strands(strands, copy=False, join=False)
+        new_motif.autopairing = data.pop("autopairing", True)
+        if basepair:
+            new_motif.basepair = basepair
+
+        # Assign any other remaining attributes
+        for key, value in data.items():
+            setattr(new_motif, key, value)
+
+        return new_motif
+
+    @classmethod
+    def from_json_file(cls, file_path: str, **kwargs) -> "Motif":
+        """
+        Create a Motif object from a JSON file.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the JSON file representing the motif.
+        **kwargs : dict
+            Additional arguments to pass to the Motif constructor.
+
+        Returns
+        -------
+        Motif
+            The constructed Motif object.
+        """
+        with open(file_path, "r", encoding="utf-8") as f:
+            json_data = json.load(f)
+        return cls.from_json(json_data, **kwargs)
 
     @classmethod
     def from_list(cls, motif_list: List[str], **kwargs) -> "Motif":
@@ -2835,6 +2933,36 @@ class Motif(Callback):
                 f.write(f"{seq}\n")
                 f.write(f"{dotb[i]}\n")
 
+    def save_json(
+        self, filename: str = "motif", return_data: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Save the motif representation as a JSON file.
+
+        Parameters
+        ----------
+        filename : str, default 'motif'
+            The filepath to save (without extension). Default is 'motif'.
+        return_data : bool, default False
+            If True, return the JSON data instead of saving to a file.
+
+        Returns
+        -------
+        dict, optional
+            The JSON data if `return_data` is True.
+        """
+        from ... import __version__  # import here to avoid circular imports
+
+        json_data = {"pyfurnace_version": __version__}
+        json_data.update(self.to_json())
+
+        if return_data:
+            return json.dumps(json_data, indent=4)
+
+        path = Path(filename).with_suffix(".json")
+        with open(str(path), "w", encoding="utf-8") as f:
+            json.dump(json_data, f, indent=4)
+
     def save_text(self, filename: str = "motif") -> None:
         """
         Save the motif representation as a text file.
@@ -2959,3 +3087,26 @@ class Motif(Callback):
         shift = (-min_pos[0] * int(skip_axis != 1), -min_pos[1] * int(skip_axis != 0))
         self.shift(shift)
         return self
+
+    def to_json(self) -> Dict[str, Any]:
+        """
+        Convert the Motif instance to a JSON-serializable dictionary.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary representation of the Motif instance.
+        """
+        motif_dict = {
+            "motif_type": self.__class__.__name__,
+            "strands": [s.to_json() for s in self],
+            "autopairing": self._autopairing,
+            "basepair": {k.to_json(): v.to_json() for k, v in self._basepair.items()},
+            "lock_coords": self._lock_coords,
+        }
+        dummy_motif = Motif()
+        for attr in self.__dict__:
+            if attr not in dummy_motif.__dict__:
+                # assuming the attribute is JSON serializable
+                motif_dict[attr] = getattr(self, attr)
+        return motif_dict

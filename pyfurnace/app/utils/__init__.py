@@ -231,7 +231,18 @@ def save_origami(origami_name="Origami"):
     col1, col2 = st.columns([1, 5])
     with col1:
         file_type = st.selectbox(
-            "File type", ["py", "txt", "fasta", "PDB", "oxDNA"], key="file_type"
+            "File type",
+            ["json", "py", "txt", "fasta", "PDB", "oxDNA"],
+            key="file_type",
+            help="Select the file format to download the RNA origami structure.\n\n"
+            "- json: JSON format to save the origami in pyFuRNAce.\n\n"
+            "- py: Python code to recreate the origami structure.\n\n"
+            "- txt: Text format compatible with the Roadmap software.\n\n"
+            "- fasta: FASTA format with the RNA sequence.\n\n"
+            "- PDB: 3D structure in PDB format "
+            "(only standard nucleotides allowed).\n\n"
+            "- oxDNA: Files for oxDNA simulations "
+            "(configuration, topology, and forces).",
         )
     with col2:
         ori_name = st.text_input(
@@ -266,6 +277,9 @@ def save_origami(origami_name="Origami"):
                     ori_name,
                     return_text=True,
                 )
+
+            elif file_type == "json":
+                text_data = origami.save_json(return_data=True)
 
             st.download_button(
                 label="Download",

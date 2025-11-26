@@ -1,6 +1,7 @@
 from pathlib import Path
 import warnings
 import copy
+import json
 from typing import Iterable, Optional, Union, Literal, List, Dict, Tuple, Any, Set
 import numpy as np
 
@@ -17,6 +18,7 @@ try:
 except ImportError:
     oat_installed = False
 
+# pyFuRNAce IMPORTS
 from .symbols import (
     nucleotides,
     symb_to_road,
@@ -339,6 +341,8 @@ class Strand(Callback):
             if new_coords.size == 0:
                 self._coords = Coords()
                 return
+        elif isinstance(new_coords, Coords):
+            pass
         elif not new_coords:
             self._coords = Coords()
             return
@@ -619,6 +623,84 @@ class Strand(Callback):
         # assign the new block to the strand
         self._strands_block = new_block
         self._strands_block.add(self)
+
+    ###
+    ### CLASS METHODS
+    ###
+
+    @classmethod
+    def from_json(cls, json_data: Dict[str, Any]) -> "Strand":
+        """
+        Create a Strand object from a JSON dictionary.
+        The json dictionary is parsed, and is consumed to create the Motif object.
+
+        Parameters
+        ----------
+        json_data : Dict[str, Any]
+            The JSON dictionary containing the strand attributes.
+
+        Returns
+        -------
+        Strand
+            The created Strand object.
+        """
+        if isinstance(json_data, str):
+            data = json.loads(json_data)
+        elif isinstance(json_data, dict):
+            data = json_data
+        else:
+            raise ValueError(
+                f"{json_data} must be a JSON string or dictionary."
+                f" Got {type(json_data)} instead."
+            )
+        # remove version if present
+        data.pop("pyfurnace_version", None)
+        # version tracking is useful for backward compatibility
+
+        # extract known attributes
+        strand_str = data.pop("strand", "")
+        start = Position.from_json(data.pop("start", None))
+        direction = Position.from_json(data.pop("direction", None))
+        directionality = data.pop("directionality", "53")
+        coords = data.pop("coords", None)
+
+        # remove the strands_block if present, useful only for motifs
+        data.pop("strands_block_id", None)
+
+        # create the Strand object
+        strand = cls(
+            strand=strand_str,
+            start=start,
+            direction=direction,
+            directionality=directionality,
+            coords=Coords.from_json(coords),
+        )
+
+        # set any additional attributes
+        for key, value in data.items():
+            setattr(strand, key, value)
+
+        return strand
+
+    @classmethod
+    def from_json_file(cls, file_path: Union[str, Path]) -> "Strand":
+        """
+        Create a Strand object from a JSON file.
+
+        Parameters
+        ----------
+        file_path : Union[str, Path]
+            The path to the JSON file containing the strand attributes.
+
+        Returns
+        -------
+        Strand
+            The created Strand object.
+        """
+        with open(file_path, "r") as f:
+            data = json.load(f)
+
+        return cls.from_json(data)
 
     ###
     ### STATIC METHODS
@@ -1916,6 +1998,36 @@ class Strand(Callback):
 
             oxDNA_PDB(conf, system, filename, **kwargs)
 
+    def save_json(
+        self, filename: str = "Strand", return_data: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Save the Strand instance to a JSON file.
+
+        Parameters
+        ----------
+        filename : str, default 'Strand'
+            The name of the JSON file to save the strand to.
+        return_data : bool, default False
+            If True, return the JSON data as a dictionary instead of saving to file.
+
+        Returns
+        -------
+        Dict[str, Any] or None
+            The JSON data as a dictionary if `return_data` is True, otherwise None.
+        """
+        from ... import __version__  # import here to avoid circular imports
+
+        strand_data = {"pyfurnace_version": __version__}
+        strand_data.update(self.to_json())
+
+        if return_data:
+            return json.dumps(strand_data, indent=4)
+
+        filename = str(Path(filename).with_suffix(".json"))  # ensure .json extension
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(strand_data, f, indent=4)
+
     def shift(
         self,
         shift_position: Union["Position", "Direction", Tuple[int, int]],
@@ -1964,6 +2076,34 @@ class Strand(Callback):
 
         self._trigger_callbacks()
         return self
+
+    def to_json(self) -> Dict[str, Any]:
+        """
+        Serialize the Strand instance to a JSON-compatible dictionary.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary representation of the Strand instance.
+        """
+        strand_dict = {
+            "strand": self.strand,
+            "sequence": str(self.sequence),
+            "directionality": self.directionality,
+            "start": self.start.to_json(),
+            "direction": self.direction.to_json(),
+            "pk_info": self.pk_info,
+            "coords": self.coords.to_json(),
+            "strands_block_id": (
+                None if self.strands_block is None else id(self.strands_block)
+            ),
+        }
+        dummy_strand = Strand()
+        for attr in self.__dict__:
+            if attr not in dummy_strand.__dict__:
+                # assuming the attribute is JSON serializable
+                strand_dict[attr] = getattr(self, attr)
+        return strand_dict
 
     def transform(self, transformation_matrix: Any) -> None:
         """

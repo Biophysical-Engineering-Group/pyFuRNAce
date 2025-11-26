@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial.transform import Rotation as R
-from typing import Tuple, List, Union, Literal, TYPE_CHECKING
+from typing import Any, Dict, Tuple, List, Union, Literal, TYPE_CHECKING
 
 ### OAT IMPORTS
 try:
@@ -340,6 +340,264 @@ class Coords:
         Return the size of the coordinates array.
         """
         return self.array.size
+
+    ###
+    ### CLASS METHODS
+    ###
+
+    @classmethod
+    def from_json(cls, data: Dict[str, Any]) -> "Coords":
+        """
+        Create a Coords instance from a JSON-like dictionary.
+
+        Parameters
+        ----------
+        data : Dict[str, Any]
+            A dictionary containing the coordinate data.
+
+        Returns
+        -------
+        Coords
+            A Coords instance created from the provided data.
+        """
+        input_array = np.array(data.get("array", []))
+        dummy_ends_data = data.get("dummy_ends", ([], []))
+        dummy_ends = (np.array(dummy_ends_data[0]), np.array(dummy_ends_data[1]))
+        proteins_data = data.get("proteins", [])
+        proteins = [
+            ProteinCoords(
+                sequence=protein_data.get("sequence", ""),
+                coords=np.array(protein_data.get("coords", [])),
+            )
+            for protein_data in proteins_data
+        ]
+        return cls(input_array=input_array, dummy_ends=dummy_ends, proteins=proteins)
+
+    @classmethod
+    def load_from_file(
+        cls,
+        filename: str,
+        dummy_ends: Tuple[bool, bool] = (False, False),
+        extend: Tuple[int, int] = (0, 0),
+        topology_file: str = None,
+        protein: bool = False,
+        verbose: bool = False,
+    ) -> "Coords":
+        """
+        Load and cleanup coordinates from an oxDNA configuration or PDB file.
+
+        Parameters
+        ----------
+        filename : str
+            Path to the oxDNA configuration or PDB file.
+        dummy_ends : Tuple[bool, bool], default is (False, False)
+            A tuple indicating whether the coordinates have dummy ends at the
+            beginning or end.
+        extend : Tuple[int, int], default is (0, 0)
+            Number of nucleotides to extend the coordinates at the beginning and end.
+        topology_file : str, optional
+            The path to the topology file (only required for proteins).
+        protein : bool, default False
+            Whether to load protein coordinates.
+        verbose : bool, default False
+            Whether to print the generated code for the coordinates.
+
+        Returns
+        -------
+        Coords
+            An instance of the Coords class with the cleaned-up coordinates.
+        """
+        # Check if the file is a pdb file
+        pdb = False
+        top_text = None  # initialize the topology text
+
+        # check the path
+        if not isinstance(filename, str):
+            try:
+                filename = str(filename)
+            except Exception as e:
+                raise ValueError(
+                    "The filename must be a string or a path-like "
+                    f"object, got {type(filename)}. Full error: {e}"
+                )
+
+        # check the file extension
+        if filename.endswith(".pdb") or filename.endswith(".PDB"):
+            pdb = True
+
+        # read the file
+        with open(filename, "r") as f:
+            conf_text = f.read()
+
+        if not pdb and topology_file:
+            with open(topology_file, "r") as f:
+                top_text = f.read()
+
+        return cls.load_from_text(
+            conf_text,
+            dummy_ends,
+            extend,
+            verbose,
+            top_text=top_text,
+            pdb_format=pdb,
+            protein=protein,
+        )
+
+    @classmethod
+    def load_from_text(
+        cls,
+        conf_text: str,
+        dummy_ends: Tuple[bool, bool] = (False, False),
+        extend: Tuple[int, int] = (0, 0),
+        verbose: bool = False,
+        top_text: str = None,
+        pdb_format: bool = False,
+        protein: bool = False,
+    ) -> "Coords":
+        """
+        Load and cleanup coordinates from an oxDNA or PDB configuration text.
+
+        Parameters
+        ----------
+        conf_text : str
+            OxDNA configuration text.
+        dummy_ends : Tuple[bool, bool], default is (False, False)
+            A tuple indicating whether the coordinates have dummy ends at the
+            beginning or end.
+        extend : Tuple[int, int], default is (0, 0)
+            Number of nucleotides to extend the coordinates at the beginning and end.
+        verbose : bool, default False
+            Whether to print the generated code for the coordinates.
+        top_text : str, optional
+            The topology file text (only required for proteins).
+        pdb_format : bool, default False
+            Whether the configuration text is in PDB format.
+        protein : bool, default False
+            Whether to load protein coordinates.
+
+        Returns
+        -------
+        Coords
+            A Coords object
+        """
+        if pdb_format:
+            if not oat_installed:
+                raise ValueError(
+                    "oxDNA_analysis_tools not installed. "
+                    "Please install it to use the pdb option"
+                )
+            confs, systems = PDB_oxDNA(conf_text)
+            conf_text = conf_to_str(confs[0])
+            top_text = get_top_string(systems[0])
+
+        lines = conf_text.split("\n")
+
+        ### EXTRACT THE COORDINATES
+        def extract_coords_from_line(line):
+            splitted = line.strip().split()
+            return [
+                [float(p) for p in splitted[0:3]],
+                [float(b) for b in splitted[3:6]],
+                [float(n) for n in splitted[6:9]],
+            ]
+
+        coords = np.array(
+            [extract_coords_from_line(line) for line in lines[3:] if line.strip()]
+        )
+
+        ### LOAD PROTEINS
+        all_prot_coords = []
+        protein_coords = None
+        if verbose:
+            protein_text = ""
+        if protein:
+
+            if top_text is None:
+                raise ValueError(
+                    "A topology file path must be provided when loading"
+                    " a structure with proteins"
+                )
+
+            # initialize protein text
+            if verbose:
+                protein_text = ",\n\tproteins=["
+            # Split the topology text into lines
+            lines = top_text.split("\n")[1:]
+            seq_start_ind = 0
+            for line in lines:
+                if not line:
+                    continue
+                # get the sequence
+                seq = line.split()[0]
+                # Detect a protein sequence
+                if "peptide" in line:
+
+                    # load the protein coordinates
+                    protein_coords = coords[seq_start_ind : seq_start_ind + len(seq)]
+                    if verbose:
+                        protein_text += (
+                            f'ProteinCoords("{seq}", '
+                            f"coords={protein_coords.tolist()}), "
+                        )
+                    all_prot_coords.append(ProteinCoords(seq, protein_coords))
+
+                    # remove the protein coordinates from the main coordinates
+                    coords = np.delete(
+                        coords, np.s_[seq_start_ind : seq_start_ind + len(seq)], axis=0
+                    )
+                    seq_start_ind -= len(seq)
+
+                # update the coordinates index
+                seq_start_ind += len(seq)
+
+            if verbose:
+                protein_text += "]"
+
+        ### ENTEND THE COORDINATES
+        if extend[0] > 0:
+            extend_first = Coords.compute_helix_from_nucl(
+                coords[0][0],
+                coords[0][1],
+                coords[0][2],
+                extend[0],
+                directionality="35",
+                double=False,
+                use_cached=False,
+            )[::-1]
+            coords = np.concatenate((extend_first, coords))
+
+        if extend[1] > 0:
+            extend_last = Coords.compute_helix_from_nucl(
+                coords[-1][0],
+                coords[-1][1],
+                coords[-1][2],
+                extend[1],
+                directionality="53",
+                double=False,
+                use_cached=False,
+            )
+            coords = np.concatenate((coords, extend_last))
+
+        ### CREATE DUMMIES
+        dummy_0 = np.array(())
+        dummy_1 = np.array(())
+        dummy_text = ""
+
+        if dummy_ends[0]:
+            dummy_0 = coords[0]
+            coords = coords[1:]
+
+        if dummy_ends[1]:
+            dummy_1 = coords[-1]
+            coords = coords[:-1]
+
+        if verbose:
+            dummy_text = f",\n\tdummy_ends=({dummy_0.tolist()}, {dummy_1.tolist()})"
+
+        if verbose:
+            print(f"Coords({coords.tolist()}{dummy_text}{protein_text})")
+
+        return cls(coords, dummy_ends=(dummy_0, dummy_1), proteins=all_prot_coords)
 
     ###
     ### STATIC METHODS
@@ -763,6 +1021,7 @@ class Coords:
 
         # Combine results
         if double:
+            # Combine both strands for double helix, both directions are 5' to 3'
             combined = np.concatenate((out, out_double[::-1]), axis=0)
         else:
             combined = out
@@ -830,231 +1089,6 @@ class Coords:
         T[:3, :3] = rotation_matrix
         T[:3, 3] = t
         return T
-
-    @staticmethod
-    def load_from_file(
-        filename: str,
-        dummy_ends: Tuple[bool, bool] = (False, False),
-        extend: Tuple[int, int] = (0, 0),
-        topology_file: str = None,
-        protein: bool = False,
-        verbose: bool = False,
-    ) -> "Coords":
-        """
-        Load and cleanup coordinates from an oxDNA configuration or PDB file.
-
-        Parameters
-        ----------
-        filename : str
-            Path to the oxDNA configuration or PDB file.
-        dummy_ends : Tuple[bool, bool], default is (False, False)
-            A tuple indicating whether the coordinates have dummy ends at the
-            beginning or end.
-        extend : Tuple[int, int], default is (0, 0)
-            Number of nucleotides to extend the coordinates at the beginning and end.
-        topology_file : str, optional
-            The path to the topology file (only required for proteins).
-        protein : bool, default False
-            Whether to load protein coordinates.
-        verbose : bool, default False
-            Whether to print the generated code for the coordinates.
-
-        Returns
-        -------
-        Coords
-            An instance of the Coords class with the cleaned-up coordinates.
-        """
-        # Check if the file is a pdb file
-        pdb = False
-        top_text = None  # initialize the topology text
-
-        # check the path
-        if not isinstance(filename, str):
-            try:
-                filename = str(filename)
-            except Exception as e:
-                raise ValueError(
-                    "The filename must be a string or a path-like "
-                    f"object, got {type(filename)}. Full error: {e}"
-                )
-
-        # check the file extension
-        if filename.endswith(".pdb") or filename.endswith(".PDB"):
-            pdb = True
-
-        # read the file
-        with open(filename, "r") as f:
-            conf_text = f.read()
-
-        if not pdb and topology_file:
-            with open(topology_file, "r") as f:
-                top_text = f.read()
-
-        return Coords.load_from_text(
-            conf_text,
-            dummy_ends,
-            extend,
-            verbose,
-            top_text=top_text,
-            pdb_format=pdb,
-            protein=protein,
-        )
-
-    @staticmethod
-    def load_from_text(
-        conf_text: str,
-        dummy_ends: Tuple[bool, bool] = (False, False),
-        extend: Tuple[int, int] = (0, 0),
-        verbose: bool = False,
-        top_text: str = None,
-        pdb_format: bool = False,
-        protein: bool = False,
-    ) -> Union["Coords", None]:
-        """
-        Load and cleanup coordinates from an oxDNA or PDB configuration text.
-
-        Parameters
-        ----------
-        conf_text : str
-            OxDNA configuration text.
-        dummy_ends : Tuple[bool, bool], default is (False, False)
-            A tuple indicating whether the coordinates have dummy ends at the
-            beginning or end.
-        extend : Tuple[int, int], default is (0, 0)
-            Number of nucleotides to extend the coordinates at the beginning and end.
-        verbose : bool, default False
-            Whether to print the generated code for the coordinates.
-        top_text : str, optional
-            The topology file text (only required for proteins).
-        pdb_format : bool, default False
-            Whether the configuration text is in PDB format.
-        protein : bool, default False
-            Whether to load protein coordinates.
-
-        Returns
-        -------
-        Coords or None
-            A Coords object
-        """
-        if pdb_format:
-            if not oat_installed:
-                raise ValueError(
-                    "oxDNA_analysis_tools not installed. "
-                    "Please install it to use the pdb option"
-                )
-            confs, systems = PDB_oxDNA(conf_text)
-            conf_text = conf_to_str(confs[0])
-            top_text = get_top_string(systems[0])
-
-        lines = conf_text.split("\n")
-
-        ### EXTRACT THE COORDINATES
-        def extract_coords_from_line(line):
-            splitted = line.strip().split()
-            return [
-                [float(p) for p in splitted[0:3]],
-                [float(b) for b in splitted[3:6]],
-                [float(n) for n in splitted[6:9]],
-            ]
-
-        coords = np.array(
-            [extract_coords_from_line(line) for line in lines[3:] if line.strip()]
-        )
-
-        ### LOAD PROTEINS
-        all_prot_coords = []
-        protein_coords = None
-        if verbose:
-            protein_text = ""
-        if protein:
-
-            if top_text is None:
-                raise ValueError(
-                    "A topology file path must be provided when loading"
-                    " a structure with proteins"
-                )
-
-            # initialize protein text
-            if verbose:
-                protein_text = ",\n\tproteins=["
-            # Split the topology text into lines
-            lines = top_text.split("\n")[1:]
-            seq_start_ind = 0
-            for line in lines:
-                if not line:
-                    continue
-                # get the sequence
-                seq = line.split()[0]
-                # Detect a protein sequence
-                if "peptide" in line:
-
-                    # load the protein coordinates
-                    protein_coords = coords[seq_start_ind : seq_start_ind + len(seq)]
-                    if verbose:
-                        protein_text += (
-                            f'ProteinCoords("{seq}", '
-                            f"coords={protein_coords.tolist()}), "
-                        )
-                    all_prot_coords.append(ProteinCoords(seq, protein_coords))
-
-                    # remove the protein coordinates from the main coordinates
-                    coords = np.delete(
-                        coords, np.s_[seq_start_ind : seq_start_ind + len(seq)], axis=0
-                    )
-                    seq_start_ind -= len(seq)
-
-                # update the coordinates index
-                seq_start_ind += len(seq)
-
-            if verbose:
-                protein_text += "]"
-
-        ### ENTEND THE COORDINATES
-        if extend[0] > 0:
-            extend_first = Coords.compute_helix_from_nucl(
-                coords[0][0],
-                coords[0][1],
-                coords[0][2],
-                extend[0],
-                directionality="35",
-                double=False,
-                use_cached=False,
-            )[::-1]
-            coords = np.concatenate((extend_first, coords))
-
-        if extend[1] > 0:
-            extend_last = Coords.compute_helix_from_nucl(
-                coords[-1][0],
-                coords[-1][1],
-                coords[-1][2],
-                extend[1],
-                directionality="53",
-                double=False,
-                use_cached=False,
-            )
-            coords = np.concatenate((coords, extend_last))
-
-        ### CREATE DUMMIES
-        dummy_0 = np.array(())
-        dummy_1 = np.array(())
-        dummy_text = ""
-
-        if dummy_ends[0]:
-            dummy_0 = coords[0]
-            coords = coords[1:]
-
-        if dummy_ends[1]:
-            dummy_1 = coords[-1]
-            coords = coords[:-1]
-
-        if verbose:
-            dummy_text = f",\n\tdummy_ends=({dummy_0.tolist()}, {dummy_1.tolist()})"
-
-        ### RETURN OR PRINT
-        if verbose:
-            print(f"Coords({coords.tolist()}{dummy_text}{protein_text})")
-
-        return Coords(coords, dummy_ends=(dummy_0, dummy_1), proteins=all_prot_coords)
 
     @staticmethod
     def set_reference(
@@ -1215,6 +1249,27 @@ class Coords:
         """
         self._array = np.flip(self._array, axis=0)
         self._dummy_ends = (self._dummy_ends[1], self._dummy_ends[0])
+
+    def to_json(self) -> Dict[str, Any]:
+        """
+        Serialize the Coords object to a JSON-compatible dictionary.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary representation of the Coords object.
+        """
+        return {
+            "array": self._array.tolist(),
+            "dummy_ends": (
+                self._dummy_ends[0].tolist(),
+                self._dummy_ends[1].tolist(),
+            ),
+            "proteins": [
+                {"sequence": p.sequence, "coords": p.coords.tolist()}
+                for p in self._proteins
+            ],
+        }
 
     def transform(self, T: np.ndarray) -> "Coords":
         """

@@ -1,7 +1,10 @@
 import copy
+import json
 from pathlib import Path
 from functools import wraps
-from typing import List, Tuple, Union, Literal, Callable, Optional
+from typing import Any, Dict, List, Tuple, Union, Literal, Callable, Optional
+
+# pyFuRNAce IMPORTS
 from .symbols import (
     iupac_code,
     rotate_dot_bracket,
@@ -1269,6 +1272,76 @@ class Origami(Callback):
         return self.assembled.structure
 
     ###
+    ### CLASS METHODS
+    ###
+
+    @classmethod
+    def from_json(cls, json_data: Union[str, dict]) -> "Origami":
+        """
+        Create an Origami object from a JSON string or dictionary.
+        The json dictionary is parsed, and is consumed to create the Motif object.
+
+        Parameters
+        ----------
+        json_data : str or dict
+            A JSON string or dictionary representing the origami.
+
+        Returns
+        -------
+        Origami
+            An Origami object created from the JSON data.
+        """
+        if isinstance(json_data, str):
+            json_dict = json.loads(json_data)
+        elif isinstance(json_data, dict):
+            json_dict = json_data
+        else:
+            raise TypeError(
+                f"json_data must be a string or a dictionary, "
+                f"but got {type(json_data)}."
+            )
+
+        # remove version if present
+        json_dict.pop("pyfurnace_version", None)
+        # version tracking is useful for backward compatibility
+
+        # rebuild the matrix of motifs
+        matrix = []
+        for line in json_dict.get("matrix", []):
+            new_line = []
+            for motif_data in line:
+                # retrieve the motif class
+                motif = Motif.from_json(motif_data)
+                new_line.append(motif)
+            matrix.append(new_line)
+
+        return cls(
+            matrix,
+            align=json_dict.get("align", "left"),
+            ss_assembly=json_dict.get("ss_assembly", False),
+        )
+        # create the origami from the json dictionary
+
+    @classmethod
+    def from_json_file(cls, file_path: str) -> "Origami":
+        """
+        Create an Origami object from a JSON file.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the JSON file containing the origami data.
+
+        Returns
+        -------
+        Origami
+            An Origami object created from the JSON file.
+        """
+        with open(file_path, "r") as file:
+            json_data = json.load(file)
+        return cls.from_json(json_data)
+
+    ###
     ###  STATIC METHODS
     ###
 
@@ -2083,6 +2156,37 @@ class Origami(Callback):
         with open(str(path), "w", encoding="utf-8") as f:
             f.write(text)
 
+    def save_json(
+        self, filename: str = "Origami", return_data: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Save the Origami instance to a JSON file.
+
+        Parameters
+        ----------
+        filename : str, default 'Origami'
+            Path to the output file.
+        return_data : bool, default False
+            If True, return the JSON data instead of saving it to a file.
+
+        Returns
+        -------
+        Optional[Dict[str, Any]]
+            The JSON data if return_data is True.
+        """
+        from ... import __version__  # import here to avoid circular imports
+
+        path = Path(filename).with_suffix(".json")
+
+        data = {"pyfurnace_version": __version__}
+        data.update(self.to_json())
+
+        if return_data:
+            return json.dumps(data, indent=4)
+
+        with open(str(path), "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+
     def save_text(
         self, filename: str, to_road: bool = False, return_text: bool = False
     ) -> Optional[str]:
@@ -2120,6 +2224,21 @@ class Origami(Callback):
             return text
         with open(str(path), "w", encoding="utf-8") as f:
             f.write(text)
+
+    def to_json(self) -> Dict[str, Any]:
+        """
+        Convert the Origami instance to a JSON-serializable dictionary.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary representation of the Origami.
+        """
+        return {
+            "matrix": [[m.to_json() for m in line] for line in self._matrix],
+            "align": self._align,
+            "ss_assembly": self._ss_assembly,
+        }
 
     def to_road(self) -> str:
         """

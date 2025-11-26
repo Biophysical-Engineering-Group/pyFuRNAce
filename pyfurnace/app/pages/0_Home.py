@@ -123,10 +123,12 @@ def load_template():
 @st.dialog("Load a file")
 def load_file():
     uploaded_file = st.file_uploader(
-        "Add a fasta file (.fasta) with sequence and "
-        " structure or a python script (.py)"
-        " with the pyfurnace origami code.",
-        type=["py", "fasta"],
+        "Upload a file to load your RNA origami design",
+        help="Supported file types:\n"
+        "- A pyfurnace json file (.json) with the origami structure\n\n"
+        "- A python script (.py) with the pyfurnace origami code.\n\n"
+        "- A fasta file (.fasta) with sequence and optional dot-bracket structure\n\n",
+        type=["json", "py", "fasta"],
     )
 
     if uploaded_file is None:
@@ -175,6 +177,19 @@ def load_file():
         st_state.qs_origami = origami
         st.success("File loaded successfully!", icon=":material/check_circle:")
 
+    elif ".json" in uploaded_file.name:
+        file_contents = uploaded_file.read().decode("utf-8")
+        try:
+            st_state.qs_origami = pf.Origami.from_json(file_contents)
+            st_state.qs_text = (
+                "# Origami loaded from json file\n"
+                f"origami = pf.Origami.from_json('''{file_contents}''')"
+            )
+        except Exception as e:
+            st.error(f"Error loading JSON file: {e}", icon=":material/personal_injury:")
+        else:
+            st.success("File loaded successfully!", icon=":material/check_circle:")
+
     load_origami_button()
 
 
@@ -203,7 +218,7 @@ def newcomer_flow():
         if start == "Yes":
             with question_col[1]:
                 start2 = st.radio(
-                    "-> Do you have a fasta or python file?",
+                    "-> Do you have a fasta, json or python file?",
                     index=None,
                     options=["No", "Yes"],
                     horizontal=True,

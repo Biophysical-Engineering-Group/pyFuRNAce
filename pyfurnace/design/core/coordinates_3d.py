@@ -204,12 +204,19 @@ class Coords:
         A cache for storing previously computed helical coordinates.
         This is used to optimize performance by avoiding redundant calculations,
         since the Origami are usually built upon repeating helical structures.
+    _CACHED_AE_T : np.ndarray
+        Cached transformation matrix for dovetail crossovers.
+    _CACHED_AE_T_INV : np.ndarray
+        Cached inverse transformation matrix for dovetail crossovers.
+    _CACHED_KL180 : dict
+        Cached coordinates for 180-degree kissing loops.
     """
 
     ### --- CACHED DATA ---
     _CACHED_HELICES = dict()
     _CACHED_AE_T = None
     _CACHED_AE_T_INV = None
+    _CACHED_KL180 = dict()
 
     ### --- RNA-A HELIX PARAMETERS ---
     # Inclination angle in radians
@@ -668,6 +675,7 @@ class Coords:
 
         # clear the cached helices since the parameters have changed
         cls._CACHED_HELICES = dict()
+        cls._CACHED_KL180 = dict()
         cls._CACHED_AE_T = None
         cls._CACHED_AE_T_INV = None
 
@@ -1334,7 +1342,9 @@ class Coords:
 
     @staticmethod
     def compute_kissing_loop180(
-        second_strand: bool = False, branched=False
+        second_strand: bool = False,
+        branched: bool = False,
+        use_cached: bool = True,
     ) -> "Coords":
         """
         Compute the coordinates for a 3D kissing loop with 180-degree angle.
@@ -1350,12 +1360,23 @@ class Coords:
             (both connecting and kissing strands) with dummy ends for branching.
             The transformation matricess are adapted from the 3D model of branched
             kissing loops from ROAD (https://doi.org/10.1038/s41557-021-00679-1).
+        use_cached : bool, default True
+            If True, use cached coordinates if available.
 
         Returns
         -------
         Coords
             Generated coordinates for the 3D kissing loop.
         """
+        # Determine the coordinate name based on parameters
+        coord_name = "KL180_first"
+        if second_strand:
+            coord_name = "KL180_second"
+        if branched:
+            coord_name += "KL180_branched"
+
+        if use_cached and coord_name in Coords._CACHED_KL180:
+            return Coords._CACHED_KL180[coord_name]
 
         def middle_nucleotide_coords(n1, n2):
             """
@@ -1417,7 +1438,6 @@ class Coords:
         second_A1 = (first_A1 + first_kl1_nt) / 2
         second_A1 = middle_nucleotide_coords(first_A1, first_kl1_nt)
 
-        # coords = Coords(np.vstack([[first_A1], [second_A1], coords2[1:7]]))
         if branched:
             connect_T = np.array(
                 [
@@ -1450,9 +1470,11 @@ class Coords:
             connect_coords = Coords(dummy_ends=(connect_dummy_start, connect_dummy_end))
             kl_coords = Coords(coords2[1:8], dummy_ends=(kl_dummy_start, kl_dummy_end))
 
+            Coords._CACHED_KL180[coord_name] = (kl_coords, connect_coords)
             return kl_coords, connect_coords
         else:
             coords = Coords(np.vstack([[first_A1], [second_A1], coords2[1:8]]))
+            Coords._CACHED_KL180[coord_name] = coords
             return coords
 
     @staticmethod

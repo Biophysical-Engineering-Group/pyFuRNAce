@@ -370,8 +370,6 @@ class KissingLoop180(KissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords = Coords.compute_kissing_loop180()
-
     def __init__(
         self,
         open_left: bool = False,
@@ -424,6 +422,10 @@ class KissingLoop180(KissingLoop):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
+        # compute the coordinates for the 180-degree kissing loop
+        # always use cached coordinates
+        KissingLoop180._KL_coords = Coords.compute_kissing_loop180()
+
         strand = super()._create_strands(
             sequence,
             return_strand=True,
@@ -472,14 +474,6 @@ class BranchedKissingLoop(KissingLoop):
     **kwargs : dict
         Additional keyword arguments.
     """
-
-    # _KL_coords = Coords.load_from_file(
-    #     CONFS_PATH / "BranchedKissingLoop_1.dat", dummy_ends=(True, False)
-    # )
-    # _KL_coords2 = Coords.load_from_file(
-    #     CONFS_PATH / "BranchedKissingLoop_2.dat", dummy_ends=(True, True)
-    # )
-    _KL_coords, _KL_coords2 = Coords.compute_kissing_loop180(branched=True)
 
     def __init__(
         self,
@@ -534,6 +528,12 @@ class BranchedKissingLoop(KissingLoop):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
+        # compute the coordinates for the 180-degree kissing loop
+        # always use cached coordinates
+        computed = Coords.compute_kissing_loop180(branched=True)
+        BranchedKissingLoop._KL_coords = computed[0].copy()
+        BranchedKissingLoop._KL_coords2 = computed[1].copy()
+
         strand = super()._create_strands(
             sequence,
             return_strand=True,
@@ -580,8 +580,6 @@ class KissingDimer(KissingLoop180):
     **kwargs : dict
         Additional keyword arguments.
     """
-
-    _KL_coords2 = Coords.compute_kissing_loop180(second_strand=True)
 
     def __init__(
         self,
@@ -631,6 +629,10 @@ class KissingDimer(KissingLoop180):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
+        # load the coordinates for the 180-degree kissing loop dimer
+        coords = Coords.compute_kissing_loop180(second_strand=True)
+        KissingDimer._KL_coords2 = coords.copy()
+
         bottom_pk_index = self.complementary_pk_index(pk_index)
         bottom_strand = super()._create_strands(
             sequence,
@@ -811,8 +813,6 @@ class BranchedDimer(BranchedKissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords3 = Coords.compute_kissing_loop180(second_strand=True)
-
     def __init__(
         self,
         sequence: str = "",
@@ -858,6 +858,10 @@ class BranchedDimer(BranchedKissingLoop):
             Returns a list containing the created strand if `return_strand` is True.
             Otherwise, it replaces the existing strands in the motif and returns None.
         """
+        # always use cached coordinates
+        coords = Coords.compute_kissing_loop180(second_strand=True)
+        BranchedDimer._KL_coords3 = coords.copy()
+
         # the bottom pk_index is the inverse of the top one
         bottom_pk_index = self.complementary_pk_index(pk_index)
 

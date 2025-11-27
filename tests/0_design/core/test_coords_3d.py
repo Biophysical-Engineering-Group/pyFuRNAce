@@ -1,4 +1,4 @@
-from pyfurnace import Coords
+from pyfurnace import Coords, KissingLoop180
 
 
 def test_helix_caching():
@@ -10,12 +10,21 @@ def test_helix_caching():
 
     assert Coords._CACHED_AE_T is None
     assert Coords._CACHED_AE_T_INV is None
-    assert len(Coords._CACHED_HELICES) == 2
+    assert len(Coords._CACHED_HELICES) == 1
     cached_helices = iter(Coords._CACHED_HELICES.values())
-    assert len(next(cached_helices)) == 9 * 2  # KL cached helix, double stranded
     assert len(next(cached_helices)) == len(
         stem1
     )  # stem1 cached helix, single stranded
+
+    KissingLoop180()  # create the kissing loop to cache its helix
+    assert len(Coords._CACHED_HELICES) == 3
+    cached_helices = iter(Coords._CACHED_HELICES.values())
+    next(cached_helices)  # skip stem1
+    stem2 = next(cached_helices)
+    stem3 = next(cached_helices)
+    assert len(stem2) == 9 * 2  # kissing loop helix, double stranded
+    # side coordinates created for the kissing loop
+    assert len(stem3) == 6  # 6 bases kl, single stranded
 
     # change helix parameters resets the coords
     Coords.set_helix_params(inclination=-18.0)

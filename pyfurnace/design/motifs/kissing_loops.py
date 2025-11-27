@@ -370,7 +370,7 @@ class KissingLoop180(KissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords = Coords.compute_3d_kissing_loop180()
+    _KL_coords = Coords.compute_kissing_loop180()
 
     def __init__(
         self,
@@ -479,7 +479,7 @@ class BranchedKissingLoop(KissingLoop):
     # _KL_coords2 = Coords.load_from_file(
     #     CONFS_PATH / "BranchedKissingLoop_2.dat", dummy_ends=(True, True)
     # )
-    _KL_coords, _KL_coords2 = Coords.compute_3d_kissing_loop180(branched=True)
+    _KL_coords, _KL_coords2 = Coords.compute_kissing_loop180(branched=True)
 
     def __init__(
         self,
@@ -581,7 +581,7 @@ class KissingDimer(KissingLoop180):
         Additional keyword arguments.
     """
 
-    _KL_coords2 = Coords.compute_3d_kissing_loop180(second_strand=True)
+    _KL_coords2 = Coords.compute_kissing_loop180(second_strand=True)
 
     def __init__(
         self,
@@ -811,7 +811,7 @@ class BranchedDimer(BranchedKissingLoop):
         Additional keyword arguments.
     """
 
-    _KL_coords3 = Coords.compute_3d_kissing_loop180(second_strand=True)
+    _KL_coords3 = Coords.compute_kissing_loop180(second_strand=True)
 
     def __init__(
         self,

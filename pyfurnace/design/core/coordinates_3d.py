@@ -170,6 +170,10 @@ class Coords:
     3D coordinates used in molecular structures. It supports transformations
     such as rotation and translation, as well as operations for combining
     multiple coordinate sets.
+    The Coords class includes functions to build RNA-A helices based on
+    the oxRNA model parameters and to handle dovetail crossovers.
+    The RNA-A helix parameters and dovetail crossover parameters can be
+    adjusted using class methods `set_helix_params` and `set_AE_crossover_params`.
 
     Parameters
     ----------
@@ -202,7 +206,36 @@ class Coords:
         since the Origami are usually built upon repeating helical structures.
     """
 
+    ### --- CACHED DATA ---
     _CACHED_HELICES = dict()
+    _CACHED_AE_T = None
+    _CACHED_AE_T_INV = None
+
+    ### --- RNA-A HELIX PARAMETERS ---
+    # Inclination angle in radians
+    inclination = -15.5 * np.pi / 180
+    # Distance between base pairs along the backbone
+    bp_backbone_distance = 2.0
+    # Diameter of the helix
+    diameter = 2.35
+    # Distance between bases along the helix axis
+    base_base_distance = 0.3287
+    # Rotation angle between next bases in radians
+    rot_angle = 32.73 * np.pi / 180
+
+    ### --- DOVETAIL AE CROSSOVER PARAMETERS ---
+    # these values optimize the symmetry of the AE crossover
+    # they are obtaiend from a initial guess (manual tuning) and then
+    # optimized with a numerical minimization of the asymmetry
+
+    # Shift along the base pair plane
+    ae_v_shift = 1.006
+    # Rotation around the helix axis in radians
+    ae_rot = 40.267 * np.pi / 180
+    # Shift in the helix x direction
+    ae_hx_shift = 2.293
+    # Shift in the helix y direction
+    ae_hy_shift = -0.5214
 
     def __init__(
         self,
@@ -599,6 +632,79 @@ class Coords:
 
         return cls(coords, dummy_ends=(dummy_0, dummy_1), proteins=all_prot_coords)
 
+    @classmethod
+    def set_helix_params(
+        cls,
+        inclination: float = -15.5 * np.pi / 180,
+        bp_backbone_distance: float = 2.0,
+        diameter: float = 2.35,
+        base_base_distance: float = 0.3287,
+        rot_angle: float = 32.7 * np.pi / 180,
+    ) -> None:
+        """
+        Set the helix parameters for coordinate computations.
+        Parameters
+        ----------
+        inclination : float, default -15.5 * np.pi / 180
+            Inclination angle in radians.
+        bp_backbone_distance : float, default 2.0
+            Distance between base pairs along the backbone.
+        diameter : float, default 2.35
+            Diameter of the helix.
+        base_base_distance : float, default 0.3287
+            Distance between bases along the helix axis.
+        rot_angle : float, default 32.7 * np.pi / 180
+            Rotation angle between next bases in radians.
+
+        Returns
+        -------
+        None
+        """
+        cls.inclination = inclination
+        cls.bp_backbone_distance = bp_backbone_distance
+        cls.diameter = diameter
+        cls.base_base_distance = base_base_distance
+        cls.rot_angle = rot_angle
+
+        # clear the cached helices since the parameters have changed
+        cls._CACHED_HELICES = dict()
+        cls._CACHED_AE_T = None
+        cls._CACHED_AE_T_INV = None
+
+    @classmethod
+    def set_AE_crossover_params(
+        cls,
+        ae_v_shift: float = 1.006,
+        ae_rot: float = 40.267 * np.pi / 180,
+        ae_hx_shift: float = 2.293,
+        ae_hy_shift: float = -0.5214,
+    ) -> None:
+        """
+        Set the AE crossover parameters for coordinate computations.
+
+        Parameters
+        ----------
+        ae_v_shift : float, default 0.99
+            Shift along the base pair plane.
+        ae_rot : float, default 40.52 * np.pi / 180
+            Rotation around the helix axis in radians.
+        ae_hx_shift : float, default 2.23
+            Shift in the helix x direction.
+        ae_hy_shift : float, default -0.52
+            Shift in the helix y direction.
+
+        Returns
+        -------
+        None
+        """
+        cls.ae_v_shift = ae_v_shift
+        cls.ae_rot = ae_rot
+        cls.ae_hx_shift = ae_hx_shift
+        cls.ae_hy_shift = ae_hy_shift
+        # clear the cached dovetail transformations
+        cls._CACHED_AE_T = None
+        cls._CACHED_AE_T_INV = None
+
     ###
     ### STATIC METHODS
     ###
@@ -816,6 +922,7 @@ class Coords:
         directionality: Literal["53", "35"] = "53",
         double: bool = False,
         use_cached: bool = True,
+        return_dir_vectors: bool = False,
     ) -> "Coords":
         """
         Compute helical coordinates for nucleotides.
@@ -839,13 +946,17 @@ class Coords:
             If True, generate double-stranded coordinates.
         use_cached : bool, default False
             If True, use or save cached coordinates for faster computation.
+        return_dir_vectors : bool, default False
+            If True, return the direction vector and start position also.
+            This disables the caching mechanism, because the output is not
+            only the coordinates.
 
         Returns
         -------
         Coords
             Generated helical coordinates.
         """
-        if use_cached:
+        if use_cached and not return_dir_vectors:
             info = (
                 tuple(pos),
                 tuple(old_a1),
@@ -867,21 +978,15 @@ class Coords:
         if isinstance(old_a3, (list, tuple)):
             old_a3 = np.array(old_a3)
 
-        # Model constants: Define structural parameters for the helix
-        inclination = -15.5 * np.pi / 180  # Inclination angle in radians
-        bp_backbone_distance = 2  # Distance between base pairs along the backbone
-        diameter = 2.35  # Diameter of the helix
-        base_base_distance = 0.3287  # Distance between bases along the helix axis
-        rot = 32.73 * np.pi / 180  # Rotation angle between next bases in radians
-        cord = np.cos(inclination) * bp_backbone_distance  # Chord length
+        cord = np.cos(Coords.inclination) * Coords.bp_backbone_distance  # Chord length
         # Distance from center to chord
-        center_to_cord = np.sqrt((diameter / 2) ** 2 - (cord / 2) ** 2)
+        center_to_cord = np.sqrt((Coords.diameter / 2) ** 2 - (cord / 2) ** 2)
         fudge = 0.4  # Fudge factor for position adjustment
 
         # Calculate the axis perpendicular to the old A1 and A3 vectors
         norm_a1_a3 = np.cross(old_a1, old_a3)
         # Create the rotation matrix for the direction vector
-        R_dir = R.from_rotvec(norm_a1_a3 * inclination)
+        R_dir = R.from_rotvec(norm_a1_a3 * Coords.inclination)
         # Calculate the direction vector,
         # rotating the old normal vector by the inclination angle
         dir_vector = -R_dir.apply(old_a3)
@@ -895,12 +1000,12 @@ class Coords:
         x1, y1, z1 = (
             center_to_cord,
             -cord / 2,
-            -(bp_backbone_distance / 2) * np.sin(inclination),
+            -(Coords.bp_backbone_distance / 2) * np.sin(Coords.inclination),
         )
         x2, y2, z2 = (
             center_to_cord,
             +cord / 2,
-            +(bp_backbone_distance / 2) * np.sin(inclination),
+            +(Coords.bp_backbone_distance / 2) * np.sin(Coords.inclination),
         )
         r1 = np.array([x1, y1, z1])
         r2 = np.array([x2, y2, z2])
@@ -951,14 +1056,16 @@ class Coords:
         r1 = q2.apply(r1)  # Apply rotation to r1
         r2 = q2.apply(r2)  # Apply rotation to r2
 
-        # Center point of the helix axis
+        # Select the backbone position as reference (r1 for 5'->3', r2 for 3'->5')
         r = r1
         if direction_35:
             r = r2  # Adjust direction if specified
         start_pos = pos - r - old_a1 * fudge  # Calculate the starting position
 
         # Create per-step rotation matrix
-        R_step = R.from_rotvec(dir_vector * rot)  # Create rotation for each step
+        R_step = R.from_rotvec(
+            dir_vector * Coords.rot_angle
+        )  # Create rotation for each step
 
         # Initialize properties of new nucleotide
         # Preallocate result arrays
@@ -966,7 +1073,7 @@ class Coords:
         out_double = np.empty((length, 3, 3), dtype=np.float64) if double else None
 
         # Precompute the steps
-        step_vector = dir_vector * base_base_distance
+        step_vector = dir_vector * Coords.base_base_distance
         R_step_apply = R_step.apply
 
         # Generate nucleotide positions and orientations
@@ -984,7 +1091,10 @@ class Coords:
             a1proj = a1 - np.dot(a1, dir_vector) * dir_vector
             a1proj /= np.linalg.norm(a1proj)  # Normalize projection
             # Calculate a3
-            a3 = -np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj
+            a3 = (
+                -np.cos(Coords.inclination) * dir_vector
+                + np.sin(Coords.inclination) * a1proj
+            )
             a3 /= np.linalg.norm(a3)  # Normalize a3
 
             # Calculate position
@@ -1007,7 +1117,10 @@ class Coords:
                 # Normalize projection
                 a1proj /= np.linalg.norm(a1proj)
                 # Calculate a3
-                a3 = np.cos(inclination) * dir_vector + np.sin(inclination) * a1proj
+                a3 = (
+                    np.cos(Coords.inclination) * dir_vector
+                    + np.sin(Coords.inclination) * a1proj
+                )
                 a3 /= np.linalg.norm(a3)  # Normalize a3
                 r = r2
                 if direction_35:
@@ -1029,10 +1142,198 @@ class Coords:
         if use_cached:
             # Cache the helical coordinates for future use
             Coords._CACHED_HELICES[info] = Coords(combined)
+
+        if return_dir_vectors:
+            return Coords(combined), dir_vector, start_pos
         return Coords(combined)
 
     @staticmethod
-    def compute_3d_kissing_loop180(
+    def compute_AE_crossover(
+        helix_length: int = 8,
+        return_helices: bool = False,
+        use_cached: bool = True,
+        compute_all_T: bool = False,
+    ) -> Union[Tuple["Coords", "Coords"], Tuple[np.ndarray, np.ndarray]]:
+        """
+        Compute the coordinates for an A-form AE crossover.
+        It generates two parallel helices, then translate and rotate
+        a second helix to create the crossover geometry between the middle
+        nucleotides of each helix.
+        This function is based on the parameters set in `set_AE_crossover_params`.
+        The AE parameters are based on manual tuning and scipy refinement so that
+        the AE transformation matrix of the two crossover strands is the same.
+
+        Parameters
+        ----------
+        helix_length : int, default 8
+            Length of each helix in nucleotides.
+        return_helices : bool, default True
+            If True, return the two Coords objects for the helices
+            used to create the crossover.
+            If False, return the transformation matrices.
+        use_cached : bool, default True
+            If True, use cached transformation matrices if available.
+        compute_all_T : bool, default False
+            If True, compute and return additional transformation matrices.
+
+        Returns
+        -------
+        Union[Tuple[Coords, Coords], Tuple[np.ndarray, np.ndarray]]
+            If `return_helices` is True, returns two Coords objects for the helices.
+            If `return_helices` is False, returns the transformation matrices.
+            If `compute_all_T` is True, returns additional transformation matrices
+            for the crossover.
+
+        """
+        if (
+            use_cached
+            and not return_helices
+            and not compute_all_T
+            and Coords._CACHED_AE_T is not None
+            and Coords._CACHED_AE_T_INV is not None
+        ):
+            return Coords._CACHED_AE_T, Coords._CACHED_AE_T_INV
+
+        pos = np.array((0, 0, 0))
+        old_a1 = np.array((1, 0, 0))
+        old_a3 = np.array((0, 1, 0))
+
+        h1, dir_vector, start_pos = Coords.compute_helix_from_nucl(
+            pos,  # start position
+            old_a1,  # base vector
+            old_a3,  # normal vector
+            length=helix_length,
+            double=True,
+            # we need the direction vector:
+            use_cached=False,
+            return_dir_vectors=True,
+        )
+        h2 = h1.copy()
+        # move h2 up along the direction vector
+        # equivalent of "step_vector = dir_vector * base_base_distance"
+        translate = dir_vector * Coords.ae_v_shift  # 3.55 Amstrongs up
+        Transl_mat = np.array(
+            [
+                [1, 0, 0, translate[0]],
+                [0, 1, 0, translate[1]],
+                [0, 0, 1, translate[2]],
+                [0, 0, 0, 1],
+            ]
+        )
+        h2.transform(Transl_mat)
+
+        ### PREPARE FOR TRANSLATION
+        middle = helix_length // 2
+        nt = h1[middle][0]  # position of first nucleotide
+
+        # project nt onto the *actual* axis: start_pos + t * dir_vector
+        nt_rel = nt - start_pos  # move into axis frame
+        # dir_vector is unit, so no denominator needed
+        proj_coeff = np.dot(nt_rel, dir_vector)
+        proj = start_pos + proj_coeff * dir_vector  # point on the axis closest to nt
+
+        v = nt - proj  # vector from axis to nt
+        v /= np.linalg.norm(v)  # normalize
+
+        # get the oterher orthogonal vector
+        ortho_vector = np.cross(dir_vector, v)
+        ortho_vector /= np.linalg.norm(ortho_vector)
+        xy_shift = v * Coords.ae_hx_shift + ortho_vector * Coords.ae_hy_shift
+
+        # PREPARE FOR ROTATION AND ROTATE
+        h2_array = h2.array  # shape (N, 3, 3)
+        q_rot = R.from_rotvec(dir_vector * Coords.ae_rot)  # rotation quaternion
+
+        # split into position + orientation arrays
+        pos = h2_array[:, 0, :]  # (N, 3)
+        a1 = h2_array[:, 1, :]  # (N, 3)
+        a3 = h2_array[:, 2, :]  # (N, 3)
+
+        # --- rotate positions around the axis ---
+        # 1) translate so axis_point is at origin
+        pos_shifted = pos - start_pos
+
+        # 2) rotate around axis (through origin)
+        pos_rot = q_rot.apply(pos_shifted)
+
+        # 3) translate back
+        pos_rot += start_pos
+
+        # --- rotate orientations (NO translation!) ---
+        a1_rot = q_rot.apply(a1)
+        a3_rot = q_rot.apply(a3)
+
+        # --- recombine ---
+        rotated_array = np.stack([pos_rot, a1_rot, a3_rot], axis=1)
+        h2 = Coords(rotated_array)
+
+        # TRANSLATE
+        Transl_mat2 = np.array(
+            [
+                [1, 0, 0, xy_shift[0]],
+                [0, 1, 0, xy_shift[1]],
+                [0, 0, 1, xy_shift[2]],
+                [0, 0, 0, 1],
+            ]
+        )
+
+        h2.transform(Transl_mat2)
+
+        first_nt = h1[middle]
+        second_nt = h2[-middle - 1]
+        ae_T = Coords.compute_transformation_matrix(
+            first_nt[0],
+            first_nt[1],
+            first_nt[2],
+            second_nt[0],
+            second_nt[1],
+            second_nt[2],
+            local=True,
+        )
+        ae_T_inv = Coords.compute_transformation_matrix(
+            second_nt[0],
+            second_nt[1],
+            second_nt[2],
+            first_nt[0],
+            first_nt[1],
+            first_nt[2],
+            local=True,
+        )
+
+        Coords._CACHED_AE_T = ae_T
+        Coords._CACHED_AE_T_INV = ae_T_inv
+
+        if return_helices:
+            return h1, h2
+
+        if compute_all_T:
+            first_nt = h2[-middle - 2]
+            second_nt = h1[middle + 1]
+            ae_T_2 = Coords.compute_transformation_matrix(
+                first_nt[0],
+                first_nt[1],
+                first_nt[2],
+                second_nt[0],
+                second_nt[1],
+                second_nt[2],
+                local=True,
+            )
+            ae_T_inv_2 = Coords.compute_transformation_matrix(
+                second_nt[0],
+                second_nt[1],
+                second_nt[2],
+                first_nt[0],
+                first_nt[1],
+                first_nt[2],
+                local=True,
+            )
+
+            return ae_T, ae_T_inv, ae_T_2, ae_T_inv_2
+
+        return ae_T, ae_T_inv
+
+    @staticmethod
+    def compute_kissing_loop180(
         second_strand: bool = False, branched=False
     ) -> "Coords":
         """

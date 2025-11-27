@@ -6,7 +6,8 @@ from ..core.sequence import Sequence
 from ..core.strand import Strand
 from .stem import Stem
 
-### DAE PARALLEL FROM PDB MEAN roughly refined
+### transfromantion for AE crossover
+### calculated from PDB-7QDU; mean crossover roughly refined
 # DAE_T_53 = np.array([[-0.79306138, -0.05738916, -0.60643229, -0.60152068],
 #                     [-0.05738916, -0.98408458,  0.16817856, -0.26217635],
 #                     [-0.60643229,  0.16817856,  0.77714596, -0.83494375],
@@ -17,23 +18,17 @@ from .stem import Stem
 #                     [-0.60643229,  0.16817856,  0.77714596,  0.32818404],
 #                     [ 0.        ,  0.        ,  0.        ,  1.        ],])
 
-### DAE PARALLEL FROM PDB MEAN refined for ss-assembly
-DAE_T_53 = np.array(
-    [
-        [-0.82936192, -0.04732277, -0.55670411, -0.60615603],
-        [-0.0473231, -0.98687633, 0.15438835, -0.23843062],
-        [-0.55670399, 0.15438806, 0.81623819, -0.84790395],
-        [0.0, 0.0, 0.0, 1.0],
-    ]
-)
-DAE_T_35 = np.array(
-    [
-        [-0.82936221, -0.04732235, -0.55670361, -0.98603719],
-        [-0.04732238, -0.98687625, 0.15438865, -0.13307951],
-        [-0.55670361, 0.15438867, 0.81623846, 0.39145356],
-        [0.0, 0.0, 0.0, 1.0],
-    ]
-)
+### transfromantion for AE crossover currently used
+### modeled from oxRNA RNA-A helix
+# DAE_T_53 = np.array([[ 0.70838381, -0.47377676, -0.52319017, -1.56379685],
+#                      [-0.47377676, -0.86861008,  0.14509347, -0.27700864],
+#                      [-0.52319017,  0.14509347, -0.83977374,  0.15200037],
+#                      [ 0.        ,  0.        ,  0.        ,  1.        ]])
+
+# DAE_T_35 = np.array([[ 0.70838381, -0.47377676, -0.52319017,  1.05605322],
+#                      [-0.47377676, -0.86861008,  0.14509347, -1.00355736],
+#                      [-0.52319017,  0.14509347, -0.83977374, -0.65032507],
+#                      [ 0.        ,  0.        ,  0.        ,  1.        ],])
 
 
 class Dovetail(Stem):
@@ -331,6 +326,7 @@ class Dovetail(Stem):
         #  seq_len * 2 + 3;  seq_len + 2
         #        |           |
         #   bot_strand1; bot_strand2
+        DAE_T_53, DAE_T_35 = Coords.compute_AE_crossover()
 
         ### the dovetail is positive
         if pos:

@@ -1177,7 +1177,9 @@ def update_code(code_text, return_origami=False):
         # Retrieve the last defined Origami object
         origami = next(
             iter(
-                [v for v in local_context.values() if isinstance(v, pf.Origami)][::-1]
+                [v for v in local_context.values() if isinstance(v, pf.Origami) if v][
+                    ::-1
+                ]
             ),
             None,
         )

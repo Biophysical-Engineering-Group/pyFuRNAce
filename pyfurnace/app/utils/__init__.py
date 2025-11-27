@@ -175,7 +175,8 @@ def save_pdb(origami, ori_name="Origami"):
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         file_path = f"{tmpdirname}/origami"
-        origami.save_3d_model(file_path, sequence=sequence, pdb=True)
+        with st.spinner("Constructing PDB file..."):
+            origami.save_3d_model(file_path, sequence=sequence, pdb=True)
         try:
             with open(f"{file_path}.pdb", "r") as f:
                 pdb_text = f.read()

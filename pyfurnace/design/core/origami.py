@@ -41,7 +41,10 @@ class Origami(Callback):
     *args : Motif or list of Motif
         Additional motifs or rows of motifs to add to the matrix.
     align : {'left', 'first', 'center'}, default='left'
-        How motifs should be aligned vertically.
+        How rows are vertically aligned.
+        Left: align each row to the left.
+        First: align to the first crossover in each row.
+        Center: align every row to the center of the widest row.
     copy : bool, default=False
         Whether to create a copy of the motifs before adding them to the origami.
     ss_assembly : bool, default=False
@@ -545,7 +548,10 @@ class Origami(Callback):
         *args : Motif or list of Motif
             Additional motifs or rows of motifs to add to the matrix.
         align : {'left', 'first', 'center'}, default='left'
-            How motifs should be aligned vertically.
+            How rows are vertically aligned.
+            Left: align each row to the left.
+            First: align to the first crossover in each row.
+            Center: align every row to the center of the widest row.
         copy : bool, default=False
             Whether to create a copy of the motifs before adding them to the origami.
         ss_assembly : bool, default=False

@@ -1188,11 +1188,6 @@ def update_code(code_text, return_origami=False):
         if render_target and isinstance(render_target, pf.Origami):
             origami = render_target
 
-        if origami:
-            # select the end of the origami
-            st_state.line_index = len(origami) - 1
-            st_state.motif_index = len(origami[-1])
-
     except Exception as e:
         st.error(f"Error in executing the code: {e}")
         return False
@@ -1200,9 +1195,13 @@ def update_code(code_text, return_origami=False):
     if return_origami:
         return origami
 
-    st.success("Nanostructure updated successfully!")
+    if origami:
+        # select the end of the origami
+        st_state.line_index = len(origami) - 1
+        st_state.motif_index = len(origami[-1]) - 1
+        st_state.origami = origami
 
-    st_state.origami = origami
+    st.success("Nanostructure updated successfully!")
     st_state.code = code_text.split("\n\n")
     st.rerun()
 

@@ -897,6 +897,137 @@ class Origami(Callback):
         ### update the motif
         self._updated_motif()
 
+    def __delitem__(
+        self,
+        key: Union[
+            int,
+            slice,
+            Tuple[int, int],
+            Tuple[slice, slice],
+            Callable[[Motif], bool],
+        ],
+    ) -> None:
+        """
+        Delete motifs/rows from the matrix using the same slicing conventions
+        as __getitem__ and __setitem__.
+
+        Supported keys
+        --------------
+        - int or slice: delete row(s)
+        - (int, int): delete a single motif
+        - (int, slice): delete a slice in a single row
+        - (slice, slice): delete a 2D submatrix (same x-slice for each row)
+        - (slice, int): delete a vertical selection (same column for each row)
+        - callable: delete all motifs for which key(motif) is True
+        """
+
+        # Callable: delete everything that matches the predicate
+        if hasattr(key, "__call__"):
+            # collect indices first so we don't mutate while iterating
+            rows_to_delete: List[Tuple[int, List[int]]] = []
+            for i, row in enumerate(self._matrix):
+                cols = [j for j, m in enumerate(row) if key(m)]
+                if cols:
+                    rows_to_delete.append((i, cols))
+
+            for i, cols in rows_to_delete:
+                row = self._matrix[i]
+                for j in sorted(cols, reverse=True):
+                    m = row[j]
+                    m._clear_callbacks()
+                    del row[j]
+
+            self._updated_motif()
+            return
+
+        # 1D: entire row(s)
+        if isinstance(key, int):
+            if not self._matrix:
+                return
+            y_int = key % len(self._matrix)
+            for m in self._matrix[y_int]:
+                m._clear_callbacks()
+            del self._matrix[y_int]
+            self._updated_motif()
+            return
+
+        if isinstance(key, slice):
+            rows = self._matrix[key]
+            for row in rows:
+                for m in row:
+                    m._clear_callbacks()
+            del self._matrix[key]
+            self._updated_motif()
+            return
+
+        # 2D: tuple / list of two indices
+        if isinstance(key, (tuple, list)) and len(key) == 2:
+            y, x = key
+
+            # (int, int): single motif
+            if isinstance(y, int) and isinstance(x, int):
+                if not self._matrix:
+                    return
+                y_int = y % len(self._matrix)
+                if not self._matrix[y_int]:
+                    return
+                x_int = x % len(self._matrix[y_int])
+                m = self._matrix[y_int][x_int]
+                m._clear_callbacks()
+                del self._matrix[y_int][x_int]
+                self._updated_motif()
+                return
+
+            # (int, slice): horizontal slice in one row
+            if isinstance(y, int) and isinstance(x, slice):
+                if not self._matrix:
+                    return
+                y_int = y % len(self._matrix)
+                row = self._matrix[y_int]
+                motifs = row[x]
+                for m in motifs:
+                    m._clear_callbacks()
+                del row[x]
+                self._updated_motif()
+                return
+
+            # (slice, int): vertical selection (same column across rows)
+            if isinstance(y, slice) and isinstance(x, int):
+                rows = self._matrix[y]
+                if not rows:
+                    return
+                # mirror __setitem__ behaviour (modulo against len(self._matrix[y]))
+                x_int = x % len(rows)
+                for row in rows:
+                    if not row:
+                        continue
+                    m = row[x_int]
+                    m._clear_callbacks()
+                    del row[x_int]
+                self._updated_motif()
+                return
+
+            # (slice, slice): 2D submatrix
+            if isinstance(y, slice) and isinstance(x, slice):
+                y_indices = range(*y.indices(len(self._matrix)))
+                for i in y_indices:
+                    row = self._matrix[i]
+                    motifs = row[x]
+                    for m in motifs:
+                        m._clear_callbacks()
+                    del row[x]
+                self._updated_motif()
+                return
+
+        # If we get here, the key type is unsupported
+        raise TypeError(
+            "Origami indexes can be: \n"
+            "\t - a function to screen the motifs, \n"
+            "\t - an int/slice to select a row, \n"
+            "\t - a tuple of two int/slice to select a region. \n"
+            f"Got: {key}, of type: {type(key)}"
+        )
+
     def __len__(self):
         """Get the number of rows in the origami."""
         return len(self._matrix)
@@ -1953,8 +2084,10 @@ class Origami(Callback):
         return ori
 
     def index(
-        self, condition: Union[Callable[[Motif], bool], Motif]
-    ) -> List[Tuple[int, int]]:
+        self,
+        condition: Union[Callable[[Motif], bool], Motif],
+        return_matrix_format: bool = False,
+    ) -> Union[List[Tuple[int, int]], List[List[int]]]:
         """
         Find the matrix coordinates of motifs that satisfy a given condition.
 
@@ -1963,11 +2096,18 @@ class Origami(Callback):
         condition : Callable[[Motif], bool] or Motif
             A function that takes a Motif and returns True if it matches,
             or a Motif instance to match directly.
+        return_matrix_format : bool, default=False
+            If True, returns indices in matrix format (row, column),
+            otherwise returns a flat list of indices.
+            The matrix format is a list of lists (row-wise) of indices
+            (column-wise).
 
         Returns
         -------
-        List[Tuple[int, int]]
+        Union[List[Tuple[int, int]], List[List[int]]]
             List of (row, column) indices of matching motifs.
+            If `return_matrix_format` is True,
+            returns a list of lists (row-wise) of indices (column-wise).
 
         Raises
         ------
@@ -1986,6 +2126,11 @@ class Origami(Callback):
                 f"The condition must be a function or a Motif "
                 f"object, but {condition} was given."
             )
+
+        if return_matrix_format:
+            return [
+                [x for x, m in enumerate(line) if condition(m)] for line in self._matrix
+            ]
 
         return [
             (y, x)

@@ -334,13 +334,135 @@ def test_invalid_setitem(sample_origami):
         sample_origami[0, 0] = "not_a_motif"
 
 
-def test_index(sample_origami):
-    """Test the index method."""
-    assert sample_origami.index(Stem(2)) == [(0, 1)], "Index not found."
+def test_delitem_single_row(sample_origami):
+    origami = sample_origami
+    # Deleting the first row
+    del origami[0]
+    assert len(origami) == 1
+    assert origami[0] == [Stem(3), TetraLoop(open_left=True)]
+
+
+def test_delitem_multiple_rows(sample_origami):
+    origami = sample_origami
+    # Deleting a slice of rows (first row)
+    del origami[0:1]
+    assert len(origami) == 1
+    assert origami[0] == [Stem(3), TetraLoop(open_left=True)]
+
+
+def test_delitem_single_motif(sample_origami):
+    origami = sample_origami
+    # Deleting a single motif at (0, 1) (first row, second motif)
+    del origami[0, 1]
+    assert origami[0] == [TetraLoop()]
+    assert len(origami) == 2  # Should still have two rows
+
+
+def test_delitem_row_slice(sample_origami):
+    origami = sample_origami
+    # Deleting a slice of the first row (motif2)
+    del origami[0, 1:2]
+    assert origami[0] == [TetraLoop()]
+    assert len(origami) == 2  # Still 2 rows
+
+
+def test_delitem_2d_submatrix(sample_origami):
+    origami = sample_origami
+    # Deleting a submatrix (first two rows, columns 1 to 2)
+    del origami[0:2, 1:2]
+    assert origami[0] == [TetraLoop()]
+    assert origami[1] == [Stem(3)]
+    assert len(origami) == 2
+
+
+def test_delitem_column(sample_origami):
+    origami = sample_origami
+    # Deleting the second column (1st motif of each row)
+    del origami[:, 1]
+    assert origami[0] == [TetraLoop()]
+    assert origami[1] == [Stem(3)]
+
+
+def test_delitem_callable(sample_origami):
+    origami = sample_origami
+    # Deleting motifs where the motif is a Stem (2 bases)
+    del origami[lambda m: isinstance(m, Stem) and len(m) == 2]
+    assert origami[0] == [TetraLoop()]
+    assert len(origami) == 2
+
+
+def test_delitem_invalid_key(sample_origami):
+    origami = sample_origami
+    with pytest.raises(TypeError):
+        # Invalid key type should raise an error
+        del origami["invalid"]
+
+
+def test_index_by_motif(sample_origami):
+    """Test the index function with an exact match using a Motif."""
+    # Find Stem(2) motif
+    assert sample_origami.index(Stem(2)) == [(0, 1)]
+
+    # Find TetraLoop motif (with open_left=True)
+    assert sample_origami.index(TetraLoop(open_left=True)) == [(1, 1)]
+
+
+def test_index_by_condition(sample_origami):
+    """Test the index function with a condition (lambda function)."""
+    # Find all TetraLoop motifs (without considering open_left)
     assert sample_origami.index(lambda m: isinstance(m, TetraLoop)) == [
         (0, 0),
         (1, 1),
-    ], "Index not found."
+    ]
+
+    # Find all Stem motifs with length 2
+    assert sample_origami.index(lambda m: isinstance(m, Stem) and m.length == 2) == [
+        (0, 1)
+    ]
+
+
+def test_index_matrix_format(sample_origami):
+    """Test the index function with return_matrix_format=True."""
+    # Find Stem(2) motif and return in matrix format
+    result = sample_origami.index(Stem(2), return_matrix_format=True)
+    assert result == [[1], []], "Matrix format result is incorrect."
+
+    # Find TetraLoop motifs and return in matrix format
+    result = sample_origami.index(
+        lambda m: isinstance(m, TetraLoop), return_matrix_format=True
+    )
+    assert result == [[0], [1]], "Matrix format result is incorrect."
+
+
+def test_index_no_matches(sample_origami):
+    """Test the index function when no motifs match."""
+    # Searching for a motif that does not exist (no Stem of length 4)
+    assert (
+        sample_origami.index(lambda m: isinstance(m, Stem) and len(m) == 4) == []
+    ), "No matches expected."
+
+    # Searching for a non-existent TetraLoop
+    fake_loop = TetraLoop()
+    fake_loop.sequence = "AAAA"  # Different sequence
+    assert sample_origami.index(fake_loop) == [], "No matches expected."
+
+
+def test_index_empty_matrix():
+    """Test the index function with an empty matrix."""
+    origami = Origami(matrix=[[], []])  # Empty 2x2 matrix
+    assert (
+        origami.index(lambda m: isinstance(m, TetraLoop)) == []
+    ), "Expected no matches in empty matrix."
+    assert origami.index(Stem(2)) == [], "Expected no matches in empty matrix."
+
+
+def test_index_invalid_condition(sample_origami):
+    """Test the index function with invalid condition input."""
+    with pytest.raises(ValueError, match="The condition must be a function or a Motif"):
+        sample_origami.index(123)  # Invalid condition type
+
+    with pytest.raises(ValueError, match="The condition must be a function or a Motif"):
+        sample_origami.index(None)  # Invalid condition type
 
 
 def test_from_structure():

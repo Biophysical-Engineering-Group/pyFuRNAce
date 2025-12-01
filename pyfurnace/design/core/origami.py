@@ -1233,8 +1233,9 @@ class Origami(Callback):
                 new_strand_seq += new_seq[ind + offset]
 
             # add the last strand
-            last_strand = self._matrix[strand_ID[0]][strand_ID[1]][strand_ID[2]]
-            last_strand.sequence = new_strand_seq
+            if strand_ID is not None:
+                last_strand = self._matrix[strand_ID[0]][strand_ID[1]][strand_ID[2]]
+                last_strand.sequence = new_strand_seq
 
             # update the offset
             offset += len(s.sequence)

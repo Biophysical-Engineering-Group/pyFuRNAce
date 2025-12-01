@@ -266,6 +266,7 @@ class Strand(Callback):
         if isinstance(other, Strand):
             return (
                 self.positions == other.positions
+                and self.strand == other.strand
                 and self.directionality == other.directionality
             )
         elif isinstance(other, Sequence):

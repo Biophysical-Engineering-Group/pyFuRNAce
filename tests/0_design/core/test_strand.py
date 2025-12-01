@@ -77,6 +77,11 @@ def test_equivalence(strand):
     assert strand == Sequence("AUGC")
     assert strand != 1
     assert strand.__repr__() == "A\\U|G/C"
+    strand_copy = strand.copy()
+    assert strand_copy == strand
+    assert strand_copy is not strand
+    strand_copy = strand_copy.strand[::-1] + "N"
+    assert strand_copy != strand
 
 
 def test_strand_addition(strand):

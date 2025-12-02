@@ -1,3 +1,19 @@
+"""
+Optimize the AE crossover parameters to minimize asymmetry in the AE T matrices.
+This script uses scipy.optimize.minimize to adjust the AE crossover parameters
+(dae_v_shift, dae_rot, dae_hx_shift, dae_hy_shift) to minimize the difference between
+the direct and inverse T matrices of the strands involved in the crossover.
+The code depends on the initial parameters and the helix length used in the crossover.
+Use find_AE.py to visualize and manually adjust parameters before optimization.
+
+Requires pyFuRNAce: pip install pyfurnace
+Author: Luca Monari
+Date: December 2025
+
+Usage:
+    python scripts/optimize_AE_cross.py
+"""
+
 import pyfurnace as pf
 from scipy.optimize import minimize
 import numpy as np

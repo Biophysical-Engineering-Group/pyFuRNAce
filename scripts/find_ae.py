@@ -1,7 +1,13 @@
-###
-### Run this script with:
-### streamlit run scripts/find_ae.py
-###
+"""
+Find AEs in Origami
+This script allows users to interactively find and visualize the parameters for
+antiparallel-even turns (AE) crossovers in RNA origami structures. Users can adjust
+the helix parameters and AE crossover parameters using sliders, and visualize the
+resulting 3D structure with highlighted crossover points.
+
+Usage:
+    streamlit run scripts/find_ae.py
+"""
 
 import pyfurnace as pf
 import numpy as np

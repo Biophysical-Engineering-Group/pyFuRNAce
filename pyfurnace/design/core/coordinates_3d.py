@@ -1378,7 +1378,7 @@ class Coords:
         if use_cached and coord_name in Coords._CACHED_KL180:
             return Coords._CACHED_KL180[coord_name]
 
-        def middle_nucleotide_coords(n1, n2):
+        def middle_nucleotide_coords(n1, n2, rotate_a3_angle=180):
             """
             Compute the coordinates of a middle nucleotide between two nucleotides.
 
@@ -1394,23 +1394,20 @@ class Coords:
             np.ndarray
                 Coordinates of the middle nucleotide (position, base, normal).
             """
-            # Alternative more complex method to compute middle nucleotide coords
-            # p1, b1, n1 = n1[0], n1[1], n1[2]
-            # p2, b2, n2 = n2[0], n2[1], n2[2]
-
-            # r_mid = 0.5 * (p1 + p2)
-
-            # b_mid = (b1 + b2) / np.linalg.norm(b1 + b2)
-
-            # n_raw = (n1 + n2)
-            # # Remove component along b_mid
-            # n_raw_proj = np.dot(n_raw, b_mid) * b_mid
-            # n_ortho = n_raw - n_raw_proj
-            # n_norm = np.linalg.norm(n_ortho)
-            # n_mid = n_ortho / n_norm if n_norm > 0 else n_raw
-
-            # return np.vstack([r_mid, b_mid, n_mid])
-            return (n1 + n2) / 2
+            avg = (n1 + n2) / 2
+            pos = avg[0]
+            bas = avg[1] / np.linalg.norm(avg[1])
+            # normal goes from n1 to n2
+            norm = n2[0] - n1[0]
+            # ensure the normal is orthogonal to the base
+            norm -= np.dot(norm, bas) * bas
+            norm /= np.linalg.norm(norm)
+            angle = np.deg2rad(rotate_a3_angle)
+            rot = R.from_rotvec(bas * angle)
+            # Apply rotation
+            norm_rot = rot.apply(norm)
+            norm_rot /= np.linalg.norm(norm_rot)
+            return np.vstack([pos, bas, norm_rot])
 
         coords = Coords.compute_helix_from_nucl(
             (0, 0, 0),  # start position

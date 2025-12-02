@@ -79,7 +79,7 @@ Citation
 
 If you use pyFuRNAce in your research, please cite:
 
-Monari, L., Braun, I., Poppleton, E. & Göpfrich, K. PyFuRNAce: An integrated design engine for RNA origami. (2025) `doi:10.1101/2025.04.17.647389 <https://doi.org/10.1101/2025.04.17.647389>`_
+Monari, L. et al. PyFuRNAce: an integrated design engine for RNA origami. Nat Commun 16, 10815 (2025). `https://doi.org/10.1038/s41467-025-66290-x <https://doi.org/10.1038/s41467-025-66290-x>`_.
 
 
 .. _license:

@@ -5,6 +5,10 @@ antiparallel-even turns (AE) crossovers in RNA origami structures. Users can adj
 the helix parameters and AE crossover parameters using sliders, and visualize the
 resulting 3D structure with highlighted crossover points.
 
+
+Author: Luca Monari
+Date: December 2025
+
 Usage:
     streamlit run scripts/find_ae.py
 """

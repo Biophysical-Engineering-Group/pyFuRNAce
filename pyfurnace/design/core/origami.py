@@ -2,7 +2,7 @@ import copy
 import json
 from pathlib import Path
 from functools import wraps
-from typing import Any, Dict, List, Tuple, Union, Literal, Callable, Optional
+from typing import Any, Dict, List, Tuple, Union, Literal, Callable, Optional, Type
 
 # pyFuRNAce IMPORTS
 from .symbols import (
@@ -2085,7 +2085,7 @@ class Origami(Callback):
 
     def index(
         self,
-        condition: Union[Callable[[Motif], bool], Motif],
+        condition: Union[Callable[[Motif], bool], Motif, Type[Motif]],
         return_matrix_format: bool = False,
     ) -> Union[List[Tuple[int, int]], List[List[int]]]:
         """
@@ -2093,9 +2093,10 @@ class Origami(Callback):
 
         Parameters
         ----------
-        condition : Callable[[Motif], bool] or Motif
-            A function that takes a Motif and returns True if it matches,
-            or a Motif instance to match directly.
+        condition : Callable[[Motif], bool] or Motif or Type[Motif]
+            - A function that takes a Motif and returns True if it matches,
+            - a Motif instance to match directly (==, e.g. `pf.Tetraloop()`),
+            - or a Motif *class* to match by isinstance (e.g. `pf.Stem`).
         return_matrix_format : bool, default=False
             If True, returns indices in matrix format (row, column),
             otherwise returns a flat list of indices.
@@ -2112,13 +2113,19 @@ class Origami(Callback):
         Raises
         ------
         ValueError
-            If `condition` is neither a callable nor a Motif.
+            If `condition` is not a callable, a Motif instance, or a Motif subclass.
         """
         if isinstance(condition, Motif):
             motif = condition
 
             def condition(m: Motif) -> bool:
                 return m == motif
+
+        elif isinstance(condition, type) and issubclass(condition, Motif):
+            motif_type = condition
+
+            def condition(m: Motif) -> bool:
+                return isinstance(m, motif_type)
 
         # if we submit a function, return the matrix filtered by the function
         elif not hasattr(condition, "__call__"):

@@ -407,6 +407,52 @@ def test_index_by_motif(sample_origami):
     assert sample_origami.index(TetraLoop(open_left=True)) == [(1, 1)]
 
 
+def test_index_by_type(sample_origami):
+    """
+    Test the index function when given a Motif subclass (type)
+    to match by isinstance.
+    """
+    # All TetraLoop instances: (0, 0) and (1, 1)
+    assert sample_origami.index(TetraLoop) == [(0, 0), (1, 1)]
+
+    # All Stem instances: (0, 1) and (1, 0)
+    assert sample_origami.index(Stem) == [(0, 1), (1, 0)]
+
+
+def test_index_by_type_matrix_format(sample_origami):
+    """Test type-based indexing with return_matrix_format=True."""
+    # TetraLoop positions in matrix format
+    result = sample_origami.index(TetraLoop, return_matrix_format=True)
+    # row 0: TetraLoop() at x=0
+    # row 1: TetraLoop(open_left=True) at x=1
+    assert result == [[0], [1]]
+
+    # Stem positions in matrix format
+    result = sample_origami.index(Stem, return_matrix_format=True)
+    # row 0: Stem(2) at x=1
+    # row 1: Stem(3) at x=0
+    assert result == [[1], [0]]
+
+
+def test_index_type_equivalent_to_lambda(sample_origami):
+    """Passing a type should behave like using isinstance in a lambda."""
+    # TetraLoop
+    by_type = sample_origami.index(TetraLoop)
+    by_lambda = sample_origami.index(lambda m: isinstance(m, TetraLoop))
+    assert by_type == by_lambda
+
+    # Stem
+    by_type = sample_origami.index(Stem)
+    by_lambda = sample_origami.index(lambda m: isinstance(m, Stem))
+    assert by_type == by_lambda
+
+
+def test_index_by_base_class(sample_origami):
+    """If you pass the base Motif class, you should get all motifs."""
+    indices = sample_origami.index(Motif)
+    assert sorted(indices) == [(0, 0), (0, 1), (1, 0), (1, 1)]
+
+
 def test_index_by_condition(sample_origami):
     """Test the index function with a condition (lambda function)."""
     # Find all TetraLoop motifs (without considering open_left)
@@ -458,10 +504,10 @@ def test_index_empty_matrix():
 
 def test_index_invalid_condition(sample_origami):
     """Test the index function with invalid condition input."""
-    with pytest.raises(ValueError, match="The condition must be a function or a Motif"):
+    with pytest.raises(ValueError, match="The condition must be a function"):
         sample_origami.index(123)  # Invalid condition type
 
-    with pytest.raises(ValueError, match="The condition must be a function or a Motif"):
+    with pytest.raises(ValueError, match="The condition must be a function"):
         sample_origami.index(None)  # Invalid condition type
 
 

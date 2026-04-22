@@ -236,13 +236,13 @@ class Coords:
     # optimized with a numerical minimization of the asymmetry
 
     # Shift along the base pair plane
-    ae_v_shift = 1.006
+    ae_v_shift = 0.328125
     # Rotation around the helix axis in radians
-    ae_rot = 40.267 * np.pi / 180
+    ae_rot = 40.00415 * np.pi / 180
     # Shift in the helix x direction
-    ae_hx_shift = 2.293
+    ae_hx_shift = 2.48166
     # Shift in the helix y direction
-    ae_hy_shift = -0.5214
+    ae_hy_shift = -0.57016
 
     def __init__(
         self,

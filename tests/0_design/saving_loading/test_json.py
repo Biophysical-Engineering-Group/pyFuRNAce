@@ -77,7 +77,7 @@ def test_motif_to_json_includes_all_attributes():
     assert motif_json["basepair"] == dict()
     assert motif_json["strands"][0]["start"] == "1,2"
     assert motif_json["strands"][0]["direction"] == "1,0"
-    assert motif_json["strands"][0]["strand"] in ("──AUGCUAGCUAGC-", "--AUGCUAGCUAGC-")
+    assert motif_json["strands"][0]["strand"] in ("──AUGCUAGCUAGC─", "--AUGCUAGCUAGC-")
     assert (
         "pyfurnace_version" not in motif_json
     )  # version is added only when saving to file

@@ -16,23 +16,8 @@ Usage:
 
 """
 
-import numpy as np
 import pyfurnace as pf
 import plotly.graph_objects as go
-
-
-def load_oxdna_file(filename):
-    """
-    Load oxDNA-style file where each row has:
-    x y z  bx by bz  nx ny nz
-
-    Lines starting with '#' are treated as comments.
-    """
-    data = np.loadtxt(filename, comments="#")
-    pos = data[:, 0:3]  # x, y, z
-    base = data[:, 3:6]  # bx, by, bz
-    normal = data[:, 6:9]  # nx, ny, nz
-    return pos, base, normal
 
 
 def _make_vector_lines(pos, vec, scale=1.0):

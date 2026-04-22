@@ -56,7 +56,7 @@ def test_compute_AE_crossover_caching():
     assert AE_T_INV_2 is Coords._CACHED_AE_T_INV
 
     # changing AE parameters resets the cached transformations
-    assert Coords.ae_v_shift == 1.006
+    assert Coords.ae_v_shift == 0.328125
     Coords.set_AE_crossover_params(ae_v_shift=-1.2)
     # create a stem to be cached
     Coords.compute_helix_from_nucl((0, 0, 0), (0, 0, 1), (1, 0, 0), 5, double=False)

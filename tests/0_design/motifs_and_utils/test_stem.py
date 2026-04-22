@@ -198,10 +198,11 @@ def test_set_up_sequence_accepts_string_and_rebuilds():
 
 
 def test_set_down_sequence_bug_raises_typeerror():
-    # The method calls set_up_sequence with a wrong keyword; exercise the path.
     st = Stem(length=4, strong_bases=False, wobble_interval=0)
-    with pytest.raises(TypeError):
-        st.set_down_sequence("AUGC")
+
+    st.set_down_sequence("AAUUCCGG")
+    assert str(st[0].sequence) == "CCGGAAUU"  # reverse complement
+    assert str(st[1].sequence) == "AAUUCCGG"
 
 
 # --------------------------------------------------------------------------- #

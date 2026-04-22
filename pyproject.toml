@@ -27,7 +27,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
-    "streamlit>=1.48,<=1.51",
+    "streamlit>=1.48,<=1.56",
     "st-click-detector",
     "streamlit_code_editor",
     "st_forna_component",

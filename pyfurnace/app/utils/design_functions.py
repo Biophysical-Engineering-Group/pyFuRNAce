@@ -1198,7 +1198,7 @@ def update_code(code_text, return_origami=False):
     if origami:
         # select the end of the origami
         st_state.line_index = len(origami) - 1
-        st_state.motif_index = len(origami[-1]) - 1
+        st_state.motif_index = len(origami[-1])  # no motif selected
         st_state.origami = origami
 
     st.success("Nanostructure updated successfully!")

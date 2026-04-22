@@ -1,9 +1,9 @@
 # .coveragerc
 [run]
 branch = True
-source_pkgs =
-    pyfurnace.design
-    pyfurnace.generate
+source =
+    pyfurnace/design
+    pyfurnace/generate
 relative_files = True
 
 [report]

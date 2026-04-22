@@ -670,6 +670,8 @@ class Origami(Callback):
             If tuple of two ints, returns the motif at that position.
             If tuple of two slices, returns a submatrix of motifs.
             If a function, returns a submatrix of motifs that satisfy the function.
+            If a motif class, returns a submatrix of motifs of that class.
+            If a motif instance, returns a submatrix of motifs equal to that instance.
 
         Returns
         -------
@@ -705,6 +707,12 @@ class Origami(Callback):
         ### 1D slice, return the row
         elif isinstance(key, slice) or isinstance(key, int):
             return self._matrix[key]
+
+        elif isinstance(key, type) and issubclass(key, Motif):
+            return [[m for m in row if isinstance(m, key)] for row in self._matrix]
+
+        elif isinstance(key, Motif):
+            return [[m for m in row if m == key] for row in self._matrix]
 
         ### Function, return a 2D list of motifs that satisfy the function
         elif hasattr(key, "__call__"):
@@ -798,7 +806,7 @@ class Origami(Callback):
             y_int = key % len(self._matrix)
 
             y_slice = slice(y_int, y_int + 1)
-            x_slice = slice(0, len(self._matrix[key]))
+            x_slice = slice(0, len(self._matrix[y_int]))
 
         # the key is a tuples of ints, we select a single motif
         elif isinstance(key, (tuple, list)) and all(isinstance(i, int) for i in key):
@@ -838,9 +846,9 @@ class Origami(Callback):
             and isinstance(key[1], int)
         ):
             key_dimension = 2  # still select a 2D region, but VERTICAL
-            x_int = key[1] % len(self._matrix[key[0]])
 
             y_slice = key[0]
+            x_int = key[1] % len(self._matrix[y_slice.start])
             x_slice = slice(x_int, x_int + 1)
 
         else:
@@ -1836,6 +1844,37 @@ class Origami(Callback):
             return origami_lines
         return "\n".join(origami_lines)
 
+    def clear_sequence(
+        self,
+        clear_kissing_loops: bool = True,
+        clear_tetraloops: bool = False,
+    ) -> None:
+        """
+        Clear the sequences of all stems in the origami, resetting it
+        to the default state.
+
+        Parameters
+        ----------
+        clear_tetraloops : bool, default=True
+            Whether to clear the sequences of tetraloops.
+        clear_kissing_loops : bool, default=True
+            Whether to clear the sequences of kissing loops.
+
+        Returns
+        -------
+        None
+        """
+        from ..motifs import Stem, KissingLoop, TetraLoop
+
+        for line in self._matrix:
+            for motif in line:
+                if isinstance(motif, Stem):
+                    motif.length = motif.length
+                elif isinstance(motif, KissingLoop) and clear_kissing_loops:
+                    motif.set_sequence("N" * len(motif.get_kissing_sequence()))
+                elif isinstance(motif, TetraLoop) and clear_tetraloops:
+                    motif.set_sequence("N" * len(motif.sequence))
+
     def copy(self) -> "Origami":
         """
         Create a deep copy of the Origami.
@@ -1898,13 +1937,13 @@ class Origami(Callback):
     def folding_barriers(self, kl_delay: int = 150) -> Tuple[str, int]:
         return self.assembled.folding_barriers(kl_delay=kl_delay)
 
-    def get_motif_at_position(self, position: Tuple[int, int]) -> Motif:
+    def get_motif_at_position(self, position: Position) -> Motif:
         """
         Get a motif from its position in 2D coordinates.
 
         Parameters
         ----------
-        position : tuple of int
+        position : Position
             Global coordinate (x, y) in the assembled structure.
 
         Returns
@@ -1918,16 +1957,17 @@ class Origami(Callback):
             If the position is not valid or not found in the map.
         """
         if (
-            not isinstance(position, (tuple, list))
-            or len(position) < 2
-            or not all(isinstance(i, int) for i in position)
+            isinstance(position, tuple)
+            and len(position) > 2
+            and all(isinstance(coord, int) for coord in position)
         ):
+            position = Position(position)
+        elif not isinstance(position, Position):
             raise ValueError(
-                f"The position must be a tuple of two integers,"
-                f" but {position} was given."
+                f"The position must be a Position object or a tuple of integers,"
+                f" but {position} was given (type: {type(position)})."
             )
 
-        position = tuple(position)
         if position not in self.pos_index_map:
             raise ValueError(
                 f"The position {position} is not in the map" f" of the origami."

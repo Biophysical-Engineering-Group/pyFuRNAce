@@ -6,7 +6,7 @@ from pyfurnace.design.core import (
     dot_bracket_to_tree,
     dot_bracket_to_pair_map,
 )
-from pyfurnace.design.motifs import Stem, TetraLoop
+from pyfurnace.design.motifs import Stem, KissingLoop, TetraLoop
 from pyfurnace.design.utils import simple_origami
 
 
@@ -778,3 +778,54 @@ def test_improve_folding_pathway():
     new_bar, new_penalty = origami.folding_barriers()
     assert new_penalty < penalty
     assert new_penalty == 24
+
+
+def test_clear_sequence_resets_stems_and_kissing_loops_but_not_tetraloops():
+    stem = Stem(sequence="AUGC")
+    kl = KissingLoop(sequence="AUGCAAAA")
+    tl = TetraLoop(sequence="GAAA")
+
+    origami = Origami([[stem, kl, tl]])
+
+    stem_seq_before = str(stem.sequence)
+    tl_seq_before = str(tl.sequence)
+
+    origami.clear_sequence()
+
+    # Stem should be reset
+    assert str(origami[0, 0].sequence) != stem_seq_before
+
+    # Kissing loop should be cleared by default
+    assert str(origami[0, 1].get_kissing_sequence()) == "N" * len(
+        origami[0, 1].get_kissing_sequence()
+    )
+
+    # Tetraloop should stay unchanged by default
+    assert str(origami[0, 2].sequence) == tl_seq_before
+
+
+def test_clear_sequence_can_also_clear_tetraloops():
+    stem = Stem(sequence="AUGC")
+    kl = KissingLoop(sequence="AUGCAAAA")
+    tl = TetraLoop(sequence="GAAA")
+
+    origami = Origami([[stem, kl, tl]])
+
+    origami.clear_sequence(clear_tetraloops=True)
+
+    # Tetraloop should now be cleared too
+    assert str(origami[0, 2].sequence) == "N" * len(origami[0, 2].sequence)
+
+
+def test_clear_sequence_can_leave_kissing_loops_unchanged():
+    stem = Stem(sequence="AUGC")
+    kl = KissingLoop(sequence="AUGCAAAA")
+    tl = TetraLoop(sequence="GAAA")
+
+    origami = Origami([[stem, kl, tl]])
+
+    kl_seq_before = str(origami[0, 1].sequence)
+
+    origami.clear_sequence(clear_kissing_loops=False)
+
+    assert str(origami[0, 1].sequence) == kl_seq_before

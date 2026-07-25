@@ -6,10 +6,12 @@ from pyfurnace.design import (
     KissingLoop,
     KissingLoop120,
     KissingLoop180,
+    AlphaKissingLoop,
     BranchedKissingLoop,
     KissingDimer,
     KissingDimer120,
     BranchedDimer,
+    AlphaKissingDimer,
 )
 
 # --- base KissingLoop ---------------------------------------------------------
@@ -114,6 +116,8 @@ def test_get_and_set_sequence_roundtrip():
         KissingDimer,
         KissingDimer120,
         BranchedDimer,
+        AlphaKissingLoop,
+        AlphaKissingDimer,
     ]:
         seq1 = "GGGUUA"
         seq2 = "CCCGGG"
@@ -122,11 +126,15 @@ def test_get_and_set_sequence_roundtrip():
         if kl_mot in (KissingLoop, KissingDimer120):
             seq1 = "GGGUUAC"
             seq2 = "CCCGGGU"
-        if kl_mot in (KissingDimer, KissingDimer120):
+        elif kl_mot in (AlphaKissingLoop, AlphaKissingDimer):
+            seq1 = "GGUA"
+            seq2 = "CCAU"
+        if kl_mot in (KissingDimer, KissingDimer120, AlphaKissingDimer):
             open_left = False  # dimers always closed
 
         kl = kl_mot(open_left=open_left, sequence=seq1)
         kl.set_sequence(seq2)
+        print(kl_mot.__name__)
         assert str(kl.get_kissing_sequence()) == seq2
         assert kl == kl_mot(open_left=open_left, sequence=seq2)
 
@@ -140,6 +148,8 @@ def test_pk_index_setter():
         KissingDimer,
         KissingDimer120,
         BranchedDimer,
+        AlphaKissingLoop,
+        AlphaKissingDimer,
     ]:
         open_left = True
         kl = kl_mot(open_left=open_left)
@@ -150,7 +160,7 @@ def test_pk_index_setter():
         # check that all strands with pk_info have correct ids
         assert kl[0].pk_info["id"][0] == "3'"
         assert kl[0].strand == kl_mot(open_left=open_left)[0]
-        if len(kl) > 1:
+        if len(kl) > 1 and not isinstance(kl, AlphaKissingDimer):
             for s in kl[1:]:
                 if hasattr(s, "pk_info") and getattr(s, "pk_info"):
                     assert s.pk_info["id"][0] == "3"

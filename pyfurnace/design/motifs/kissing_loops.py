@@ -7,7 +7,9 @@ from typing import Optional, Union, List
 from . import CONFS_PATH
 from ..core.coordinates_3d import Coords
 from ..core.sequence import Sequence
+from ..core.motif import Motif
 from ..core.strand import Strand
+from ..core import LEFT, RIGHT, DOWN
 from .loops import Loop
 
 ### File Location for the kissing loop energy dictionaries
@@ -122,6 +124,7 @@ class KissingLoop(Loop):
                     assigned = True
                 else:
                     s.pk_info["id"] = [complementary_index]
+        self._trigger_callbacks()
 
     @property
     def energy_tolerance(self):
@@ -138,7 +141,7 @@ class KissingLoop(Loop):
             raise ValueError("The energy tolerance should be a positive number.")
         self._energy_tolerance = new_energy_tolerance
         for strand in self:
-            if hasattr(strand, "pk_info"):
+            if hasattr(strand, "pk_info") and strand.pk_info:
                 strand.pk_info["dE"] = [new_energy_tolerance]
         self._trigger_callbacks()
 
@@ -153,7 +156,7 @@ class KissingLoop(Loop):
         new_energy = round(float(new_energy), 2)
         self._energy = new_energy
         for strand in self:
-            if hasattr(strand, "pk_info"):
+            if hasattr(strand, "pk_info") and strand.pk_info:
                 strand.pk_info["E"] = [new_energy]
         self._trigger_callbacks()
 
@@ -210,6 +213,7 @@ class KissingLoop(Loop):
         return_strand: bool = False,
         pk_index: Optional[Union[str, int]] = None,
         fold_180kl: bool = False,
+        sequence_wrapper: Optional[List[str]] = None,
         only_sequence: bool = False,
     ) -> Union[None, List[Strand]]:
         """
@@ -226,6 +230,9 @@ class KissingLoop(Loop):
             The pseudoknot index for the kissing loop (default is None).
         fold_180kl : bool, default is False
             If True, folds the kissing loop as a 180-degree loop.
+        sequence_wrapper : Optional[List[str, str]], default is None
+            If provided, the sequence will be wrapped between the
+            two strings in the list.
         only_sequence : bool, default is False
             If True, only updates the sequence of the existing strand without
             recreating it (default is False).
@@ -271,8 +278,8 @@ class KissingLoop(Loop):
 
         # if the strands are already created, just update the sequence
         if only_sequence:
-            if fold_180kl:
-                sequence = "AA" + sequence + "A"
+            if sequence_wrapper:
+                sequence = sequence_wrapper[0] + sequence + sequence_wrapper[1]
             self._strands[0].sequence = sequence
             self._strands[0].pk_info["id"] = [self._pk_index]
             self._strands[0].pk_info["E"] = [self._energy]
@@ -431,6 +438,7 @@ class KissingLoop180(KissingLoop):
             return_strand=True,
             pk_index=pk_index,
             fold_180kl=True,
+            sequence_wrapper=["AA", "A"],
             only_sequence=only_sequence,
         )[0]
 
@@ -446,6 +454,126 @@ class KissingLoop180(KissingLoop):
 
         # replace the strands
         self.replace_all_strands([strand], copy=False, join=False)
+
+
+class AlphaKissingLoop(KissingLoop):
+    """
+    Alpha kissing loop motif with idealized helical geometry.
+    Designed by Cody Geary.
+
+    Parameters
+    ----------
+    open_left : bool, optional
+        Whether the loop is open on the left. Default is False.
+    sequence : str, optional
+        RNA sequence for the motif. Default is an empty string.
+    pk_index : str or int, optional
+        Pseudoknot index for identification. Default is '0'.
+    energy : float, optional
+        Free energy of the motif. Default is -8.5.
+    energy_tolerance : float, optional
+        Acceptable energy deviation. Default is 1.0.
+    **kwargs : dict
+        Additional keyword arguments.
+    """
+
+    _KL_coords = Coords.load_from_file(
+        CONFS_PATH / "AlphaKissingLoop1.dat",
+    )
+    _KL_coords1_2 = Coords.load_from_file(
+        CONFS_PATH / "AlphaKissingLoop2.dat",
+    )
+
+    def __init__(
+        self,
+        open_left: bool = False,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -4.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        kwargs["seq_len"] = 4
+        super().__init__(
+            open_left=open_left,
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
+
+    def get_kissing_sequence(self):
+        """Returns the kissing sequence of the kissing loop"""
+        return super().get_kissing_sequence()[4:8]
+
+    def _create_strands(
+        self,
+        sequence: str = "",
+        return_strand: bool = False,
+        pk_index: int = 0,
+        only_sequence: bool = False,
+    ):
+        """
+        Protected class that takes a sequence and a pk_index and creates a strand
+        with the kissing loop structure and metadata.
+
+        Parameters
+        ----------
+        sequence : str, optional
+            The sequence for the kissing loop strand (default is "").
+        return_strand : bool, default is False
+            If True, returns the created strand instead of replacing it in the motif.
+        pk_index : str or int, optional
+            The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            If True, only updates the sequence of the existing strand without
+            recreating it (default is False).
+
+        Returns
+        -------
+        List[Strand] or None
+            Returns a list containing the created strand if `return_strand` is True.
+            Otherwise, it replaces the existing strands in the motif and returns None.
+        """
+        strand = super()._create_strands(
+            sequence,
+            return_strand=True,
+            pk_index=pk_index,
+            fold_180kl=True,
+            sequence_wrapper=["GGUG", "AAAUUC"],
+            only_sequence=only_sequence,
+        )[0]
+
+        if not only_sequence:
+            if not sequence:
+                sequence = "NNNN"
+            # try to catch if it's open left... seems to not be an issue
+            # keep it here just in case
+            # open_left = strand.direction == LEFT
+
+            # modify the strand start position and pk_info
+            strand.start = (0, 3)
+            strand.direction = RIGHT
+            strand.strand = f"─GGU─╯╭─┼──G╯│╮─{sequence}───A╭╰AAU──╮┼╰─UC──"
+            strand.pk_info["ind_fwd"] = [(4, 7)]
+
+            strand1 = Strand(
+                "──GA─────GCC─",
+                start=(12, 5),
+                direction=LEFT,
+                coords=self._KL_coords1_2.copy(),
+            )
+        else:
+            strand1 = self._strands[1]
+
+        strands = [strand, strand1]
+        # if we don't want to replace the strands, just return the strand
+        if return_strand:
+            return strands
+
+        # replace the strands
+        self.replace_all_strands(strands, copy=False, join=False)
 
 
 class BranchedKissingLoop(KissingLoop):
@@ -540,6 +668,7 @@ class BranchedKissingLoop(KissingLoop):
             pk_index=pk_index,
             only_sequence=only_sequence,
         )[0]
+        strand._coords = self._KL_coords.copy()
 
         if not only_sequence:
             # create the strand
@@ -909,6 +1038,131 @@ class BranchedDimer(BranchedKissingLoop):
             self[0].pk_info["E"] = [self._energy]
             self[0].pk_info["dE"] = [self._energy_tolerance]
             strands = self._strands
+
+        if return_strand:
+            return strands
+
+        # replace the strands
+        self.replace_all_strands(strands, copy=False, join=False)
+
+    def set_up_sequence(self, new_seq: Union[str, Sequence]):
+        """Set the sequence of the top strand"""
+        self.set_sequence(new_seq)
+
+    def set_down_sequence(self, new_seq: Union[str, Sequence]):
+        """Set the sequence of the bottom strand"""
+        new_seq = Sequence(new_seq, self[1].directionality)
+        self.set_sequence(new_seq.reverse_complement())
+
+
+class AlphaKissingDimer(AlphaKissingLoop):
+    """
+    Alpha kissing loop dimer with top and bottom interactions.
+
+    Parameters
+    ----------
+    sequence : str, optional
+        Sequence for the top kissing strand. Default is "".
+    pk_index : str or int, optional
+        Identifier for the pseudoknot. Default is '0'.
+    energy : float, optional
+        Free energy of the motif. Default is -8.5.
+    energy_tolerance : float, optional
+        Energy tolerance threshold. Default is 1.0.
+    **kwargs : dict
+        Additional keyword arguments.
+    """
+
+    _KL_coords2_1 = Coords.load_from_file(
+        CONFS_PATH / "AlphaDimer1.dat",
+    )
+    _KL_coords2_2 = Coords.load_from_file(
+        CONFS_PATH / "AlphaDimer2.dat",
+    )
+
+    def __init__(
+        self,
+        sequence: str = "",
+        pk_index: str | int = "0",
+        energy: float = -4.5,
+        energy_tolerance: float = 1.0,
+        **kwargs,
+    ):
+        super().__init__(
+            sequence=sequence,
+            pk_index=pk_index,
+            energy=energy,
+            energy_tolerance=energy_tolerance,
+            **kwargs,
+        )
+
+    ###
+    ### METHODS
+    ###
+
+    def _create_strands(
+        self, sequence="", return_strand=False, pk_index=0, only_sequence: bool = False
+    ):
+        """
+        Protected class that takes a sequence and a pk_index and creates a strand
+        with the kissing loop structure and metadata.
+
+        Parameters
+        ----------
+        sequence : str, optional
+            The sequence for the kissing loop strand (default is "").
+        return_strand : bool, default is False
+            If True, returns the created strand instead of replacing it in the motif.
+        pk_index : str or int, optional
+            The pseudoknot index for the kissing loop (default is None).
+        only_sequence : bool, default is False
+            If True, only updates the sequence of the existing strand
+            without creating a new one (default is False).
+
+        Returns
+        -------
+        List[Strand] or None
+            Returns a list containing the created strand if `return_strand` is True.
+            Otherwise, it replaces the existing strands in the motif and returns None.
+        """
+        # avoid circular import
+        from ..utils.motif_lib import stem_cap_link
+
+        if not sequence:
+            sequence = Sequence("N" * self._seq_len, directionality="53")
+        elif not isinstance(sequence, Sequence):
+            sequence = Sequence(sequence, directionality="53")
+
+        rev_comp = sequence.reverse_complement()
+
+        if only_sequence:
+            # metti al primo posto il branched KL
+            self._strands[0].sequence = f"GGUG{sequence}AAAUUC"
+            self._strands[2].sequence = f"GGUG{rev_comp}AAAUUC"
+            strands = self._strands
+        else:
+            alpha1 = AlphaKissingLoop(
+                open_left=True,
+                sequence=sequence,
+                pk_index=pk_index,
+                energy=self._energy,
+                energy_tolerance=self._energy_tolerance,
+            )
+            alpha2 = AlphaKissingLoop(
+                open_left=False,
+                sequence=rev_comp,
+                pk_index=pk_index,
+                energy=self._energy,
+                energy_tolerance=self._energy_tolerance,
+            )
+            alpha2 = Motif.concat(
+                stem_cap_link(), alpha2, stem_cap_link(hflip=1), copy=False
+            )
+            alpha1.shift(RIGHT * 5)
+            alpha2[0]._coords = self._KL_coords2_1.copy()
+            alpha2[1]._coords = self._KL_coords2_2.copy()
+            alpha2.shift(DOWN * 7)
+            strands = [alpha1[0], alpha1[1], alpha2[0], alpha2[1]]
 
         if return_strand:
             return strands

@@ -19,6 +19,8 @@ MOTIF_ICONS = {
     "BranchedKissingLoop": "bi bi-align-top",
     "BranchedDimer": "bi bi-tree",
     "KissingDimer120": "bi bi-send",
+    "AlphaKissingLoop": "bi bi-pentagon-half",
+    "AlphaKissingDimer": "bi bi-pentagon",
     # Common aptamers
     "Broccoli": "bi bi-lightbulb",
     "Pepper": "bi bi-stoplights",

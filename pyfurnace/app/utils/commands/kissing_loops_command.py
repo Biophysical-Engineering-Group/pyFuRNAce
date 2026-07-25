@@ -15,6 +15,8 @@ kl_name_map = {
     "120°": "KissingLoop120",
     "Branched Dimer": "BranchedDimer",
     "Branched KL": "BranchedKissingLoop",
+    "Alpha KL": "AlphaKissingLoop",
+    "Alpha Dimer": "AlphaKissingDimer",
 }
 
 
@@ -122,6 +124,8 @@ class KissingLoopsCommand(MotifCommand):
                 all_pk_indexes.append(str(last_ind) + "'")
             all_pk_indexes.append(str(last_ind + 1))
             if default_pk_index is not None:
+                if default_pk_index not in all_pk_indexes:
+                    all_pk_indexes.append(default_pk_index)
                 index_for_list = all_pk_indexes.index(default_pk_index)
             else:
                 index_for_list = len(all_pk_indexes) - 1
